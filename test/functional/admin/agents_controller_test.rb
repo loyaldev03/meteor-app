@@ -266,6 +266,21 @@ class Admin::AgentsControllerTest < ActionController::TestCase
   # CLUBS ROLES
   ##################################################### 
 
+  def prepare_agents_with_club_roles
+    @agent_club_role_admin = FactoryGirl.create(:agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.role = "admin"
+    club_role.agent_id = @agent_club_role_admin.id
+    club_role.save
+    @agent_club_role_admin2 = FactoryGirl.create(:agent)
+    club2 = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club2.id
+    club_role.role = "admin"
+    club_role.agent_id = @agent_club_role_admin2.id
+    club_role.save
+  end
+
   test "agent with club roles different from admin should not should not get index" do
     sign_in(@agent)
     club = FactoryGirl.create(:simple_club_with_gateway)
@@ -356,21 +371,6 @@ class Admin::AgentsControllerTest < ActionController::TestCase
       delete :destroy, id: @agent
       assert_response :unauthorized
     end
-  end
-
-  def prepare_agents_with_club_roles
-    @agent_club_role_admin = FactoryGirl.create(:agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
-    club_role = ClubRole.new :club_id => club.id
-    club_role.role = "admin"
-    club_role.agent_id = @agent_club_role_admin.id
-    club_role.save
-    @agent_club_role_admin2 = FactoryGirl.create(:agent)
-    club2 = FactoryGirl.create(:simple_club_with_gateway)
-    club_role = ClubRole.new :club_id => club2.id
-    club_role.role = "admin"
-    club_role.agent_id = @agent_club_role_admin2.id
-    club_role.save
   end
 
   test "agent with club roles admin should get index" do

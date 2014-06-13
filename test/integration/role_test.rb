@@ -81,439 +81,439 @@ class RolesTest < ActionController::IntegrationTest
   #ADMIN
   ##############################################################
 
-#   test "select all clubs for admin agent."do
-#     setup_admin
-#     partner = FactoryGirl.create(:partner)
-#     10.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-#     find("#my_clubs").click
+  test "select all clubs for admin agent."do
+    setup_admin
+    partner = FactoryGirl.create(:partner)
+    10.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    find("#my_clubs").click
 
-#     within("#change_partner")do
-#       Club.all.each do |club|
-#         assert page.has_content?("#{club.partner.prefix} - #{club.name}")
-#       end
-#     end
-#   end
+    within("#change_partner")do
+      Club.all.each do |club|
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
+      end
+    end
+  end
 
-#   test "Agent admin can assign role_clubs, when there are no global roles" do
-#     setup_admin
-#     setup_member false
-#     @agent_no_role = FactoryGirl.create :confirmed_agent
-#     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
-#     club1 = Club.first
-#     club2 = Club.find(2)
-#     club3 = Club.find(3)
-#     club_last = Club.last
-#     visit edit_admin_agent_path(@agent_no_role.id)
-#     within(".table-condensed")do
-#       click_link_or_button 'Add'
-#       select('admin', :from => '[club_roles_attributes][1][role]')
-#       select(club1.name, :from => '[club_roles_attributes][1][club_id]')
-#     end
-#     click_link_or_button 'Update Agent'
-#     click_link_or_button 'Edit'
-#     within(".table-condensed")do
-#       click_link_or_button 'Add'
-#       select('supervisor', :from => '[club_roles_attributes][1][role]')
-#       select(club2.name, :from => '[club_roles_attributes][1][club_id]')
-#     end
-#     click_link_or_button 'Update Agent'
-#     click_link_or_button 'Edit'
-#     within(".table-condensed")do
-#       click_link_or_button 'Add'
-#       select('representative', :from => '[club_roles_attributes][1][role]')
-#       select(club3.name, :from => '[club_roles_attributes][1][club_id]')
-#     end
-#     click_link_or_button 'Update Agent'
-#     assert page.has_content?("admin for")
-#     assert page.has_content?("supervisor for")
-#     assert page.has_content?("representative for")
-#   end
+  test "Agent admin can assign role_clubs, when there are no global roles" do
+    setup_admin
+    setup_member false
+    @agent_no_role = FactoryGirl.create :confirmed_agent
+    7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+    club1 = Club.first
+    club2 = Club.find(2)
+    club3 = Club.find(3)
+    club_last = Club.last
+    visit edit_admin_agent_path(@agent_no_role.id)
+    within(".table-condensed")do
+      click_link_or_button 'Add'
+      select('admin', :from => '[club_roles_attributes][1][role]')
+      select(club1.name, :from => '[club_roles_attributes][1][club_id]')
+    end
+    click_link_or_button 'Update Agent'
+    click_link_or_button 'Edit'
+    within(".table-condensed")do
+      click_link_or_button 'Add'
+      select('supervisor', :from => '[club_roles_attributes][1][role]')
+      select(club2.name, :from => '[club_roles_attributes][1][club_id]')
+    end
+    click_link_or_button 'Update Agent'
+    click_link_or_button 'Edit'
+    within(".table-condensed")do
+      click_link_or_button 'Add'
+      select('representative', :from => '[club_roles_attributes][1][role]')
+      select(club3.name, :from => '[club_roles_attributes][1][club_id]')
+    end
+    click_link_or_button 'Update Agent'
+    assert page.has_content?("admin for")
+    assert page.has_content?("supervisor for")
+    assert page.has_content?("representative for")
+  end
 
-#   test "Admin should see full breadcrumb" do
-#     setup_admin
-#     setup_member
+  test "Admin should see full breadcrumb" do
+    setup_admin
+    setup_member
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     within(".breadcrumb")do
-#       assert page.has_content?("Partner")
-#       assert page.has_content?("Club")
-#       assert page.has_content?("Show")
-#     end
-#   end
+    within(".breadcrumb")do
+      assert page.has_content?("Partner")
+      assert page.has_content?("Club")
+      assert page.has_content?("Show")
+    end
+  end
 
-#   test "Admin should be able to destroy a credit card" do
-#     setup_admin
-#     setup_member
-#     @saved_member.set_as_canceled!
-#     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
+  test "Admin should be able to destroy a credit card" do
+    setup_admin
+    setup_member
+    @saved_member.set_as_canceled!
+    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     within('.nav-tabs'){ click_on('Credit Cards')}
-#     within("#credit_cards") do
-#       assert page.has_selector?("#destroy")
-#     end
-#   end
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do
+      assert page.has_selector?("#destroy")
+    end
+  end
 
-#   test "Admin role - Recover a member" do
-#     setup_admin
-#     setup_member
-#     @saved_member.set_as_canceled!
+  test "Admin role - Recover a member" do
+    setup_admin
+    setup_member
+    @saved_member.set_as_canceled!
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     find(:xpath, "//a[@id='recovery']").click
-#     assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
-#   end
+    find(:xpath, "//a[@id='recovery']").click
+    assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
+  end
 
-#   ##############################################################
-#   #SUPERVISOR
-#   ##############################################################
+  ##############################################################
+  #SUPERVISOR
+  ##############################################################
 
-#   # Select only clubs related to supervisor agent.
-#   test "select every club when member has global role 'supervisor'" do
-#     setup_supervisor
-#     partner = FactoryGirl.create(:partner)
-#     7.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-#     find("#my_clubs").click
+  # Select only clubs related to supervisor agent.
+  test "select every club when member has global role 'supervisor'" do
+    setup_supervisor
+    partner = FactoryGirl.create(:partner)
+    7.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    find("#my_clubs").click
 
-#     within("#change_partner")do
-#       Club.all.each do |club|
-#         assert page.has_content?("#{club.partner.prefix} - #{club.name}")
-#       end
-#     end
-#     within("#my_clubs_table")do
-#       Club.all.each {|club| assert page.has_content?(club.name) }
-#     end
-#   end
+    within("#change_partner")do
+      Club.all.each do |club|
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
+      end
+    end
+    within("#my_clubs_table")do
+      Club.all.each {|club| assert page.has_content?(club.name) }
+    end
+  end
 
-#   test "Supervisor should see full breadcrumb" do
-#     setup_supervisor
-#     setup_member
+  test "Supervisor should see full breadcrumb" do
+    setup_supervisor
+    setup_member
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     within(".breadcrumb")do
-#       assert page.has_no_content?("Partner")
-#       assert page.has_no_content?("Club")
-#       assert page.has_content?("Show")
-#     end
-#   end
+    within(".breadcrumb")do
+      assert page.has_no_content?("Partner")
+      assert page.has_no_content?("Club")
+      assert page.has_content?("Show")
+    end
+  end
 
-#   # Profile Supervisor - "Add a Credit Card" 
-#   test "Profile Supervisor - Add a Credit Card" do
-#     setup_supervisor
-#     setup_member
-#     credit_card = FactoryGirl.build(:credit_card_american_express)
+  # Profile Supervisor - "Add a Credit Card" 
+  test "Profile Supervisor - Add a Credit Card" do
+    setup_supervisor
+    setup_member
+    credit_card = FactoryGirl.build(:credit_card_american_express)
 
-#     add_credit_card(@saved_member,credit_card)
+    add_credit_card(@saved_member,credit_card)
 
-#     credit_card = CreditCard.last
-#     page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
-#   end
+    credit_card = CreditCard.last
+    page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
+  end
 
-#   test "Profile Supervisor - Delete Credit Card" do
-#     setup_supervisor
-#     setup_member
-#     @saved_member.set_as_canceled!
-#     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
+  test "Profile Supervisor - Delete Credit Card" do
+    setup_supervisor
+    setup_member
+    @saved_member.set_as_canceled!
+    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     within('.nav-tabs'){ click_on('Credit Cards')}
-#     within("#credit_cards") do 
-#       assert page.has_selector?("#destroy")
-#     end
-#   end
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do 
+      assert page.has_selector?("#destroy")
+    end
+  end
 
-#   test "Mark a member as 'wrong address' - Supervisor Role" do
-#     setup_supervisor
-#     setup_member(@agent)
-#     5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+  test "Mark a member as 'wrong address' - Supervisor Role" do
+    setup_supervisor
+    setup_member(@agent)
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
 
-#     set_as_undeliverable_member(@saved_member,'reason')
+    set_as_undeliverable_member(@saved_member,'reason')
 
-#     within("#table_demographic_information")do
-#       assert page.has_css?('tr.yellow')
-#     end 
-#     @saved_member.reload
+    within("#table_demographic_information")do
+      assert page.has_css?('tr.yellow')
+    end 
+    @saved_member.reload
 
-#     @saved_member.fulfillments do |fulfillment|
-#       assert_equal fulfillment.status, 'bad_address'
-#     end
-#   end
+    @saved_member.fulfillments do |fulfillment|
+      assert_equal fulfillment.status, 'bad_address'
+    end
+  end
 
-#   test "Supervisor role - Recover a member" do
-#     setup_supervisor
-#     setup_member
-#     @saved_member.set_as_canceled!
+  test "Supervisor role - Recover a member" do
+    setup_supervisor
+    setup_member
+    @saved_member.set_as_canceled!
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     find(:xpath, "//a[@id='recovery']").click
-#     assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
-#   end
+    find(:xpath, "//a[@id='recovery']").click
+    assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
+  end
 
-#   test "supervisor should be able to refund" do
-#     setup_supervisor
-#     setup_member
+  test "supervisor should be able to refund" do
+    setup_supervisor
+    setup_member
     
-#     bill_member(@saved_member, true)
-#   end
+    bill_member(@saved_member, true)
+  end
 
-#   ##############################################################
-#   # REPRESENTATIVE
-#   ##############################################################
+  ##############################################################
+  # REPRESENTATIVE
+  ##############################################################
 
-#   # Select only clubs related to representative agent.
-#   test "select every club when member has global role 'representative'" do
-#     setup_representative
-#     partner = FactoryGirl.create(:partner)
-#     10.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
-#     find("#my_clubs").click
+  # Select only clubs related to representative agent.
+  test "select every club when member has global role 'representative'" do
+    setup_representative
+    partner = FactoryGirl.create(:partner)
+    10.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    find("#my_clubs").click
 
-#     within("#change_partner")do
-#       Club.all.each do |club|
-#         assert page.has_content?("#{club.partner.prefix} - #{club.name}")
-#       end
-#     end
-#   end
+    within("#change_partner")do
+      Club.all.each do |club|
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
+      end
+    end
+  end
 
-#   test "Representative should not see full breadcrumb" do
-#     setup_representative
-#     setup_member
+  test "Representative should not see full breadcrumb" do
+    setup_representative
+    setup_member
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     within(".breadcrumb")do
-#       assert page.has_no_content?("Partner")
-#       assert page.has_no_content?("Club")
-#       assert page.has_content?("Show")
-#     end
-#   end
+    within(".breadcrumb")do
+      assert page.has_no_content?("Partner")
+      assert page.has_no_content?("Club")
+      assert page.has_content?("Show")
+    end
+  end
 
-#   #Do not allow Mark a member as "wrong address" - Representative Role
-#   test "Profile Representative - Delete Credit Card" do
-#     setup_representative
-#     setup_member
-#     @saved_member.set_as_canceled!
-#     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
+  #Do not allow Mark a member as "wrong address" - Representative Role
+  test "Profile Representative - Delete Credit Card" do
+    setup_representative
+    setup_member
+    @saved_member.set_as_canceled!
+    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     assert find(:xpath, "//a[@id='link_member_set_undeliverable' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='link_member_set_undeliverable' and @disabled='disabled']")
 
-#     within('.nav-tabs'){ click_on('Credit Cards')}
-#     within("#credit_cards") do
-#       assert page.has_no_selector?("#destroy")
-#     end
-#   end
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do
+      assert page.has_no_selector?("#destroy")
+    end
+  end
 
-#   # Profile representative
-#   test "Representative should only see credit card last digits" do
-#     setup_representative
-#     setup_member
-#     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
+  # Profile representative
+  test "Representative should only see credit card last digits" do
+    setup_representative
+    setup_member
+    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     within("#table_active_credit_card") do
-#         assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
-#         assert page.has_no_content?("#{@saved_member.active_credit_card.token}")
-#     end
+    within("#table_active_credit_card") do
+        assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
+        assert page.has_no_content?("#{@saved_member.active_credit_card.token}")
+    end
 
-#     within('.nav-tabs'){ click_on 'Credit Cards'}
-#     within('.tab-content') do
-#       within("#credit_cards") do
-#           assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
-#           assert page.has_no_content?("#{@saved_member.active_credit_card.token}")
-#       end
-#     end
-#     visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-#     assert page.has_selector?("#new_member")
-#   end
+    within('.nav-tabs'){ click_on 'Credit Cards'}
+    within('.tab-content') do
+      within("#credit_cards") do
+          assert page.has_content?("#{@saved_member.active_credit_card.last_digits}")
+          assert page.has_no_content?("#{@saved_member.active_credit_card.token}")
+      end
+    end
+    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert page.has_selector?("#new_member")
+  end
 
-#   # Profile Representative - "Add a Credit Card" 
-#   test "Profile Representative - Add a Credit Card" do
-#     setup_representative
-#     setup_member
-#     credit_card = FactoryGirl.build(:credit_card_american_express)
+  # Profile Representative - "Add a Credit Card" 
+  test "Profile Representative - Add a Credit Card" do
+    setup_representative
+    setup_member
+    credit_card = FactoryGirl.build(:credit_card_american_express)
 
-#     add_credit_card(@saved_member,credit_card)
+    add_credit_card(@saved_member,credit_card)
 
-#     credit_card = CreditCard.last
-#     page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
-#   end
+    credit_card = CreditCard.last
+    page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
+  end
 
-#   test "Representative role - Recover a member" do
-#     setup_representative
-#     setup_member
-#     @saved_member.set_as_canceled!
+  test "Representative role - Recover a member" do
+    setup_representative
+    setup_member
+    @saved_member.set_as_canceled!
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     find(:xpath, "//a[@id='recovery']").click
-#     assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
-#   end
+    find(:xpath, "//a[@id='recovery']").click
+    assert page.has_content?("Today in: #{@saved_member.current_membership.terms_of_membership.name}")
+  end
 
 
-#    ###############################################################
-#    ## API
-#    ###############################################################
+   ###############################################################
+   ## API
+   ###############################################################
 
-#   #should show every club when api global role.
-#   test "Should show agent's related club_roles, when agent has api global role."do
-#     setup_api
-#     partner = FactoryGirl.create(:partner)
-#     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+  #should show every club when api global role.
+  test "Should show agent's related club_roles, when agent has api global role."do
+    setup_api
+    partner = FactoryGirl.create(:partner)
+    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
 
-#     find("#my_clubs").click
-#     within("#my_clubs_table")do
-#       Club.all.each do |club|
-#         assert page.has_content?("#{club.name}")
-#       end 
-#     end
-#     within("#change_partner")do
-#       Club.all.each do |club|
-#         assert page.has_content?("#{club.partner.prefix} - #{club.name}")
-#       end
-#     end
-#   end
+    find("#my_clubs").click
+    within("#my_clubs_table")do
+      Club.all.each do |club|
+        assert page.has_content?("#{club.name}")
+      end 
+    end
+    within("#change_partner")do
+      Club.all.each do |club|
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
+      end
+    end
+  end
 
-#    ###############################################################
-#    ## AGENCY
-#    ###############################################################
+   ###############################################################
+   ## AGENCY
+   ###############################################################
 
-#   # Select only clubs related to agency agent.
-#   test "select every club when member has global role 'agency'" do
-#     setup_agency
-#     partner = FactoryGirl.create(:partner)
-#     5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+  # Select only clubs related to agency agent.
+  test "select every club when member has global role 'agency'" do
+    setup_agency
+    partner = FactoryGirl.create(:partner)
+    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
 
-#     find("#my_clubs").click
-#     within("#my_clubs_table")do
-#       Club.all.each do |club|
-#         assert page.has_content?("#{club.name}")
-#       end
-#     end
-#     within("#change_partner")do
-#       Club.all.each do |club|
-#         assert page.has_content?("#{club.partner.prefix} - #{club.name}")
-#       end
-#     end
-#   end
+    find("#my_clubs").click
+    within("#my_clubs_table")do
+      Club.all.each do |club|
+        assert page.has_content?("#{club.name}")
+      end
+    end
+    within("#change_partner")do
+      Club.all.each do |club|
+        assert page.has_content?("#{club.partner.prefix} - #{club.name}")
+      end
+    end
+  end
 
-#   test "Agency should see full breadcrumb" do
-#     setup_agency
-#     setup_member
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+  test "Agency should see full breadcrumb" do
+    setup_agency
+    setup_member
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     within(".breadcrumb")do
-#       assert page.has_no_content?("Partner")
-#       assert page.has_no_content?("Club")
-#       assert page.has_content?("Show")
-#     end
-#   end
+    within(".breadcrumb")do
+      assert page.has_no_content?("Partner")
+      assert page.has_no_content?("Club")
+      assert page.has_content?("Show")
+    end
+  end
 
-#   test "Agency should not be able to destroy a credit card" do
-#     setup_agency
-#     setup_member
-#     credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
+  test "Agency should not be able to destroy a credit card" do
+    setup_agency
+    setup_member
+    credit_card = FactoryGirl.create(:credit_card_american_express, :member_id => @saved_member.id, :active => false )
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     within('.nav-tabs'){ click_on('Credit Cards')}
-#     within("#credit_cards") do
-#       assert page.has_no_selector?("#destroy")
-#     end
-#   end 
+    within('.nav-tabs'){ click_on('Credit Cards')}
+    within("#credit_cards") do
+      assert page.has_no_selector?("#destroy")
+    end
+  end 
 
-# test "Agency role - Recover a member" do
-#     setup_agency
-#     setup_member
-#     @saved_member.set_as_canceled!
+test "Agency role - Recover a member" do
+    setup_agency
+    setup_member
+    @saved_member.set_as_canceled!
 
-#     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-#     assert find_field('input_first_name').value == @saved_member.first_name
+    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    assert find_field('input_first_name').value == @saved_member.first_name
 
-#     assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
-#   end
+    assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
+  end
 
-#    ###############################################################
-#    ## FULFILLLMENT MANAGMENT
-#    ###############################################################
+   ###############################################################
+   ## FULFILLLMENT MANAGMENT
+   ###############################################################
 
-#   test "Profile fulfillment_managment" do
-#     setup_fulfillment_managment
-#     setup_member false
-#     unsaved_member = FactoryGirl.build(:member_with_api, :club_id => @club.id)
-#     create_member(unsaved_member)
-#     saved_member = Member.find_by_email(unsaved_member.email)
+  test "Profile fulfillment_managment" do
+    setup_fulfillment_managment
+    setup_member false
+    unsaved_member = FactoryGirl.build(:member_with_api, :club_id => @club.id)
+    create_member(unsaved_member)
+    saved_member = Member.find_by_email(unsaved_member.email)
 
-#     validate_view_member_base(saved_member)
-#   end
+    validate_view_member_base(saved_member)
+  end
 
-#   test "fulfillment_managment role - Fulfillment page" do
-#     setup_fulfillment_managment
-#     setup_member
+  test "fulfillment_managment role - Fulfillment page" do
+    setup_fulfillment_managment
+    setup_member
 
-#     bill_member(@saved_member, false)
+    bill_member(@saved_member, false)
 
-#     search_fulfillments
-#     fulfillments = []
-#     fulfillments << @saved_member.fulfillments.last
+    search_fulfillments
+    fulfillments = []
+    fulfillments << @saved_member.fulfillments.last
 
-#     #we make any update just to test...
-#     update_status_on_fulfillments(fulfillments, 'sent')
-#   end
+    #we make any update just to test...
+    update_status_on_fulfillments(fulfillments, 'sent')
+  end
 
-#   test "Profile fulfillment_managment - Add a Credit Card" do
-#     setup_fulfillment_managment
-#     setup_member
-#     @agent.update_attribute(:roles, 'fulfillment_managment')
-#     credit_card = FactoryGirl.build(:credit_card_american_express)
+  test "Profile fulfillment_managment - Add a Credit Card" do
+    setup_fulfillment_managment
+    setup_member
+    @agent.update_attribute(:roles, 'fulfillment_managment')
+    credit_card = FactoryGirl.build(:credit_card_american_express)
 
-#     add_credit_card(@saved_member,credit_card)
+    add_credit_card(@saved_member,credit_card)
 
-#     credit_card = CreditCard.last
-#     page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
-#     within("#table_active_credit_card"){
-#       assert page.has_content?(credit_card.last_digits)
-#     }
-#   end
+    credit_card = CreditCard.last
+    page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
+    within("#table_active_credit_card"){
+      assert page.has_content?(credit_card.last_digits)
+    }
+  end
 
-#   test "Profile fulfillment_managment - Refund active member" do
-#     setup_fulfillment_managment
-#     setup_member
-#     @agent.update_attribute(:roles, 'fulfillment_managment')
+  test "Profile fulfillment_managment - Refund active member" do
+    setup_fulfillment_managment
+    setup_member
+    @agent.update_attribute(:roles, 'fulfillment_managment')
     
-#     bill_member(@saved_member, true)
-#   end
+    bill_member(@saved_member, true)
+  end
 
-#   test "fulfillment_managment role - Recover a member" do
-#     setup_fulfillment_managment
-#     setup_member
-#     @new_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'new_tome')
-#     @saved_member.set_as_canceled!
-#     recover_member(@saved_member,@new_tom)
-#   end
+  test "fulfillment_managment role - Recover a member" do
+    setup_fulfillment_managment
+    setup_member
+    @new_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'new_tome')
+    @saved_member.set_as_canceled!
+    recover_member(@saved_member,@new_tom)
+  end
 
-#    ###############################################################
-#    ## OTHERS
-#    ###############################################################
+   ###############################################################
+   ## OTHERS
+   ###############################################################
 
   test "Profiles that not allow see products " do
     setup_supervisor
