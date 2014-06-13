@@ -358,6 +358,7 @@ en:
         initial_club_cash_amount: 'Initial Club Cash Amount'
         club_cash_installment_amount: 'Club Cash Amount'
         skip_first_club_cash: 'Skip first club cash'
+        needs_enrollment_approval: 'Needs Enrollment Approval'
         wizard:
           title_new: 'New Subscription Plan'
           title_edit: 'Edit Subscription Plan'
@@ -374,6 +375,7 @@ en:
           step_1_edit_button_next: 'Edit Membership Terms'
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
+          needs_enrollment_approval: 'Needs Enrollment Approval'
           initial_fee: 'Initial Fee'
           initial_fee_amount: 'Initial Fee Amount'
           trial_period: 'Trial Period'

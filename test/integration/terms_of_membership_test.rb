@@ -1021,4 +1021,99 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		end
 		assert page.has_content?("was not destroyed.")
 	end
+
+	test "Create a TOM that Requires Approval" do
+		tom_name = 'TOM that Requires Approval'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		click_link_or_button 'Add New Plan'
+
+		fill_in_step_1(tom_name)
+		click_link_or_button 'Define Membership Terms'
+		
+		check('terms_of_membership_needs_enrollment_approval');
+		choose('is_payment_expected_no')
+		choose('subscription_terms_until_cancelled')
+		click_link_or_button 'Define Upgrades / Downgrades'
+
+		click_link_or_button 'Create Plan'
+
+		assert page.has_content?('was created succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	end
+
+
+	test "Edit a TOM that doesn't Require Approval" do
+		tom_name = 'TOM that doesnt Require Approval'
+		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+			within("tr", :text => tom_name) do
+				click_link_or_button "Edit"
+			end
+		end
+
+		fill_in_step_1(tom_name + ' Updated')
+		click_link_or_button 'Edit Membership Terms'
+
+		check('terms_of_membership_needs_enrollment_approval');
+		choose('is_payment_expected_no')
+		choose('subscription_terms_until_cancelled')
+		click_link_or_button 'Edit Upgrades / Downgrades'
+		
+		click_link_or_button 'Update Plan'
+
+		assert page.has_content?('was updated succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	end
+
+
+	test "Edit a TOM that Requires Approval" do
+		tom_name = 'TOM that Requires Approval'
+		tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => tom_name)
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+			within("tr", :text => tom_name) do
+				click_link_or_button "Edit"
+			end
+		end
+
+		fill_in_step_1(tom_name + ' Updated')
+		click_link_or_button 'Edit Membership Terms'
+
+		check('terms_of_membership_needs_enrollment_approval');
+		choose('is_payment_expected_no')
+		choose('subscription_terms_until_cancelled')
+		click_link_or_button 'Edit Upgrades / Downgrades'
+		
+		click_link_or_button 'Update Plan'
+		
+		assert page.has_content?('was updated succesfully') # TOM was created
+		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+	end
+
+	test "Delete a TOM that Requires Approval" do
+		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :name => "test#{n}" ,:club_id => @club.id) }
+		the_tom = TermsOfMembership.last
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
+			within("tr", :text => the_tom.name) do
+				confirm_ok_js
+				click_link_or_button "Destroy"
+			end
+		end
+		assert page.has_content?("was successfully destroyed.")
+	end
+
+	test "Create a member a TOM that Requires Approval" do
+		the_tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => 'TOM that Requires Approval')
+		unsaved_member =  FactoryGirl.build(:active_member, :club_id => the_tom.club_id)
+		credit_card = FactoryGirl.build(:credit_card_master_card)
+		enrollment_info = FactoryGirl.build(:enrollment_info)
+		create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, the_tom)
+		@saved_member = Member.find_by_email(unsaved_member.email)  
+		visit show_member_path(:partner_prefix => the_tom.club.partner.prefix, :club_prefix => the_tom.club.name, :member_prefix => @saved_member.id)
+	end
 end

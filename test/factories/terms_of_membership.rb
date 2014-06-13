@@ -272,4 +272,21 @@ FactoryGirl.define do
     provisional_days 0
     # association :club, factory: :simple_club_with_gateway
   end
+
+  factory :terms_of_membership_with_gateway_and_approval_required, class: TermsOfMembership do
+    sequence(:name) {|n| "test with gateway_#{n}" }
+    installment_amount 100
+    installment_period 30 # installment_type '1.month'
+    initial_fee 0
+    trial_period_amount 0
+    is_payment_expected 1
+    subscription_limits 0
+    if_cannot_bill 'cancel'
+    needs_enrollment_approval true
+    initial_club_cash_amount 150
+    club_cash_installment_amount 100
+    skip_first_club_cash 0
+    provisional_days 30
+    # association :club, factory: :simple_club_with_gateway
+  end
 end

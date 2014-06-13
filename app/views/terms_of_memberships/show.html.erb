@@ -54,6 +54,12 @@
         </div>
       <% end %>
     </div>
+    <div class="row-fluid">
+      <div class="span2"> 
+        <b> <%= t('activerecord.attributes.terms_of_membership.needs_enrollment_approval') %>: </b> 
+        <%= @tom.needs_enrollment_approval ? 'Yes' : 'No' %>
+      </div>
+    </div>
   </div>
 </div>
 

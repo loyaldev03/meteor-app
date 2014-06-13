@@ -53,6 +53,16 @@
     </div>
   </div> -->
 
+  <div class="control-group" id="needs_enrollment_approval_group">
+    <%= label_tag 'needs_enrollment_approval', t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval'), :class => 'control-label' %>
+    <div class="controls">
+      <%= f.check_box 'needs_enrollment_approval' %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval'), 
+        :content => t('lorem') } %> 
+    </div>
+  </div>
+
   <div class="control-group">
     <%= label_tag 'trial_period_amount', t('activerecord.attributes.terms_of_membership.wizard.trial_period'), :class => 'control-label' %>
     <div class="controls">
