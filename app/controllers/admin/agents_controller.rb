@@ -1,4 +1,5 @@
 class Admin::AgentsController < ApplicationController
+  before_filter :load_clubs_related, only: [ :new, :edit, :create, :update ]
 
   # GET /agents
   def index
@@ -19,14 +20,12 @@ class Admin::AgentsController < ApplicationController
   def new
     my_authorize_agents!(:new, Agent)
     @agent = Agent.new
-    @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
   end
 
   # GET /agents/1/edit
   def edit
     @agent = Agent.find(params[:id])
-    my_authorize_agents!(:edit, Agent, @agent.clubs.each.collect(&:id))
-    @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
+    my_authorize_agents!(:edit, Agent, @agent.clubs.collect(&:id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
   end
 
@@ -34,9 +33,8 @@ class Admin::AgentsController < ApplicationController
   def create
     my_authorize_agents!(:create, Agent)
     @agent = Agent.new(params[:agent])
-    success = false
-    @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
+    success = false
     ClubRole.transaction do
       begin
         if params[:agent][:roles].present? and params[:club_roles_attributes].present?
@@ -65,11 +63,10 @@ class Admin::AgentsController < ApplicationController
 
   # PUT /agents/1
   def update
-    my_authorize_agents!(:update, Agent)
     @agent = Agent.find(params[:id])
-    success = false
-    @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs
+    my_authorize_agents!(:update, Agent, @agent.clubs.collect(&:id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
+    success = false
     ClubRole.transaction do
       begin
         cleanup_for_update!(params[:agent])
@@ -103,7 +100,7 @@ class Admin::AgentsController < ApplicationController
   # DELETE /agents/1
   def destroy
     @agent = Agent.find(params[:id])
-    my_authorize_agents!(:destroy, Agent)
+    my_authorize_agents!(:destroy, Agent, @agent.clubs.collect(&:id))
     @agent.destroy
     redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.')
   end
@@ -129,7 +126,11 @@ class Admin::AgentsController < ApplicationController
       end
     end
 
-    def my_authorize_agents!(action, model, club_list=nil)
-      raise CanCan::AccessDenied unless @current_agent.has_role_or_has_club_role_where_can?(action, model, club_list)
+    def my_authorize_agents!(action, model, club_id_list=nil)
+      raise CanCan::AccessDenied unless @current_agent.has_role_or_has_club_role_where_can?(action, model, club_id_list)
     end
+
+    def load_clubs_related 
+      @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs.where("club_roles.role = 'admin'")
+    end 
 end
