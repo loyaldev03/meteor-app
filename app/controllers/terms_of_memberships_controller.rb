@@ -3,7 +3,7 @@ class TermsOfMembershipsController < ApplicationController
   # before_filter :check_permissions
 
   def index
-    my_authorize! :list, TermsOfMembership, @tom.club_id
+    my_authorize! :list, TermsOfMembership, @current_club.id
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: TermsOfMembershipDatatable.new(view_context,@current_partner,@current_club,nil,@current_agent) }
@@ -11,13 +11,14 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def new
-    my_authorize! :new, TermsOfMembership, @tom.club_id
+    my_authorize! :new, TermsOfMembership, @current_club.id
+    # my_authorize! :new, TermsOfMembership, @tom.club_id
     @tom = TermsOfMembership.new
   end
 
   def create
-    my_authorize! :create, TermsOfMembership, @tom.club_id
     @tom = TermsOfMembership.new(params[:tom])
+    my_authorize! :create, TermsOfMembership, @tom.club_id
     prepare_tom_data_to_save(params)
     if @tom.save
       redirect_to terms_of_memberships_url, :notice => "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
@@ -28,8 +29,8 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def edit
-    my_authorize! :edit, TermsOfMembership, @tom.club_id
     @tom = TermsOfMembership.find(params[:id])
+    my_authorize! :edit, TermsOfMembership, @tom.club_id    
     if !@tom.can_update_or_delete
       flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
       redirect_to terms_of_memberships_url
@@ -37,8 +38,8 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def update
-    my_authorize! :update, TermsOfMembership, @tom.club_id
     @tom = TermsOfMembership.find(params[:id])
+    my_authorize! :update, TermsOfMembership, @tom.club_id
     if @tom.can_update_or_delete
       prepare_tom_data_to_save(params)
       if @tom.save
@@ -55,8 +56,8 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def destroy
-    my_authorize! :destroy, TermsOfMembership, @tom.club_id
     @tom = TermsOfMembership.find(params[:id])
+    my_authorize! :destroy, TermsOfMembership, @tom.club_id
     if @tom.destroy
       flash[:notice] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
     else
@@ -66,8 +67,8 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def show
-    my_authorize! :show, TermsOfMembership, @tom.club_id
     @tom = TermsOfMembership.find(params[:id])
+    my_authorize! :show, TermsOfMembership, @tom.club_id
     @email_templates = EmailTemplate.find_all_by_terms_of_membership_id(params[:id])
     @payment_gateway_configuration = @tom.club.payment_gateway_configuration
   end
