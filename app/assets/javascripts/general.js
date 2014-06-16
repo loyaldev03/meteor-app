@@ -1083,7 +1083,7 @@ function admin_form_functions(){
             $("#td_notice").append("<div class='alert-info alert'>"+data.message+"</div>");
           }else{
             $("#td_notice").children().remove();
-            $("#td_notice").append("<div class='alert-info error'>"+data.message+"</div>");
+            $("#td_notice").append("<div class='error-info alert'>"+data.message+"</div>");
           }
         },
       });
@@ -1110,7 +1110,7 @@ function admin_form_functions(){
             $("#td_notice").append("<div class='alert-info alert'>"+data.message+"</div>");
           }else{
             $("#td_notice").children().remove();
-            $("#td_notice").append("<div class='error-info error'>"+data.message+"</div>");
+            $("#td_notice").append("<div class='error-info alert'>"+data.message+"</div>");
           }
         },
       });
