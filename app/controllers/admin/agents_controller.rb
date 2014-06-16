@@ -49,6 +49,8 @@ class Admin::AgentsController < ApplicationController
       begin
         if params[:agent][:roles].present? and params[:club_roles_attributes].present?
           flash.now[:error] = 'Cannot set both global and club roles at the same time'
+        elsif not @current_agent.has_global_role? and not params[:club_roles_attributes].present?
+          flash.now[:error] = 'Cannot create agent without roles.'
         else
           @agent.save!
           if params[:club_roles_attributes]
@@ -124,7 +126,7 @@ class Admin::AgentsController < ApplicationController
     club_role = ClubRole.find(params[:id])
     club_role.role = params[:role]
     if club_role.save
-      answer = { code: "000", message: "Club Role updated successfully." }
+      answer = { code: "000", message: "Club Role for #{club_role.club.name} updated successfully." }
     else
       answer = { code: Settings.error_codes.wrong_data, message: "Role could not be updated." }
     end

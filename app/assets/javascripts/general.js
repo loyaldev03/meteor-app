@@ -1050,14 +1050,18 @@ function admin_form_functions(){
   });
 
   $("#club_role_edit").live("click", function(event){
-    var role_list = roles.split(",");
     event.preventDefault();
+    var role_list = roles.split(",");
     club_role_id = $(this).attr('name');
+    var previous_role = $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").text();
     $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").empty();
     $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]'] #club_role_edit").remove();
     var options_for_role = ""
     for (var i in role_list){
-      options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>" 
+      if(role_list[i] == previous_role)
+        options_for_role = options_for_role+"<option value='"+role_list[i]+"' selected>"+role_list[i]+"</option>"
+      else
+        options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>"
     };
     $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").append("<select id='select_club_role_"+club_role_id+"' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select>");
     $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]']").prepend("<input type='button' id='club_role_update' name='"+club_role_id+"' class='btn-primary btn-mini' value='Update'></td>");
@@ -1077,9 +1081,11 @@ function admin_form_functions(){
             $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").append(new_role);
             $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]'] #club_role_update").remove();
             $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]']").prepend("<input type='button' id='club_role_edit' name='"+club_role_id+"' class='btn btn-mini' value='Edit'></td>");
-            alert(data.message)
+            $("#td_notice").children().remove();
+            $("#td_notice").append("<div class='alert-info alert'>"+data.message+"</div>");
           }else{
-            alert(data.message)
+            $("#td_notice").children().remove();
+            $("#td_notice").append("<div class='alert-info error'>"+data.message+"</div>");
           }
         },
       });
@@ -1102,9 +1108,11 @@ function admin_form_functions(){
               clubs = array[2]+","+array[1];  
             else
               clubs = clubs+";"+array[2]+","+array[1];
-            alert(data.message)
+            $("#td_notice").children().remove();
+            $("#td_notice").append("<div class='alert-info alert'>"+data.message+"</div>");
           }else{
-            alert(data.message)
+            $("#td_notice").children().remove();
+            $("#td_notice").append("<div class='error-info error'>"+data.message+"</div>");
           }
         },
       });

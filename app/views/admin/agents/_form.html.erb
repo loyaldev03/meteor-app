@@ -43,7 +43,10 @@
     <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
     <div class="controls">
       <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;" id="club_role_table">
-        <tr><td colspan="3"> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td></tr>
+        <tr >
+          <td width=250px> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td>
+          <td id="td_notice" colspan="2" class="alert"> </td>
+        </tr>
         <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
         <% unless @agent.new_record? %>
           <% @club_roles.each do |club_role| %>
