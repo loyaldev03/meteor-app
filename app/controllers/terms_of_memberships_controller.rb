@@ -17,7 +17,7 @@ class TermsOfMembershipsController < ApplicationController
 
   def create
     @tom = TermsOfMembership.new(params[:tom])
-    my_authorize! :create, TermsOfMembership, @tom.club_id
+    my_authorize! :create, TermsOfMembership, @current_club.id
     prepare_tom_data_to_save(params)
     if @tom.save
       redirect_to terms_of_memberships_url, :notice => "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
