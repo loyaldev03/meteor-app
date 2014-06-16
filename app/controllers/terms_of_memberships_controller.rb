@@ -3,7 +3,6 @@ class TermsOfMembershipsController < ApplicationController
   # before_filter :check_permissions
 
   def index
-    my_authorize! :list, TermsOfMembership, @current_club.id
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: TermsOfMembershipDatatable.new(view_context,@current_partner,@current_club,nil,@current_agent) }
@@ -11,14 +10,11 @@ class TermsOfMembershipsController < ApplicationController
   end
 
   def new
-    my_authorize! :new, TermsOfMembership, @current_club.id
-    # my_authorize! :new, TermsOfMembership, @tom.club_id
     @tom = TermsOfMembership.new
   end
 
   def create
     @tom = TermsOfMembership.new(params[:tom])
-    my_authorize! :create, TermsOfMembership, @tom.club_id
     prepare_tom_data_to_save(params)
     if @tom.save
       redirect_to terms_of_memberships_url, :notice => "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
@@ -30,7 +26,6 @@ class TermsOfMembershipsController < ApplicationController
 
   def edit
     @tom = TermsOfMembership.find(params[:id])
-    my_authorize! :edit, TermsOfMembership, @tom.club_id    
     if !@tom.can_update_or_delete
       flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
       redirect_to terms_of_memberships_url
@@ -39,7 +34,6 @@ class TermsOfMembershipsController < ApplicationController
 
   def update
     @tom = TermsOfMembership.find(params[:id])
-    my_authorize! :update, TermsOfMembership, @tom.club_id
     if @tom.can_update_or_delete
       prepare_tom_data_to_save(params)
       if @tom.save
@@ -57,7 +51,6 @@ class TermsOfMembershipsController < ApplicationController
 
   def destroy
     @tom = TermsOfMembership.find(params[:id])
-    my_authorize! :destroy, TermsOfMembership, @tom.club_id
     if @tom.destroy
       flash[:notice] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
     else
@@ -86,7 +79,8 @@ class TermsOfMembershipsController < ApplicationController
       @tom.name = post_data[:terms_of_membership][:name]
       @tom.api_role = post_data[:terms_of_membership][:api_role]
       @tom.description = post_data[:terms_of_membership][:description]
-      # Step 2      
+      # Step 2
+      @tom.needs_enrollment_approval = post_data[:terms_of_membership][:needs_enrollment_approval]
       @tom.initial_fee = post_data[:initial_fee_amount]
       @tom.trial_period_amount = post_data[:trial_period_amount]
       @tom.provisional_days = post_data[:trial_period_lasting_time_span] == 'months' ? months_to_days(post_data[:trial_period_lasting].to_i) : post_data[:trial_period_lasting].to_i
