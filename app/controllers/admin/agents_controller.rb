@@ -13,6 +13,7 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/1
   def show
     @agent = Agent.find(params[:id])
+    @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
     my_authorize_agents!(:show, Agent, @agent.clubs.each.collect(&:id))
   end 
 
@@ -25,6 +26,7 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/1/edit
   def edit
     @agent = Agent.find(params[:id])
+    @club_roles = @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
     my_authorize_agents!(:edit, Agent, @agent.clubs.collect(&:id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
   end
@@ -66,6 +68,7 @@ class Admin::AgentsController < ApplicationController
     @agent = Agent.find(params[:id])
     my_authorize_agents!(:update, Agent, @agent.clubs.collect(&:id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
+    @club_roles = @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
     success = false
     ClubRole.transaction do
       begin
@@ -73,9 +76,6 @@ class Admin::AgentsController < ApplicationController
         if params[:agent][:roles].present? and params[:club_roles_attributes].present?
           flash.now[:error] = 'Cannot set both global and club roles at the same time'
         elsif @agent.update_attributes(params[:agent])
-          if params[:club_roles].present?
-            @agent.delete_club_roles(params[:club_roles][:delete])
-          end
           if params[:club_roles_attributes]
             @agent.set_club_roles(params[:club_roles_attributes])
           end
@@ -112,6 +112,29 @@ class Admin::AgentsController < ApplicationController
     end
   end
 
+  def update_club_role
+    club_role = ClubRole.find(params[:id])
+    club_role.role = params[:role]
+    if club_role.save
+      answer = { code: "000", message: "Club Role updated successfully." }
+    else
+      answer = { code: Settings.error_codes.wrong_data, message: "Role could not be updated." }
+    end
+    render json: answer
+  end
+
+  def delete_club_role
+    club_role = ClubRole.find(params[:id])
+    if @current_agent.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, @current_agent.club_roles.where("role = 'admin'").collect(&:club_id)).count == 1
+      answer = { code: Settings.error_codes.wrong_data, message: "Role could not be deleted. It is the last one." }
+    elsif club_role.delete
+      answer = { code: "000", message: "Club Role deleted successfully" }
+    else
+      answer = { code: Settings.error_codes.wrong_data, message: "Role could not be deleted." }
+    end
+    render json: answer
+  end
+
   private
 
     def cleanup_for_update!(hash)
@@ -130,7 +153,7 @@ class Admin::AgentsController < ApplicationController
       raise CanCan::AccessDenied unless @current_agent.has_role_or_has_club_role_where_can?(action, model, club_id_list)
     end
 
-    def load_clubs_related 
+    def load_clubs_related
       @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs.where("club_roles.role = 'admin'")
-    end 
+    end
 end

@@ -415,9 +415,13 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test "agent with club roles admin should not update agent" do
+  test "agent with club roles admin should update agent" do
     prepare_agents_with_club_roles
     sign_in(@agent_club_role_admin)
+    club_role = ClubRole.new :club_id => @agent_club_role_admin.clubs.first.id
+    club_role.role = "admin"
+    club_role.agent_id = @agent.id
+    club_role.save
     put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
     assert_redirected_to admin_agent_path(assigns(:agent))
   end
@@ -425,6 +429,10 @@ class Admin::AgentsControllerTest < ActionController::TestCase
   test "agent with club roles admin should not destroy agent" do
     prepare_agents_with_club_roles
     sign_in(@agent_club_role_admin)
+    club_role = ClubRole.new :club_id => @agent_club_role_admin.clubs.first.id
+    club_role.role = "admin"
+    club_role.agent_id = @agent.id
+    club_role.save
     assert_difference('Agent.count', -1) do
       delete :destroy, id: @agent
     end

@@ -109,7 +109,7 @@ class Agent < ActiveRecord::Base
 
   def set_club_roles(club_roles_info)
     club_roles_info.each do |club_role|
-      self.club_roles << ClubRole.create(club_role.last)
+      self.club_roles << ClubRole.create(club_role.last) 
     end
   end
 

@@ -46,14 +46,15 @@
         <tr><td colspan="3"> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td></tr>
         <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
         <% unless @agent.new_record? %>
-          <% @agent.club_roles.each do |club_role| %>
-          <tr>
+          <% @club_roles.each do |club_role| %>
+          <tr id=<%="tr_club_role_role[#{club_role.id}]"%>>
             <% if @current_agent.club_roles.empty? or @current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
-              <td> <%= club_role.role %> </td>
+              <td id=<%="td_club_role_role[#{club_role.id}]"%>> <%= club_role.role %> </td>
               <td> <%= club_role.club.name %> </td>
-              <td>
+              <td id=<%="td_club_role_buttons[#{club_role.id}]"%>>
                 <% unless @current_agent==@agent %>
-                   Delete <%= check_box_tag "club_roles[delete][]", club_role.id %>
+                    <%= link_to("Edit", "#" , :class => 'btn btn-mini', :id => "club_role_edit", :name => club_role.id)%>
+                    <%= link_to("Delete", "#" , :class => 'btn btn-mini', :id => "club_role_delete", :name => "#{club_role.id};#{club_role.club_id};#{club_role.club.name}")%>
                 <% end %>
               </td>
             <% end %>

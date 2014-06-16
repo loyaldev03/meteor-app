@@ -35,7 +35,7 @@ private
     agents = if @current_agent.has_global_role?
       Agent.order("#{sort_column} #{sort_direction}")
     else
-      Agent.joins(:club_roles).where("club_id in (?)", @current_agent.clubs.collect(&:id)).order("#{sort_column} #{sort_direction}").group("agents.id").limit(1)
+      Agent.joins(:club_roles).where("club_id in (?)", @current_agent.clubs.where("role = 'admin'").collect(&:id)).order("#{sort_column} #{sort_direction}").group("agents.id").limit(1)
     end
     agents = agents.page(page).per_page(per_page)
     if params[:sSearch].present?
