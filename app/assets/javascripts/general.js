@@ -1049,7 +1049,7 @@ function admin_form_functions(){
     }
   });
 
-  $("#club_role_edit").live("click", function(){
+  $("#club_role_edit").live("click", function(event){
     var role_list = roles.split(",");
     event.preventDefault();
     club_role_id = $(this).attr('name');
@@ -1063,7 +1063,7 @@ function admin_form_functions(){
     $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]']").prepend("<input type='button' id='club_role_update' name='"+club_role_id+"' class='btn-primary btn-mini' value='Update'></td>");
   });   
 
-  $("#club_role_update").live("click", function(){
+  $("#club_role_update").live("click", function(event){
     event.preventDefault();
     if (confirm("Are you sure you want to update this club role?")) {
       var new_role = $("#select_club_role_"+$(this).attr('name')).val();
@@ -1086,7 +1086,7 @@ function admin_form_functions(){
     } 
   });
 
-  $("#club_role_delete").live("click", function(){
+  $("#club_role_delete").live("click", function(event){
     event.preventDefault();
     if (confirm("Are you sure you want to delete this club role?")) {
       array = $(this).attr('name').split(";");
