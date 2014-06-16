@@ -1077,6 +1077,7 @@ function admin_form_functions(){
             $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").append(new_role);
             $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]'] #club_role_update").remove();
             $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]']").prepend("<input type='button' id='club_role_edit' name='"+club_role_id+"' class='btn btn-mini' value='Edit'></td>");
+            alert(data.message)
           }else{
             alert(data.message)
           }
