@@ -1053,14 +1053,12 @@ function admin_form_functions(){
     event.preventDefault();
     var role_list = roles.split(",");
     club_role_id = $(this).attr('name');
-    var previous_role = $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").text();
+    var previous_role = $.trim($("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").text());
+    var options_for_role = "<option value='"+previous_role+"' selected>"+previous_role+"</option>"
     $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").empty();
     $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]'] #club_role_edit").remove();
-    var options_for_role = ""
     for (var i in role_list){
-      if(role_list[i] == previous_role)
-        options_for_role = options_for_role+"<option value='"+role_list[i]+"' selected>"+role_list[i]+"</option>"
-      else
+      if(role_list[i] != previous_role)
         options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>"
     };
     $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").append("<select id='select_club_role_"+club_role_id+"' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select>");
@@ -1117,7 +1115,14 @@ function admin_form_functions(){
         },
       });
     }
-  });  
+  });
+
+  $("input[name='commit']").click(function(event){
+    if($("#club_role_update").length > 0){
+      if(!confirm("You have unsaved roles, are you sure you want to proceed? Role's changes will be lost."))
+        event.preventDefault();
+    }
+  })
 };
 
 
