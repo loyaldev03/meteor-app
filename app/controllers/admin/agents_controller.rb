@@ -13,7 +13,11 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/1
   def show
     @agent = Agent.find(params[:id])
-    @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
+    if @current_agent.has_global_role?
+      @club_roles = @agent.club_roles
+    else
+      @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
+    end
     my_authorize_agents!(:show, Agent, @agent.clubs.each.collect(&:id))
   end 
 
@@ -26,7 +30,11 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/1/edit
   def edit
     @agent = Agent.find(params[:id])
-    @club_roles = @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
+    if @current_agent.has_global_role?
+      @club_roles = @agent.club_roles
+    else
+      @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
+    end
     my_authorize_agents!(:edit, Agent, @agent.clubs.collect(&:id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
   end
