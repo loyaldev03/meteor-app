@@ -41,8 +41,8 @@ class Admin::AgentsController < ApplicationController
 
   # POST /agents
   def create
-    my_authorize_agents!(:create, Agent)
     @agent = Agent.new(params[:agent])
+    my_authorize_agents!(:create, Agent, @agent.club_roles.collect(&:club_id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     success = false
     ClubRole.transaction do
@@ -76,7 +76,7 @@ class Admin::AgentsController < ApplicationController
   # PUT /agents/1
   def update
     @agent = Agent.find(params[:id])
-    my_authorize_agents!(:update, Agent, @agent.clubs.collect(&:id))
+    my_authorize_agents!(:update, Agent, @agent.club_roles.collect(&:club_id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     @club_roles = @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
     success = false
