@@ -5,6 +5,7 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.json
   def index
+    my_authorize! :list, Product, @current_club.id
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: ProductsDatatable.new(view_context,@current_partner,@current_club,nil,@current_agent) }
@@ -14,20 +15,24 @@ class ProductsController < ApplicationController
   # GET /products/1
   def show
     @product = Product.find(params[:id])
+    my_authorize! :show, Product, @product.club_id
   end
 
   # GET /products/new
   def new
+    my_authorize! :new, Product, @current_club.id
     @product = Product.new
   end
 
   # GET /products/1/edit
   def edit
     @product = Product.find(params[:id])
+    my_authorize! :edit, Product, @product.club_id
   end
 
   # POST /products
   def create
+    my_authorize! :create, Product, @current_club.id
     @product = Product.new
     @product.club_id = @current_club.id
     @product.update_product_data_by_params(params[:product])
@@ -44,6 +49,7 @@ class ProductsController < ApplicationController
   # PUT /products/1
   def update
     @product = Product.find(params[:id])
+    my_authorize! :update, Product, @product.club_id
     @product.update_product_data_by_params params[:product]
     if @product.save
       redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully updated.' 
@@ -58,6 +64,7 @@ class ProductsController < ApplicationController
   # DELETE /products/1
   def destroy
     @product = Product.find(params[:id])
+    my_authorize! :destroy, Product, @product.club_id
     if @product.destroy
       redirect_to products_url, notice: "Product #{@product.sku} was successfully destroyed."
     else
