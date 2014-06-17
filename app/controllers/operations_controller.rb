@@ -9,20 +9,22 @@ class OperationsController < ApplicationController
     end
     respond_to do |format|
       format.html
-      format.json { render json: OperationsDatatable.new(view_context,@current_partner,@current_club,@current_member,@current_agent)}
+      format.json { render json: OperationsDatatable.new(view_context, @current_partner, @current_club, @current_member, @current_agent)}
     end
   end
 
   # GET /operations/1
   def show
-    my_authorize! :show, Operation, @current_club.id
     @operation = Operation.find(params[:id])
+    @member = Member.find(@operation.member_id)
+    my_authorize! :edit, Operation, @member.club_id
   end
 
   # PUT /operations/1
   def update
-    my_authorize! :edit, Operation, @current_club.id
     operation = Operation.find(params[:id])
+    @member = Member.find(operation.member_id)
+    my_authorize! :edit, Operation, @member.club_id
     @link = (view_context.link_to "#{operation.id}", operation_path(@current_partner.prefix,@current_club.name,@current_member.id,operation.id))
     if operation.update_attributes(params[:operation])
       message = "Edited operation note #{@link}".html_safe
