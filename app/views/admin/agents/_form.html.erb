@@ -44,13 +44,13 @@
     <div class="controls">
       <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;" id="club_role_table">
         <tr >
-          <td width=250px> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td>
+          <td style="width:250px"> <%= link_to 'Add', '#', :class => 'btn', :id=> "add_new_club_role" %> </td>
           <td id="td_notice" colspan="2"> </td>
         </tr>
         <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
         <% unless @agent.new_record? %>
           <% @club_roles.each do |club_role| %>
-          <tr id=<%="tr_club_role_role[#{club_role.id}]"%>>
+          <tr id=<%="tr_club_role_[#{club_role.id}]"%>>
             <% if @current_agent.club_roles.empty? or @current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
               <td id=<%="td_club_role_role[#{club_role.id}]"%>> <%= club_role.role %> </td>
               <td> <%= club_role.club.name %> </td>
@@ -77,7 +77,7 @@
 
 
 <script>
-  roles = "<%= Agent::ROLES.join(',') %>"
-  clubs = "<%= @clubs.collect{|club| club.name+","+club.id.to_s}.join(";") %>"
+  var roles = "<%= Agent::ROLES.join(',') %>"
+  var clubs = "<%= @clubs.collect{|club| club.name+","+club.id.to_s}.join(";") %>"
   $(document).ready(admin_form_functions());
 </script>

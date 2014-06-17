@@ -1101,7 +1101,7 @@ function admin_form_functions(){
         data: { id:$(this).attr("name") },
         success: function(data){
           if(data.code == "000"){
-            $("#club_role_table tr[id='tr_club_role_role["+club_role_id+"]']").remove();
+            $("#club_role_table tr[id='tr_club_role["+club_role_id+"]']").remove();
             if(clubs.length == 0)
               clubs = array[2]+","+array[1];  
             else

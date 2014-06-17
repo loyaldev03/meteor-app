@@ -68,7 +68,7 @@ class Agent < ActiveRecord::Base
 
   def has_role_or_has_club_role_where_can?(action, model, clubs_id_list = nil)
     return true if can? action, model
-    clubs_id_list ||= self.club_roles.each.collect(&:club_id)
+    clubs_id_list ||= self.club_roles.collect(&:club_id)
     clubs_id_list.each do |club_id|
       return true if can? action, model, club_id
     end
@@ -119,6 +119,9 @@ class Agent < ActiveRecord::Base
     end
   end
 
+  def can_agent_by_role_delete_club_role(club_role)
+    self.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, self.club_roles.where("role = 'admin'").collect(&:club_id)).count == 1
+  end
     
   protected
 

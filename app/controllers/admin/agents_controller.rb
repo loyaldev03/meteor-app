@@ -135,7 +135,7 @@ class Admin::AgentsController < ApplicationController
 
   def delete_club_role
     club_role = ClubRole.find(params[:id])
-    if @current_agent.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, @current_agent.club_roles.where("role = 'admin'").collect(&:club_id)).count == 1
+    if @current_agent.can_agent_by_role_delete_club_role(club_role)
       answer = { code: Settings.error_codes.wrong_data, message: "Role could not be deleted. It is the last one." }
     elsif club_role.delete
       answer = { code: "000", message: "Club Role deleted successfully" }
