@@ -66,11 +66,24 @@ class Agent < ActiveRecord::Base
   end
   alias_method_chain :has_role?, :club
 
+  def is_admin?
+    answer = self.has_role?("admin") ? true : false
+    unless answer 
+      self.club_roles.each do |club_role|
+        answer = true if club_role.role == "admin"
+      end
+    end
+    answer
+  end
+
   def has_role_or_has_club_role_where_can?(action, model, clubs_id_list = nil)
-    return true if can? action, model
-    clubs_id_list ||= self.club_roles.collect(&:club_id)
-    clubs_id_list.each do |club_id|
-      return true if can? action, model, club_id
+    if self.has_global_role?
+      return true if can? action, model
+    else
+      clubs_id_list ||= self.club_roles.collect(&:club_id)
+      clubs_id_list.each do |club_id|
+        return true if can? action, model, club_id
+      end
     end
     false 
   end
