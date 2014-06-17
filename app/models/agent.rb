@@ -66,6 +66,15 @@ class Agent < ActiveRecord::Base
   end
   alias_method_chain :has_role?, :club
 
+  def has_role_or_has_club_role_where_can?(action, model, clubs_id_list = nil)
+    return true if can? action, model
+    clubs_id_list ||= self.club_roles.collect(&:club_id)
+    clubs_id_list.each do |club_id|
+      return true if can? action, model, club_id
+    end
+    false 
+  end
+
   def role_for(role, club)
     self.club_roles.where(role: role, club_id: club).first
   end
@@ -100,7 +109,7 @@ class Agent < ActiveRecord::Base
 
   def set_club_roles(club_roles_info)
     club_roles_info.each do |club_role|
-      self.club_roles << ClubRole.create(club_role.last)
+      self.club_roles << ClubRole.create(club_role.last) 
     end
   end
 
@@ -110,6 +119,9 @@ class Agent < ActiveRecord::Base
     end
   end
 
+  def can_agent_by_role_delete_club_role(club_role)
+    self.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, self.club_roles.where("role = 'admin'").collect(&:club_id)).count == 1
+  end
     
   protected
 

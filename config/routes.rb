@@ -31,6 +31,8 @@ SacPlatform::Application.routes.draw do
     resources :agents do
       get :lock
       get :unlock
+      put :update_club_role
+      put :delete_club_role
     end
     resources :delayed_jobs, :only => [ :index ]
     match '/delayed_jobs/:id/reschedule' => 'delayed_jobs#reschedule', as: 'delayed_job_reschedule', :via => [:post]
