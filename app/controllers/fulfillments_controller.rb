@@ -51,6 +51,7 @@ class FulfillmentsController < ApplicationController
 
   def list_for_file
     @file = FulfillmentFile.find(params[:fulfillment_file_id])
+    my_authorize! :report, Fulfillment, @file.club_id
     @fulfillments = @file.fulfillments.includes(:member)
     render :index
   end
