@@ -391,8 +391,10 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     prepare_agents_with_club_roles
     sign_in(@agent_club_role_admin)
     agent = FactoryGirl.build(:confirmed_admin_agent)
+    club_role = ClubRole.new :club_id => @agent_club_role_admin.clubs.first.id
+    club_role.role = "admin"
     assert_difference('Agent.count') do
-      post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
+      post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email }, club_roles_attributes: { "1" => { role:"api", club_id: @agent_club_role_admin.clubs.first.id }}
     end
     assert_redirected_to admin_agent_path(assigns(:agent))
   end
@@ -426,7 +428,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     assert_redirected_to admin_agent_path(assigns(:agent))
   end
 
-  test "agent with club roles admin should not destroy agent" do
+  test "agent with club roles admin should destroy agent" do
     prepare_agents_with_club_roles
     sign_in(@agent_club_role_admin)
     club_role = ClubRole.new :club_id => @agent_club_role_admin.clubs.first.id

@@ -21,6 +21,17 @@ class ApplicationController < ActionController::Base
       raise CanCan::AccessDenied unless @current_agent.can?(action, what, club_id)
     end
 
+    def my_authorize_admin_agents!(action, model, club_id_list=nil)
+      allowed = @current_agent.can? action, model
+      unless allowed
+        club_id_list ||= @current_agent.club_roles.collect(&:club_id)
+        club_id_list.each do |club_id|
+          allowed = true if @current_agent.can? action, model, club_id
+        end
+      end
+      raise CanCan::AccessDenied unless allowed
+    end
+
     def current_ability
       Ability.new(current_agent, params[:club_id] || (@current_club.id rescue nil))
     end

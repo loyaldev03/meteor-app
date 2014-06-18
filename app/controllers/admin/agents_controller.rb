@@ -3,7 +3,7 @@ class Admin::AgentsController < ApplicationController
 
   # GET /agents
   def index
-    my_authorize_agents!(:list, Agent)
+    my_authorize_admin_agents!(:list, Agent)
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: AgentsDatatable.new(view_context,nil,nil,nil,@current_agent)  }
@@ -13,36 +13,37 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/1
   def show
     @agent = Agent.find(params[:id])
+    my_authorize_admin_agents!(:show, Agent, @agent.clubs.each.collect(&:id))
     if @current_agent.has_global_role?
       @club_roles = @agent.club_roles
     else
       @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
     end
-    my_authorize_agents!(:show, Agent, @agent.clubs.each.collect(&:id))
   end 
 
   # GET /agents/new
   def new
-    my_authorize_agents!(:new, Agent)
+    my_authorize_admin_agents!(:new, Agent)
     @agent = Agent.new
   end
 
   # GET /agents/1/edit
   def edit
     @agent = Agent.find(params[:id])
+    my_authorize_admin_agents!(:edit, Agent, @agent.clubs.collect(&:id))
     if @current_agent.has_global_role?
       @club_roles = @agent.club_roles
     else
       @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
     end
-    my_authorize_agents!(:edit, Agent, @agent.clubs.collect(&:id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
   end
 
   # POST /agents
   def create
     @agent = Agent.new(params[:agent])
-    my_authorize_agents!(:create, Agent, @agent.club_roles.collect(&:club_id))
+    raise CanCan::AccessDenied unless @current_agent.is_admin?
+    # my_authorize_admin_agents!(:create, Agent, @agent.club_roles.collect(&:club_id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     success = false
     ClubRole.transaction do
@@ -76,7 +77,7 @@ class Admin::AgentsController < ApplicationController
   # PUT /agents/1
   def update
     @agent = Agent.find(params[:id])
-    my_authorize_agents!(:update, Agent, @agent.club_roles.collect(&:club_id))
+    my_authorize_admin_agents!(:update, Agent, @agent.club_roles.collect(&:club_id))
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     @club_roles = @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
     success = false
@@ -110,7 +111,7 @@ class Admin::AgentsController < ApplicationController
   # DELETE /agents/1
   def destroy
     @agent = Agent.find(params[:id])
-    my_authorize_agents!(:destroy, Agent, @agent.clubs.collect(&:id))
+    my_authorize_admin_agents!(:destroy, Agent, @agent.clubs.collect(&:id))
     @agent.destroy
     redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.')
   end
@@ -125,6 +126,7 @@ class Admin::AgentsController < ApplicationController
   def update_club_role
     club_role = ClubRole.find(params[:id])
     club_role.role = params[:role]
+    my_authorize!(:update_club_role, Agent, club_role.club_id)
     if club_role.save
       answer = { code: "000", message: "Club Role for #{club_role.club.name} updated successfully." }
     else
@@ -135,6 +137,7 @@ class Admin::AgentsController < ApplicationController
 
   def delete_club_role
     club_role = ClubRole.find(params[:id])
+    my_authorize!(:update_club_role, Agent, club_role.club_id)
     if @current_agent.can_agent_by_role_delete_club_role(club_role)
       answer = { code: Settings.error_codes.wrong_data, message: "Role could not be deleted. It is the last one." }
     elsif club_role.delete
@@ -157,10 +160,6 @@ class Admin::AgentsController < ApplicationController
           hash[:roles] = ""
         end
       end
-    end
-
-    def my_authorize_agents!(action, model, club_id_list=nil)
-      raise CanCan::AccessDenied unless @current_agent.has_role_or_has_club_role_where_can?(action, model, club_id_list)
     end
 
     def load_clubs_related

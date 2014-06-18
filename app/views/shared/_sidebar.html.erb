@@ -5,15 +5,15 @@
       <% if @current_member %>
         <ul class="nav nav-list">
           <li class="nav-header">Member</li>
-          <li><%= link_to "Member Dashboard", show_member_path if can?(:read,Member) %></li>
-          <li><%= link_to "Club Dashboard", members_path if can?(:read,Club) %></li>
+          <li><%= link_to "Member Dashboard", show_member_path if can?(:read, Member) %></li>
+          <li><%= link_to "Club Dashboard", members_path if can?(:read, Club) %></li>
         </ul>
       <% elsif @current_partner %>
         <ul class="nav nav-list">
           <li class="nav-header">General</li>
-          <li><%= link_to "Domains", domains_path if can?(:read,Domain) %></li>
-          <li><%= link_to "Clubs", clubs_path if can?(:read,Club) %></li>
-          <li><%= link_to "Dashboard", admin_partner_dashboard_path if params[:action] != 'dashboard' %></li>
+          <li><%= link_to "Domains", domains_path if @current_agent.is_admin? %></li>
+          <li><%= link_to "Clubs", clubs_path if @current_agent.can?(:read, Club) %></li>
+          <li><%= link_to "Dashboard", admin_partner_dashboard_path if params[:action] != 'dashboard' and @current_agent.can?(:read,Partner) %></li>
         </ul>
       <% end %>
     </div><!--/.well -->

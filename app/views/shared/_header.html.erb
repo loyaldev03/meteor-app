@@ -13,7 +13,7 @@
       <% if current_agent %>
         <div class="container nav-collapse">
           <% if @current_club.nil? %>
-            <% unless @current_partner.nil? %>
+            <% if not @current_partner.nil? and @current_agent.can?(:read,Partner) %>
               <%= link_to @current_partner.name, admin_partner_dashboard_path %>
             <% end %>
           <% else %>
@@ -71,7 +71,7 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <%= I18n.t("menu.admin_menu") %> <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><%= link_to t('menu.agents'), admin_agents_path if @current_agent.has_role_or_has_club_role_where_can?(:read, Agent) %></li>
+                <li><%= link_to t('menu.agents'), admin_agents_path if @current_agent.is_admin? %></li>
                 <li><%= link_to t('menu.partners'), admin_partners_path if @current_agent.can? :read, Agent %></li>
                 <li><%= link_to "DelayedJobs", admin_delayed_jobs_path if @current_agent.can? :read, DelayedJob %></li>
               </ul>
