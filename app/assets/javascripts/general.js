@@ -271,6 +271,7 @@ function member_index_functions(){
           $('#submit_button').removeAttr('disabled');
         },
         error: function(jqXHR, exception){
+          endAjaxLoader();
           if (jqXHR.status == 0) {
             alert('The search is talking more than expected. Please, try again in a moment.');
             $('#submit_button').removeAttr('disabled');
