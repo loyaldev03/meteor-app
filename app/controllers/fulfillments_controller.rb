@@ -51,6 +51,7 @@ class FulfillmentsController < ApplicationController
 
   def list_for_file
     @file = FulfillmentFile.find(params[:fulfillment_file_id])
+    my_authorize! :report, Fulfillment, @file.club_id
     @fulfillments = @file.fulfillments.includes(:member)
     render :index
   end
@@ -69,11 +70,15 @@ class FulfillmentsController < ApplicationController
     if not params[:fulfillment_selected].nil?
       begin
         ff.save!
+        ff_counts = 0
         params[:fulfillment_selected].each do |fs|
           fulfillment = Fulfillment.find(fs.first)
           ff.fulfillments << fulfillment
           fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
+          ff_counts += 1
         end
+        ff.fulfillment_count = ff_counts
+        ff.save
         flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
       rescue Exception => e
         flash.now[:error] = t('error_messages.airbrake_error_message')

@@ -1,6 +1,4 @@
 class Transaction < ActiveRecord::Base
-  include Extensions::UUID
-
   belongs_to :member
   belongs_to :membership
   belongs_to :payment_gateway_configuration
@@ -145,6 +143,10 @@ class Transaction < ActiveRecord::Base
     gateway == "authorize_net"
   end
 
+  def first_data?
+    gateway == "first_data"
+  end
+
   def one_time_type?
     operation_type == Settings.operation_types.no_recurrent_billing
   end
@@ -157,6 +159,8 @@ class Transaction < ActiveRecord::Base
       LitleTransaction.store!(am_credit_card, pgc)
     elsif pgc.authorize_net?
       AuthorizeNetTransaction.store!(am_credit_card, pgc)
+    elsif pgc.first_data?
+      FirstDataTransaction.store!(am_credit_card, pgc)
     else
       raise "No payment gateway configuration set for gateway \"#{pgc.gateway}\""
     end
@@ -170,6 +174,8 @@ class Transaction < ActiveRecord::Base
       LitleTransaction.new
     when 'authorize_net'
       AuthorizeNetTransaction.new
+    when 'first_data'
+      FirstDataTransaction.new
     else
       raise "No payment gateway configuration set for gateway \"#{gateway}\""
     end
@@ -200,8 +206,7 @@ class Transaction < ActiveRecord::Base
           Communication.deliver!(:refund, sale_transaction.member)
           sale_transaction.member.update_attribute :need_exact_target_sync, true
         else
-          answer = answer.is_a?(Hash) ? answer[:message].to_s : { :message => answer.to_s }
-          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer}", sale_transaction.member, Settings.operation_types.credit_error)
+          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
           trans.update_attribute :operation_type, Settings.operation_types.credit_error
         end
         answer
@@ -221,6 +226,8 @@ class Transaction < ActiveRecord::Base
       expired_codes = ['8','316']
     elsif self.litle?
       expired_codes = ['305']
+    elsif self.first_data?
+      expire_codes = ['522']
     end
     expired_codes.include? self.response_code 
   end
@@ -244,8 +251,9 @@ class Transaction < ActiveRecord::Base
     rescue Timeout::Error
       save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
-      save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Credit", e, {:member => self.member.inspect, :transaction => self.inspect })
+      response = save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
+      Auditory.report_issue("Transaction::Credit", e, {:member => self.member.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
+      response
     end
 
     def refund
@@ -261,8 +269,9 @@ class Transaction < ActiveRecord::Base
     rescue Timeout::Error
       save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
-      save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Refund", e, {:member => self.member.inspect, :transaction => self.inspect })
+      response = save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
+      Auditory.report_issue("Transaction::Refund", e, {:member => self.member.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
+      response
     end    
 
     # Process only sale operations

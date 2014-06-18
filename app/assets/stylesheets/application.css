@@ -215,3 +215,5 @@ div.dataTables_length label {
   border-bottom: solid;
 }
 
+.input-prepend .add-on, .input-append .add-on { margin-top: -10px; }
+

@@ -52,4 +52,12 @@ FactoryGirl.define do
     number "370000000000002" # credit card number is provided by Auth.Net
     gateway "authorize_net"
   end
+
+  factory :credit_card_visa_first_data, class: CreditCard do
+    active true
+    expire_month { (Date.today + 2.month).month }
+    expire_year { (Date.today + 2.year).year }
+    number "4111111111111111" # VISA credit card number is provided by FirstData
+    gateway "first_data"
+  end
 end

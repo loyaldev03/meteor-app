@@ -1,24 +1,31 @@
 <% delimiter = raw ' <span class="divider">></span> ' %>
 <% if @current_agent %>
   <ul class="breadcrumb">
-    <li>
-      <a href="<%= root_path %>">Home</a>
-    </li>
+    
+    <li><a href="<%= root_path %>">Home</a></li>
+
     <% if @current_partner and can? :read, Partner %>
+      <li><%= delimiter %>Partner</li>
       <li>
-        <%= delimiter %>Partner
-      </li>
-      <li>
-        <%= delimiter %><a href="<%= admin_partner_dashboard_path(@current_partner.prefix) %>"><%= @current_partner.name %></a>
+        <%= delimiter %>
+        <% if @current_agent.can? :show, Partner %>
+          <a href="<%= admin_partner_dashboard_path(@current_partner.prefix) %>"><%= @current_partner.name %></a>
+        <% else %>
+          <%= @current_partner.name %>
+        <% end %>
       </li>
     <% end %>
-    <% if @current_club and can? :read ,Club %>
+    
+    <% if @current_club and can? :read, Club %>
+      <li><%= delimiter %>Club</li>
       <li>
-        <%= delimiter %>Club
-      </li>
-      <li>
-        <%= delimiter %><a href="<%= clubs_path %>"><%= @current_club.name %></a>
-      </li>
+        <%= delimiter %>
+        <% if @current_agent.can? :show, Club %>
+          <a href="<%= clubs_path %>"><%= @current_club.name %></a>
+        <% else %>
+          <%= @current_club.name %>
+        <% end %>
+      </li>      
       <% if params[:controller] == 'members' and params[:action] == 'index' %>
         <%= delimiter %><li class="active">Search</li>
       <% end %>
@@ -41,13 +48,9 @@
 
     <% if @current_member %>
       <%= delimiter %>
-      <li>
-        <a href="<%= members_path %>">Members</a>
-      </li>
+      <li><a href="<%= members_path %>">Members</a></li>
       <%= delimiter %>
-      <li>
-        <a href="<%= show_member_path %>">Member</a>
-      </li>
+      <li><a href="<%= show_member_path %>">Member</a></li>
       <%= delimiter %>
       <% if params[:controller].include?('member_notes') %>
         <li class="active">Notes</li>
@@ -61,5 +64,6 @@
         <li class="active"><%= params[:action].humanize %></li>
       <% end %>
     <% end %>
+
   </ul>
 <% end %>

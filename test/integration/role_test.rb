@@ -1062,5 +1062,5 @@ test "Agency role - Recover a member" do
       assert page.has_no_content?("Products")
       assert page.has_no_content?("Fulfillments")
     end
-  end    
+  end
 end

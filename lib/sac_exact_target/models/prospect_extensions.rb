@@ -10,25 +10,30 @@ module SacExactTarget
         club_base = Club.exact_target_related
         club_base.each do |club|
           tzc = Time.zone.now
-          base = club.prospects.where("need_exact_target_sync = 1")
-          Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{base.count} prospects for club #{club.id}"
-          base.find_in_batches do |group|
-            group.each_with_index do |prospect,index|
+          prospect_club_count = club.prospects.where("need_exact_target_sync = 1").count
+          Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{prospect_club_count} prospects for club #{club.id}"
+          base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
+          index = 0
+          while not base.empty? do
+            base.each do |prospect|
               tz = Time.zone.now
               begin
                 Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
                 prospect.exact_target_after_create_sync_to_remote_domain(club) if defined?(SacExactTarget::ProspectModel)
               rescue Exception => e
-                Airbrake.notify(:error_class => "ExactTarget::ProspectSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => prospect.inspect })
+                Auditory.report_issue("ExactTarget::ProspectSync", e, { :prospect => prospect.inspect} )
+                prospect.update_attribute :need_exact_target_sync, 0
                 Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
               end
               Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for prospect ##{prospect.id}"
+              index+=1
             end
+            base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
           end
           Rails.logger.info "    ... took #{Time.zone.now - tzc}seconds for club ##{club.id}"
         end
       end
-    end   
+    end
 
     module InstanceMethods
       def exact_target_prospect
@@ -40,6 +45,7 @@ module SacExactTarget
       end
 
       def exact_target_sync_to_remote_domain(club = nil)
+        SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
         time_elapsed = Benchmark.ms do
           exact_target_prospect.save!(club)
         end

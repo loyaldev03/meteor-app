@@ -39,7 +39,8 @@ class Member < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_exact_target_sync_as_needed
-  after_save 'asyn_solr_index'
+  after_create :solr_index_asyn_call
+  after_update :solr_index_asyn_call
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_member_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
@@ -123,6 +124,10 @@ class Member < ActiveRecord::Base
     raise e
   end
   handle_asynchronously :asyn_solr_index, queue: :solr_indexing, priority: 10
+
+  def solr_index_asyn_call
+    asyn_solr_index if not (self.changed & ['id', 'club_id', 'first_name', 'last_name', 'address', 'city', 'country', 'state', 'zip', 'email', 'status', 'next_retry_bill_date', 'phone_country_code', 'phone_area_code', 'phone_local_number', 'sync_status', 'external_id', 'join_date']).empty?
+  end
   ########### SEARCH ###############
 
   state_machine :status, :initial => :none, :action => :save_state do
@@ -515,7 +520,9 @@ class Member < ActiveRecord::Base
     end
   rescue Exception => e
     trans.update_attribute :operation_type, Settings.operation_types.membership_billing_with_error if trans
-    Auditory.report_issue( "Billing:membership", e, { :member => self.inspect, :exception => e.to_s, :transaction => trans.inspect } )
+    report_options = { :member => self.inspect, :exception => e.to_s }
+    report_options.merge! :transaction => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" if trans
+    Auditory.report_issue( "Billing:membership", e, report_options)
     { :message => I18n.t('error_messages.airbrake_error_message'), :code => Settings.error_codes.membership_billing_error } 
   end
 
@@ -677,7 +684,7 @@ class Member < ActiveRecord::Base
     self.current_membership = membership
 
     operation_type = check_enrollment_operation
-    if amount.to_f != 0.0
+    if amount.to_f != 0.0      
       trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
@@ -828,7 +835,7 @@ class Member < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :nillify_club_cash, :queue => :generic_queue, priority: 18
+  handle_asynchronously :nillify_club_cash, :queue => :club_cash_queue, priority: 18
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
@@ -838,7 +845,7 @@ class Member < ActiveRecord::Base
       self.save(:validate => false)
     end
   end
-  handle_asynchronously :reset_club_cash, :queue => :generic_queue, priority: 18
+  handle_asynchronously :reset_club_cash, :queue => :club_cash_queue, priority: 18
 
   def assign_first_club_cash 
     assign_club_cash unless terms_of_membership.skip_first_club_cash
@@ -858,7 +865,7 @@ class Member < ActiveRecord::Base
     # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
     Auditory.report_issue("Member:assign_club_cash:sync", e, { :member => self.inspect, :amount => amount, :message => message })
   end
-  handle_asynchronously :assign_club_cash, :queue => :generic_queue, :run_at => Proc.new { 5.minutes.from_now }, priority: 5
+  handle_asynchronously :assign_club_cash, :queue => :club_cash_queue, :run_at => Proc.new { 5.minutes.from_now }, priority: 5
 
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0,description = nil)
@@ -1249,7 +1256,7 @@ class Member < ActiveRecord::Base
 
     def proceed_with_manual_billing_logic(trans, operation_type)
       unless set_as_active
-        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
       message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
@@ -1261,7 +1268,7 @@ class Member < ActiveRecord::Base
 
     def proceed_with_billing_logic(trans)
       unless set_as_active
-        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => trans.inspect })
+        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
       if check_upgradable 
         schedule_renewal
@@ -1343,6 +1350,7 @@ class Member < ActiveRecord::Base
           end
         end
       end
+      
       self.save(:validate => false)
       Auditory.audit(nil, trans, message, self, operation_type )
       if cancel_member

@@ -295,5 +295,47 @@ class AgentsTest < ActionController::IntegrationTest
     saved_agent = Agent.find_by_username(unsaved_agent.username)
 
     assert saved_agent.roles.blank?
-  end 
+  end
+
+  #####################################################
+  # CLUBS ROLES
+  ##################################################### 
+
+  def prepare_agents_with_club_roles
+    @agent_club_role_admin = FactoryGirl.create(:agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.role = "admin"
+    club_role.agent_id = @agent_club_role_admin.id
+    club_role.save
+    @agent_club_role_admin2 = FactoryGirl.create(:agent)
+    club2 = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club2.id
+    club_role.role = "admin"
+    club_role.agent_id = @agent_club_role_admin2.id
+    club_role.save
+  end
+
+  test "Agent with club_role admin can not create agents with global roles" do
+    prepare_agents_with_club_roles
+    sign_in_as(@agent_club_role_admin)
+    visit new_admin_agent_path
+    assert page.has_no_content?("Global Roles")
+    assert page.has_no_selector?(:xpath, "//input[@id='agent_roles_admin']")
+    assert page.has_no_selector?(:xpath, "//input[@id='agent_roles_api']")
+    assert page.has_no_selector?(:xpath, "//input[@id='agent_roles_representative']")
+    assert page.has_no_selector?(:xpath, "//input[@id='agent_roles_supervisor']")
+    assert page.has_no_selector?(:xpath, "//input[@id='agent_roles_agency']")
+    assert page.has_no_selector?(:xpath, "//input[@id='agent_roles_fulfillment_managment']")
+  end
+
+  test "See agents with rol only for the club that you are seeing" do
+    prepare_agents_with_club_roles
+    sign_in_as(@agent_club_role_admin)
+    visit admin_agents_path
+    within("#agents_table") do 
+      find("tr", :text => @agent_club_role_admin.email)
+      assert page.has_no_content?(@agent_club_role_admin2.email)
+    end
+  end
 end

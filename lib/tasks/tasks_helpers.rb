@@ -258,8 +258,8 @@ module TasksHelpers
   def self.sync_to_exact_target
     base = Member.where("need_exact_target_sync = 1")
     base.find_in_batches do |group|
-      tz = Time.zone.now
       group.each_with_index do |member,index|
+        tz = Time.zone.now
         begin
           Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
           member.marketing_tool_sync_without_dj

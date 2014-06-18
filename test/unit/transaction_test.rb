@@ -13,6 +13,7 @@ class TransactionTest < ActiveSupport::TestCase
     @sd_mes_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "054")
     @sd_litle_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "305", :gateway => "litle")
     @sd_auth_net_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "316", :gateway => "authorize_net")
+    @sd_first_data_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "605", :gateway => "first_data")
     @hd_strategy = FactoryGirl.create(:hard_decline_strategy)
     FactoryGirl.create(:without_grace_period_decline_strategy_monthly)
     FactoryGirl.create(:without_grace_period_decline_strategy_yearly)
@@ -185,7 +186,7 @@ class TransactionTest < ActiveSupport::TestCase
       Timecop.travel(next_year) do
         next_year = next_year + member.terms_of_membership.installment_period.days
         Delayed::Worker.delay_jobs = true
-        assert_difference('DelayedJob.count',3)do
+        assert_difference('DelayedJob.count',2)do
           TasksHelpers.bill_all_members_up_today
         end
         Delayed::Worker.delay_jobs = false
@@ -618,62 +619,6 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  # Tets Authorize net transactions
-  def club_with_authorize_net
-    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
-    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
-    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
-  end
-
-  # test "Bill membership with Authorize net" do
-  #   club_with_authorize_net
-  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
-  #   amount = @authorize_net_terms_of_membership.installment_amount
-  #   Timecop.travel(active_member.next_retry_bill_date) do
-  #     answer = active_member.bill_membership
-  #     active_member.reload
-  #     assert_equal active_member.status, 'active'
-  #   end
-  # end
-
-  # test "Enroll with Authorize net" do
-  #   club_with_authorize_net
-  #   enroll_member(@authorize_net_terms_of_membership, 23, false, @credit_card_authorize_net)
-  # end
-
-  # test "Full refund with Authorize net" do
-  #   club_with_authorize_net
-  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
-  #   amount = @authorize_net_terms_of_membership.installment_amount
-  #   Timecop.travel(active_member.next_retry_bill_date) do
-  #     answer = active_member.bill_membership
-  #     active_member.reload
-  #     assert_equal active_member.status, 'active'
-  #     trans = active_member.transactions.last
-  #     answer = Transaction.refund(amount, trans)
-  #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
-  #   end
-  #   assert_equal Transaction.find_by_transaction_type('credit').operation_type, Settings.operation_types.credit
-  # end
-
-  # test "Partial refund with Authorize net" do
-  #   club_with_authorize_net
-  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
-  #   amount = @authorize_net_terms_of_membership.installment_amount
-  #   Timecop.travel(active_member.next_retry_bill_date) do
-  #     answer = active_member.bill_membership
-  #     active_member.reload
-  #     assert_equal active_member.status, 'active'
-  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
-  #     refunded_amount = amount-0.34
-  #     answer = Transaction.refund(refunded_amount, trans)
-  #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
-  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
-  #     assert_equal trans.operation_type, Settings.operation_types.credit
-  #     assert_equal trans.transaction_type, 'refund'
-  #   end
-  # end
-
   test "should not update NBD after save the sale from monthly-tom to monthly-tom" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
@@ -968,72 +913,6 @@ class TransactionTest < ActiveSupport::TestCase
 
     Timecop.travel(active_member.next_retry_bill_date) do
       active_merchant_stubs_litle
-
-      old_year = active_member.active_credit_card.expire_year
-      old_month = active_member.active_credit_card.expire_month
-      
-      assert_difference('Operation.count', 3) do
-        assert_difference('Transaction.count') do
-          active_member.bill_membership
-        end
-      end
-      active_member.reload
-      assert_equal active_member.active_credit_card.expire_year, old_year
-      assert_equal active_member.active_credit_card.expire_month, old_month
-    end
-  end
-
-  # Try billing a member's membership when he was previously SD for credit_card_expired before last billing for Auth.net
-  test "Try billing a member's membership when he was previously SD for credit_card_expired for Auth.net" do 
-    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
-    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
-    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net, :token => "tzNduuh2DRQT7FXUILDl3Q==")
-
-    active_member = create_active_member(@authorize_net_terms_of_membership)
-    active_merchant_stubs_auth_net(@sd_auth_net_expired_strategy.response_code, "decline stubbed", false)
-    active_member.active_credit_card.update_attribute :token, @credit_card_authorize_net.token
-
-    active_member.bill_membership
-
-    Timecop.travel(active_member.next_retry_bill_date) do
-      active_merchant_stubs_auth_net
-      old_year = active_member.active_credit_card.expire_year
-      old_month = active_member.active_credit_card.expire_month
-      assert_difference('Operation.count', 4) do
-        assert_difference('Transaction.count') do
-          active_member.bill_membership
-        end
-      end
-      active_member.reload
-      assert_equal active_member.active_credit_card.expire_year, old_year+2
-      assert_equal active_member.active_credit_card.expire_month, old_month
-    end
-
-    Timecop.travel(active_member.next_retry_bill_date) do
-      old_year = active_member.active_credit_card.expire_year
-      old_month = active_member.active_credit_card.expire_month
-      active_member.bill_membership
-      active_member.reload
-      assert_equal active_member.active_credit_card.expire_year, old_year
-      assert_equal active_member.active_credit_card.expire_month, old_month
-    end
-  end
-
-  test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for Auth.net" do 
-    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
-    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
-    @authorize_net_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id, :name =>"second_one")
-    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
-    
-    active_member = enroll_member(@authorize_net_terms_of_membership, 0, false, @credit_card_authorize_net)
-    active_member.next_retry_bill_date = Time.zone.now
-
-    active_merchant_stubs_auth_net(@sd_auth_net_expired_strategy.response_code, "decline stubbed", false)
-    active_member.bill_membership
-    active_member.change_terms_of_membership(@authorize_net_terms_of_membership_second.id, "changing tom", 100)
-
-    Timecop.travel(active_member.next_retry_bill_date) do
-      active_merchant_stubs_auth_net
 
       old_year = active_member.active_credit_card.expire_year
       old_month = active_member.active_credit_card.expire_month
@@ -1388,6 +1267,263 @@ class TransactionTest < ActiveSupport::TestCase
           answer = Transaction.refund(amount, trans)
         end 
       end
+    end
+  end
+
+
+#####################################################
+######  AUTHORIZED NET ##############################
+#####################################################
+
+  # Tets Authorize net transactions
+  def club_with_authorize_net
+    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
+  end
+
+  test "Bill membership with Authorize net" do
+    club_with_authorize_net
+    active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+    amount = @authorize_net_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+    end
+  end
+
+  test "Enroll with Authorize net" do
+    club_with_authorize_net
+    enroll_member(@authorize_net_terms_of_membership, 23, false, @credit_card_authorize_net)
+  end
+
+  # test "Full refund with Authorize net" do
+  #   club_with_authorize_net
+  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+  #   amount = @authorize_net_terms_of_membership.installment_amount
+  #   Timecop.travel(active_member.next_retry_bill_date) do
+  #     answer = active_member.bill_membership
+  #     active_member.reload
+  #     assert_equal active_member.status, 'active'
+  #     trans = active_member.transactions.last
+  #     answer = Transaction.refund(amount, trans)
+  #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
+  #   end
+  #   assert_equal Transaction.find_by_transaction_type('credit').operation_type, Settings.operation_types.credit
+  # end
+
+  # test "Partial refund with Authorize net" do
+  #   club_with_authorize_net
+  #   active_member = enroll_member(@authorize_net_terms_of_membership, 100, false, @credit_card_authorize_net)
+  #   amount = @authorize_net_terms_of_membership.installment_amount
+  #   Timecop.travel(active_member.next_retry_bill_date) do
+  #     answer = active_member.bill_membership
+  #     active_member.reload
+  #     assert_equal active_member.status, 'active'
+  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+  #     refunded_amount = amount-0.34
+  #     answer = Transaction.refund(refunded_amount, trans)
+  #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
+  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+  #     assert_equal trans.operation_type, Settings.operation_types.credit
+  #     assert_equal trans.transaction_type, 'refund'
+  #   end
+  # end
+
+  # Try billing a member's membership when he was previously SD for credit_card_expired before last billing for Auth.net
+  test "Try billing a member's membership when he was previously SD for credit_card_expired for Auth.net" do 
+    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net, :token => "tzNduuh2DRQT7FXUILDl3Q==")
+
+    active_member = create_active_member(@authorize_net_terms_of_membership)
+    active_merchant_stubs_auth_net(@sd_auth_net_expired_strategy.response_code, "decline stubbed", false)
+    active_member.active_credit_card.update_attribute :token, @credit_card_authorize_net.token
+
+    active_member.bill_membership
+    Timecop.travel(active_member.next_retry_bill_date) do
+      active_merchant_stubs_auth_net
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      assert_difference('Operation.count', 4) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
+      end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year+2
+      assert_equal active_member.active_credit_card.expire_month, old_month
+    end
+
+    Timecop.travel(active_member.next_retry_bill_date) do
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year
+      assert_equal active_member.active_credit_card.expire_month, old_month
+    end
+  end
+
+  test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for Auth.net" do 
+    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @authorize_net_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id, :name =>"second_one")
+    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
+    
+    active_member = enroll_member(@authorize_net_terms_of_membership, 0, false, @credit_card_authorize_net)
+    active_member.next_retry_bill_date = Time.zone.now
+
+    active_merchant_stubs_auth_net(@sd_auth_net_expired_strategy.response_code, "decline stubbed", false)
+    active_member.bill_membership
+    active_member.change_terms_of_membership(@authorize_net_terms_of_membership_second.id, "changing tom", 100)
+
+    Timecop.travel(active_member.next_retry_bill_date) do
+      active_merchant_stubs_auth_net
+
+      old_year = active_member.active_credit_card.expire_year
+      old_month = active_member.active_credit_card.expire_month
+      
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
+      end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, old_year
+      assert_equal active_member.active_credit_card.expire_month, old_month
+    end
+  end
+
+######################################################
+#######  FIRST DATA ##################################
+######################################################
+
+  # Tets FirstData transactions
+  def club_with_first_data
+    @first_data_club = FactoryGirl.create(:simple_club_with_first_data_gateway)
+    @first_data_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @first_data_club.id)
+    @credit_card_first_data = FactoryGirl.build(:credit_card_visa_first_data)
+  end
+
+  test "Enroll with FirstData" do
+    club_with_first_data
+    enroll_member(@first_data_terms_of_membership, 23, false, @credit_card_first_data)
+  end
+
+  test "Bill membership with FirstData" do
+    club_with_first_data
+    active_member = enroll_member(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
+    amount = @first_data_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+    end
+  end
+
+  test "Full refund with FirstData" do
+    club_with_first_data
+    active_member = enroll_member(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
+    amount = @first_data_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+      trans = active_member.transactions.last
+      answer = Transaction.refund(amount, trans)
+      assert_equal answer[:code], "000", answer[:message]
+    end
+    assert_equal Transaction.find_by_transaction_type('refund').operation_type, Settings.operation_types.credit
+  end
+
+  test "Partial refund with FirstData" do
+    club_with_first_data
+    active_member = enroll_member(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
+    amount = @first_data_terms_of_membership.installment_amount
+    Timecop.travel(active_member.next_retry_bill_date) do
+      answer = active_member.bill_membership
+      active_member.reload
+      assert_equal active_member.status, 'active'
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      refunded_amount = amount-0.34
+      answer = Transaction.refund(refunded_amount, trans)
+      assert_equal answer[:code], "000", answer[:message] # refunds cant be processed on Auth.net test env
+      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
+      assert Transaction.where("member_id = ? and operation_type = ?", active_member.id, Settings.operation_types.credit).count == 1
+      assert_equal trans.transaction_type, 'refund'
+    end
+  end
+
+  # Try billing a member's membership when he was previously SD for credit_card_expired before last billing for FirstData
+  test "Try billing a member's membership when he was previously SD for credit_card_expired for FirstDate" do 
+    club_with_first_data
+    active_member = enroll_member(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
+    # active_merchant_stubs_first_data(@sd_first_data_expired_strategy.response_code, "decline stubbed", false)
+    active_card = active_member.active_credit_card
+    active_member.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_member.first_name, active_member.last_name, @credit_card_first_data.expire_month, (Time.zone.now-1.year).year].join(";")
+    active_member.active_credit_card.update_attribute :expire_year, (Time.zone.now-1.year).year
+    
+    Timecop.travel(active_member.next_retry_bill_date) do
+      active_member.bill_membership
+    end
+
+    active_member.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_member.first_name, active_member.last_name, @credit_card_first_data.expire_month, (Time.zone.now+2.year).year].join(";")
+    Timecop.travel(active_member.next_retry_bill_date) do
+      assert_difference('Operation.count', 4) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
+        active_member.reload
+        assert_equal active_member.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
+      end
+    end
+    
+    Timecop.travel(active_member.next_retry_bill_date) do
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
+      end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
+    end
+  end
+
+  test "Try billing a member's membership when he was previously SD for credit_card_expired on different membership for FirstData" do 
+    club_with_first_data
+    @first_data_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @first_data_club.id, :name =>"second_one")
+    active_member = enroll_member(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
+    # active_merchant_stubs_first_data(@sd_first_data_expired_strategy.response_code, "decline stubbed", false)
+    active_card = active_member.active_credit_card
+    active_member.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_member.first_name, active_member.last_name, @credit_card_first_data.expire_month, (Time.zone.now-1.year).year].join(";")
+    active_member.active_credit_card.update_attribute :expire_year, (Time.zone.now-1.year).year
+    
+    Timecop.travel(active_member.next_retry_bill_date) do
+      active_member.bill_membership
+    end
+    active_member.change_terms_of_membership(@first_data_terms_of_membership_second.id, "changing tom", 100)
+
+    active_member.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_member.first_name, active_member.last_name, @credit_card_first_data.expire_month, (Time.zone.now+2.year).year].join(";")
+    Timecop.travel(active_member.next_retry_bill_date) do
+      assert_difference('Operation.count', 4) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
+        active_member.reload
+        assert_equal active_member.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
+      end
+    end
+
+    Timecop.travel(active_member.next_retry_bill_date) do
+      assert_difference('Operation.count', 3) do
+        assert_difference('Transaction.count') do
+          active_member.bill_membership
+        end
+      end
+      active_member.reload
+      assert_equal active_member.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
     end
   end
 end

@@ -97,6 +97,16 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::AuthorizeNetGateway.any_instance.stubs(:store).returns(answer)
   end 
 
+  def active_merchant_stubs_first_data(code = "000", message = "This transaction has been approved with stub", success = true)
+    answer = ActiveMerchant::Billing::Response.new(success, message, 
+      {"response_code"=>code, "response_reason_code"=>"6", "response_reason_text"=> message, 
+       "avs_result_code"=>"P", "transaction_id"=>"0", "card_code"=>"", "action"=>"AUTH_CAPTURE"})
+    ActiveMerchant::Billing::FirstdataE4Gateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::FirstdataE4Gateway.any_instance.stubs(:refund).returns(answer)
+    ActiveMerchant::Billing::FirstdataE4Gateway.any_instance.stubs(:credit).returns(answer)
+    ActiveMerchant::Billing::FirstdataE4Gateway.any_instance.stubs(:store).returns(answer)
+  end 
+
   def active_merchant_stubs_store(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)
