@@ -304,13 +304,10 @@ class ProductsControllerTest < ActionController::TestCase
     @club_admin.save
     sign_in(@club_admin)
     @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    product = FactoryGirl.build(:product)
-    post :create, partner_prefix: @partner.prefix, 
-      club_prefix: @other_club.name, 
-      product: {
-        name: product.name, recurrent: product.recurrent, package: product.package, 
-        sku: product.sku, stock: product.stock, weight: product.weight, club_id: @other_club.id
-      }
+    @product = FactoryGirl.build(:product)
+    @product.club_id = @other_club.id
+    @product.save
+    get :edit, id: @product, partner_prefix: @partner.prefix, club_prefix: @other_club.name
     assert_response :unauthorized
   end
 
