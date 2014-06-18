@@ -16,7 +16,7 @@ class OperationsController < ApplicationController
   # GET /operations/1
   def show
     @operation = Operation.find(params[:id])
-    my_authorize! :edit, Operation, @operation.member.club_id
+    my_authorize! :show, Operation, @operation.member.club_id
   end
 
   # PUT /operations/1
