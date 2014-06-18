@@ -276,4 +276,56 @@ class ProductsControllerTest < ActionController::TestCase
     end
     assert_redirected_to products_path
   end
+
+  test "Admin_by_role can not see product from another club where it has not permissions" do
+    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @club_admin.id
+    club_role.role = "admin"
+    club_role.save
+    @club_admin.roles = nil
+    @club_admin.save
+    sign_in(@club_admin)
+    @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @product = FactoryGirl.create(:product)
+    @product.club_id = @other_club.id
+    @product.save
+    get :show, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
+    assert_response :unauthorized
+  end
+
+  test "Admin_by_role can not edit product from another club where it has not permissions" do
+    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @club_admin.id
+    club_role.role = "admin"
+    club_role.save
+    @club_admin.roles = nil
+    @club_admin.save
+    sign_in(@club_admin)
+    @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @product = FactoryGirl.build(:product)
+    @product.club_id = @other_club.id
+    @product.save
+    get :edit, id: @product, partner_prefix: @partner.prefix, club_prefix: @other_club.name
+    assert_response :unauthorized
+  end
+
+  test "Admin_by_role can not delete products from another club where it has not permissions" do
+    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @club_admin.id
+    club_role.role = "admin"
+    club_role.save
+    @club_admin.roles = nil
+    @club_admin.save
+    sign_in(@club_admin)
+    @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @product = FactoryGirl.create(:product)
+    @product.club_id = @other_club.id
+    @product.save
+    delete :destroy, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
+    assert_response :unauthorized
+  end
+
 end
