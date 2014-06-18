@@ -44,9 +44,9 @@ $(document).ready( function() {
   $(function() {
     $.ajaxSetup({
       error: function(jqXHR, exception) {
+        endAjaxLoader();
         if (jqXHR.status == 0) {
           alert('The operation is taking more than expected. Please wait a moment while we finish processing this request and check if it was done.');
-          endAjaxLoader();
         }else
           alert(global_ajax_error_messages(jqXHR));
       },
@@ -273,10 +273,11 @@ function member_index_functions(){
         error: function(jqXHR, exception){
           if (jqXHR.status == 0) {
             alert('The search is talking more than expected. Please, try again in a moment.');
-            endAjaxLoader();
             $('#submit_button').removeAttr('disabled');
-          }else
+          }else{
             global_ajax_error_messages(jqXHR);
+          }
+          endAjaxLoader();
         }
       });
       return false;
