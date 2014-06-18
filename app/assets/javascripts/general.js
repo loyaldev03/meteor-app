@@ -274,10 +274,8 @@ function member_index_functions(){
           if (jqXHR.status == 0) {
             alert('The search is talking more than expected. Please, try again in a moment.');
             $('#submit_button').removeAttr('disabled');
-          }else{
+          }else
             global_ajax_error_messages(jqXHR);
-          }
-          endAjaxLoader();
         }
       });
       return false;
