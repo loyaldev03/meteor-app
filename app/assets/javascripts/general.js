@@ -419,6 +419,12 @@ function new_member_functions(){
           }
         }
       },
+      error: function(jqXHR, exception){
+        endAjaxLoader();
+        alert(global_ajax_error_messages(jqXHR));
+        $('#submit_button').removeAttr('disabled');
+        $('#cancel_button').show();
+      }
     });
   });
   today = new Date()
