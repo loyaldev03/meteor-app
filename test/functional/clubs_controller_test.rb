@@ -333,7 +333,7 @@ class ClubsControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       club_role.role = role
       club_role.save
       get :show, id: @club, partner_prefix: @partner_prefix
@@ -341,17 +341,15 @@ class ClubsControllerTest < ActionController::TestCase
     end
   end
 
-  test "agent with club roles should not get edit" do
+  test "agent with club role admin should get edit club" do
     sign_in(@agent)
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      club_role.role = role
-      club_role.save
-      get :edit, id: @club, partner_prefix: @partner_prefix
-      assert_response :unauthorized
-    end
+    club_role.role = "admin"
+    club_role.save
+    get :show, id: club, partner_prefix: @partner_prefix
+    assert_response :success
   end
 
   test "agent with club roles should not update club" do
@@ -359,12 +357,23 @@ class ClubsControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       club_role.role = role
       club_role.save
       put :update, id: @club, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name }
       assert_response :unauthorized
     end
+  end
+
+  test "agent with club role admin should update club" do
+    sign_in(@agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @agent.id
+    club_role.role = "admin"
+    club_role.save
+    put :update, id: club.id, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name }
+    assert_response :success
   end
 
   test "agent with club roles should not destroy club" do
@@ -375,7 +384,7 @@ class ClubsControllerTest < ActionController::TestCase
     ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       club_role.role = role
       club_role.save
-      delete :destroy, id: @club, partner_prefix: @partner_prefix
+      delete :destroy, id: club.id, partner_prefix: @partner_prefix
       assert_response :unauthorized
     end
   end
