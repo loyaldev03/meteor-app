@@ -1,11 +1,12 @@
 class DomainsController < ApplicationController
   layout '2-cols'
+  before_filter :load_clubs_related, only: [ :new, :edit ]
 
 
   # GET /domains
   # GET /domains.json
   def index
-    my_authorize_admin_agents!(:list, Domain, @current_partner.clubs.collect(&:id))
+    my_authorize_action_within_clubs!(:list, Domain, @current_partner.clubs.collect(&:id))
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: DomainsDatatable.new(view_context,@current_partner,nil,nil,@current_agent)}
@@ -20,17 +21,15 @@ class DomainsController < ApplicationController
 
   # GET /domains/new
   def new
-    my_authorize_admin_agents!(:new, Domain, @current_partner.clubs.collect(&:id))
+    my_authorize_action_within_clubs!(:new, Domain, @current_partner.clubs.collect(&:id))
     @domain = Domain.new :partner => @current_partner
     @domain.club_id = params[:club_id] if params[:club_id]
-    @clubs = Club.where(:partner_id => @current_partner)
   end
 
   # GET /domains/1/edit
   def edit
     @domain = Domain.find(params[:id])
     my_authorize!(:edit, Domain, @domain.club_id)
-    @clubs = Club.where(:partner_id => @current_partner)
   end
 
   # POST /domains
@@ -42,7 +41,7 @@ class DomainsController < ApplicationController
     if @domain.save
       redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully created."
     else
-      @clubs = @current_agent.has_global_role? ? Club.where(:partner_id => @current_partner) : @current_agent.clubs.where(:partner_id => @current_partner)
+      load_clubs_related
       render action: "new"
     end
   end
@@ -61,7 +60,7 @@ class DomainsController < ApplicationController
     if @domain.save
       redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully updated."
     else
-      @clubs = @current_agent.has_global_role? ? Club.where(:partner_id => @current_partner) : @current_agent.clubs.where(:partner_id => @current_partner)
+      load_clubs_related
       render action: "edit"
     end
   end
@@ -76,5 +75,9 @@ class DomainsController < ApplicationController
     else
       redirect_to domains_path(:id => @domain), :flash => { error: "The domain #{@domain.url} cannot be destroyed. You must have at least one domain."}
     end
+  end
+
+  def load_clubs_related
+    @clubs = @current_agent.has_global_role? ? Club.select("id,name").where(:partner_id => @current_partner) : @current_agent.clubs.where(:partner_id => @current_partner)
   end
 end

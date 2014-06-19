@@ -21,10 +21,12 @@ class ApplicationController < ActionController::Base
       raise CanCan::AccessDenied unless @current_agent.can?(action, what, club_id)
     end
 
-    def my_authorize_admin_agents!(action, model, club_id_list=nil)
+    #TODO: Merge this method with 'my_authorize'
+    #Used to check if the agent is allowed to make any of these actions within a given list of clubs or it's own.
+    def my_authorize_action_within_clubs!(action, model, club_id_list=nil)
       allowed = @current_agent.can? action, model
       unless allowed
-        club_id_list ||= @current_agent.get_clubs_related
+        club_id_list ||= @current_agent.clubs_related_id_list
         club_id_list.each do |club_id|
           allowed = true if @current_agent.can? action, model, club_id
         end

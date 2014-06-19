@@ -65,23 +65,20 @@ class Agent < ActiveRecord::Base
   end
   alias_method_chain :has_role?, :club
 
-  def set_is_admin
-    @is_admin = true
-  end
-
   def is_admin?
-    unless @is_admin
-      set_is_admin if self.has_role?("admin") ? true : false
+    if @is_admin.nil?
+      @is_admin = false
+      @is_admin = true if self.has_role?("admin")
       unless @is_admin 
         self.club_roles.each do |club_role|
-          set_is_admin if club_role.role == "admin"
+          @is_admin = true if club_role.role == "admin"
         end
       end
     end
     @is_admin
   end
 
-  def get_clubs_related(role=nil)
+  def clubs_related_id_list(role=nil)
     if role 
       club_roles.where("role = ?", role).collect(&:club_id)
     else
@@ -93,7 +90,7 @@ class Agent < ActiveRecord::Base
     if self.has_global_role?
       return true if can? action, model
     else
-      clubs_id_list ||= self.get_clubs_related
+      clubs_id_list ||= self.clubs_related_id_list
       clubs_id_list.each do |club_id|
         return true if can? action, model, club_id
       end
@@ -146,7 +143,7 @@ class Agent < ActiveRecord::Base
   end
 
   def can_agent_by_role_delete_club_role(club_role)
-    self.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, self.get_clubs_related("admin")).count == 1
+    self.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, self.clubs_related_id_list("admin")).count == 1
   end
     
   protected
