@@ -15,7 +15,7 @@ class ClubsController < ApplicationController
   # GET /clubs
   # GET /clubs.json
   def index
-    my_authorize!(:list, Club)
+    my_authorize_admin_agents!(:list, Club, @current_partner.clubs.collect(&:id))
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: ClubsDatatable.new(view_context,@current_partner,nil,nil,@current_agent) }

@@ -31,10 +31,10 @@
         <% if @current_agent.has_global_role? %>
           <%= generate_select_club_id f, @domain, @clubs %>
         <% else %>
-          <%= generate_select_club_id f, @domain, @current_agent.clubs %>
+          <%= generate_select_club_id f, @domain, @current_agent.clubs, false %>
         <% end %>
       <% else %>
-        <%= f.collection_select :club_id, [@domain.club], "id", "name" %>
+        <%= generate_select_club_id f, @domain, [@domain.club], false %>
       <% end %>
     </div>
   </div>

@@ -29,7 +29,6 @@ class Agent < ActiveRecord::Base
   validates_uniqueness_of_without_deleted :username
   validates :username, :presence => true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
 
-
   before_save :ensure_authentication_token
 
   def self.find_for_database_authentication(warden_conditions)
@@ -66,21 +65,35 @@ class Agent < ActiveRecord::Base
   end
   alias_method_chain :has_role?, :club
 
+  def set_is_admin
+    @is_admin = true
+  end
+
   def is_admin?
-    answer = self.has_role?("admin") ? true : false
-    unless answer 
-      self.club_roles.each do |club_role|
-        answer = true if club_role.role == "admin"
+    unless @is_admin
+      set_is_admin if self.has_role?("admin") ? true : false
+      unless @is_admin 
+        self.club_roles.each do |club_role|
+          set_is_admin if club_role.role == "admin"
+        end
       end
     end
-    answer
+    @is_admin
+  end
+
+  def get_clubs_related(role=nil)
+    if role 
+      club_roles.where("role = ?", role).collect(&:club_id)
+    else
+      club_roles.collect(&:club_id)
+    end
   end
 
   def has_role_or_has_club_role_where_can?(action, model, clubs_id_list = nil)
     if self.has_global_role?
       return true if can? action, model
     else
-      clubs_id_list ||= self.club_roles.collect(&:club_id)
+      clubs_id_list ||= self.get_clubs_related
       clubs_id_list.each do |club_id|
         return true if can? action, model, club_id
       end
@@ -133,7 +146,7 @@ class Agent < ActiveRecord::Base
   end
 
   def can_agent_by_role_delete_club_role(club_role)
-    self.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, self.club_roles.where("role = 'admin'").collect(&:club_id)).count == 1
+    self.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, self.get_clubs_related("admin")).count == 1
   end
     
   protected

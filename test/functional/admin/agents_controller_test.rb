@@ -316,7 +316,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       club_role.role = role
       club_role.save
-      post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
+      post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email }, club_roles_attributes: { "1" => { role:"api", club_id: @agent.clubs.first.id }}
       assert_response :unauthorized
     end
   end

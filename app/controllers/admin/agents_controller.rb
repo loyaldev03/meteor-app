@@ -1,5 +1,5 @@
 class Admin::AgentsController < ApplicationController
-  before_filter :load_clubs_related, only: [ :new, :edit, :create, :update ]
+  before_filter :load_get_clubs_related, only: [ :new, :edit, :create, :update ]
 
   # GET /agents
   def index
@@ -13,11 +13,11 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/1
   def show
     @agent = Agent.find(params[:id])
-    my_authorize_admin_agents!(:show, Agent, @agent.clubs.each.collect(&:id))
+    my_authorize_admin_agents!(:show, Agent, @agent.get_clubs_related)
     if @current_agent.has_global_role?
       @club_roles = @agent.club_roles
     else
-      @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
+      @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.get_clubs_related("admin"))
     end
   end 
 
@@ -30,11 +30,11 @@ class Admin::AgentsController < ApplicationController
   # GET /agents/1/edit
   def edit
     @agent = Agent.find(params[:id])
-    my_authorize_admin_agents!(:edit, Agent, @agent.clubs.collect(&:id))
+    my_authorize_admin_agents!(:edit, Agent, @agent.get_clubs_related)
     if @current_agent.has_global_role?
       @club_roles = @agent.club_roles
     else
-      @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
+      @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.get_clubs_related("admin"))
     end
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
   end
@@ -42,8 +42,13 @@ class Admin::AgentsController < ApplicationController
   # POST /agents
   def create
     @agent = Agent.new(params[:agent])
-    raise CanCan::AccessDenied unless @current_agent.is_admin?
-    # my_authorize_admin_agents!(:create, Agent, @agent.club_roles.collect(&:club_id))
+    if @current_agent.has_global_role?
+      my_authorize_admin_agents!(:create, Agent)
+    elsif params[:club_roles_attributes]
+      club_roles_id = []
+      params[:club_roles_attributes].each{|k,v| club_roles_id << v["club_id"] }
+      my_authorize_admin_agents!(:create, Agent, club_roles_id)
+    end
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     success = false
     ClubRole.transaction do
@@ -77,9 +82,9 @@ class Admin::AgentsController < ApplicationController
   # PUT /agents/1
   def update
     @agent = Agent.find(params[:id])
-    my_authorize_admin_agents!(:update, Agent, @agent.club_roles.collect(&:club_id))
+    my_authorize_admin_agents!(:update, Agent, @agent.get_clubs_related)
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
-    @club_roles = @agent.club_roles.where("club_id in (?)", @current_agent.club_roles.where("role = 'admin'").collect(&:club_id))
+    @club_roles = @agent.club_roles.where("club_id in (?)", @current_agent.get_clubs_related("admin"))
     success = false
     ClubRole.transaction do
       begin
@@ -111,7 +116,7 @@ class Admin::AgentsController < ApplicationController
   # DELETE /agents/1
   def destroy
     @agent = Agent.find(params[:id])
-    my_authorize_admin_agents!(:destroy, Agent, @agent.clubs.collect(&:id))
+    my_authorize_admin_agents!(:destroy, Agent, @agent.get_clubs_related)
     @agent.destroy
     redirect_to(admin_agents_url, :notice => 'Agent was successfully deleted.')
   end
@@ -162,7 +167,7 @@ class Admin::AgentsController < ApplicationController
       end
     end
 
-    def load_clubs_related
+    def load_get_clubs_related
       @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs.where("club_roles.role = 'admin'")
     end
 end

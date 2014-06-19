@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
     def my_authorize_admin_agents!(action, model, club_id_list=nil)
       allowed = @current_agent.can? action, model
       unless allowed
-        club_id_list ||= @current_agent.club_roles.collect(&:club_id)
+        club_id_list ||= @current_agent.get_clubs_related
         club_id_list.each do |club_id|
           allowed = true if @current_agent.can? action, model, club_id
         end

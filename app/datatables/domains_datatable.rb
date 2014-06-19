@@ -36,7 +36,7 @@ private
     domains = if @current_agent.has_global_role?
       Domain.where(:partner_id => @current_partner.id).order("#{sort_column} #{sort_direction}")
     else
-      Domain.where("partner_id = ? and club_id in (?)", @current_partner.id, @current_agent.clubs.where("role = 'admin'").collect(&:id)).order("#{sort_column} #{sort_direction}")
+      Domain.where("partner_id = ? and club_id in (?)", @current_partner.id, @current_agent.get_clubs_related("admin")).order("#{sort_column} #{sort_direction}")
     end    
     domains = domains.page(page).per_page(per_page)
     if params[:sSearch].present?

@@ -20,7 +20,7 @@ class DomainsController < ApplicationController
 
   # GET /domains/new
   def new
-    my_authorize_admin_agents!(:list, Domain, @current_partner.clubs.collect(&:id))
+    my_authorize_admin_agents!(:new, Domain, @current_partner.clubs.collect(&:id))
     @domain = Domain.new :partner => @current_partner
     @domain.club_id = params[:club_id] if params[:club_id]
     @clubs = Club.where(:partner_id => @current_partner)
@@ -39,15 +39,10 @@ class DomainsController < ApplicationController
     @domain.partner = @current_partner
     @domain.club_id = params[:domain][:club_id]
     my_authorize!(:create, Domain, @domain.club_id)
-
-    @clubs = Club.where(:partner_id => @current_partner)
     if @domain.save
-      if not @current_agent.has_global_role? and @domain.club_id
-        redirect_to club_path(:id => @domain.club), notice: "The domain #{@domain.url} was successfully created."
-      else
-        redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully created."
-      end
+      redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully created."
     else
+      @clubs = @current_agent.has_global_role? ? Club.where(:partner_id => @current_partner) : @current_agent.clubs.where(:partner_id => @current_partner)
       render action: "new"
     end
   end
@@ -56,8 +51,6 @@ class DomainsController < ApplicationController
   def update
     @domain = Domain.find(params[:id])
     my_authorize!(:update, Domain, @domain.club_id)
-    
-    @clubs = Club.where(:partner_id => @current_partner)
     @domain.url = params[:domain][:url]
     @domain.data_rights = params[:domain][:data_rights]
     @domain.description = params[:domain][:description]
@@ -65,10 +58,10 @@ class DomainsController < ApplicationController
     if not params[:domain][:club_id].nil? and @domain.club.nil?
       @domain.club_id = params[:domain][:club_id]       
     end
-
     if @domain.save
       redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully updated."
     else
+      @clubs = @current_agent.has_global_role? ? Club.where(:partner_id => @current_partner) : @current_agent.clubs.where(:partner_id => @current_partner)
       render action: "edit"
     end
   end
