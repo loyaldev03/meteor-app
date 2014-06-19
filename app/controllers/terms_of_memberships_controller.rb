@@ -74,6 +74,7 @@ class TermsOfMembershipsController < ApplicationController
 
   def resumed_information
     @tom = TermsOfMembership.find(params[:terms_of_membership_id])
+    my_authorize! :show, TermsOfMembership, @tom.club_id
     render :partial => "resumed_information", :locals => { :tom => @tom }
   end
 
