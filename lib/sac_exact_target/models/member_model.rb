@@ -125,12 +125,14 @@ module SacExactTarget
       enrollment_fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(enrollment_info, api_field, our_field)
       end  
-      if Rails.env.production? and preferences_fieldmap
+      if Rails.env.production? and self.member.preferences and preferences_fieldmap
         member_preferences = self.member.member_preferences
         preferences_fieldmap.each do |api_field, our_field|
-          member_preference = member_preferences.where(:param => our_field).first
-          attributes << SacExactTarget.format_attribute(member_preference, api_field, 'value') if member_preference
+          attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.member.preferences[our_field].to_s)
         end
+      elsif Rails.env.prototype? and self.member.preferences
+        attributes << ExactTargetSDK::Attributes.new(Name: "pref_field_1", Value: self.member.preferences["example_color"].to_s)
+        attributes << ExactTargetSDK::Attributes.new(Name: "pref_field_2", Value: self.member.preferences["example_team"].to_s)
       end
       attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
       ExactTargetSDK::Subscriber.new({
