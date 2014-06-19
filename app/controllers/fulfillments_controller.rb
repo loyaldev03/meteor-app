@@ -68,21 +68,30 @@ class FulfillmentsController < ApplicationController
     end
     ff.product = params[:product_type]
     if not params[:fulfillment_selected].nil?
-      begin
-        ff.save!
-        ff_counts = 0
-        params[:fulfillment_selected].each do |fs|
-          fulfillment = Fulfillment.find(fs.first)
-          ff.fulfillments << fulfillment
-          fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
-          ff_counts += 1
+      fulfillment_file.transaction do 
+        begin
+          ff.save!
+          ff_counts = 0
+          params[:fulfillment_selected].each do |fs|
+            fulfillment = Fulfillment.find(fs.first)
+            if fulfillment.club_id == ff.club_id
+              ff.fulfillments << fulfillment
+              fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
+              ff_counts += 1
+            end
+          end
+          ff.fulfillment_count = ff_counts
+          ff.save
+          raise ActiveRecord::Rollbackif ff_counts == 0 
+          flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
+        
+        rescue ActiveRecord::Rollback
+          flash.now[:error] = t('t("error_messages.fulfillment_file_cant_be_empty")')
+          raise ActiveRecord::Rollback
+        rescue Exception => e
+          flash.now[:error] = t('error_messages.airbrake_error_message')
+          Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
         end
-        ff.fulfillment_count = ff_counts
-        ff.save
-        flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
-      rescue Exception => e
-        flash.now[:error] = t('error_messages.airbrake_error_message')
-        Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
       end
     else
       flash.now[:error] = t('error_messages.fulfillment_file_cant_be_empty')

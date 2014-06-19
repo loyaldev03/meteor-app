@@ -6,6 +6,7 @@ class Club < ActiveRecord::Base
   has_many :domains
   has_many :terms_of_memberships
   has_many :members
+  has_many :fulfillments
   has_many :prospects
   has_many :payment_gateway_configurations
   has_many :member_group_types

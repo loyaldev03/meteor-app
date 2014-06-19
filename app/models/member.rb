@@ -758,6 +758,7 @@ class Member < ActiveRecord::Base
             f.recurrent = product.recurrent 
           end
           f.member_id = self.id
+          f.club_id = self.club_id
           f.save
           answer = f.decrease_stock!
           unless answer[:code] == Settings.error_codes.success
