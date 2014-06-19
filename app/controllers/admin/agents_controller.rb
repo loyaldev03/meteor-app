@@ -1,5 +1,5 @@
 class Admin::AgentsController < ApplicationController
-  before_filter :load_get_clubs_related, only: [ :new, :edit, :create, :update ]
+  before_filter :load_clubs_related, only: [ :new, :edit, :create, :update ]
 
   # GET /agents
   def index
@@ -167,7 +167,7 @@ class Admin::AgentsController < ApplicationController
       end
     end
 
-    def load_get_clubs_related
+    def load_clubs_related
       @clubs = @current_agent.has_global_role? ? Club.all : @current_agent.clubs.where("club_roles.role = 'admin'")
     end
 end
