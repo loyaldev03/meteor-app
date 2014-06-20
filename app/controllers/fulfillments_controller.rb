@@ -34,12 +34,14 @@ class FulfillmentsController < ApplicationController
   end
 
   def update_status
-    my_authorize! :update_status, Fulfillment, @current_club.id
     fulfillment = Fulfillment.find(params[:id])
+    my_authorize! :update_status, Fulfillment, fulfillment.club_id
     file = (params[:file].blank? ? nil : params[:file])
     render json: fulfillment.update_status(@current_agent, params[:new_status], params[:reason], file).merge(:id => params[:id])
   rescue ActiveRecord::RecordNotFound => e
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found, :id => params[:id] }
+  rescue CanCan::AccessDenied
+    render json: { :message => "You are not allowed to change status on this fulfillment.", :code => Settings.error_codes.not_authorized, :id => params[:id] }
   end
 
   # def resend
