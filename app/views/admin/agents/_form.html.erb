@@ -1,5 +1,3 @@
-<%= @agent.deleted? %>
-
 <%= form_for [ :admin, @agent ],
   :url => ( (@agent.new_record? or @agent.deleted?) ? '/admin/agents' : '/admin/agents/update' ),
   :method =>  ( (@agent.new_record? or @agent.deleted?) ? 'post' : 'put' ),
