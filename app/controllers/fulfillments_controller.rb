@@ -7,17 +7,17 @@ class FulfillmentsController < ApplicationController
       @status = params[:status]
       if params[:all_times] == '1'
         if params[:product_type] == Settings.others_product
-          @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and club_id = ?', params[:status], @current_club.id).type_others.not_renewed
+          @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and fulfillments.club_id = ?', params[:status], @current_club.id).type_others.not_renewed
         else
-          @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and club_id = ? and product_sku = ? ', params[:status], @current_club.id, params[:product_type]).not_renewed
+          @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and fulfillments.club_id = ? and product_sku = ? ', params[:status], @current_club.id, params[:product_type]).not_renewed
         end
         @product_type = params[:product_type]
       else
         if params[:product_type] == Settings.others_product
-          @fulfillments = Fulfillment.includes(:member).joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? ', 
+          @fulfillments = Fulfillment.includes(:member).joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? ', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_others.not_renewed
         else
-          @fulfillments = Fulfillment.includes(:member).joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ? AND product_sku = ? ', 
+          @fulfillments = Fulfillment.includes(:member).joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? AND product_sku = ? ', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id, params[:product_type]]).not_renewed
         end
       end  
@@ -34,12 +34,14 @@ class FulfillmentsController < ApplicationController
   end
 
   def update_status
-    my_authorize! :update_status, Fulfillment, @current_club.id
     fulfillment = Fulfillment.find(params[:id])
+    my_authorize! :update_status, Fulfillment, fulfillment.club_id
     file = (params[:file].blank? ? nil : params[:file])
     render json: fulfillment.update_status(@current_agent, params[:new_status], params[:reason], file).merge(:id => params[:id])
   rescue ActiveRecord::RecordNotFound => e
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found, :id => params[:id] }
+  rescue CanCan::AccessDenied
+    render json: { :message => "You are not allowed to change status on this fulfillment.", :code => Settings.error_codes.not_authorized, :id => params[:id] }
   end
 
   # def resend
@@ -69,20 +71,30 @@ class FulfillmentsController < ApplicationController
     ff.product = params[:product_type]
     if not params[:fulfillment_selected].nil?
       begin
-        ff.save!
-        ff_counts = 0
-        params[:fulfillment_selected].each do |fs|
-          fulfillment = Fulfillment.find(fs.first)
-          ff.fulfillments << fulfillment
-          fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
-          ff_counts += 1
-        end
-        ff.fulfillment_count = ff_counts
-        ff.save
-        flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
+        FulfillmentFile.transaction do 
+          ff.save!
+          ff_counts = 0
+          params[:fulfillment_selected].each do |fs|
+            fulfillment = Fulfillment.find(fs.first)
+            if fulfillment.club_id == ff.club_id
+              ff.fulfillments << fulfillment
+              fulfillment.update_status(ff.agent, "in_process", "Fulfillment file generated", ff.id)
+              ff_counts += 1
+            end
+          end
+          ff.fulfillment_count = ff_counts
+          ff.save
+          if ff_counts == 0
+            flash.now[:error] = t('error_messages.fulfillment_file_cant_be_empty') 
+            raise ActiveRecord::Rollback
+          else
+            flash.now[:notice] = "File created succesfully. <a href='#{download_xls_fulfillments_path(:fulfillment_file_id => ff.id)}' class='btn btn-success'>Download it from here</a>".html_safe
+          end
+        end       
       rescue Exception => e
         flash.now[:error] = t('error_messages.airbrake_error_message')
         Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
+        raise ActiveRecord::Rollback
       end
     else
       flash.now[:error] = t('error_messages.fulfillment_file_cant_be_empty')

@@ -41,7 +41,16 @@ class Admin::AgentsController < ApplicationController
 
   # POST /agents
   def create
-    @agent = Agent.new(params[:agent])
+    tmp_agent = Agent.where(email: params[:agent][:email]).with_deleted.first
+    if tmp_agent and tmp_agent.deleted?
+      @club_roles = []
+      @agent = tmp_agent
+      @agent.assign_attributes(params[:agent])
+      @agent.deleted_at = nil
+    else
+      @agent = Agent.new(params[:agent])
+    end
+
     if @current_agent.has_global_role?
       my_authorize_action_within_clubs!(:create, Agent)
     elsif params[:club_roles_attributes]
@@ -49,6 +58,7 @@ class Admin::AgentsController < ApplicationController
       params[:club_roles_attributes].each{|k,v| club_roles_id << v["club_id"] }
       my_authorize_action_within_clubs!(:create, Agent, club_roles_id)
     end
+
     success = false
     ClubRole.transaction do
       begin
@@ -74,8 +84,10 @@ class Admin::AgentsController < ApplicationController
     if success 
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
     else
+      # TODO: review if this order it's ok.
       load_clubs_related
       @agent.clubs.each{ |c| @clubs = @clubs - [c] }
+      @agent.reload unless @agent.new_record? #hack for deleted users
       render :action => "new"
     end
   end

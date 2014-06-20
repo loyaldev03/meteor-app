@@ -8,6 +8,60 @@ class AgentsTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
+
+  def create_agent_try_to_recover_it(global_role = true)
+    confirmed_agent = FactoryGirl.create(:confirmed_agent)
+    assert_equal 1, Agent.where(email: confirmed_agent.email).count
+
+    visit new_admin_agent_path
+    fill_in 'agent[email]', :with => confirmed_agent.email
+    fill_in 'agent[username]', :with => 'newpassword'
+    fill_in 'agent[password]', :with => 'newpassword'
+    fill_in 'agent[password_confirmation]', :with => 'newpassword'
+
+    if global_role
+      choose('agent_roles_admin')
+    else
+      within("#new_agent") do 
+        click_on 'Add'
+        select('admin', :from => '[club_roles_attributes][1][role]' )
+      end
+    end
+    assert_difference('Agent.count', 0) do
+      click_link_or_button 'Create Agent'
+    end
+
+    assert page.has_content?("has already been taken")
+    assert_equal 1, Agent.where(email: confirmed_agent.email).count
+  end
+
+  def create_agent_destroy_it_and_recover_it(global_role = true)
+    confirmed_agent = FactoryGirl.create(:confirmed_agent)
+    assert_equal 1, Agent.where(email: confirmed_agent.email).count
+    confirmed_agent.destroy
+    assert_equal 0, Agent.where(email: confirmed_agent.email).count
+
+    visit new_admin_agent_path
+    fill_in 'agent[email]', :with => confirmed_agent.email
+    fill_in 'agent[username]', :with => 'newpassword'
+    fill_in 'agent[password]', :with => 'newpassword'
+    fill_in 'agent[password_confirmation]', :with => 'newpassword'
+    if global_role
+      choose('agent_roles_admin')
+    else
+      within("#new_agent") do 
+        click_on 'Add'
+        select('admin', :from => '[club_roles_attributes][1][role]' )
+      end
+    end
+    assert_difference('Agent.count') do
+      click_link_or_button 'Create Agent'
+    end
+    assert page.has_content?("Agent was successfully created")
+    assert_equal 1, Agent.where(email: confirmed_agent.email).count
+  end
+
+
   test "create empty agent" do
     setup_environment
     visit admin_agents_path
@@ -297,6 +351,17 @@ class AgentsTest < ActionController::IntegrationTest
     assert saved_agent.roles.blank?
   end
 
+  test "recover agent that was deleted" do
+    setup_environment
+    create_agent_destroy_it_and_recover_it(true)
+  end  
+
+  test "Global Admin should not create agent that exist now" do
+    setup_environment
+    create_agent_try_to_recover_it(true)
+  end
+  
+
   #####################################################
   # CLUBS ROLES
   ##################################################### 
@@ -441,4 +506,17 @@ class AgentsTest < ActionController::IntegrationTest
     @agent_club_role_representative.reload
     assert_equal @agent_club_role_representative.club_roles.count, 2
   end
+
+  test "Admin by role should recover agents" do
+    prepare_agents_with_club_roles
+    sign_in_as(@agent_club_role_admin)
+    create_agent_destroy_it_and_recover_it(false)
+  end
+
+  test "Admin by role should not create agent that exist now" do
+    prepare_agents_with_club_roles
+    sign_in_as(@agent_club_role_admin)
+    create_agent_try_to_recover_it(false)
+  end
+
 end
