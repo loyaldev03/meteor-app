@@ -1,5 +1,5 @@
 <%= form_for [ :admin, @agent ],
-  :url => ( (@agent.new_record? or @agent.deleted?) ? '/admin/agents' : '/admin/agents/update' ),
+  :url => ( (@agent.new_record? or @agent.deleted?) ? '/admin/agents' : '/admin/agents/'+@agent.id.to_s+'update' ),
   :method =>  ( (@agent.new_record? or @agent.deleted?) ? 'post' : 'put' ),
   :html => { :class => 'form-horizontal' } do |f| %>
   <div class="control-group">
