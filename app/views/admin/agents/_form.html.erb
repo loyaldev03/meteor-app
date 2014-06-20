@@ -1,4 +1,9 @@
-<%= form_for [ :admin, @agent ], :html => { :class => 'form-horizontal' } do |f| %>
+<%= @agent.deleted? %>
+
+<%= form_for [ :admin, @agent ],
+  :url => ( (@agent.new_record? or @agent.deleted?) ? '/admin/agents' : '/admin/agents/update' ),
+  :method =>  ( (@agent.new_record? or @agent.deleted?) ? 'post' : 'put' ),
+  :html => { :class => 'form-horizontal' } do |f| %>
   <div class="control-group">
     <%= f.label :email, :class => 'control-label' %>
     <div class="controls">
@@ -50,18 +55,18 @@
         <tr><th>Role</th><th>Club</th><th style="width:100px;">&nbsp;</th></tr>
         <% unless @agent.new_record? %>
           <% @club_roles.each do |club_role| %>
-          <tr id=<%="tr_club_role_[#{club_role.id}]"%>>
-            <% if @current_agent.club_roles.empty? or @current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
-              <td id=<%="td_club_role_role[#{club_role.id}]"%>> <%= club_role.role %> </td>
-              <td> <%= club_role.club.name %> </td>
-              <td id=<%="td_club_role_buttons[#{club_role.id}]"%>>
-                <% unless @current_agent==@agent %>
-                    <%= link_to("Edit", "#" , :class => 'btn btn-mini', :id => "club_role_edit", :name => club_role.id)%>
-                    <%= link_to("Delete", "#" , :class => 'btn btn-mini', :id => "club_role_delete", :name => "#{club_role.id};#{club_role.club_id};#{club_role.club.name}")%>
-                <% end %>
-              </td>
-            <% end %>
-          </tr>
+            <tr id=<%="tr_club_role_[#{club_role.id}]"%>>
+              <% if @current_agent.club_roles.empty? or @current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
+                <td id=<%="td_club_role_role[#{club_role.id}]"%>> <%= club_role.role %> </td>
+                <td> <%= club_role.club.name %> </td>
+                <td id=<%="td_club_role_buttons[#{club_role.id}]"%>>
+                  <% unless @current_agent==@agent %>
+                      <%= link_to("Edit", "#" , :class => 'btn btn-mini', :id => "club_role_edit", :name => club_role.id)%>
+                      <%= link_to("Delete", "#" , :class => 'btn btn-mini', :id => "club_role_delete", :name => "#{club_role.id};#{club_role.club_id};#{club_role.club.name}")%>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
           <% end %>
         <% end %>
       </table>

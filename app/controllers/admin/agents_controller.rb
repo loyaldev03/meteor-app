@@ -42,7 +42,15 @@ class Admin::AgentsController < ApplicationController
   # POST /agents
   def create
     my_authorize_agents!(:create, Agent)
-    @agent = Agent.new(params[:agent])
+    tmp_agent = Agent.where(email: params[:agent][:email]).with_deleted.first
+    if tmp_agent and tmp_agent.deleted?
+      @club_roles = []
+      @agent = tmp_agent
+      @agent.assign_attributes(params[:agent])
+      @agent.deleted_at = nil
+    else
+      @agent = Agent.new(params[:agent])
+    end
     @agent.clubs.each{ |c| @clubs = @clubs - [c] }
     success = false
     ClubRole.transaction do
@@ -69,6 +77,7 @@ class Admin::AgentsController < ApplicationController
     if success 
       redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
     else
+      @agent.reload unless @agent.new_record? #hack for deleted users
       render :action => "new"
     end
   end
