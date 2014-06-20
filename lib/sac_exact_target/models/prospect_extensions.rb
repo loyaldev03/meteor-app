@@ -25,12 +25,12 @@ module SacExactTarget
                 prospect.update_attribute :need_exact_target_sync, 0
                 Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
               end
-              Rails.logger.info "    ... took #{Time.zone.now - tz} for prospect ##{prospect.id}"
+              Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for prospect ##{prospect.id}"
               index+=1
             end
             base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
           end
-          Rails.logger.info "    ... took #{Time.zone.now - tzc} for club ##{club.id}"
+          Rails.logger.info "    ... took #{Time.zone.now - tzc}seconds for club ##{club.id}"
         end
       end
     end

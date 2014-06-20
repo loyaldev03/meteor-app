@@ -302,14 +302,22 @@ class AgentsTest < ActionController::IntegrationTest
   ##################################################### 
 
   def prepare_agents_with_club_roles
-    @agent_club_role_admin = FactoryGirl.create(:agent)
     club = FactoryGirl.create(:simple_club_with_gateway)
+    club2 = FactoryGirl.create(:simple_club_with_gateway)
+    club3 = FactoryGirl.create(:simple_club_with_gateway)
+    @agent_club_role_admin = FactoryGirl.create(:agent)
+    [club, club3].each do |club|
+      club_role = ClubRole.new :club_id => club.id
+      club_role.role = "admin"
+      club_role.agent_id = @agent_club_role_admin.id
+      club_role.save
+    end
+    @agent_club_role_representative = FactoryGirl.create(:agent)
     club_role = ClubRole.new :club_id => club.id
-    club_role.role = "admin"
-    club_role.agent_id = @agent_club_role_admin.id
+    club_role.role = "representative"
+    club_role.agent_id = @agent_club_role_representative.id
     club_role.save
     @agent_club_role_admin2 = FactoryGirl.create(:agent)
-    club2 = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club2.id
     club_role.role = "admin"
     club_role.agent_id = @agent_club_role_admin2.id
@@ -337,5 +345,100 @@ class AgentsTest < ActionController::IntegrationTest
       find("tr", :text => @agent_club_role_admin.email)
       assert page.has_no_content?(@agent_club_role_admin2.email)
     end
+  end
+
+  test "Club role admin should be able to edit club roles" do
+    prepare_agents_with_club_roles
+    sign_in_as(@agent_club_role_admin)
+    visit admin_agents_path
+    within("#agents_table") do
+      within("tr", :text => @agent_club_role_representative.email) do
+        click_link_or_button "Edit"
+      end
+    end
+
+    within("#club_role_table") do
+      click_link_or_button "Edit"
+      select "supervisor", :from => "select_club_role_#{@agent_club_role_representative.club_roles.first.id}"
+      confirm_ok_js
+      click_link_or_button "Update"
+      assert page.has_content? "Club Role for #{@agent_club_role_representative.clubs.first.name} updated successfully."
+    end
+  end
+
+  test "Club role admin should be able to create agents with club roles" do
+    prepare_agents_with_club_roles
+    sign_in_as(@agent_club_role_admin)
+    visit new_admin_agent_path
+
+    unsaved_agent = FactoryGirl.build(:agent)
+    fill_in 'agent[email]', :with => unsaved_agent.email
+    fill_in 'agent[username]', :with => unsaved_agent.username
+    fill_in 'agent[password]', :with => unsaved_agent.password
+    fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
+
+    within("#club_role_table") do
+      click_link_or_button "Add"
+      select "supervisor", :from => "[club_roles_attributes][1][role]"
+    end
+  
+    assert_difference('Agent.count') do
+      click_link_or_button 'Create Agent'
+    end
+    assert page.has_content?("Agent was successfully created")
+  end
+
+  test "Club role admin can delete club roles, unless it is the last one." do
+    prepare_agents_with_club_roles
+    sign_in_as(@agent_club_role_admin)
+    aditional_club = FactoryGirl.create(:simple_club_with_gateway)
+    club_role = ClubRole.new :club_id => aditional_club.id
+    club_role.role = "admin"
+    club_role.agent_id = @agent_club_role_admin.id
+    club_role.save
+
+    visit admin_agents_path
+    within("#agents_table") do
+      within("tr", :text => @agent_club_role_representative.email) do
+        click_link_or_button "Edit"
+      end
+    end
+
+    within("#club_role_table") do
+      click_link_or_button "Add"
+      select "supervisor", :from => "[club_roles_attributes][1][role]"
+      select aditional_club.name, :from => "[club_roles_attributes][1][club_id]"
+    end
+
+    click_link_or_button 'Update Agent'
+    assert page.has_content?("Agent was successfully updated.")
+
+    click_link_or_button "Edit"
+
+    club_role_to_delete_first = @agent_club_role_representative.club_roles.first
+    club_name_deleted = club_role_to_delete_first.club.name
+
+    within("#club_role_table") do
+      confirm_ok_js
+      within("#tr_club_role_#{@agent_club_role_representative.club_roles.first.id}") do
+        confirm_ok_js
+        click_link_or_button "Delete"
+      end
+      assert page.has_content?("Club Role deleted successfully")
+      assert page.has_no_content?(club_name_deleted)
+      within("#tr_club_role_#{@agent_club_role_representative.club_roles.last.id}") do
+        click_link_or_button "Delete"
+      end
+      assert page.has_content?(@agent_club_role_representative.club_roles.last.club.name)
+      
+      click_link_or_button "Add"
+      select "supervisor", :from => "[club_roles_attributes][1][role]"
+    end
+
+    click_link_or_button 'Update Agent'
+    assert page.has_content?("Agent was successfully updated")
+
+    @agent_club_role_representative.reload
+    assert_equal @agent_club_role_representative.club_roles.count, 2
   end
 end

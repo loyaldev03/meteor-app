@@ -1008,7 +1008,7 @@ function admin_form_functions(){
         club = club_list[i].split(',');
         options_for_club_id = options_for_club_id+"<option value='"+club[1]+"'>"+club[0]+"</option>"
       };
-      $('#club_role_table').append("<tr id='tr_new_club_rol_["+count+"]'><td><select id='club_roles_attributes_"+count+"_role' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='club_roles_attributes_"+count+"_club_id' name='[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td><input type='button' id='new_club_role_delete' name='"+count+"' class='btn btn-mini' value='Delete'></td></tr>")
+      $('#club_role_table').append("<tr id='tr_new_club_rol_["+count+"]'><td><select id='select_club_role_"+count+"' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='select_club_role_"+count+"_club_id' name='[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td><input type='button' id='new_club_role_delete' name='"+count+"' class='btn btn-mini' value='Delete'></td></tr>")
     };
 
     $("*[id$='_club_id']").each(function() {
@@ -1059,16 +1059,16 @@ function admin_form_functions(){
     event.preventDefault();
     var role_list = roles.split(",");
     club_role_id = $(this).attr('name');
-    var previous_role = $.trim($("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").text());
+    var previous_role = $.trim($("#club_role_table tr td[id='td_club_role_role_"+club_role_id+"']").text());
     var options_for_role = "<option value='"+previous_role+"' selected>"+previous_role+"</option>"
-    $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").empty();
-    $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]'] #club_role_edit").remove();
+    $("#club_role_table tr td[id='td_club_role_role_"+club_role_id+"']").empty();
+    $("#club_role_table tr td[id='td_club_role_buttons_"+club_role_id+"'] #club_role_edit").remove();
     for (var i in role_list){
       if(role_list[i] != previous_role)
         options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>"
     };
-    $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").append("<select id='select_club_role_"+club_role_id+"' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select>");
-    $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]']").prepend("<input type='button' id='club_role_update' name='"+club_role_id+"' class='btn-primary btn-mini' value='Update'></td>");
+    $("#club_role_table tr td[id='td_club_role_role_"+club_role_id+"']").append("<select id='select_club_role_"+club_role_id+"' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select>");
+    $("#club_role_table tr td[id='td_club_role_buttons_"+club_role_id+"']").prepend("<input type='button' id='club_role_update' name='"+club_role_id+"' class='btn-primary btn-mini' value='Update'></td>");
   });   
 
   $("#club_role_update").live("click", function(event){
@@ -1081,10 +1081,10 @@ function admin_form_functions(){
         data: { id:$(this).attr("name"), role:new_role },
         success: function(data){
           if(data.code == "000"){
-            $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").empty();
-            $("#club_role_table tr td[id='td_club_role_role["+club_role_id+"]']").append(new_role);
-            $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]'] #club_role_update").remove();
-            $("#club_role_table tr td[id='td_club_role_buttons["+club_role_id+"]']").prepend("<input type='button' id='club_role_edit' name='"+club_role_id+"' class='btn btn-mini' value='Edit'></td>");
+            $("#club_role_table tr td[id='td_club_role_role_"+club_role_id+"']").empty();
+            $("#club_role_table tr td[id='td_club_role_role_"+club_role_id+"']").append(new_role);
+            $("#club_role_table tr td[id='td_club_role_buttons_"+club_role_id+"'] #club_role_update").remove();
+            $("#club_role_table tr td[id='td_club_role_buttons_"+club_role_id+"']").prepend("<input type='button' id='club_role_edit' name='"+club_role_id+"' class='btn btn-mini' value='Edit'></td>");
             $("#td_notice").children().remove();
             $("#td_notice").append("<div class='alert-info alert'>"+data.message+"</div>");
           }else{
@@ -1107,7 +1107,7 @@ function admin_form_functions(){
         data: { id:$(this).attr("name") },
         success: function(data){
           if(data.code == "000"){
-            $("#club_role_table tr[id='tr_club_role["+club_role_id+"]']").remove();
+            $("#club_role_table tr[id='tr_club_role_"+club_role_id+"']").remove();
             if(clubs.length == 0)
               clubs = array[2]+","+array[1];  
             else

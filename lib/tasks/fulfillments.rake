@@ -53,7 +53,7 @@ namespace :fulfillments do
                   ]
             sheet.add_row row 
             fulfillment_file.fulfillments << fulfillment
-            Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
+            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
         end
       end
@@ -73,7 +73,7 @@ namespace :fulfillments do
       Auditory.report_issue("Fulfillments::NaammaReport", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run task"
     end
   end
 
@@ -129,7 +129,7 @@ namespace :fulfillments do
                     member.full_phone_number, member.email,
                     tom.id, tom.name, tom.description]
             fulfillment_file.fulfillments << fulfillment
-            Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
+            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
         end
       end
@@ -159,7 +159,7 @@ namespace :fulfillments do
       Auditory.report_issue("Fulfillments::NaammaSloopReport", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run task"    
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run task"    
     end
   end
 
@@ -238,7 +238,7 @@ namespace :fulfillments do
               sheet.add_row row 
               fulfillment_file.fulfillments << fulfillment
             end
-            Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
+            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.member_id}"
           end
         end
       end
@@ -258,7 +258,7 @@ namespace :fulfillments do
       Auditory.report_issue("Fulfillments::NflaReport", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run task"        
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run task"        
     end  
   end
 
@@ -424,7 +424,7 @@ namespace :fulfillments do
       ftp.quit()
       File.delete(temp_file)
     end 
-    Rails.logger.info "It all took #{Time.zone.now - tall} to run task"
+    Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run task"
   end
 
   def process_fulfillment(fulfillment, fulfillment_file, record_type)
@@ -514,7 +514,7 @@ namespace :fulfillments do
     line << "P".rjust(1, '0')  # MARKETING 20
     line << "\n".rjust(1, '0')
     fulfillment_file.fulfillments << fulfillment
-    Rails.logger.info " *** It took #{Time.zone.now - tz} to process #{fulfillment.id} for member #{fulfillment.member_id}"
+    Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.member_id}"
     line
   end
 

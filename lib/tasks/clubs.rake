@@ -14,7 +14,7 @@ namespace :clubs do
       Auditory.report_issue("Clubs::count_members_in_clubs", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"      
     ensure 
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run clubs:count_members_in_clubs task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run clubs:count_members_in_clubs task"
     end 
   end
 end

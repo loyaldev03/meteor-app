@@ -28,9 +28,13 @@
     <%= f.label :club_id, :class => 'control-label' %>
     <div class="controls">
       <% if @domain.club.nil? %>
-        <%= generate_select_club_id f, @domain, @clubs %>
+        <% if @current_agent.has_global_role? %>
+          <%= generate_select_club_id f, @domain, @clubs %>
+        <% else %>
+          <%= generate_select_club_id f, @domain, @current_agent.clubs, false %>
+        <% end %>
       <% else %>
-        <%= @domain.club.name %>
+        <%= generate_select_club_id f, @domain, [@domain.club], false %>
       <% end %>
     </div>
   </div>

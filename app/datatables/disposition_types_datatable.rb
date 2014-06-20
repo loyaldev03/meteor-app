@@ -14,7 +14,7 @@ private
       [
         disposition_type.id,
         disposition_type.name, 
-        (link_to(I18n.t(:edit),@url_helpers.edit_disposition_type_path(:partner_prefix=> @current_partner.prefix, :club_prefix => @current_club.name, :id => disposition_type.id ), :class => 'btn btn-mini')if @current_agent.can? :edit, DispositionType)
+        (link_to(I18n.t(:edit),@url_helpers.edit_disposition_type_path(:partner_prefix=> @current_partner.prefix, :club_prefix => @current_club.name, :id => disposition_type.id ), :class => 'btn btn-mini')if @current_agent.can? :edit, DispositionType, @current_club.id)
       ]
     end
   end

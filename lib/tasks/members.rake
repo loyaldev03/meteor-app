@@ -11,7 +11,7 @@ namespace :billing do
     begin
       TasksHelpers.bill_all_members_up_today
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run billing:for_today task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run billing:for_today task"
     end
   end
 
@@ -26,7 +26,7 @@ namespace :billing do
       # We use bill_date because we will only send this email once!
       TasksHelpers.send_prebill
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run billing:send_prebill task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run billing:send_prebill task"
     end
   end
 end
@@ -57,7 +57,7 @@ namespace :members do
     begin
       TasksHelpers.cancel_all_member_up_today
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:cancel task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:cancel task"
     end
   end
 
@@ -71,7 +71,7 @@ namespace :members do
     begin
       TasksHelpers.send_happy_birthday
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:send_happy_birthday task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:send_happy_birthday task"
     end
   end
 
@@ -84,7 +84,7 @@ namespace :members do
     begin
       TasksHelpers.send_pillar_emails
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:send_pillar_emails task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:send_pillar_emails task"
     end
   end
 
@@ -98,7 +98,7 @@ namespace :members do
     begin
       TasksHelpers.reset_club_cash_up_today
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_club_cash task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:process_club_cash task"
     end
   end
 
@@ -112,7 +112,7 @@ namespace :members do
     begin
       TasksHelpers.process_fulfillments_up_today
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_fulfillments task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:process_fulfillments task"
     end
   end
 
@@ -126,7 +126,7 @@ namespace :members do
     begin
       TasksHelpers.process_sync
     ensure 
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_sync task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:process_sync task"
     end
   end
 
@@ -140,7 +140,7 @@ namespace :members do
     begin
       TasksHelpers.process_email_sync_error
     ensure 
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:process_email_sync_error task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:process_email_sync_error task"
     end 
   end
 
@@ -153,7 +153,7 @@ namespace :members do
     begin
       TasksHelpers.sync_to_exact_target
     ensure 
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run members:sync_to_exact_target task"
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:sync_to_exact_target task"
     end 
   end
 
@@ -199,7 +199,7 @@ namespace :members do
     begin 
       TasksHelpers.send_hot_rod_magazine_cancellation_email
     ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall} to run task"        
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run task"        
     end
   end
 
