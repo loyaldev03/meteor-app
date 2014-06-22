@@ -1450,9 +1450,7 @@ class TransactionTest < ActiveSupport::TestCase
       refunded_amount = amount-0.34
       answer = Transaction.refund(refunded_amount, trans)
       assert_equal answer[:code], "000", answer[:message] # refunds cant be processed on Auth.net test env
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
-      assert Transaction.where("member_id = ? and operation_type = ?", active_member.id, Settings.operation_types.credit).count == 1
-      assert_equal trans.transaction_type, 'refund'
+      assert_equal Transaction.where("member_id = ? and operation_type = ? and transaction_type = 'refund'", active_member.id, Settings.operation_types.credit).count, 1
     end
   end
 
