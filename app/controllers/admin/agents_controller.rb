@@ -73,9 +73,10 @@ class Admin::AgentsController < ApplicationController
           end
           success = true
         end
-      rescue ActiveRecord::RecordInvalid
-        @agent.errors.add(:email, "has already been taken")
-      rescue Exception => e
+      rescue ActiveRecord::RecordInvalid => e
+        logger.error e
+        flash.now[:error] = 'Agent was not saved.'
+      rescue Exception => e        
         Auditory.report_issue("Agent:Create", e, { :agent => @agent.inspect, :club_roles_attributes => params[:club_roles_attributes] })
         flash.now[:error] = I18n.t('error_messages.airbrake_error_message')
         raise ActiveRecord::Rollback
@@ -109,9 +110,9 @@ class Admin::AgentsController < ApplicationController
           end
           success = true
         end
-      rescue ActiveRecord::RecordNotUnique
-        @agent.errors.add(:email, "has already been taken")
-        success = false
+      rescue ActiveRecord::RecordInvalid => e
+        logger.error e
+        flash.now[:error] = 'Agent was not updated.'
       rescue Exception => e
         Auditory.report_issue("Agent:Update", e, { :agent => @agent.inspect, :club_roles_attributes => params[:club_roles_attributes] })
         flash.now[:error] = I18n.t('error_messages.airbrake_error_message')
