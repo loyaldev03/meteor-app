@@ -93,7 +93,7 @@ class ClubsController < ApplicationController
       domain = Domain.find(drupal_domain_id)
       if domain.partner_id == @current_partner.id
         unless @current_agent.has_global_role? and domain.club 
-          clubs_id = @current_agent.has_global_role? ? @current_partner.clubs.collect(&:id) : @current_agent.clubs.where("partner_id = ? and club_roles.role = 'admin'", @current_partner.id).collect(&:id)
+          clubs_id = @current_agent.clubs.where("partner_id = ? and club_roles.role = 'admin'", @current_partner.id).collect(&:id)
           valid = false unless clubs_id.include?(domain.club_id)
         end
       else
