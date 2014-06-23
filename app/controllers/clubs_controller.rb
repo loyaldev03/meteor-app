@@ -45,11 +45,16 @@ class ClubsController < ApplicationController
   def create
     my_authorize!(:create, Club)
     @club = Club.new(params[:club])
-    @club.partner = @current_partner
-    if @club.save
-      redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully created."
-    else
+    unless check_domain_belongs_to_partner(params[:club][:drupal_domain_id])
+      flash.now[:error] = "Agent can't assign domain. Domain not available."
       render action: "new" 
+    else
+      @club.partner = @current_partner
+      if @club.save
+        redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully created."
+      else
+        render action: "new" 
+      end
     end
   end
 
@@ -57,10 +62,15 @@ class ClubsController < ApplicationController
   def update
     my_authorize!(:show, Club, params[:id])
     @club = Club.find(params[:id])
-    if @club.update_attributes(params[:club])
-      redirect_to club_path(:partner_prefix => @current_partner.prefix, :id => @club.id), notice: "The club #{@club.name} was successfully updated."
+    unless check_domain_belongs_to_partner(params[:club][:drupal_domain_id])
+      flash.now[:error] = "Agent can't assign domain. Domain not available."
+      render action: "edit" 
     else
-      render action: "edit"
+      if @club.update_attributes(params[:club])
+        redirect_to club_path(:partner_prefix => @current_partner.prefix, :id => @club.id), notice: "The club #{@club.name} was successfully updated."
+      else
+        render action: "edit"
+      end
     end
   end
 
@@ -75,4 +85,22 @@ class ClubsController < ApplicationController
       redirect_to clubs_url
     end 
   end
+
+
+  def check_domain_belongs_to_partner(drupal_domain_id)
+    valid = true
+    if drupal_domain_id
+      domain = Domain.find(drupal_domain_id)
+      if domain.partner_id == @current_partner.id
+        unless @current_agent.has_global_role? and domain.club 
+          clubs_id = @current_agent.has_global_role? ? @current_partner.clubs.collect(&:id) : @current_agent.clubs.where("partner_id = ? and club_roles.role = 'admin'", @current_partner.id).collect(&:id)
+          valid = false unless clubs_id.include?(domain.club_id)
+        end
+      else
+        valid = false
+      end
+    end
+    valid
+  end
 end
+
