@@ -5,6 +5,7 @@ class AgentsTest < ActionController::IntegrationTest
 
   def setup_environment
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    club = FactoryGirl.create(:simple_club_with_gateway)
     sign_in_as(@admin_agent)
   end
 
@@ -35,8 +36,13 @@ class AgentsTest < ActionController::IntegrationTest
     assert_equal 1, Agent.where(email: confirmed_agent.email).count
   end
 
-  def create_agent_destroy_it_and_recover_it(global_role = true)
-    confirmed_agent = FactoryGirl.create(:confirmed_agent)
+  def create_agent_destroy_it_and_recover_it(destination_global_role, source_global_role)
+    if source_global_role
+      confirmed_agent = FactoryGirl.create(:confirmed_admin_agent)
+    else
+      prepare_agents_with_club_roles
+      confirmed_agent = @agent_club_role_admin
+    end
     assert_equal 1, Agent.where(email: confirmed_agent.email).count
     confirmed_agent.destroy
     assert_equal 0, Agent.where(email: confirmed_agent.email).count
@@ -46,7 +52,7 @@ class AgentsTest < ActionController::IntegrationTest
     fill_in 'agent[username]', :with => 'newpassword'
     fill_in 'agent[password]', :with => 'newpassword'
     fill_in 'agent[password_confirmation]', :with => 'newpassword'
-    if global_role
+    if destination_global_role
       choose('agent_roles_admin')
     else
       within("#new_agent") do 
@@ -59,6 +65,14 @@ class AgentsTest < ActionController::IntegrationTest
     end
     assert page.has_content?("Agent was successfully created")
     assert_equal 1, Agent.where(email: confirmed_agent.email).count
+
+    if destination_global_role
+      assert page.has_xpath?('//ul[@id="global_role_list"]/li')
+      assert page.has_no_xpath?('//ul[@id="club_role_list"]/li')
+    else
+      assert page.has_no_xpath?('//ul[@id="global_role_list"]/li')
+      assert page.has_xpath?('//ul[@id="club_role_list"]/li')
+    end
   end
 
 
@@ -351,15 +365,6 @@ class AgentsTest < ActionController::IntegrationTest
     assert saved_agent.roles.blank?
   end
 
-  test "recover agent that was deleted" do
-    setup_environment
-    create_agent_destroy_it_and_recover_it(true)
-  end  
-
-  test "Global Admin should not create agent that exist now" do
-    setup_environment
-    create_agent_try_to_recover_it(true)
-  end
   
 
   #####################################################
@@ -507,16 +512,51 @@ class AgentsTest < ActionController::IntegrationTest
     assert_equal @agent_club_role_representative.club_roles.count, 2
   end
 
-  test "Admin by role should recover agents" do
+  # issue 73326130
+
+  test "Admin by club role should recover agents. global role to club role" do
     prepare_agents_with_club_roles
     sign_in_as(@agent_club_role_admin)
-    create_agent_destroy_it_and_recover_it(false)
+    create_agent_destroy_it_and_recover_it(false, true)
+  end
+
+  test "Admin by club role should recover agents. club role to club role" do
+    prepare_agents_with_club_roles
+    sign_in_as(@agent_club_role_admin)
+    create_agent_destroy_it_and_recover_it(false, false)
   end
 
   test "Admin by role should not create agent that exist now" do
     prepare_agents_with_club_roles
     sign_in_as(@agent_club_role_admin)
     create_agent_try_to_recover_it(false)
+  end
+
+  test "Global Admin should recover agents. global role to global role" do
+    setup_environment
+    create_agent_destroy_it_and_recover_it(true, true)
+  end  
+
+  test "Global Admin should recover agents. global role to club role" do
+    setup_environment
+    require 'ruby-debug'
+    debugger
+    create_agent_destroy_it_and_recover_it(false, true)
+  end  
+
+  test "Global Admin should recover agents. club role to global role" do
+    setup_environment
+    create_agent_destroy_it_and_recover_it(true, false)
+  end  
+
+  test "Global Admin should recover agents. club role to club role" do
+    setup_environment
+    create_agent_destroy_it_and_recover_it(false, false)
+  end  
+
+  test "Global Admin should not create agent that exist now" do
+    setup_environment
+    create_agent_try_to_recover_it(true)
   end
 
 end
