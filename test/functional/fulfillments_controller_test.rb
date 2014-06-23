@@ -115,23 +115,6 @@ class FulfillmentsControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test "Admin_by_role should not update fulfillment status from another club where it has not permissions" do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
-    club_role = ClubRole.new :club_id => @club.id
-    club_role.agent_id = @club_admin.id
-    club_role.role = "admin"
-    club_role.save
-    @club_admin.roles = nil
-    @club_admin.save
-    sign_in(@club_admin)
-    @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @ff_file = FactoryGirl.create(:fulfillment_file)
-    @ff_file.club_id = @other_club.id
-    @ff_file.save
-    put :update_status, id: @ff_file, partner_prefix: @partner.prefix, club_prefix: @other_club.name, fulfillment_file: {status: 'sent'}
-    assert_response :unauthorized
-  end
-
   test "Admin_by_role should not Export to XLS fulfillments from another club where it has not permissions" do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
@@ -148,6 +131,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
     get :generate_xls, id: @ff_file, partner_prefix: @partner.prefix, club_prefix: @other_club.name
     assert_response :unauthorized
   end
+
   test "Fulfillment Manager should not change status of fulfilments from other club that it does not manage" do
     update_status_on_fulfillment_where_i_do_not_manage('fulfillment_managment')
   end
@@ -155,5 +139,4 @@ class FulfillmentsControllerTest < ActionController::TestCase
   test "Admin by role should not change status of fulfilments from other club that it does not manage" do
     update_status_on_fulfillment_where_i_do_not_manage('admin')
   end
-
 end
