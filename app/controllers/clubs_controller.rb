@@ -45,16 +45,11 @@ class ClubsController < ApplicationController
   def create
     my_authorize!(:create, Club)
     @club = Club.new(params[:club])
-    unless check_domain_belongs_to_partner(params[:club][:drupal_domain_id])
-      flash.now[:error] = "Agent can't assign domain. Domain not available."
-      render action: "new" 
+    @club.partner = @current_partner
+    if @club.save
+      redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully created."
     else
-      @club.partner = @current_partner
-      if @club.save
-        redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully created."
-      else
-        render action: "new" 
-      end
+      render action: "new" 
     end
   end
 
@@ -95,7 +90,7 @@ class ClubsController < ApplicationController
         unless @current_agent.has_global_role? and domain.club 
           clubs_id = @current_agent.clubs.where("partner_id = ? and club_roles.role = 'admin'", @current_partner.id).collect(&:id)
           valid = false unless clubs_id.include?(domain.club_id)
-        end
+        end   
       else
         valid = false
       end
