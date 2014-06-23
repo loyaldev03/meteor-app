@@ -31,7 +31,7 @@
         <% if @current_agent.has_global_role? %>
           <%= generate_select_club_id f, @domain, @clubs %>
         <% else %>
-          <%= generate_select_club_id f, @domain, @current_agent.clubs, false %>
+          <%= generate_select_club_id f, @domain, @clubs, false %>
         <% end %>
       <% else %>
         <%= generate_select_club_id f, @domain, [@domain.club], false %>

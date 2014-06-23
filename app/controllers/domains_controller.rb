@@ -37,6 +37,7 @@ class DomainsController < ApplicationController
     @domain = Domain.new(:url => params[:domain][:url], :data_rights => params[:domain][:data_rights], :description => params[:domain][:description], :hosted => params[:domain][:hosted])
     @domain.partner = @current_partner
     @domain.club_id = params[:domain][:club_id]
+
     my_authorize!(:create, Domain, @domain.club_id)
     if @domain.save
       redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully created."
@@ -78,6 +79,6 @@ class DomainsController < ApplicationController
   end
 
   def load_clubs_related
-    @clubs = @current_agent.has_global_role? ? Club.select("id,name").where(:partner_id => @current_partner) : @current_agent.clubs.where(:partner_id => @current_partner)
+    @clubs = @current_agent.has_global_role? ? Club.select("id,name").where(:partner_id => @current_partner) : @current_agent.clubs.where("partner_id = ? and club_roles.role = 'admin'", @current_partner.id)
   end
 end

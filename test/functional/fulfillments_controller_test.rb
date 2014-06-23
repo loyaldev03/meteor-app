@@ -10,7 +10,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:club, :partner_id => @partner.id)
-    @product = FactoryGirl.create(:product, :club_id => @club_id)
+    @product = FactoryGirl.create(:product, :club_id => @club.id)
   end
 
   def update_status_on_fulfillment_where_i_do_not_manage(profile)
@@ -61,6 +61,40 @@ class FulfillmentsControllerTest < ActionController::TestCase
     assert_equal 1, @my_club_saved_member.fulfillments.where(status: 'out_of_stock').count
   end
 
+  def create_xls_file_with_club_role(role)
+    @agent = FactoryGirl.create(:agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.role = role
+    club_role.agent_id = @agent.id
+    club_role.save
+    sign_in(@agent)
+
+    second_club = FactoryGirl.create(:simple_club_with_gateway)
+    second_product = FactoryGirl.create(:product, :club_id => second_club.id)
+    first_member = FactoryGirl.create(:member, :club_id => @club.id)
+    second_member = FactoryGirl.create(:member, :club_id => second_club.id)
+
+    first_fulfillment = Fulfillment.new
+    first_fulfillment.product_sku = @product.sku
+    first_fulfillment.club_id = @club.id
+    first_fulfillment.member_id = first_member.id
+    first_fulfillment.save
+    second_fulfillment = Fulfillment.new
+    second_fulfillment.product_sku = second_product.sku
+    second_fulfillment.club_id = second_club.id
+    second_fulfillment.member_id = second_member.id
+    second_fulfillment.save
+
+    get :generate_xls, initial_date: I18n.l(Time.zone.now, :format=>:only_date),
+        end_date: I18n.l(Time.zone.now, :format=>:only_date), status: "not_processed",
+        radio_product_type:"KIT-CARD", product_type:"KIT-CARD", 
+        fulfillment_selected: { "#{first_fulfillment.id}"=>"#{first_fulfillment.id}", "#{second_fulfillment.id}"=>"#{second_fulfillment.id}"},
+        partner_prefix: @partner.prefix, club_prefix: @club.name
+
+    fulfillments = FulfillmentFile.last.fulfillments
+    assert_equal fulfillments.count, 1
+    assert_equal fulfillments.first.id, first_fulfillment.id
+  end
 
   test "Admin should get index" do
     sign_in @admin_user
@@ -97,6 +131,10 @@ class FulfillmentsControllerTest < ActionController::TestCase
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
     assert_response :success
   end
+
+  #####################################################
+  # CLUBS ROLES
+  ##################################################### 
 
   test "Admin_by_role should not see fulfillment files from another club where it has not permissions" do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
@@ -138,5 +176,56 @@ class FulfillmentsControllerTest < ActionController::TestCase
   
   test "Admin by role should not change status of fulfilments from other club that it does not manage" do
     update_status_on_fulfillment_where_i_do_not_manage('admin')
+  end
+
+  test "Admin, fulfillment_managment and agency by role should not be able to create fulfillment files with fulfillments from other clubs" do
+    @agent = FactoryGirl.create(:agent)
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.role = 'admin'
+    club_role.agent_id = @agent.id
+    club_role.save
+    
+    ['admin','fulfillment_managment','agency'].each do |role|
+      @agent.club_roles.first.update_attribute :role, role
+      second_club = FactoryGirl.create(:simple_club_with_gateway)
+      second_product = FactoryGirl.create(:product, :club_id => second_club.id)
+      first_member = FactoryGirl.create(:member, :club_id => @club.id)
+      second_member = FactoryGirl.create(:member, :club_id => second_club.id)
+
+      first_fulfillment = Fulfillment.new
+      first_fulfillment.product_sku = @product.sku
+      first_fulfillment.club_id = @club.id
+      first_fulfillment.member_id = first_member.id
+      first_fulfillment.save
+      second_fulfillment = Fulfillment.new
+      second_fulfillment.product_sku = second_product.sku
+      second_fulfillment.club_id = second_club.id
+      second_fulfillment.member_id = second_member.id
+      second_fulfillment.save
+
+      get :generate_xls, initial_date: I18n.l(Time.zone.now, :format=>:only_date),
+          end_date: I18n.l(Time.zone.now, :format=>:only_date), status: "not_processed",
+          radio_product_type:"KIT-CARD", product_type:"KIT-CARD", 
+          fulfillment_selected: { "#{first_fulfillment.id}"=>"#{first_fulfillment.id}", "#{second_fulfillment.id}"=>"#{second_fulfillment.id}"},
+          partner_prefix: @partner.prefix, club_prefix: @club.name
+
+      fulfillments = FulfillmentFile.last.fulfillments
+      assert_equal fulfillments.count, 1
+      assert_equal fulfillments.first.id, first_fulfillment.id
+    end
+  end
+
+  test "Supervisor by role should not be able to create fulfillment files with fulfillments from other clubs" do
+    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @club_admin.id
+    club_role.role = "supervisor"
+    club_role.save
+    @club_admin.roles = nil
+    @club_admin.save
+    sign_in(@club_admin)
+    get :generate_xls, partner_prefix: @partner.prefix, club_prefix: @club.name
+    assert_response :unauthorized
   end
 end

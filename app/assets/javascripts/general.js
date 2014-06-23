@@ -1075,6 +1075,7 @@ function admin_form_functions(){
     event.preventDefault();
     if (confirm("Are you sure you want to update this club role?")) {
       var new_role = $("#select_club_role_"+$(this).attr('name')).val();
+      var club_role_id = $(this).attr('name');
       $.ajax({
         type: "PUT",
         url: "/admin/agents/"+agent_id+"/update_club_role",
