@@ -63,12 +63,14 @@
 <% end %>
 
 <h2 id="global_roles">Global Role</h2>
-<ul>
-  <%= @agent.roles %>
+<ul id="global_role_list">
+  <% unless @agent.roles.blank? %>
+    <li><%= @agent.roles %></li>
+  <% end %>
 </ul>
 
 <h2>Club Roles</h2>
-<ul>
+<ul id="club_role_list">
   <% @club_roles.each do |role| %>
     <% if @current_agent.has_global_role? or @current_agent.clubs.each.collect(&:id).include? role.club_id %>
       <li>
