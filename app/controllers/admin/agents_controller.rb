@@ -45,6 +45,8 @@ class Admin::AgentsController < ApplicationController
     if tmp_agent and tmp_agent.deleted?
       @club_roles = []
       @agent = tmp_agent
+      @agent.roles = nil
+      @agent.delete_club_roles(tmp_agent.club_roles)
       @agent.assign_attributes(params[:agent])
       @agent.deleted_at = nil
     else
