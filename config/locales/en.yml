@@ -409,6 +409,9 @@ en:
           no_downgrade_upgrade_configuration: 'According to the configuration you selected on step 2, there is nothing to configure on this step.'
           upgrade_help: "Upon successful billing we will check if the member should be upgraded or not. We will check if join date + upgrade period is older than date when it is billed, and If so, we will change member's subscriptions plan to the one especified."
       email_template:
+        title_new: 'New Communication'
+        title_edit: 'Edit Communication'
+        show_communications: 'Communications'
         name: 'Name'
         type: 'Type'
         client: 'Client'
