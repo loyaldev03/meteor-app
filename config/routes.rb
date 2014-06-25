@@ -51,6 +51,7 @@ SacPlatform::Application.routes.draw do
       
       resources :terms_of_memberships, :path => 'subscription_plans' do
         get :resumed_information
+        resources :email_templates, :path => 'communications'
       end
 
       scope '/member/:member_prefix' do
