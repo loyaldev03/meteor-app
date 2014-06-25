@@ -1166,3 +1166,19 @@ function tom_create_wizard() {
     textSubmit: ''
   });
 }
+
+// Communications
+function email_templates_table_index_functions(column_count){
+  $('#email_templates_table').dataTable({
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bFilter": true,
+    "sPaginationType": "bootstrap",
+    "sDom": '<"top"lf>rt<"bottom"pi>',
+    "bServerSide": true,
+    "bLengthChange": false,
+    "aaSorting": [[ 0, "desc" ]],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2, column_count-1 ] }],
+    "sAjaxSource": $('#email_templates_table').data('source')
+  });
+}
