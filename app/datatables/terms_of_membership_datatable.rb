@@ -19,7 +19,8 @@ private
         get_agent_name(tom),
         (link_to(I18n.t(:show), @url_helpers.terms_of_membership_path(@current_partner.prefix, @current_club.name, tom.id), :class => 'btn btn-mini', :id => 'show') if @current_agent.can? :read, TermsOfMembership, @current_club.id).to_s+
         (link_to(I18n.t(:edit), @url_helpers.edit_terms_of_membership_path(@current_partner.prefix, @current_club.name, tom.id), :class => 'btn btn-mini', :id => 'edit') if @current_agent.can? :edit, TermsOfMembership, @current_club.id).to_s+
-        (link_to(I18n.t(:destroy), @url_helpers.terms_of_membership_path(@current_partner.prefix, @current_club.name, tom.id), :method => :delete, :confirm => I18n.t("are_you_sure"), :id => 'destroy', :class => 'btn btn-mini btn-danger') if @current_agent.can? :delete, TermsOfMembership, @current_club.id).to_s
+        (link_to(I18n.t(:destroy), @url_helpers.terms_of_membership_path(@current_partner.prefix, @current_club.name, tom.id), :method => :delete, :confirm => I18n.t("are_you_sure"), :id => 'destroy', :class => 'btn btn-mini btn-danger') if @current_agent.can? :delete, TermsOfMembership, @current_club.id).to_s+
+        (link_to(I18n.t('activerecord.attributes.email_template.show_communications'), @url_helpers.terms_of_membership_email_templates_path(@current_partner.prefix, @current_club.name, tom.id), :class => 'btn btn-mini', :id => 'email_templates_index') if @current_agent.can? :read, EmailTemplate, @current_club.id).to_s
       ]
     end
   end
