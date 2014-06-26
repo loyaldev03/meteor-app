@@ -1,43 +1,53 @@
 <% if @et.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@et.errors.count, "error") %></h2>
-
-      <ul>
-      <% @et.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
+  <div id="error_explanation">
+    <h2><%= pluralize(@et.errors.count, "error") %></h2>
+    <ul><% @et.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+  </div>
 <%end%>
 
 <div class="control-group">
   <%= f.label :name, :class => 'control-label' %>
   <div class="controls">
     <%= f.text_field :name, :class => 'text_field required', :maxlength => 3 %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.email_template.name'), 
+        :content => t('activerecord.attributes.email_template.help_for_name') } %>
   </div>
 </div>
 <div class="control-group">
   <%= f.label :template_type, :class => 'control-label' %>
   <div class="controls">
-    <%= select_tag :template_type, options_for_select(template_types_options, @et.template_type), :include_blank => true, :class => 'required' %>
+    <%= select_tag :template_type, options_for_select(template_types_options(@tom.id, @et.template_type), @et.template_type), :include_blank => true, :class => 'required',  :include_blank => (controller.action_name == 'new') %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.email_template.type'), 
+        :content => t('activerecord.attributes.email_template.help_for_type') } %>
+  </div>
+</div>
+<div class="control-group" id="control_group_days_after_join_date" style="display:none;">
+  <%= f.label :days_after_join_date, :class => 'control-label' %>
+  <div class="controls">
+    <%= f.text_field :days_after_join_date, :class => 'text_field input-small', :type => 'number', :min => 0 %>&nbsp;day(s)
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.email_template.days_after_join_date'), 
+        :content => t('activerecord.attributes.email_template.help_for_days_after_join_date') } %>
   </div>
 </div>
 <div class="control-group">
   <%= f.label :client, :class => 'control-label' %>
   <div class="controls">
-    <%= select_tag :client, options_for_select(clients_options, @et.client), :include_blank => true, :class => 'required' %>
-  </div>
-</div>
-<div class="control-group">
-  <%= f.label :days_after_join_date, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :days_after_join_date, :class => 'text_field input-small', :type => 'number', :min => 0, :value => @et.days_after_join_date %>&nbsp;day(s)
+    <%= select_tag :client, options_for_select(clients_options, @et.client), :include_blank => true, :class => 'required', :include_blank => (controller.action_name == 'new') %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.email_template.client'), 
+        :content => t('activerecord.attributes.email_template.help_for_clients') } %>
   </div>
 </div>
 <div class="control-group">
   <%= f.label :external_attributes, :class => 'control-label' %>
   <div class="controls">
-    <%= f.text_area :external_attributes, :class => 'text_area', :rows => 5, :cols => 40, :value => @et.external_attributes %>
+    <%= f.text_area :external_attributes, :class => 'text_area', :rows => 5, :cols => 40 %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.email_template.external_attributes'), 
+        :content => t('activerecord.attributes.email_template.help_for_external_attributes') } %>
   </div>
 </div>
 
@@ -45,3 +55,24 @@
   <%= f.submit nil, :class => 'btn btn-primary' %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_membership_email_templates_path, :class => 'btn' %>
 </div>
+
+<script type='text/javascript'>
+  $(document).ready(function() {
+    switch_days_after_join_date();
+  });
+  $("#template_type").change(function() {
+    switch_days_after_join_date();
+  });
+
+  function switch_days_after_join_date() {
+    if ($("#template_type").val() == 'pillar') {
+      $("#control_group_days_after_join_date").show(100);
+    }
+    else {
+     $("#control_group_days_after_join_date").hide(100); 
+     $("#email_template_days_after_join_date").val(0);
+    }
+  }
+
+  email_templates_functions();
+</script>
