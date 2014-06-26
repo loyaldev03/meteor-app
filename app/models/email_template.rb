@@ -25,9 +25,7 @@ class EmailTemplate < ActiveRecord::Base
   
   validates :external_attributes, length: { maximum: 2048, too_long: "%{count} characters is the maximum allowed" }
   
-  validates :days_after_join_date,
-    :presence => :true,
-    numericality: { only_integer: true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 1000 }
+  validates :days_after_join_date, numericality: { only_integer: true, :greater_than_or_equal_to => 0, :less_than_or_equal_to => 1000 }, :if => :is_pillar?
 
   def lyris?
     self.client == 'lyris'
@@ -43,6 +41,10 @@ class EmailTemplate < ActiveRecord::Base
 
   def self.datatable_columns
     [ 'id', 'name', 'template_type', 'days_after_join_date' ]
+  end
+
+  def is_pillar?
+    self.template_type == 'pillar'
   end
 
 end
