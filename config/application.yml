@@ -11,6 +11,7 @@ defaults: &defaults
   hot_rod_cancellation_emails: 'sonia@xagax.com,clawler@stoneacreinc.com'
   others_product: "SLOOPS"
   kit_card_product: 'KIT-CARD'
+  payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle']
   lyris_service:
     domain: 'www.elabs10.com'
     url: '/API/mailing_list.html'

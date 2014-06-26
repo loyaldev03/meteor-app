@@ -363,6 +363,17 @@ function retrieve_information(){
   return data
 }
 
+function payment_gateway_configuration_functions(){
+  $('form').submit( function(event) { 
+    if(confirm(confirmationText)){
+      if(!confirm(reConfirmationText)){
+        event.preventDefault();
+      }
+    }else
+      event.preventDefault();
+  });
+}
+
 function new_member_functions(){
   $('#error_explanation').hide();
   $(".datepicker").datepicker({ constrainInput: true, 
