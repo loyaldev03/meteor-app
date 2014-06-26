@@ -1168,7 +1168,11 @@ function tom_create_wizard() {
 }
 
 // Communications
-function email_templates_table_index_functions(column_count){
+function email_templates_functions() {
+  $('.help').popover({offset: 10});
+}
+
+function email_templates_table_index_functions(column_count) {
   $('#email_templates_table').dataTable({
     "bJQueryUI": false,
     "bProcessing": true,
