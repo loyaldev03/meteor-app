@@ -5,51 +5,50 @@
   </div>
 <%end%>
 
+<h4>General</h4>
 <div class="control-group">
-  <%= f.label :name, :class => 'control-label' %>
+  <%= f.label :name, 'Name*', :class => 'control-label' %>
   <div class="controls">
-    <%= f.text_field :name, :class => 'text_field required', :maxlength => 3 %>
+    <%= f.text_field :name, required: true, :class => 'text_field required' %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.name'), 
         :content => t('activerecord.attributes.email_template.help_for_name') } %>
   </div>
 </div>
 <div class="control-group">
-  <%= f.label :template_type, :class => 'control-label' %>
+  <%= f.label :template_type, 'Template Type*', :class => 'control-label' %>
   <div class="controls">
-    <%= select_tag :template_type, options_for_select(template_types_options(@tom.id, @et.template_type), @et.template_type), :include_blank => true, :class => 'required',  :include_blank => (controller.action_name == 'new') %>
+    <%= select_tag :template_type, options_for_select(template_types_options(@tom.id, @et.template_type), @et.template_type), required: true, :include_blank => true, :class => 'required',  :include_blank => (controller.action_name == 'new') %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.type'), 
         :content => t('activerecord.attributes.email_template.help_for_type') } %>
   </div>
 </div>
 <div class="control-group" id="control_group_days_after_join_date" style="display:none;">
-  <%= f.label :days_after_join_date, :class => 'control-label' %>
+  <%= f.label :days_after_join_date, 'Days after Join Date*', :class => 'control-label' %>
   <div class="controls">
-    <%= f.text_field :days_after_join_date, :class => 'text_field input-small', :type => 'number', :min => 0 %>&nbsp;day(s)
+    <%= f.number_field :days_after_join_date, :class => 'text_field input-small', :type => 'number', :min => 1 %>&nbsp;day(s)
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.days_after_join_date'), 
         :content => t('activerecord.attributes.email_template.help_for_days_after_join_date') } %>
   </div>
 </div>
 <div class="control-group">
-  <%= f.label :client, :class => 'control-label' %>
+  <%= f.label :client, "Client*", :class => 'control-label' %>
   <div class="controls">
-    <%= select_tag :client, options_for_select(clients_options, @et.client), :include_blank => true, :class => 'required', :include_blank => (controller.action_name == 'new') %>
+    <%= select_tag :client, options_for_select(controller.clients_options, @et.client), required: true, :include_blank => true, :class => 'required', :include_blank => (controller.action_name == 'new') %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.client'), 
         :content => t('activerecord.attributes.email_template.help_for_clients') } %>
   </div>
 </div>
-<div class="control-group">
-  <%= f.label :external_attributes, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_area :external_attributes, :class => 'text_area', :rows => 5, :cols => 40 %>
-    <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.email_template.external_attributes'), 
-        :content => t('activerecord.attributes.email_template.help_for_external_attributes') } %>
-  </div>
-</div>
+
+<% # In this div will be loaded the external attributes html rendered from partial %>
+<h4>External Attributes
+<%= render :partial => "shared/help", :locals => { 
+  :title => t('activerecord.attributes.email_template.external_attributes'), 
+  :content => t('activerecord.attributes.email_template.help_for_external_attributes') } %></h4>
+<div id="external_attributes_group"></div>
 
 <div class="form-actions">
   <%= f.submit nil, :class => 'btn btn-primary' %>
@@ -59,9 +58,16 @@
 <script type='text/javascript'>
   $(document).ready(function() {
     switch_days_after_join_date();
+    switch_external_attributes();
+    email_templates_functions();
   });
+
   $("#template_type").change(function() {
     switch_days_after_join_date();
+  });
+
+  $("#client").change(function() {
+    switch_external_attributes();
   });
 
   function switch_days_after_join_date() {
@@ -70,9 +76,22 @@
     }
     else {
      $("#control_group_days_after_join_date").hide(100); 
-     $("#email_template_days_after_join_date").val(0);
+     $("#email_template_days_after_join_date").val(1);
     }
   }
 
-  email_templates_functions();
+  function switch_external_attributes() {
+    if($("#client").val() == '') {
+      $("#external_attributes_group").html('Select a Client');
+    }
+    else {
+      $.ajax({
+        type: 'GET',
+        data: 'client=' + $("#client").val() + '&<%= controller.action_name == "edit" ? @et.external_attributes.to_query : "" %>',
+        url: "<%= terms_of_membership_email_template_external_attributes_html_url(:terms_of_membership_id => @tom.id, :email_template_id => 1) %>",
+        success: function(data) { $("#external_attributes_group").html(data); }
+      });
+      $("#external_attributes_group").show(100)
+    }
+  }
 </script>
