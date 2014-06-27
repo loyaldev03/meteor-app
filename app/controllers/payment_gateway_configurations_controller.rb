@@ -7,20 +7,25 @@ class PaymentGatewayConfigurationsController < ApplicationController
 	end
 
 	def new
-		@payment_gateway_configuration = PaymentGatewayConfiguration.new
     my_authorize! :new, PaymentGatewayConfiguration, @current_club.id
+		@payment_gateway_configuration = PaymentGatewayConfiguration.new
 	end
 
 	def create
 		my_authorize! :create, PaymentGatewayConfiguration, @current_club.id
 		@payment_gateway_configuration = PaymentGatewayConfiguration.new(params[:payment_gateway_configuration])
-		if @current_club.members.count == 0		
-			@payment_gateway_configuration.club_id = @current_club.id
-			success = false
-			if @payment_gateway_configuration.valid?
-				@current_club.payment_gateway_configurations.first.delete if @current_club.payment_gateway_configurations.first
-				@payment_gateway_configuration.save!
-				success = true
+		@payment_gateway_configuration.club_id = @current_club.id
+		success = false
+		if @current_club.members_count.to_i == 0 and @current_club.members.count == 0
+			PaymentGatewayConfiguration.transaction do 
+				begin
+					if @payment_gateway_configuration.valid?
+						@current_club.payment_gateway_configurations.first.delete if @current_club.payment_gateway_configurations.first
+						success = true if @payment_gateway_configuration.save!
+					end
+				rescue Exception => e
+					raise ActiveRecord::Rollback
+				end
 			end
 		else
 			flash.now[:error] = I18n.t("error_messages.pgc_cannot_be_created_club_has_members")
