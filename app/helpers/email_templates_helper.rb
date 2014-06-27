@@ -17,19 +17,14 @@ module EmailTemplatesHelper
 			templates_used = templates_used + [tu.template_type]
 		end
 		result = Array.new()
-		free_templates = templates - templates_used + Array(current_type) + ['pillar']
+		free_templates = templates - templates_used + Array(current_type)
+		if !free_templates.include?('pillar')
+			free_templates = free_templates + ['pillar']
+		end
 		free_templates.each do |ft|
 			result << [ft.humanize, ft]
 		end
 		result.sort!
 		result
-	end
-
-	def clients_options
-		[
-			# ['Action Mailer', 'action_mailer'],
-			['Exact Target', 'exact_target'],
-			# ['Lyris ', 'lyris']
-		]
 	end
 end
