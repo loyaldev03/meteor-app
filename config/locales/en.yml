@@ -31,7 +31,8 @@ en:
   blacklisted: 'Blacklisted'
   search_results: 'Search results'
   are_you_sure: 'Are you sure?'
-  pgc_are_you_sure: "Are you really sure? This Payment Gateway will replace he previous one and you wont be able to change it once there are enrolled members in the club."
+  pgc_are_you_sure: "Are you really sure? You wont be able to change this Payment Gateway once there are enrolled members in the club."
+  pgc_are_you_sure_replace: "Are you really sure? This payment gateway will replace previous one and you wont be able to change it once there are enrolled members in the club."
   initial_date: 'Initial date'
   end_date: 'End date'
   all_times: 'All times'
@@ -89,8 +90,9 @@ en:
     manual_billing_help: 'This Payment is a membership payment that will be applied to the membership and is received offline (not via credit card). Payments of this type will act as if they were credit card transactions adjusting next bill date accordingly.'
     reschedule: 'Reschedule'
     return: 'Return'
-    club_edit: 'Edit Club'
+    club_show: 'Show Club'
     new_payment_gateway: "New Payment Gateway"
+    replace_payment_gateway: "Replace Payment Gateway"
   admin:
     agents:
       index:
@@ -488,8 +490,8 @@ en:
         login_help: 'Login used to authenticate with the gateway.'
         password: 'Password'
         password_help: 'Password used to authenticate with the gateway'
-        descriptor_name: 'Text that will appear on the credit card statement.'
-        descriptor_name_help: 'Text that will appear on a credit card statement for transactions through this configuration.'
+        descriptor_name: 'Descriptor Name'
+        descriptor_name_help: 'Text that will appear on the credit card statement.'
         descriptor_phone: 'Descriptor Phone'
         descriptor_phone_help: 'The phone number that will appear on credit card statements for transactions'
         order_mark: 'Order Mark'

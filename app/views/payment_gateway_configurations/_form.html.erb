@@ -1,21 +1,8 @@
-<% if @payment_gateway_configuration.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@payment_gateway_configuration.errors.count, "error") %></h2>
-
-      <ul>
-      <% @payment_gateway_configuration.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-<br>
-<%end%>
-
 <% if @payment_gateway_configuration.new_record? %>
   <div class="control-group">
     <%= f.label :gateway, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= select_tag('payment_gateway_configuration[gateway]', options_for_select(Settings.payment_gateways.collect{|x| [I18n.t("activerecord.gateway.#{x}"),x]}), :class => 'text_field') %>
+      <%= generate_select_gateway(@payment_gateway_configuration, @current_club.payment_gateway_configuration) %> 
     </div>
   </div>
 <% end %>
