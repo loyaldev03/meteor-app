@@ -6,7 +6,7 @@ private
         email_template.id,
         email_template.name, 
         email_template.template_type,
-        email_template.days_after_join_date,
+        email_template.client.humanize,
         (link_to(I18n.t(:show), 
         	@url_helpers.terms_of_membership_email_template_path(
         		:partner_prefix => @current_partner.prefix, 
