@@ -479,8 +479,26 @@ en:
         run_at: 'Run at'
         created_at: 'created_at'
         rescheduled_job: "re-scheduled Job: %{job}"
-
-  date:
+      payment_gateway_configuration:
+        report_group: 'Report Group'
+        report_group_help: 'The exact name of the report group set up in Litle that you want all orders to be added to.'
+        merchant_key: 'Merchant Key'
+        merchant_key_help: 'Key used to authenticate with the gateway configured.'
+        login: 'Login'
+        login_help: 'Login used to authenticate with the gateway.'
+        password: 'Password'
+        password_help: 'Password used to authenticate with the gateway'
+        descriptor_name: 'Text that will appear on the credit card statement.'
+        descriptor_name_help: 'Text that will appear on a credit card statement for transactions through this configuration.'
+        descriptor_phone: 'Descriptor Phone'
+        descriptor_phone_help: 'The phone number that will appear on credit card statements for transactions'
+        order_mark: 'Order Mark'
+        order_mark_help: 'Not being used right now.'
+        aus_login: 'AUS Login'
+        aus_login_help: 'AUS service login'
+        aus_password: 'AUS password'
+        aus_password_help: 'AUS service password'
+  date: 
     formats:
       default: "%m/%d/%Y"
       short: "%b %d"

@@ -13,66 +13,86 @@
 
 <% if @payment_gateway_configuration.new_record? %>
   <div class="control-group">
-    <%= f.label :gateway, :class => 'control-label' %>
+    <%= f.label :gateway, :class => 'control-label required_asterick' %>
     <div class="controls">
       <%= select_tag('payment_gateway_configuration[gateway]', options_for_select(Settings.payment_gateways.collect{|x| [I18n.t("activerecord.gateway.#{x}"),x]}), :class => 'text_field') %>
     </div>
   </div>
 <% end %>
 
-<div class="control-group">
-  <%= f.label :report_group, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :report_group, :class => 'text_field' %>
+<% if @payment_gateway_configuration.new_record? or @payment_gateway_configuration.litle? %>
+  <div class="control-group">
+    <%= f.label :report_group, :class => 'control-label' %> 
+    <div class="controls">
+      <%= f.text_field :report_group, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.payment_gateway_configuration.report_group'), 
+          :content => t('activerecord.attributes.payment_gateway_configuration.report_group_help') } %> 
+    </div>
   </div>
-</div>
+<% end %>
 
 <div class="control-group">
-  <%= f.label :merchant_key, :class => 'control-label' %>
+  <%= f.label :merchant_key, :class => 'control-label required_asterick' %>
   <div class="controls">
     <%= f.text_field :merchant_key, :class => 'text_field' %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.payment_gateway_configuration.merchant_key'), 
+        :content => t('activerecord.attributes.payment_gateway_configuration.merchant_key_help') } %> 
   </div>
 </div>
 
 <div class="control-group">
-  <%= f.label :login, :class => 'control-label' %>
+  <%= f.label :login, :class => 'control-label required_asterick' %>
   <div class="controls">
     <%= f.text_field :login, :class => 'text_field' %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.payment_gateway_configuration.login'), 
+        :content => t('activerecord.attributes.payment_gateway_configuration.login_help') } %> 
   </div>
 </div>
 
 <div class="control-group">
-  <%= f.label :password, :class => 'control-label' %>
+  <%= f.label :password, :class => 'control-label required_asterick' %>
   <div class="controls">
     <%= f.password_field :password, :class => 'password_field' %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.payment_gateway_configuration.password'), 
+        :content => t('activerecord.attributes.payment_gateway_configuration.password_help') } %> 
   </div>
 </div>
 
-<div class="control-group">
-  <%= f.label :descriptor_name, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :descriptor_name, :class => 'text_field' %>
+<% if @payment_gateway_configuration.new_record? or @payment_gateway_configuration.litle? %>
+  <div class="control-group">
+    <%= f.label :descriptor_name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :descriptor_name, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.payment_gateway_configuration.descriptor_name'), 
+          :content => t('activerecord.attributes.payment_gateway_configuration.descriptor_name_help') } %> 
+    </div>
   </div>
-</div>
+<% end %>
 
-<div class="control-group">
-  <%= f.label :descriptor_phone, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :descriptor_phone, :class => 'text_field' %>
+<% if @payment_gateway_configuration.new_record? or @payment_gateway_configuration.litle? %>
+  <div class="control-group">
+    <%= f.label :descriptor_phone, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :descriptor_phone, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.payment_gateway_configuration.descriptor_phone'), 
+          :content => t('activerecord.attributes.payment_gateway_configuration.descriptor_phone_help') } %> 
+    </div>
   </div>
-</div>
-
-<div class="control-group">
-  <%= f.label :order_mark, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :order_mark, :class => 'text_field' %>
-  </div>
-</div>
-
+<% end %>
+  
 <div class="control-group">
   <%= f.label :aus_login, :class => 'control-label' %>
   <div class="controls">
     <%= f.text_field :aus_login, :class => 'text_field' %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.payment_gateway_configuration.aus_login'), 
+        :content => t('activerecord.attributes.payment_gateway_configuration.aus_login_help') } %> 
   </div>
 </div>
 
@@ -80,6 +100,9 @@
   <%= f.label :aus_password, :class => 'control-label' %>
   <div class="controls">
     <%= f.password_field :aus_password, :class => 'password_field' %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.payment_gateway_configuration.aus_password'), 
+        :content => t('activerecord.attributes.payment_gateway_configuration.aus_password_help') } %> 
   </div>
 </div>
 
@@ -88,3 +111,9 @@
 	<%= f.submit nil, :class => 'btn btn-primary' %>
 	<%= link_to t(:cancel), club_path(:id => @current_club.id), :class => 'btn' %>
 </div>
+
+
+
+<script>
+  $('document').ready(payment_gateway_configuration_functions());
+</script>
