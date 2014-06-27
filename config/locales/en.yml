@@ -495,8 +495,8 @@ en:
         order_mark: 'Order Mark'
         order_mark_help: 'Not being used right now.'
         aus_login: 'AUS Login'
-        aus_login_help: 'AUS service login'
-        aus_password: 'AUS password'
+        aus_login_help: 'Account Updater Service service login'
+        aus_password: 'Account Updater Service password'
         aus_password_help: 'AUS service password'
   date: 
     formats:

@@ -369,23 +369,20 @@ function payment_gateway_configuration_functions(){
 
 function new_payment_gateway_configuration_functions(){
   if($('#payment_gateway_configuration_gateway').val() != 'litle'){
-    $('#payment_gateway_configuration_report_group').parent().parent().hide('fast');
-    $('#payment_gateway_configuration_descriptor_name').parent().parent().hide('fast');
-    $('#payment_gateway_configuration_descriptor_phone').parent().parent().hide('fast');
-    $('#payment_gateway_configuration_order_mark').parent().parent().hide('fast');    
+    $('#div_report_group').hide('fast');
+    $('#div_descriptor_name').hide('fast');
+    $('#div_descriptor_phone').hide('fast');
   };
   
   $('#payment_gateway_configuration_gateway').change(function(){
     if($(this).val()!='litle'){
-      $('#payment_gateway_configuration_report_group').parent().parent().hide('fast');
-      $('#payment_gateway_configuration_descriptor_name').parent().parent().hide('fast');
-      $('#payment_gateway_configuration_descriptor_phone').parent().parent().hide('fast');
-      $('#payment_gateway_configuration_order_mark').parent().parent().hide('fast');
+      $('#div_report_group').hide('fast');
+      $('#div_descriptor_name').hide('fast');
+      $('#div_descriptor_phone').hide('fast');
     }else{
-      $('#payment_gateway_configuration_report_group').parent().parent().show('fast');
-      $('#payment_gateway_configuration_descriptor_name').parent().parent().show('fast');
-      $('#payment_gateway_configuration_descriptor_phone').parent().parent().show('fast');
-      $('#payment_gateway_configuration_order_mark').parent().parent().show('fast');
+      $('#div_report_group').show('fast');
+      $('#div_descriptor_name').show('fast');
+      $('#div_descriptor_phone').show('fast');
     }
   });
 
