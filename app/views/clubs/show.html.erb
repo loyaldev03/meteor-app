@@ -94,6 +94,13 @@
               new_domain_path(:club_id => @club.id), :class => 'btn btn-success' %>
   <%= link_to t(:test_api_connection),
               club_test_api_connection_path(:club_id => @club.id), :class => 'btn' %>
+  <% if @payment_gateway_configuration %>
+    <%= link_to t("activerecord.model.payment_gateway_configuration"),
+        payment_gateway_configuration_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name, :id => @payment_gateway_configuration.id), :class => 'btn' %>
+  <% else %>
+    <%= link_to t("button.new_payment_gateway"),
+        new_payment_gateway_configuration_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name), :class => 'btn' %>
+  <% end %>
   <%= link_to t(:destroy),
               club_path(:id => @club.id),
               :method => 'delete',

@@ -69,9 +69,8 @@ class TermsOfMembership < ActiveRecord::Base
   end
 
   private
-
     def validate_payment_gateway_configuration
-      errors.add :base, :club_payment_gateway_configuration unless self.payment_gateway_configuration
+      errors.add :base, I18n.t("error_messages.club_payment_gateway_configuration_not_created", :link => Rails.application.routes.url_helpers.new_payment_gateway_configuration_path(partner_prefix: self.club.partner.prefix, club_prefix: self.club.name)).html_safe unless self.payment_gateway_configuration
     end
 
     def setup_default_email_templates

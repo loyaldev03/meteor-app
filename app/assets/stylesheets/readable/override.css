@@ -126,7 +126,7 @@ div.dataTables_filter input {
   padding: 1%;
  }
 
-.required_asterick:after { content:" *"; }
+.required_asterisk:after { content:" *"; }
 
 #ajax_loader {
   position: fixed;

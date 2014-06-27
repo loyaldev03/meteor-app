@@ -1,0 +1,45 @@
+<%- model_class = @payment_gateway_configuration.class -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human %></h1>
+</div>
+<p>
+<% if @payment_gateway_configuration.litle? %>
+  <p>
+    <strong><%= model_class.human_attribute_name(:report_group) %>:</strong><br>
+    <%= @payment_gateway_configuration.report_group %>
+  </p>
+<% end %>
+<p>
+  <strong><%= model_class.human_attribute_name(:merchant_key) %>:</strong><br>
+  <%= @payment_gateway_configuration.merchant_key %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:login) %>:</strong><br>
+  <%= @payment_gateway_configuration.login %>
+</p>
+<% if @payment_gateway_configuration.litle? %>
+  <p>
+    <strong><%= model_class.human_attribute_name(:descriptor_name) %>:</strong><br>
+    <%= @payment_gateway_configuration.descriptor_name %>
+  </p>
+<% end %>
+<% if @payment_gateway_configuration.litle? %>
+  <p>
+    <strong><%= model_class.human_attribute_name(:descriptor_phone) %>:</strong><br>
+    <%= @payment_gateway_configuration.descriptor_phone %>
+  </p>
+<% end %>
+<p>
+  <strong><%= model_class.human_attribute_name(:gateway) %>:</strong><br>
+  <%= @payment_gateway_configuration.gateway %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:aus_login) %>:</strong><br>
+  <%= @payment_gateway_configuration.aus_login %>
+</p>
+
+<% if @current_club.members_count.to_i == 0 and @current_club.members.count == 0 %>
+  <%= link_to t("button.new_payment_gateway"), new_payment_gateway_configuration_path, :class => "btn", id: "new_payment_gateway" %>
+<% end %>
+<%= link_to t(:edit), edit_payment_gateway_configuration_path, :class => "btn" %>
+<%= link_to t(:back), club_path(:id => @current_club.id), :class => "btn" %>

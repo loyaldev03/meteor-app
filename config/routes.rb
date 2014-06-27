@@ -52,7 +52,8 @@ SacPlatform::Application.routes.draw do
       resources :terms_of_memberships, :path => 'subscription_plans' do
         get :resumed_information
       end
-
+      resources :payment_gateway_configurations, :except => [:index, :destroy]
+      
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]

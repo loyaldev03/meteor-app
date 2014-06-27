@@ -363,6 +363,39 @@ function retrieve_information(){
   return data
 }
 
+function payment_gateway_configuration_functions(){
+  $('.help').popover({offset: 10});
+}
+
+function new_payment_gateway_configuration_functions(){
+  if($('#payment_gateway_configuration_gateway').val() != 'litle'){
+    $('#div_report_group').hide('fast');
+    $('#div_descriptor_name').hide('fast');
+    $('#div_descriptor_phone').hide('fast');
+  };
+  
+  $('#payment_gateway_configuration_gateway').change(function(){
+    if($(this).val()!='litle'){
+      $('#div_report_group').hide('fast');
+      $('#div_descriptor_name').hide('fast');
+      $('#div_descriptor_phone').hide('fast');
+    }else{
+      $('#div_report_group').show('fast');
+      $('#div_descriptor_name').show('fast');
+      $('#div_descriptor_phone').show('fast');
+    }
+  });
+
+  $('form').submit( function(event) { 
+    if(confirm(confirmationText)){
+      if(!confirm(reConfirmationText)){
+        event.preventDefault();
+      }
+    }else
+      event.preventDefault();
+  });
+}
+
 function new_member_functions(){
   $('#error_explanation').hide();
   $(".datepicker").datepicker({ constrainInput: true, 
