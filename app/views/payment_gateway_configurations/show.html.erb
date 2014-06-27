@@ -39,7 +39,7 @@
 </p>
 
 <% if @current_club.members_count.to_i == 0 and @current_club.members.count == 0 %>
-  <%= link_to t("button.new_payment_gateway"), new_payment_gateway_configuration_path, :class => "btn", id: "new_payment_gateway" %>
+  <%= link_to t("button.replace_payment_gateway"), new_payment_gateway_configuration_path, :class => "btn", id: "new_payment_gateway" %>
 <% end %>
 <%= link_to t(:edit), edit_payment_gateway_configuration_path, :class => "btn" %>
 <%= link_to t(:back), club_path(:id => @current_club.id), :class => "btn" %>

@@ -81,7 +81,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     visit club_path(@partner.prefix, @club.id)
     click_link_or_button "Payment Gateway Configuration"
 		new_pgc = FactoryGirl.build(:payment_gateway_configuration)
-    click_link_or_button "New Payment Gateway"
+    click_link_or_button "Replace Payment Gateway"
 
     fill_in_payment_gateway_configuration(new_pgc)
     confirm_ok_js

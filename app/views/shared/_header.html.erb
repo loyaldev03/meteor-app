@@ -59,7 +59,7 @@
                     <li><%= link_to t('activerecord.model.subscription_plans'), terms_of_memberships_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
                   <% if @current_agent.can? :edit, Club, @current_club.id %>
-                    <li><%= link_to t('button.club_edit'), edit_club_path(@current_club.partner.prefix, @current_club.id) %></li>
+                    <li><%= link_to t('button.club_show'), club_path(@current_club.partner.prefix, @current_club.id) %></li>
                   <% end %>
                 </ul>
               </li>
