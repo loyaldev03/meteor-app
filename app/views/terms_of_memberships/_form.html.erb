@@ -19,7 +19,7 @@
       <%= f.text_field :name, :class => 'text_field required', :minlength => 3 %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.plan_name'), 
-        :content => t('lorem') } %> 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.plan_name_help') } %> 
     </div>
   </div>
   <div class="control-group">
@@ -28,7 +28,7 @@
       <%= f.text_field :api_role, :value => @tom.api_role, :class => 'text_field input-small' %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.external_code'), 
-        :content => t('lorem') } %> 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.external_code_help') } %> 
     </div>
   </div>
   <div class="control-group">
@@ -37,7 +37,7 @@
       <%= f.text_area :description, :class => 'text_area', :rows => 5 %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.description'), 
-        :content => t('lorem') } %> 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.description_help') } %> 
     </div>
   </div>
 </div>
@@ -59,7 +59,7 @@
       <%= f.check_box 'needs_enrollment_approval' %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval'), 
-        :content => t('lorem') } %> 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval_help') } %> 
     </div>
   </div>
 
@@ -72,7 +72,7 @@
       <%= select_for_date_span("trial_period_lasting_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.trial_period'), 
-        :content => t('lorem') } %> 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.trial_period_help') } %> 
     </div>
   </div>
 
@@ -85,7 +85,7 @@
       <%= t('activerecord.attributes.terms_of_membership.wizard.no_pay_is_expected') %>&nbsp;
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), 
-        :content => t('lorem') } %>
+        :content => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial_help') } %>
     </div>
   </div>
 
@@ -98,7 +98,7 @@
       <%= select_for_date_span("installment_amount_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
-        :content => t('lorem') } %> 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount_help') } %> 
     </div>
   </div>
 
@@ -153,8 +153,8 @@
       <%= t('activerecord.attributes.terms_of_membership.wizard.downgrade_to') %>
       <%= select_for_toms('downgrade_to_tom', @tom.downgrade_tom_id, @tom) %>
       <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), 
-        :content => t('lorem') } %> 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.downgrade_to'), 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.downgrade_to_help') } %> 
     </div>
   </div>
   <div class="control-group" id="upgrade_options">
@@ -166,7 +166,7 @@
       <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.upgrade_help') } %> 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to_help') } %> 
     </div>
   </div> 
   <div id="no_configuration_message" style="display:none">
