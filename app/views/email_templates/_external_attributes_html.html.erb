@@ -1,6 +1,6 @@
 <% controller.external_attributes(client).each do |attribute_name| %>
 <div class="control-group">
-	<%= label_tag attribute_name, attribute_name.humanize + '*', :class => 'control-label' %>
+	<%= label_tag attribute_name, attribute_name + '*', :class => 'control-label' %>
   <div class="controls">
     <%= text_field_tag attribute_name, '', required: true, :class => 'text_field input-small required', :value => params[attribute_name] if controller.action_name = 'edit' %>
   </div>
