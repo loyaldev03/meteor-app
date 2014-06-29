@@ -59,4 +59,8 @@ private
     email_templates.count
   end
 
+  def sort_column
+    EmailTemplate.datatable_columns[params[:iSortCol_0].to_i]
+  end
+
 end
