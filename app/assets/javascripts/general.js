@@ -1181,8 +1181,9 @@ function email_templates_table_index_functions(column_count) {
     "sDom": '<"top"lf>rt<"bottom"pi>',
     "bServerSide": true,
     "bLengthChange": false,
+    'bSortable':true,
     "aaSorting": [[ 0, "desc" ]],
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2, column_count-1 ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
     "sAjaxSource": $('#email_templates_table').data('source')
   });
 }
