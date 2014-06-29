@@ -21,8 +21,13 @@
   <div><h4>External Attributes</h4></div>
   <div class="table-bordered">
     <div class="row-fluid">
-      <div class="span2"><%= @et.external_attributes != nil ? @et.external_attributes : 'Not set' %></div>
+      <% if @et.external_attributes %>
+        <% @et.external_attributes.each do |k, v| %>
+        <div class="span2"><b><%= k %></b>: <%= v %></div>
+        <% end %>
+      <% else %>
+        <div class="span2">Not set</div>
+      <% end %>
     </div>
   </div>
-    
 </section>
