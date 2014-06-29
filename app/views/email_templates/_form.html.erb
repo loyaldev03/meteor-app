@@ -43,11 +43,11 @@
   </div>
 </div>
 
-<% # In this div will be loaded the external attributes html rendered from partial %>
 <h4>External Attributes
 <%= render :partial => "shared/help", :locals => { 
   :title => t('activerecord.attributes.email_template.external_attributes'), 
   :content => t('activerecord.attributes.email_template.help_for_external_attributes') } %></h4>
+<% # In the div below will be loaded the external attributes html rendered from partial %>
 <div id="external_attributes_group"></div>
 
 <div class="form-actions">
