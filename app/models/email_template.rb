@@ -22,6 +22,8 @@ class EmailTemplate < ActiveRecord::Base
   validates :name, :template_type, :terms_of_membership_id, :client,
     :presence => :true
 
+  validates :name, uniqueness: true
+
   validates :template_type, uniqueness: { scope: [:terms_of_membership_id] }, :if => :not_is_pillar?, :on => :create
   
   validates :external_attributes, length: { maximum: 2048 }
@@ -50,10 +52,6 @@ class EmailTemplate < ActiveRecord::Base
 
   def not_is_pillar?
     !self.is_pillar?
-  end
-
-  def can_be_duplicated?
-    self.is_pillar? || :template_type == self.template_type
   end
 
   def fetch_external_attributes_data

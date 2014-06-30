@@ -13,7 +13,7 @@ module EmailTemplatesHelper
 			when "action_mailer"
 				[]
 			when 'exact_target'
-				['trigger_id', 'mlid', 'site_id', 'customer_key']
+				['customer_key']
 			when 'lyris'
 				['trigger_id', 'mlid', 'site_id']
 			else

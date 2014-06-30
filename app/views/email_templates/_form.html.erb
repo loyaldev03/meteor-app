@@ -1,15 +1,8 @@
-<% if @et.errors.any? %>
-  <div id="error_explanation">
-    <h2><%= pluralize(@et.errors.count, "error") %></h2>
-    <ul><% @et.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
-  </div>
-<%end%>
-
 <h4>General</h4>
 <div class="control-group">
   <%= f.label :name, 'Name*', :class => 'control-label' %>
   <div class="controls">
-    <%= f.text_field :name, required: true, :class => 'text_field required' %>
+    <%= f.text_field :name, :class => 'text_field required' %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.name'), 
         :content => t('activerecord.attributes.email_template.help_for_name') } %>
@@ -18,7 +11,7 @@
 <div class="control-group">
   <%= f.label :template_type, 'Template Type*', :class => 'control-label' %>
   <div class="controls">
-    <%= select_tag :template_type, options_for_select(template_types_options(@tom.id, @et.template_type), @et.template_type), required: true, :include_blank => true, :class => 'required',  :include_blank => (controller.action_name == 'new') %>
+    <%= select_tag :template_type, options_for_select(template_types_options(@tom.id, @et.template_type), @et.template_type), :class => 'required', :include_blank => (controller.action_name == 'new') %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.type'), 
         :content => t('activerecord.attributes.email_template.help_for_type') } %>
@@ -36,7 +29,7 @@
 <div class="control-group">
   <%= f.label :client, "Client*", :class => 'control-label' %>
   <div class="controls">
-    <%= select_tag :client, options_for_select(clients_options, @et.client), required: true, :include_blank => true, :class => 'required', :include_blank => (controller.action_name == 'new') %>
+    <%= select_tag :client, options_for_select(clients_options, @et.client), :class => 'required', :include_blank => (controller.action_name == 'new') %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.client'), 
         :content => t('activerecord.attributes.email_template.help_for_clients') } %>

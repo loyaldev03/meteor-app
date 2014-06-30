@@ -119,9 +119,9 @@ class EmailTemplatesController < ApplicationController
 	def external_attributes(client)
 		case client
 			when "action_mailer"
-				['trigger_id', 'mlid', 'site_id']
+				[]
 			when 'exact_target'
-				['trigger_id', 'mlid', 'site_id', 'customer_key']
+				['customer_key']
 			when 'lyris'
 				['trigger_id', 'mlid', 'site_id']
 			else
