@@ -3,11 +3,6 @@
     <h1><%= @et.name %></h1>
     <h3>ID: <%= @et.id %></h3>
   </div>
-  <% if can? :edit, EmailTemplate %>
-    <%= link_to(edit_terms_of_membership_email_template_path, :class => "btn btn-primary btn_on_header", :id => "edit_communication") do %> 
-      Edit Communication
-    <% end %>
-  <% end %>
   <div><h4>General Information</h4></div>
   <div class="table-bordered">
     <div class="row-fluid">
@@ -30,4 +25,9 @@
       <% end %>
     </div>
   </div>
+</section>
+<section>
+<div style="margin-top:10px;">
+<%= link_to t('buttons.return'), terms_of_membership_email_templates_path, :class => "btn", :id => 'return_btn' %>
+</div>
 </section>
