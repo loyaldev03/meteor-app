@@ -52,8 +52,9 @@ SacPlatform::Application.routes.draw do
       resources :terms_of_memberships, :path => 'subscription_plans' do
         get :resumed_information
         resources :email_templates, :path => 'communications' do
-          match '/external_attributes_html' => 'email_templates#external_attributes_html', via: :get
+          
         end
+        match '/external_attributes_html' => 'email_templates#external_attributes_html', via: :get
       end
 
       scope '/member/:member_prefix' do

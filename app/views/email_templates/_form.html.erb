@@ -88,7 +88,7 @@
       $.ajax({
         type: 'GET',
         data: 'client=' + $("#client").val() + '&<%= controller.action_name == "edit" ? @et.external_attributes.to_query : "" %>',
-        url: "<%= terms_of_membership_email_template_external_attributes_html_url(:terms_of_membership_id => @tom.id, :email_template_id => 1) %>",
+        url: "<%= terms_of_membership_external_attributes_html_url(:terms_of_membership_id => @tom.id) %>",
         success: function(data) { $("#external_attributes_group").html(data); }
       });
       $("#external_attributes_group").show(100)
