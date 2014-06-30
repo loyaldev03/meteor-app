@@ -48,6 +48,10 @@ class EmailTemplatesController < ApplicationController
 		@et = EmailTemplate.find(params[:id])
 		@tom = TermsOfMembership.find(@et.terms_of_membership_id)
 		my_authorize! :edit, EmailTemplate, @tom.club_id
+		if !@et.external_attributes
+			attributes = Hash.new()
+			@et.external_attributes = attributes
+		end
 	end
 
 	def update
@@ -55,7 +59,7 @@ class EmailTemplatesController < ApplicationController
 		@tom = TermsOfMembership.find(@et.terms_of_membership_id)
 		my_authorize! :update, EmailTemplate, @tom.club_id
 		prepare_et_data_to_save(params)
-		if @et.save!
+		if @et.save
 			flash[:notice] = "Your Communication #{@et.name} (ID: #{@et.id}) was succesfully updated"
 			redirect_to terms_of_membership_email_templates_url
 		else
