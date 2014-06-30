@@ -1203,6 +1203,23 @@ function email_templates_functions() {
   $("#client").change(function() {
     switch_external_attributes();
   });
+
+  $("#et_form").submit(function(event) {
+    var isValid = true;
+    $('input[type="text"]').each(function() {
+      if($(this).hasClass('manual_validation')) {
+        if ($.trim($(this).val()) == '') {
+            isValid = false;
+            my_control = eval($(this).attr('id')+ '_error_message');
+            $(my_control).text(' can\'t be blank');
+        }
+        else {
+          $(my_control).text('');
+        }
+    }
+    });
+    if (isValid == false) event.preventDefault();
+  });
 }
 
 function email_templates_table_index_functions(column_count) {
