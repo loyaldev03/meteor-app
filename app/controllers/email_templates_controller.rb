@@ -12,7 +12,7 @@ class EmailTemplatesController < ApplicationController
 				format.json { render json: EmailTemplatesDatatable.new(view_context, @current_partner, @current_club, nil, @current_agent) }
 			end
 		else
-			redirect_to terms_of_membership_url, :error => "Subscription Plan not found."
+			redirect_to terms_of_memberships_url, :error => "Subscription Plan not found."
 		end
 	end
 
@@ -20,10 +20,10 @@ class EmailTemplatesController < ApplicationController
 		my_authorize! :new, EmailTemplate, @current_club.id
 		@et = EmailTemplate.new
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
-		if @tom
+		if @tom			
 			@et.terms_of_membership_id = @tom.id
 		else
-			redirect_to terms_of_membership_url, :error => "Subscription Plan not found."
+			redirect_to terms_of_memberships_url, :error => "Subscription Plan not found."
 		end
 	end
 
@@ -40,7 +40,7 @@ class EmailTemplatesController < ApplicationController
 				render action: "new"
 			end
 		else
-			redirect_to terms_of_membership_url, :error => "Subscription Plan not found."
+			redirect_to terms_of_memberships_url, :error => "Subscription Plan not found."
 		end
 	end
 
