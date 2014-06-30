@@ -122,6 +122,9 @@
     <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number', :min => 0 %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount_help') } %> 
     </div>
   </div>
 
@@ -129,6 +132,9 @@
     <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number', :placeholder => '0.0', :min => 0 %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount_help') } %> 
       <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
       <%= f.check_box 'skip_first_club_cash' %>
     </div>

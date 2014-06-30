@@ -410,7 +410,9 @@ en:
           step_2_edit_button_next: 'Edit Upgrades / Downgrades'
           club_cash_amount: 'Club Cash Amount'
           initial_club_cash_amount: 'Initial Club Cash Amount'
+          initial_club_cash_amount_help: 'The amount of club cash that should be granted to a subscriber upon enrollment.'
           club_cash_installment_amount: 'Club Cash Amount'
+          club_cash_installment_amount_help: 'Each time a successful membership billing takes place, grant this amount of club cash.'
           skip_first_club_cash: 'Skip adding club cash on first membership billing'
           # Step 3
           step_3_instructions: 'Configure whether you want to automatically upgrade or downgrade the memberships through this plan. These steps are optional'
@@ -418,7 +420,7 @@ en:
           cancel: 'Cancel'
           suspend_for: 'Suspend for'
           downgrade_to: 'Downgrade to'
-          downgrade_to_help: 'If a subscriber cannot be billed successfully, you can automatically downgrade her to a different subscription plan. If you have a freemium model, then this is the option for you.'
+          downgrade_to_help: 'If a subscriber cannot be billed successfully, you can automatically downgrade them to a different subscription plan. If you have a freemium model, then this is the option for you.'
           upgrade_to: 'On successful billing, Upgrade to (optional)'
           upgrade_to_help: 'Upgrade a subscriber to a new subscription plan after a set time frame as configured by you. Very useful if you want to automatically reward your best subscribers.'
           after: 'after'
