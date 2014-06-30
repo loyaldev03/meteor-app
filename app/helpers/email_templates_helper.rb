@@ -2,9 +2,9 @@ module EmailTemplatesHelper
 
 	def clients_options
 	[
-		['Action Mailer', 'action_mailer'],
+		# ['Action Mailer', 'action_mailer'],
 		['Exact Target', 'exact_target'],
-		['Lyris ', 'lyris']
+		# ['Lyris ', 'lyris']
 	]
 	end
 
