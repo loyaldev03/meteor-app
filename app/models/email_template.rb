@@ -22,7 +22,7 @@ class EmailTemplate < ActiveRecord::Base
   validates :name, :template_type, :terms_of_membership_id, :client,
     :presence => :true
 
-  validates :template_type, uniqueness: true, :if => :can_be_duplicated?
+  validates :template_type, uniqueness: true, :if => :not_is_pillar?, :on => :create
   
   validates :external_attributes, length: { maximum: 2048 }
   
