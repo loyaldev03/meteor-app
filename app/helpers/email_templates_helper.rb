@@ -1,4 +1,26 @@
 module EmailTemplatesHelper
+
+	def clients_options
+	[
+		['Action Mailer', 'action_mailer'],
+		['Exact Target', 'exact_target'],
+		['Lyris ', 'lyris']
+	]
+	end
+
+	def external_attributes(client)
+		case client
+			when "action_mailer"
+				['trigger_id', 'mlid', 'site_id']
+			when 'exact_target'
+				['trigger_id', 'mlid', 'site_id', 'customer_key']
+			when 'lyris'
+				['trigger_id', 'mlid', 'site_id']
+			else
+				[]
+		end
+	end
+	
 	def template_types_options(tom_id, current_type)
 		templates = [
 			"birthday", 
