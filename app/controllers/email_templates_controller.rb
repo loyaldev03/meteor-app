@@ -24,7 +24,7 @@ class EmailTemplatesController < ApplicationController
 		@et = EmailTemplate.new(params[:tom])
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id]) 
 		prepare_et_data_to_save(params)
-		if @et.save!
+		if @et.save
 			redirect_to terms_of_membership_email_templates_url, :notice => "Your Communication #{@et.name} (ID: #{@et.id}) was successfully created"
 		else
 			flash.now[:error] = "There was an error while trying to save this Communication."
@@ -74,27 +74,6 @@ class EmailTemplatesController < ApplicationController
 		render :partial => "external_attributes_html.html.erb", :locals => { :client => params[:client], :ea => params[:ea] }
 	end
 
-	def clients_options
-	[
-		['Action Mailer', 'action_mailer'],
-		['Exact Target', 'exact_target'],
-		['Lyris ', 'lyris']
-	]
-	end
-
-	def external_attributes(client)
-		case client
-			when "action_mailer"
-				['trigger_id', 'mlid', 'site_id']
-			when 'exact_target'
-				['trigger_id', 'mlid', 'site_id', 'customer_key']
-			when 'lyris'
-				['trigger_id', 'mlid', 'site_id']
-			else
-				[]
-  	end
-	end
-
 	private
 	def prepare_et_data_to_save(post_data)
 		@et.name = post_data[:email_template][:name]
@@ -112,5 +91,18 @@ class EmailTemplatesController < ApplicationController
 			attributes[attrib.to_sym] = post_data[attrib]
 		end
 		@et.external_attributes = attributes
+	end
+
+	def external_attributes(client)
+		case client
+			when "action_mailer"
+				['trigger_id', 'mlid', 'site_id']
+			when 'exact_target'
+				['trigger_id', 'mlid', 'site_id', 'customer_key']
+			when 'lyris'
+				['trigger_id', 'mlid', 'site_id']
+			else
+				[]
+		end
 	end
 end
