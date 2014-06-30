@@ -49,24 +49,24 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	# 	assert page.has_content?('was successfully created')
  #  end
 
-	test 'Do not allow enter days_after_join_date = 0 - Logged by General Admin' do
-		sign_in_as(@admin_agent)
-		visit terms_of_memberships_path(@partner.prefix, @club.name)
-		within('#terms_of_memberships_table') do
-			within("tr", :text => @tom.name) do
-				click_link_or_button "Communications"
-			end
-		end
-		click_link_or_button 'New Communication'
-		begin
-			fill_in_form(
-				{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678, email_template_days_after_join_date: '0'}, 
-				{template_type: "Pillar", client: "Exact Target"}, [])
-			click_link_or_button 'Create Email template'
-		rescue Exception => e
-			assert page.has_content?('must be greater than or equal to 1')
-		end
-  end
+	# test 'Do not allow enter days_after_join_date = 0 - Logged by General Admin' do
+	# 	sign_in_as(@admin_agent)
+	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
+	# 	within('#terms_of_memberships_table') do
+	# 		within("tr", :text => @tom.name) do
+	# 			click_link_or_button "Communications"
+	# 		end
+	# 	end
+	# 	click_link_or_button 'New Communication'
+	# 	begin
+	# 		fill_in_form(
+	# 			{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678, email_template_days_after_join_date: '0'}, 
+	# 			{template_type: "Pillar", client: "Exact Target"}, [])
+	# 		click_link_or_button 'Create Email template'
+	# 	rescue Exception => e
+	# 		assert page.has_content?('must be greater than or equal to 1')
+	# 	end
+ #  end
 
 	# test 'Show one member communication - Logged by General Admin' do
 	# 	communication_name = 'Comm Name'
@@ -86,30 +86,6 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	# 	visit terms_of_membership_email_template_path(@partner.prefix, @club.name, @tom.id, @et.id)	
 	# 	assert page.has_content?('General Information')
  #  end
-
-	test 'Do not allow enter member communication duplicate where it is not Pillar type - Logged by General Admin' do
-		old_comm = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'birthday')
-		old_comm.save
-		sign_in_as(@admin_agent)
-		visit terms_of_memberships_path(@partner.prefix, @club.name)
-		within('#terms_of_memberships_table') do
-			within("tr", :text => @tom.name) do
-				click_link_or_button "Communications"
-			end
-		end
-		click_link_or_button 'New Communication'
-		begin
-			fill_in_form(
-				{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678}, 
-				{template_type: "Pillar", client: "Exact Target"}, [])
-			within('#et_form') do
-				page.has_no_select?('template_type', :with_options => ['Birthday'])
-			end
-		rescue Exception => e
-			assert page.has_content?('must be greater than or equal to 1')
-		end
-		assert !page.has_content?('was successfully created')
-	end
 
 	# test 'Allow to create more than one member communication with Pillar type - Logged by General Admin' do
 	# 	old_comm = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'pillar')
@@ -150,34 +126,34 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	# 	assert page.has_content?('Communications')
  #  end
 
-	test 'Do not allow enter days_after_join_date = 0 - Logged by Admin_by_club' do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
-    club_role = ClubRole.new :club_id => @club.id
-    club_role.agent_id = @club_admin.id
-    club_role.role = "admin"
-    club_role.save
-    @club_admin.roles = nil
-    @club_admin.save
-    sign_in_as(@club_admin)
-    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id    
-    @club_tom.save
-		visit terms_of_memberships_path(@partner.prefix, @club.name)
-		within('#terms_of_memberships_table') do
-			within("tr", :text => @tom.name) do
-				click_link_or_button "Communications"
-			end
-		end
-		click_link_or_button 'New Communication'
-		begin
-			fill_in_form(
-				{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678, email_template_days_after_join_date: '0'}, 
-				{template_type: "Pillar", client: "Exact Target"}, [])
-			click_link_or_button 'Create Email template'
-		rescue Exception => e
-			assert page.has_content?('must be greater than or equal to 1')
-		end
-		assert !page.has_content?('was successfully created')
-  end
+	# test 'Do not allow enter days_after_join_date = 0 - Logged by Admin_by_club' do
+ #    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+ #    club_role = ClubRole.new :club_id => @club.id
+ #    club_role.agent_id = @club_admin.id
+ #    club_role.role = "admin"
+ #    club_role.save
+ #    @club_admin.roles = nil
+ #    @club_admin.save
+ #    sign_in_as(@club_admin)
+ #    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id    
+ #    @club_tom.save
+	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
+	# 	within('#terms_of_memberships_table') do
+	# 		within("tr", :text => @tom.name) do
+	# 			click_link_or_button "Communications"
+	# 		end
+	# 	end
+	# 	click_link_or_button 'New Communication'
+	# 	begin
+	# 		fill_in_form(
+	# 			{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678, email_template_days_after_join_date: '0'}, 
+	# 			{template_type: "Pillar", client: "Exact Target"}, [])
+	# 		click_link_or_button 'Create Email template'
+	# 	rescue Exception => e
+	# 		assert page.has_content?('must be greater than or equal to 1')
+	# 	end
+	# 	assert !page.has_content?('was successfully created')
+ #  end
 
 	# test 'Add member communications - Logged by Admin_by_club' do
 	# 	@club_admin = FactoryGirl.create(:confirmed_admin_agent)
@@ -254,11 +230,12 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	# 	click_link_or_button 'New Communication'
 	# 	fill_in_form(
 	# 		{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678}, 
-	# 		{template_type: "Pillar", client: "Exact Target"}, [])
+	# 		{template_type: "Birthday", client: "Exact Target"}, [])
 	# 	within('#et_form') do
 	# 		page.has_no_select?('template_type', :with_options => ['Birthday'])
 	# 	end
 	# end
+
 
 
 
