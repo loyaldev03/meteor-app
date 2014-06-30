@@ -40,12 +40,12 @@
 </div>
 
 <div class="control-group">
-  <%= f.label :password, :class => 'control-label required_asterisk' %>
+  <%= f.label :password, :class => "control-label #{'required_asterisk' if @payment_gateway_configuration.new_record?}" %>
   <div class="controls">
     <%= f.password_field :password, :class => 'password_field' %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.payment_gateway_configuration.password'), 
-        :content => t('activerecord.attributes.payment_gateway_configuration.password_help') } %> 
+        :content => t("activerecord.attributes.payment_gateway_configuration.#{@payment_gateway_configuration.new_record? ? 'password_help' : 'password_update_help'}")} %> 
   </div>
 </div>
 
@@ -89,7 +89,7 @@
     <%= f.password_field :aus_password, :class => 'password_field' %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.payment_gateway_configuration.aus_password'), 
-        :content => t('activerecord.attributes.payment_gateway_configuration.aus_password_help') } %> 
+        :content => t("activerecord.attributes.payment_gateway_configuration.#{@payment_gateway_configuration.new_record? ? 'aus_password_help' : 'aus_password_update_help'}") } %> 
   </div>
 </div>
 
