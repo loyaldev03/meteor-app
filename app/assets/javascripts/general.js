@@ -1183,7 +1183,6 @@ function switch_external_attributes() {
     $("#external_attributes_group").html('Select a Client');
   }
   else {
-    alert(external_attributes_data);
     $.ajax({
       type: 'GET',
       data: 'client=' + $("#client").val() + '&' + external_attributes_data,
