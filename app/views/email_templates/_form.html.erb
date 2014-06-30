@@ -36,7 +36,7 @@
 <div class="control-group">
   <%= f.label :client, "Client*", :class => 'control-label' %>
   <div class="controls">
-    <%= select_tag :client, options_for_select(controller.clients_options, @et.client), required: true, :include_blank => true, :class => 'required', :include_blank => (controller.action_name == 'new') %>
+    <%= select_tag :client, options_for_select(clients_options, @et.client), required: true, :include_blank => true, :class => 'required', :include_blank => (controller.action_name == 'new') %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.client'), 
         :content => t('activerecord.attributes.email_template.help_for_clients') } %>
