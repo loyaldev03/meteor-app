@@ -45,8 +45,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 			{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678}, 
 			{template_type: "Pillar", client: "Exact Target"}, [])
 		click_link_or_button 'Create Email template'
+		
 		assert page.has_content?('was successfully created')
-		assert page.find('#email_templates_table').has_content?('Comm Name')
   end
 
 	test 'Do not allow enter days_after_join_date = 0 - Logged by General Admin' do
@@ -193,7 +193,6 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 			{template_type: "Pillar", client: "Exact Target"}, [])
 		click_link_or_button 'Create Email template'
 		assert page.has_content?('was successfully created')
-		assert page.find('#email_templates_table').has_content?('Comm Name')
   end
 
 	test 'Show one member communication - Logged by Admin_by_club' do
