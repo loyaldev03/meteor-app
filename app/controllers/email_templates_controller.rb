@@ -31,17 +31,22 @@ class EmailTemplatesController < ApplicationController
 		my_authorize! :create, EmailTemplate, @current_club.id
 		@et = EmailTemplate.new(params[:email_template])
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
-		if @tom
-			prepare_et_data_to_save(params)
-			if @et.save
-				redirect_to terms_of_membership_email_templates_url, :notice => "Your Communication #{@et.name} (ID: #{@et.id}) was successfully created"
+		begin
+			if @tom
+				prepare_et_data_to_save(params)
+				if @et.save
+					redirect_to terms_of_membership_email_templates_url, :notice => "Your Communication #{@et.name} (ID: #{@et.id}) was successfully created"
+				else
+					flash.now[:error] = "There was an error while trying to save this Communication."
+					render action: "new"
+				end
 			else
-				flash.now[:error] = "There was an error while trying to save this Communication."
-				render action: "new"
+				redirect_to terms_of_memberships_url, :error => "Subscription Plan not found."
 			end
-		else
-			redirect_to terms_of_memberships_url, :error => "Subscription Plan not found."
+		rescue Exception => e 
+
 		end
+		
 	end
 
 	def edit  
@@ -119,7 +124,7 @@ class EmailTemplatesController < ApplicationController
 	def external_attributes(client)
 		case client
 			when "action_mailer"
-				['trigger_id', 'mlid', 'site_id']
+				[]
 			when 'exact_target'
 				['trigger_id', 'mlid', 'site_id', 'customer_key']
 			when 'lyris'
