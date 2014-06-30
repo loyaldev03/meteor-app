@@ -143,7 +143,7 @@
     <% @email_templates.each do |et| %>
       <div class="row-fluid">
         <div class="span3"> <%= et.name %> </div> 
-        <div class="span2"> <%= et.template_type %> </div> 
+        <div class="span2"> <%= et.template_type %> <%= '(after ' + et.days_after_join_date.to_s + ' day(s))' if et.template_type == 'pillar' %></div> 
         <div class="span2"> <%= et.client %> </div> 
         <div class="span5"> <%= et.external_attributes.to_s %> </div> 
       </div>
