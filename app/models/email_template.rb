@@ -55,4 +55,8 @@ class EmailTemplate < ActiveRecord::Base
   def can_be_duplicated?
     self.is_pillar? || :template_type == self.template_type
   end
+
+  def fetch_external_attributes_data
+    self.external_attributes ? self.external_attributes.to_query : ''
+  end
 end

@@ -29,7 +29,7 @@ class EmailTemplatesController < ApplicationController
 
 	def create
 		my_authorize! :create, EmailTemplate, @current_club.id
-		@et = EmailTemplate.new(params[:tom])
+		@et = EmailTemplate.new(params[:email_template])
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
 		if @tom
 			prepare_et_data_to_save(params)
