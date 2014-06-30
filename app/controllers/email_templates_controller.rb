@@ -58,13 +58,20 @@ class EmailTemplatesController < ApplicationController
 		@et = EmailTemplate.find(params[:id])
 		@tom = TermsOfMembership.find(@et.terms_of_membership_id)
 		my_authorize! :update, EmailTemplate, @tom.club_id
-		prepare_et_data_to_save(params)
-		if @et.save
-			flash[:notice] = "Your Communication #{@et.name} (ID: #{@et.id}) was succesfully updated"
-			redirect_to terms_of_membership_email_templates_url
-		else
-			flash.now[:error] = "Your Communication was not updated."
+		template_type = params[:template_type]
+		templates_used = TermsOfMembership.find(@tom.id).email_templates.collect(&:template_type)
+		if template_type != 'pillar' && templates_used.include?(template_type) && @et.template_type != template_type
+			flash[:error] = "Template Type already in use."
 			render action: "edit"
+		else
+			prepare_et_data_to_save(params)
+			if @et.save
+				flash[:notice] = "Your Communication #{@et.name} (ID: #{@et.id}) was succesfully updated"
+				redirect_to terms_of_membership_email_templates_url
+			else
+				flash[:error] = "Your Communication was not updated."
+				render action: "edit"
+			end
 		end
 	end
 
