@@ -1186,7 +1186,7 @@ function switch_external_attributes() {
     $.ajax({
       type: 'GET',
       data: 'client=' + $("#client").val() + '&' + external_attributes_data,
-      url: "../../external_attributes_html",
+      url: external_attributes_url,
       success: function(data) { $("#external_attributes_group").html(data); }
     });
     $("#external_attributes_group").show(100)
