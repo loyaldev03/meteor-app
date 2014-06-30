@@ -106,6 +106,62 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	# end
 
 
+
+
+
+
+
+
+
+	test 'Edit member communications - Logged by General Admin' do
+		comm = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'pillar')
+		comm.save
+		sign_in_as(@admin_agent)
+		visit edit_terms_of_membership_email_template_path(@partner.prefix, @club.name, @tom.id, comm.id)
+		fill_in_form(
+			{email_template_name: 'Edited Comm Name', trigger_id: 11111, mlid: 22222, site_id: 33333, customer_key: 44444}, 
+			{template_type: "Pillar", client: "Exact Target"}, [])
+		click_link_or_button 'Update Email template'
+		assert page.has_content?('was successfully created')
+	end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  #  test "Show all member communications - Logged by Admin_by_club" do
  #    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
  #    club_role = ClubRole.new :club_id => @club.id
