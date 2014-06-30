@@ -6,9 +6,13 @@ class EmailTemplatesController < ApplicationController
 	def index
 		my_authorize! :create, EmailTemplate, @current_club.id
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
-		respond_to do |format|
-			format.html # index.html.erb
-			format.json { render json: EmailTemplatesDatatable.new(view_context, @current_partner, @current_club, nil, @current_agent) }
+		if @tom
+			respond_to do |format|
+				format.html # index.html.erb
+				format.json { render json: EmailTemplatesDatatable.new(view_context, @current_partner, @current_club, nil, @current_agent) }
+			end
+		else
+			redirect_to terms_of_membership_url, :error => "Subscription Plan not found."
 		end
 	end
 
@@ -16,19 +20,27 @@ class EmailTemplatesController < ApplicationController
 		my_authorize! :new, EmailTemplate, @current_club.id
 		@et = EmailTemplate.new
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
-		@et.terms_of_membership_id = @tom.id
+		if @tom
+			@et.terms_of_membership_id = @tom.id
+		else
+			redirect_to terms_of_membership_url, :error => "Subscription Plan not found."
+		end
 	end
 
 	def create
 		my_authorize! :create, EmailTemplate, @current_club.id
 		@et = EmailTemplate.new(params[:tom])
-		@tom = TermsOfMembership.find(params[:terms_of_membership_id]) 
-		prepare_et_data_to_save(params)
-		if @et.save
-			redirect_to terms_of_membership_email_templates_url, :notice => "Your Communication #{@et.name} (ID: #{@et.id}) was successfully created"
+		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
+		if @tom
+			prepare_et_data_to_save(params)
+			if @et.save
+				redirect_to terms_of_membership_email_templates_url, :notice => "Your Communication #{@et.name} (ID: #{@et.id}) was successfully created"
+			else
+				flash.now[:error] = "There was an error while trying to save this Communication."
+				render action: "new"
+			end
 		else
-			flash.now[:error] = "There was an error while trying to save this Communication."
-			render action: "new"
+			redirect_to terms_of_membership_url, :error => "Subscription Plan not found."
 		end
 	end
 
