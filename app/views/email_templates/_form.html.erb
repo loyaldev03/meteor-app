@@ -55,8 +55,22 @@
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_membership_email_templates_path, :class => 'btn' %>
 </div>
 
-<%= javascript_include_tag params[:controller] %> or <%= stylesheet_link_tag params[:controller] %>
+<%= javascript_include_tag params[:controller] %>
 <script type="text/javascript">
+  $(document).ready(function() {
+    switch_days_after_join_date();
+    switch_external_attributes();
+    email_templates_functions();
+  });
+
+  $("#template_type").change(function() {
+    switch_days_after_join_date();
+  });
+
+  $("#client").change(function() {
+    switch_external_attributes();
+  });
+
   function switch_external_attributes() {
     if($("#client").val() == '') {
       $("#external_attributes_group").html('Select a Client');
