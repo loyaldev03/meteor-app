@@ -4,7 +4,7 @@ class EmailTemplatesController < ApplicationController
 	before_filter :validate_club_presence
 	
 	def index
-		my_authorize! :create, EmailTemplate, @current_club.id
+		my_authorize! :list, EmailTemplate, @current_club.id
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
 		if @tom
 			respond_to do |format|
