@@ -105,19 +105,13 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	# 	assert page.has_content?('was successfully created')
 	# end
 
-
-
-
-
-
-
-
-
 	test 'Edit member communications - Logged by General Admin' do
 		comm = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'pillar')
 		comm.save
 		sign_in_as(@admin_agent)
-		visit edit_terms_of_membership_email_template_path(@partner.prefix, @club.name, @tom.id, comm.id)
+		visit edit_terms_of_membership_email_template_path(@partner.prefix, @club.name, terms_of_membership_id: @tom.id, id: comm.id)
+		require "ruby-debug";debugger
+
 		fill_in_form(
 			{email_template_name: 'Edited Comm Name', trigger_id: 11111, mlid: 22222, site_id: 33333, customer_key: 44444}, 
 			{template_type: "Pillar", client: "Exact Target"}, [])
@@ -125,42 +119,48 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		assert page.has_content?('was successfully created')
 	end
 
+	# test 'Destroy member communications - Logged by Admin_by_club' do
+ #    @agent = FactoryGirl.create(:agent)
+ #    club_role = ClubRole.new :club_id => @club.id
+ #    club_role.agent_id = @agent.id
+ #    club_role.role = "admin"
+ #    club_role.save
+	# 	sign_in_as(@agent)
+	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
+	# 	within('#terms_of_memberships_table') do
+	# 		within("tr", :text => @tom.name) do
+	# 			click_link_or_button "Communications"
+	# 		end
+	# 	end
+	# 	assert page.has_content?('Communications')
+	# 	first_email_template = @tom.email_templates.first
+	# 	within("tr", :text => first_email_template.name) do
+	# 		assert_difference("EmailTemplate.count",-1) do
+	# 			confirm_ok_js
+	# 			click_link_or_button "Destroy"
+	# 		end
+	# 	end
+	# 	assert page.has_content? first_email_template.name
+ #  end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	# test 'Destroy member communications - Logged by General Admin' do
+	# 	sign_in_as(@admin_agent)
+	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
+	# 	within('#terms_of_memberships_table') do
+	# 		within("tr", :text => @tom.name) do
+	# 			click_link_or_button "Communications"
+	# 		end
+	# 	end
+	# 	assert page.has_content?('Communications')
+	# 	first_email_template = @tom.email_templates.first
+	# 	within("tr", :text => first_email_template.name) do
+	# 		assert_difference("EmailTemplate.count",-1) do
+	# 			confirm_ok_js
+	# 			click_link_or_button "Destroy"
+	# 		end
+	# 	end
+	# 	assert page.has_content? first_email_template.name
+ #  end
 
  #  test "Show all member communications - Logged by Admin_by_club" do
  #    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
@@ -211,30 +211,30 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	# 	assert !page.has_content?('was successfully created')
  #  end
 
-	# test 'Add member communications - Logged by Admin_by_club' do
-	# 	@club_admin = FactoryGirl.create(:confirmed_admin_agent)
- #    club_role = ClubRole.new :club_id => @club.id
- #    club_role.agent_id = @club_admin.id
- #    club_role.role = "admin"
- #    club_role.save
- #    @club_admin.roles = nil
- #    @club_admin.save
- #    sign_in_as(@club_admin)
- #    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id    
- #    @club_tom.save
-	# 	visit terms_of_memberships_path(@partner.prefix, @club.name)
-	# 	within('#terms_of_memberships_table') do
-	# 		within("tr", :text => @tom.name) do
-	# 			click_link_or_button "Communications"
-	# 		end
-	# 	end
-	# 	click_link_or_button 'New Communication'
-	# 	fill_in_form(
-	# 		{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678}, 
-	# 		{template_type: "Pillar", client: "Exact Target"}, [])
-	# 	click_link_or_button 'Create Email template'
-	# 	assert page.has_content?('was successfully created')
- #  end
+	test 'Add member communications - Logged by Admin_by_club' do
+		@club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @club_admin.id
+    club_role.role = "admin"
+    club_role.save
+    @club_admin.roles = nil
+    @club_admin.save
+    sign_in_as(@club_admin)
+    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id    
+    @club_tom.save
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			within("tr", :text => @tom.name) do
+				click_link_or_button "Communications"
+			end
+		end
+		click_link_or_button 'New Communication'
+		fill_in_form(
+			{email_template_name: 'Comm Name', trigger_id: 12345, mlid: 23456, site_id: 34567, customer_key: 45678}, 
+			{template_type: "Pillar", client: "Exact Target"}, [])
+		click_link_or_button 'Create Email template'
+		assert page.has_content?('was successfully created')
+  end
 
 	# test 'Show one member communication - Logged by Admin_by_club' do
 	# 	@club_admin = FactoryGirl.create(:confirmed_admin_agent)
@@ -291,21 +291,5 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	# 		page.has_no_select?('template_type', :with_options => ['Birthday'])
 	# 	end
 	# end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 end
