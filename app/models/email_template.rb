@@ -20,10 +20,11 @@ class EmailTemplate < ActiveRecord::Base
   CLIENTS = [ :exact_target, :action_mailer, :lyris ]
 
   validates :name, :template_type, :terms_of_membership_id, :client,
-    :presence => :true,
-    length: { maximum: 255, too_long: "%{count} characters is the maximum allowed" }
+    :presence => :true
+
+  validates :template_type, uniqueness: true, :if => :not_is_pillar?
   
-  validates :external_attributes, length: { maximum: 2048, too_long: "%{count} characters is the maximum allowed" }
+  validates :external_attributes, length: { maximum: 2048 }
   
   validates :days_after_join_date, numericality: { only_integer: true, :greater_than_or_equal_to => 1, :less_than_or_equal_to => 1000 }, :if => :is_pillar?
 
@@ -45,6 +46,10 @@ class EmailTemplate < ActiveRecord::Base
 
   def is_pillar?
     self.template_type == 'pillar'
+  end
+
+  def not_is_pillar?
+    !self.is_pillar?
   end
 
 end
