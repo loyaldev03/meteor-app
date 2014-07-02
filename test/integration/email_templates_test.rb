@@ -1,3 +1,4 @@
+
 require 'test_helper'
 
 class EmailTemplatesTest < ActionController::IntegrationTest
@@ -24,12 +25,18 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 	test 'Show all member communications - Logged by General Admin' do
 		sign_in_as(@admin_agent)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
+    @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test2')
+    communication = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom2.id, :name => "EmailTemplateTest")
 		within('#terms_of_memberships_table') do
 			within("tr", :text => @tom.name) do
 				click_link_or_button "Communications"
 			end
 		end
 		assert page.has_content?('Communications')
+		@tom.email_templates.each do |email_template|
+			assert page.has_content? email_template.name
+		end
+		assert page.has_no_content? communication.name
   end
 
 	test 'Add member communications - Logged by General Admin' do
@@ -227,8 +234,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     @club_admin.roles = nil
     @club_admin.save
     sign_in_as(@club_admin)
-    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id    
-    @club_tom.save
+    @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Another Tom')
+    communication = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom2.id, :name => "EmailTemplateTest")
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
 			within("tr", :text => @tom.name) do
@@ -236,6 +243,10 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 			end
 		end
 		assert page.has_content?('Communications')
+		@tom.email_templates.each do |email_template|
+			assert page.has_content? email_template.name
+		end
+		assert page.has_no_content? communication.name
   end
 
 	test 'Do not allow enter days_after_join_date = 0 - Logged by Admin_by_club' do
