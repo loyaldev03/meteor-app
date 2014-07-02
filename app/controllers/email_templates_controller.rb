@@ -66,7 +66,7 @@ class EmailTemplatesController < ApplicationController
 		else
 			prepare_et_data_to_save(params)
 			if @et.save
-				flash[:notice] = "Your Communication #{@et.name} (ID: #{@et.id}) was succesfully updated"
+				flash[:notice] = "Your Communication #{@et.name} (ID: #{@et.id}) was successfully updated"
 				redirect_to terms_of_membership_email_templates_url
 			else
 				flash[:error] = "Your Communication was not updated."
@@ -101,13 +101,13 @@ class EmailTemplatesController < ApplicationController
 	def prepare_et_data_to_save(post_data)
 		@et.name = post_data[:email_template][:name]
 		@et.terms_of_membership_id = @tom.id
-		@et.template_type = post_data[:template_type]
+		@et.template_type = post_data[:email_template][:template_type]
 		if @et.template_type == 'pillar'
 			@et.days_after_join_date = post_data[:email_template][:days_after_join_date].to_i
 		else
 			@et.days_after_join_date = nil
 		end
-		@et.client = post_data[:client]
+		@et.client = post_data[:email_template][:client]
 		attributes = Hash.new()
 		ea_keys = external_attributes(@et.client)
 		ea_keys.each do |attrib|

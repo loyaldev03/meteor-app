@@ -1,11 +1,8 @@
 module EmailTemplatesHelper
 
 	def clients_options
-	[
-		# ['Action Mailer', 'action_mailer'],
-		['Exact Target', 'exact_target'],
-		# ['Lyris ', 'lyris']
-	]
+	clients = [ ['Exact Target', 'exact_target'] ]
+	clients << ['Action Mailer', 'action_mailer'] unless Rails.env.production?
 	end
 
 	def external_attributes(client)

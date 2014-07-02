@@ -1169,7 +1169,7 @@ function tom_create_wizard() {
 
 // // Communications
 function switch_days_after_join_date() {
-  if ($("#template_type").val() == 'pillar') {
+  if ($("#email_template_template_type").val() == 'pillar') {
     $("#control_group_days_after_join_date").show(100);
   }
   else {
@@ -1179,13 +1179,13 @@ function switch_days_after_join_date() {
 }
 
 function switch_external_attributes() {
-  if($("#client").val() == '') {
+  if($("#email_template_client").val() == '') {
     $("#external_attributes_group").html('Select a Client');
   }
   else {
     $.ajax({
       type: 'GET',
-      data: 'client=' + $("#client").val() + '&' + external_attributes_data,
+      data: 'client=' + $("#email_template_client").val() + '&' + external_attributes_data,
       url: external_attributes_url,
       success: function(data) { $("#external_attributes_group").html(data); }
     });
@@ -1196,27 +1196,24 @@ function switch_external_attributes() {
 function email_templates_functions() {
   $('.help').popover({offset: 10});
 
-  $("#template_type").change(function() {
+  $("#email_template_template_type").change(function() {
     switch_days_after_join_date();
   });
 
-  $("#client").change(function() {
+  $("#email_template_client").change(function() {
     switch_external_attributes();
   });
 
   $("#et_form").submit(function(event) {
     var isValid = true;
-    $('input[type="text"]').each(function() {
+    $('form input[type="text"], form select').each(function() {
       if($(this).hasClass('manual_validation')) {
+        $('#control_'+$(this).attr('id')+' div').remove();
         if ($.trim($(this).val()) == '') {
-            isValid = false;
-            my_control = eval($(this).attr('id')+ '_error_message');
-            $(my_control).text(' can\'t be blank');
+          isValid = false;
+          $('#control_'+$(this).attr('id')).append('<div style="display:inline-block;"> can\'t be blank </div>');
         }
-        else {
-          $(my_control).text('');
-        }
-    }
+      }
     });
     if (isValid == false) event.preventDefault();
   });

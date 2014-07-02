@@ -1,8 +1,8 @@
 <% external_attributes(client).each do |attribute_name| %>
 <div class="control-group">
 	<%= label_tag attribute_name, attribute_name + '*', :class => 'control-label' %>
-  <div class="controls">
-    <%= text_field_tag attribute_name, '', :class => 'text_field input-small required manual_validation', :value => params[attribute_name] if controller.action_name = 'edit' %>
+  <div class="controls" id=<%="control_#{attribute_name}"%>>
+    <%= text_field_tag attribute_name, '', :class => 'text_field input-small manual_validation', :value => params[attribute_name] if controller.action_name = 'edit' %>
     <div id="<%= attribute_name %>_error_message" style='display:inline-block;'></div>
   </div>
 </div>
