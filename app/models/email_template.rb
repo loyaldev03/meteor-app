@@ -19,12 +19,11 @@ class EmailTemplate < ActiveRecord::Base
 
   CLIENTS = [ :exact_target, :action_mailer, :lyris ]
 
-  validates :name, :template_type, :terms_of_membership_id, :client,
-    :presence => :true
+  validates :name, :template_type, :terms_of_membership_id, :client, :presence => :true
 
   validates :name, uniqueness: true
 
-  validates :template_type, uniqueness: { scope: [:terms_of_membership_id] }, :if => :not_is_pillar?, :on => :create
+  validates :template_type, uniqueness: { scope: [:terms_of_membership_id] }, :if => :not_is_pillar?
   
   validates :external_attributes, length: { maximum: 2048 }
   
