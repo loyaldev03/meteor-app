@@ -281,6 +281,7 @@ class Member < ActiveRecord::Base
       next_bill_date = next_bill_date.to_datetime.change(:offset => self.get_offset_related)
       self.next_retry_bill_date = next_bill_date
       self.bill_date = next_bill_date
+      self.recycled_times = 0
       self.save(:validate => false)
       message = "Next bill date changed to #{next_bill_date.to_date}"
       Auditory.audit(current_agent, self, message, self, Settings.operation_types.change_next_bill_date)
