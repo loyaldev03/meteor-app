@@ -6,42 +6,40 @@ class EmailTemplatesController < ApplicationController
 	def index
 		my_authorize! :list, EmailTemplate, @current_club.id
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
-		if @tom
-			respond_to do |format|
-				format.html # index.html.erb
-				format.json { render json: EmailTemplatesDatatable.new(view_context, @current_partner, @current_club, nil, @current_agent) }
-			end
-		else
-			redirect_to terms_of_memberships_url, :error => "Subscription Plan not found."
+		respond_to do |format|
+			format.html # index.html.erb
+			format.json { render json: EmailTemplatesDatatable.new(view_context, @current_partner, @current_club, nil, @current_agent) }
 		end
+	rescue ActiveRecord::RecordNotFound 
+		flash[:error] = "Subscription Plan not found."
+		redirect_to terms_of_memberships_url 
 	end
 
 	def new
 		my_authorize! :new, EmailTemplate, @current_club.id
 		@et = EmailTemplate.new
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
-		if @tom			
-			@et.terms_of_membership_id = @tom.id
-		else
-			redirect_to terms_of_memberships_url, :error => "Subscription Plan not found."
-		end
+	rescue ActiveRecord::RecordNotFound 
+		flash[:error] = "Subscription Plan not found."
+		redirect_to terms_of_memberships_url 
 	end
 
 	def create
 		my_authorize! :create, EmailTemplate, @current_club.id
 		@et = EmailTemplate.new(params[:email_template])
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
-		if @tom
-			prepare_et_data_to_save(params)
-			if @et.save
-				redirect_to terms_of_membership_email_templates_url, :notice => "Your Communication #{@et.name} (ID: #{@et.id}) was successfully created"
-			else
-				flash.now[:error] = "There was an error while trying to save this Communication."
-				render action: "new"
-			end
+		@et.client = params[:email_template][:client]
+		@et.terms_of_membership_id = @tom.id
+		prepare_et_data_to_save(params)
+		if @et.save
+			redirect_to terms_of_membership_email_templates_url, :notice => "Your Communication #{@et.name} (ID: #{@et.id}) was successfully created"
 		else
-			redirect_to terms_of_memberships_url, :error => "Subscription Plan not found."
+			flash.now[:error] = "There was an error while trying to save this Communication."
+			render action: "new"
 		end
+	rescue ActiveRecord::RecordNotFound 
+		flash[:error] = "Terms of membership not found."
+		redirect_to terms_of_membership_email_templates_path
 	end
 
 	def edit  
@@ -52,6 +50,9 @@ class EmailTemplatesController < ApplicationController
 			attributes = Hash.new()
 			@et.external_attributes = attributes
 		end
+	rescue ActiveRecord::RecordNotFound 
+		flash[:error] = "Email Template not found."
+		redirect_to terms_of_membership_email_templates_path
 	end
 
 	def update
@@ -79,6 +80,9 @@ class EmailTemplatesController < ApplicationController
 		@et = EmailTemplate.find(params[:id])
 		@tom = TermsOfMembership.find(@et.terms_of_membership_id)
 		my_authorize! :show, EmailTemplate, @tom.club_id
+  rescue ActiveRecord::RecordNotFound 
+    flash[:error] = "Email Template not found."
+    redirect_to terms_of_memberships_url
 	end
 
 	def destroy
@@ -90,42 +94,29 @@ class EmailTemplatesController < ApplicationController
 		else
 			flash[:error] = "Communication #{@et.name} (ID: #{@et.id}) was not destroyed."
 		end
-		redirect_to terms_of_membership_email_templates_url
+		redirect_to terms_of_membership_email_templates_path
+	rescue ActiveRecord::RecordNotFound 
+		flash[:error] = "Email Template not found."
+		redirect_to terms_of_membership_email_templates_path
 	end
 
-	def external_attributes_html()
-		render :partial => "external_attributes_html.html.erb", :locals => { :client => params[:client], :ea => params[:ea] }
+	def external_attributes
+		render :partial => "external_attributes.html.erb", :locals => { :client => params[:client], :ea => params[:ea] }
 	end
 
 	private
 	def prepare_et_data_to_save(post_data)
-		@et.name = post_data[:email_template][:name]
-		@et.terms_of_membership_id = @tom.id
 		@et.template_type = post_data[:email_template][:template_type]
 		if @et.template_type == 'pillar'
 			@et.days_after_join_date = post_data[:email_template][:days_after_join_date].to_i
 		else
 			@et.days_after_join_date = nil
 		end
-		@et.client = post_data[:email_template][:client]
 		attributes = Hash.new()
-		ea_keys = external_attributes(@et.client)
+		ea_keys = EmailTemplate.external_attributes_related_to_client(@et.client)
 		ea_keys.each do |attrib|
 			attributes[attrib.to_sym] = post_data[attrib]
 		end
 		@et.external_attributes = attributes
-	end
-
-	def external_attributes(client)
-		case client
-			when "action_mailer"
-				[]
-			when 'exact_target'
-				['customer_key']
-			when 'lyris'
-				['trigger_id', 'mlid', 'site_id']
-			else
-				[]
-		end
 	end
 end

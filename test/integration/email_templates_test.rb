@@ -126,7 +126,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 			first(:link, "Edit").click
 			end
 		end
-		fill_in_form({email_template_name: 'Edited Comm Name', customer_key: 44444}, {"email_template[client]" => "Exact Target"}, [])
+		fill_in_form({email_template_name: 'Edited Comm Name'}, {}, [])
 		click_link_or_button 'Update Email template'
 		assert page.has_content?('was successfully updated')
 	end
@@ -177,7 +177,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 			first(:link, "Edit").click
 			end
 		end
-		fill_in_form({email_template_name: 'Edited Comm Name', customer_key: 44444}, {"email_template[client]" => "Exact Target"}, [])
+		fill_in_form({email_template_name: 'Edited Comm Name'}, {}, [])
 		click_link_or_button 'Update Email template'
 		assert page.has_content?('was successfully updated')
 	end

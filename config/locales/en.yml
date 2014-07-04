@@ -89,6 +89,7 @@ en:
     reschedule: 'Reschedule'
     return: 'Return'
     club_edit: 'Edit Club'
+    show_communications: 'Communications'
   admin:
     agents:
       index:
@@ -411,7 +412,6 @@ en:
       email_template:
         title_new: 'New Communication'
         title_edit: 'Edit Communication'
-        show_communications: 'Communications'
         name: 'Name'
         type: 'Type'
         days_after_join_date: 'Days after Join Date'

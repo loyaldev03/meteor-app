@@ -1186,7 +1186,7 @@ function switch_external_attributes() {
     $.ajax({
       type: 'GET',
       data: 'client=' + $("#email_template_client").val() + '&' + external_attributes_data,
-      url: external_attributes_url,
+      url: "/partner/"+partner_prefix+"/club/"+club_prefix+"/subscription_plans/"+terms_of_membership_id+"/external_attributes",
       success: function(data) { $("#external_attributes_group").html(data); }
     });
     $("#external_attributes_group").show(100)

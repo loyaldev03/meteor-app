@@ -11,7 +11,7 @@ private
         	@url_helpers.terms_of_membership_email_template_path(
         		:partner_prefix => @current_partner.prefix, 
         		:club_prefix => @current_club.name, 
-        		:terms_of_membership_id => TermsOfMembership.find(params[:terms_of_membership_id]).id, 
+        		:terms_of_membership_id => TermsOfMembership.find(email_template.terms_of_membership_id).id, 
         		:id => email_template.id
         	), 
         	:class => 'btn btn-mini') if @current_agent.can? :show, EmailTemplate, @current_club.id
@@ -20,7 +20,7 @@ private
         	@url_helpers.edit_terms_of_membership_email_template_path(
         		:partner_prefix => @current_partner.prefix, 
         		:club_prefix => @current_club.name, 
-        		:terms_of_membership_id => TermsOfMembership.find(params[:terms_of_membership_id]).id, 
+        		:terms_of_membership_id => TermsOfMembership.find(email_template.terms_of_membership_id).id, 
         		:id => email_template.id
         	), 
         	:class => 'btn btn-mini') if @current_agent.can? :edit, EmailTemplate, @current_club.id
@@ -29,7 +29,7 @@ private
         	@url_helpers.terms_of_membership_email_template_path(
         		:partner_prefix => @current_partner.prefix, 
         		:club_prefix => @current_club.name, 
-        		:terms_of_membership_id => TermsOfMembership.find(params[:terms_of_membership_id]).id, 
+        		:terms_of_membership_id => TermsOfMembership.find(email_template.terms_of_membership_id).id, 
         		:id => email_template.id
         	), 
         	:method => :delete, :confirm => I18n.t("are_you_sure"), :id => 'destroy', :class => 'btn btn-mini btn-danger') if @current_agent.can? :destroy, EmailTemplate, @current_club.id
@@ -52,7 +52,7 @@ private
 	end
 
   def total_records
-    email_templates.count
+    TermsOfMembership.find(params[:terms_of_membership_id]).email_templates.count
   end
 
   def total_entries
@@ -62,5 +62,4 @@ private
   def sort_column
     EmailTemplate.datatable_columns[params[:iSortCol_0].to_i]
   end
-
 end

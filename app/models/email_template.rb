@@ -21,13 +21,26 @@ class EmailTemplate < ActiveRecord::Base
 
   validates :name, :template_type, :terms_of_membership_id, :client, :presence => :true
 
-  validates :name, uniqueness: true
+  validates :name, uniqueness: { scope: [:terms_of_membership_id] }
 
-  validates :template_type, uniqueness: { scope: [:terms_of_membership_id] }, :if => :not_is_pillar?
+  validates :template_type, uniqueness: { scope: [:terms_of_membership_id] }, :unless => :is_pillar?
   
   validates :external_attributes, length: { maximum: 2048 }
   
   validates :days_after_join_date, numericality: { only_integer: true, :greater_than_or_equal_to => 1, :less_than_or_equal_to => 1000 }, :if => :is_pillar?
+
+  def self.external_attributes_related_to_client(client)
+    case client
+    when "action_mailer"
+      []
+    when 'exact_target'
+      ['customer_key']
+    when 'lyris'
+      ['trigger_id', 'mlid', 'site_id']
+    else
+      []
+    end
+  end
 
   def lyris?
     self.client == 'lyris'
@@ -49,11 +62,8 @@ class EmailTemplate < ActiveRecord::Base
     self.template_type == 'pillar'
   end
 
-  def not_is_pillar?
-    !self.is_pillar?
-  end
-
   def fetch_external_attributes_data
     self.external_attributes ? self.external_attributes.to_query : ''
   end
+
 end
