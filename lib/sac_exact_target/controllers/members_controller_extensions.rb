@@ -9,8 +9,8 @@ module SacExactTarget
         am = @current_member.exact_target_member
         if am
           am.save!
-          if @current_member.exact_target_last_sync_error_at
-            message = "Synchronization to exact_target failed: #{@current_member.exact_target_last_sync_error_at}"
+          if @current_member.marketing_client_last_sync_error_at
+            message = "Synchronization to exact_target failed: #{@current_member.marketing_client_last_sync_error_at}"
           else
             message = "Member synchronized to exact_target"
           end

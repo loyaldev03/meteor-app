@@ -8,7 +8,7 @@ module SacExactTarget
     module ClassMethods
       def sync_members_to_exact_target
         index = 0
-        base = Member.where(" exact_target_synced_status = 'not_synced' ")
+        base = Member.where(" marketing_client_synced_status = 'not_synced' ")
         Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_exact_target, processing #{base.count} members"
         base.find_in_batches do |group|
           group.each do |member|

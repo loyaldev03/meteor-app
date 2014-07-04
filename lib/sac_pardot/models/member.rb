@@ -16,7 +16,7 @@ module Pardot
     end
 
     def new_record?
-      self.member.pardot_id.nil?
+      self.member.marketing_client_id.nil?
     end
 
   private
@@ -32,17 +32,17 @@ module Pardot
     def update_member(res, destroy = false)
       data = if res.class == Hash and res.has_key? 'id'
         { 
-          pardot_id: res['id'],
-          pardot_last_synced_at: Time.zone.now,
-          pardot_synced_status: 'synced',
-          pardot_last_sync_error: nil,
-          pardot_last_sync_error_at: nil
+          marketing_client_id: res['id'],
+          marketing_client_last_synced_at: Time.zone.now,
+          marketing_client_synced_status: 'synced',
+          marketing_client_last_sync_error: nil,
+          marketing_client_last_sync_error_at: nil
         }
       else
         {
-          pardot_last_sync_error: res,
-          pardot_synced_status: 'error',
-          pardot_last_sync_error_at: Time.zone.now
+          marketing_client_last_sync_error: res,
+          marketing_client_synced_status: 'error',
+          marketing_client_last_sync_error_at: Time.zone.now
         }
       end
       ::Member.where(id: self.member.id).limit(1).update_all(data)

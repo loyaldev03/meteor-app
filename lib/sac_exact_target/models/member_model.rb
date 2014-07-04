@@ -83,26 +83,26 @@ module SacExactTarget
     def update_member(res)
       data = if res.nil?
         { 
-          exact_target_synced_status: 'error',
-          exact_target_last_sync_error: "Time out error.",
-          exact_target_last_sync_error_at: Time.zone.now
+          marketing_client_synced_status: 'error',
+          marketing_client_last_sync_error: "Time out error.",
+          marketing_client_last_sync_error_at: Time.zone.now
         }        
       elsif res.OverallStatus != "OK"
         SacExactTarget::report_error("SacExactTarget:Member:save", res)
         { 
-          exact_target_synced_status: 'error',
-          exact_target_last_sync_error: res.Results.first.status_message,
-          exact_target_last_sync_error_at: Time.zone.now
+          marketing_client_synced_status: 'error',
+          marketing_client_last_sync_error: res.Results.first.status_message,
+          marketing_client_last_sync_error_at: Time.zone.now
         }
       else
         {
-          exact_target_last_synced_at: Time.zone.now,
-          exact_target_synced_status: 'synced',
-          exact_target_last_sync_error: nil,
-          exact_target_last_sync_error_at: nil
+          marketing_client_last_synced_at: Time.zone.now,
+          marketing_client_synced_status: 'synced',
+          marketing_client_last_sync_error: nil,
+          marketing_client_last_sync_error_at: nil
         }
       end
-      data = data.merge(need_exact_target_sync: false)
+      data = data.merge(need_sync_to_marketing_client: false)
       ::Member.where(id: self.member.id).limit(1).update_all(data)
       self.member.reload rescue self.member
     end
