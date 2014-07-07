@@ -204,7 +204,7 @@ class Transaction < ActiveRecord::Base
           sale_transaction.save
           Auditory.audit(agent, trans, "Refund success $#{amount} on transaction #{sale_transaction.id}", sale_transaction.member, Settings.operation_types.credit)
           Communication.deliver!(:refund, sale_transaction.member)
-          sale_transaction.member.update_attribute :need_exact_target_sync, true
+          sale_transaction.member.update_attribute :need_sync_to_marketing_client, true
         else
           Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
           trans.update_attribute :operation_type, Settings.operation_types.credit_error

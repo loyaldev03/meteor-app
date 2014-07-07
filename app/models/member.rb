@@ -1397,6 +1397,6 @@ class Member < ActiveRecord::Base
     end
 
     def set_exact_target_sync_as_needed
-      self.need_exact_target_sync = true if defined?(SacExactTarget::MemberModel)
+      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::MemberModel)
     end
 end

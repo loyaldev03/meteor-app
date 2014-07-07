@@ -16,7 +16,7 @@ class Prospect < ActiveRecord::Base
             :product_sku, :user_id, :landing_url, :mega_channel, :user_agent, :joint,
             :campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, 
             :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description, :source,
-            :need_exact_target_sync
+            :need_sync_to_marketing_client
 
 
   def full_phone_number
@@ -44,6 +44,6 @@ class Prospect < ActiveRecord::Base
     end
 
     def set_exact_target_sync_as_needed
-      self.need_exact_target_sync = true if defined?(SacExactTarget::ProspectModel) and not self.email.blank?
+      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::ProspectModel) and not self.email.blank?
     end
 end
