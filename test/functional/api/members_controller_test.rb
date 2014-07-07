@@ -1226,15 +1226,16 @@ class Api::MembersControllerTest < ActionController::TestCase
     FactoryGirl.create :credit_card, :member_id => @member.id
       
     @member.set_as_provisional
-    
+    @member.update_attribute :recycled_times, 1
+
     next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed)
     assert_difference('Operation.count') do
       generate_put_next_bill_date(next_bill_date)
     end
     @member.reload
     date_to_check = next_bill_date.to_datetime.change(:offset => @member.get_offset_related)
-    
     assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(date_to_check.utc, :format => :only_date)
+    assert_equal @member.recycled_times, 0
   end
 
   test "Update member's next_bill_date active status" do
@@ -1244,6 +1245,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     @member.set_as_provisional
     @member.set_as_active
+    @member.update_attribute :recycled_times, 1
 
     next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed).to_datetime
     assert_difference('Operation.count') do
@@ -1253,6 +1255,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @member.reload
     date_to_check = next_bill_date.to_datetime.change(:offset => @member.get_offset_related)
     assert_equal I18n.l(@member.next_retry_bill_date.utc, :format => :only_date), I18n.l(date_to_check.utc, :format => :only_date)
+    assert_equal @member.recycled_times, 0
   end
 
   test "Update member's next_bill_date applied status" do
