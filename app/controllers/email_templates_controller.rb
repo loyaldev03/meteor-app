@@ -74,6 +74,9 @@ class EmailTemplatesController < ApplicationController
 				render action: "edit"
 			end
 		end
+	rescue ActiveRecord::RecordNotFound 
+		flash[:error] = "Terms of membership or email template not found."
+		redirect_to terms_of_memberships_url
 	end
 
 	def show
@@ -105,18 +108,18 @@ class EmailTemplatesController < ApplicationController
 	end
 
 	private
-	def prepare_et_data_to_save(post_data)
-		@et.template_type = post_data[:email_template][:template_type]
-		if @et.template_type == 'pillar'
-			@et.days_after_join_date = post_data[:email_template][:days_after_join_date].to_i
-		else
-			@et.days_after_join_date = nil
+		def prepare_et_data_to_save(post_data)
+			@et.template_type = post_data[:email_template][:template_type]
+			if @et.template_type == 'pillar'
+				@et.days_after_join_date = post_data[:email_template][:days_after_join_date].to_i
+			else
+				@et.days_after_join_date = nil
+			end
+			attributes = Hash.new()
+			ea_keys = EmailTemplate.external_attributes_related_to_client(@et.client)
+			ea_keys.each do |attrib|
+				attributes[attrib.to_sym] = post_data[attrib]
+			end
+			@et.external_attributes = attributes
 		end
-		attributes = Hash.new()
-		ea_keys = EmailTemplate.external_attributes_related_to_client(@et.client)
-		ea_keys.each do |attrib|
-			attributes[attrib.to_sym] = post_data[attrib]
-		end
-		@et.external_attributes = attributes
-	end
 end
