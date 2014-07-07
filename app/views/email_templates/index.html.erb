@@ -1,0 +1,29 @@
+<section>
+  <div class="page-header">
+    <h1>Communications</h1>
+    <h3>Plan: <%= @tom.name %></h3>
+    <% if can? :create, EmailTemplate %>
+      <%= link_to(new_terms_of_membership_email_template_path, :class => "btn btn-primary btn_on_header", :id => "new_communication") do %> 
+        <i class="icon-plus"></i> New Communication
+      <% end %>
+    <% end %>
+  </div>
+
+  <table id="email_templates_table" class="table table-bordered table-condensed dataTable" data-source="<%= terms_of_membership_email_templates_url(format: "json") %>">
+    <thead>
+      <tr>
+        <th> <%= t('activerecord.attributes.communication.id') %> </th>
+        <th> <%= t('activerecord.attributes.communication.template_name') %> </th>
+        <th> <%= t('activerecord.attributes.communication.template_type') %> </th>
+        <th> <%= t('activerecord.attributes.communication.client') %> </th>
+        <th> <%= t('.actions', :default => t("helpers.actions")) %> </th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</section>
+
+<script>
+  $(document).ready(email_templates_table_index_functions(<%= EmailTemplate.datatable_columns.size %>));
+</script>

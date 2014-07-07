@@ -1,0 +1,5 @@
+<%- model_class = @et.class -%>
+<h1><%=t '.title', :default => t('activerecord.attributes.email_template.title_new') %></h1>
+<%= form_for @et, :url => terms_of_membership_email_templates_path, :html => { :id => 'et_form', :class => 'form-horizontal bbq' } do |f| %>
+	<%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>

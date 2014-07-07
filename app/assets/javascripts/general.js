@@ -1199,3 +1199,71 @@ function tom_create_wizard() {
     textSubmit: ''
   });
 }
+
+// // Communications
+function switch_days_after_join_date() {
+  if ($("#email_template_template_type").val() == 'pillar') {
+    $("#control_group_days_after_join_date").show(100);
+  }
+  else {
+   $("#control_group_days_after_join_date").hide(100); 
+   $("#email_template_days_after_join_date").val(1);
+  }
+}
+
+function switch_external_attributes() {
+  if($("#email_template_client").val() == '') {
+    $("#external_attributes_group").html('Select a Client');
+  }
+  else {
+    $.ajax({
+      type: 'GET',
+      data: 'client=' + $("#email_template_client").val() + '&' + external_attributes_data,
+      url: "/partner/"+partner_prefix+"/club/"+club_prefix+"/subscription_plans/"+terms_of_membership_id+"/external_attributes",
+      success: function(data) { $("#external_attributes_group").html(data); }
+    });
+    $("#external_attributes_group").show(100)
+  }
+}
+
+function email_templates_functions() {
+  $('.help').popover({offset: 10});
+
+  $("#email_template_template_type").change(function() {
+    switch_days_after_join_date();
+  });
+
+  $("#email_template_client").change(function() {
+    switch_external_attributes();
+  });
+
+  $("#et_form").submit(function(event) {
+    var isValid = true;
+    $('form input[type="text"], form select').each(function() {
+      if($(this).hasClass('manual_validation')) {
+        $('#control_'+$(this).attr('id')+' div').remove();
+        if ($.trim($(this).val()) == '') {
+          isValid = false;
+          $('#control_'+$(this).attr('id')).append('<div style="display:inline-block;"> can\'t be blank </div>');
+        }
+      }
+    });
+    if (isValid == false) event.preventDefault();
+  });
+}
+
+function email_templates_table_index_functions(column_count) {
+  $('#email_templates_table').dataTable({
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bFilter": true,
+    "sPaginationType": "bootstrap",
+    "sDom": '<"top"lf>rt<"bottom"pi>',
+    "bServerSide": true,
+    "bLengthChange": false,
+    'bSortable':true,
+    "aaSorting": [[ 0, "desc" ]],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
+    "sAjaxSource": $('#email_templates_table').data('source')
+  });
+}

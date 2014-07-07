@@ -51,6 +51,8 @@ SacPlatform::Application.routes.draw do
       
       resources :terms_of_memberships, :path => 'subscription_plans' do
         get :resumed_information
+        resources :email_templates, :path => 'communications'
+        match '/external_attributes' => 'email_templates#external_attributes', via: :get
       end
       resources :payment_gateway_configurations, :except => [:index, :destroy]
       

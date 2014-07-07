@@ -1,0 +1,65 @@
+<h4>General</h4>
+<div class="control-group">
+  <%= f.label :name, 'Name*', :class => 'control-label' %>
+  <div class="controls" id="control_email_template_name">
+    <%= f.text_field :name, :class => 'text_field manual_validation' %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.email_template.name'), 
+        :content => t('activerecord.attributes.email_template.help_for_name') } %>
+  </div>
+</div>
+<div class="control-group">
+  <%= f.label :template_type, 'Template Type*', :class => 'control-label' %>
+  <div class="controls" id="control_email_template_template_type">
+    <%= select_tag 'email_template[template_type]', options_for_select(template_types_options(@tom.id, @et.template_type), @et.template_type), :class => 'manual_validation', :include_blank => (@et.new_record?) %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.email_template.type'), 
+        :content => t('activerecord.attributes.email_template.help_for_type') } %>
+  </div>
+</div>
+<div class="control-group" id="control_group_days_after_join_date" style="display:none;">
+  <%= f.label :days_after_join_date, 'Days after Join Date*', :class => 'control-label' %>
+  <div class="controls">
+    <%= f.number_field :days_after_join_date, :class => 'text_field input-small manual_validation' %>&nbsp;day(s)
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.email_template.days_after_join_date'), 
+        :content => t('activerecord.attributes.email_template.help_for_days_after_join_date') } %>
+  </div>
+</div>
+<% if @et.new_record? %>
+  <div class="control-group">
+    <%= f.label :client, "Client*", :class => 'control-label' %>
+    <div class="controls" id="control_email_template_client">
+      <%= select_tag 'email_template[client]', options_for_select(clients_options, @et.client), :class => 'manual_validation', :include_blank => (@et.new_record?) %>
+      <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.email_template.client'), 
+          :content => t('activerecord.attributes.email_template.help_for_clients') } %>
+    </div>
+  </div>
+<% else %> 
+  <%= f.hidden_field :client, :value => @et.client %>
+<% end %>
+
+<h4>External Attributes
+<%= render :partial => "shared/help", :locals => { 
+  :title => t('activerecord.attributes.email_template.external_attributes'), 
+  :content => t('activerecord.attributes.email_template.help_for_external_attributes') } %></h4>
+<% # In the div below will be loaded the external attributes html rendered from partial %>
+<div id="external_attributes_group"></div>
+
+<div class="form-actions">
+  <%= f.submit nil, :class => 'btn btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_membership_email_templates_path, :class => 'btn' %>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    switch_days_after_join_date();
+    switch_external_attributes();
+    email_templates_functions();
+  });
+  var external_attributes_data = "<%= @et.new_record? ? '' : @et.fetch_external_attributes_data %>";
+  var partner_prefix = "<%= @current_partner.prefix %>";
+  var club_prefix = "<%= @current_club.name %>";
+  var terms_of_membership_id = "<%= @tom.id %>";
+</script>

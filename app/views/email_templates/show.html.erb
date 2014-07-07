@@ -1,0 +1,31 @@
+<section>
+  <div class="page-header">    
+    <h1><%= @et.name %></h1>
+    <h3>ID: <%= @et.id %></h3>
+  </div>
+  <div><h4>General Information</h4></div>
+  <div class="table-bordered">
+    <div class="row-fluid">
+      <div class="span2"><b><%= t('activerecord.attributes.email_template.template_type') %>: </b><%= @et.template_type %></div>
+      <div class="span2"><b><%= t('activerecord.attributes.email_template.client') %>: </b><%= @et.client %></div>
+      <div class="span2"><b><%= t('activerecord.attributes.email_template.days_after_join_date') %>: </b><%= @et.days_after_join_date %></div>
+    </div>
+  </div>
+  <div><h4>External Attributes</h4></div>
+  <div class="table-bordered">
+    <div class="row-fluid">
+      <% if @et.external_attributes %>
+        <% @et.external_attributes.each do |k, v| %>
+        <div class="span2"><b><%= k %></b>: <%= v %></div>
+        <% end %>
+      <% else %>
+        <div class="span2">Not set</div>
+      <% end %>
+    </div>
+  </div>
+</section>
+<section>
+  <div style="margin-top:10px;">
+    <%= link_to t('buttons.return'), terms_of_membership_email_templates_path, :class => "btn", :id => 'return_btn' %>
+  </div>
+</section>

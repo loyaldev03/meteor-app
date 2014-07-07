@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class DomainsControllerTest < ActionController::TestCase
+  
   def setup
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)

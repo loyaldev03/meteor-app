@@ -43,6 +43,7 @@ class Ability
     cannot :manage, DispositionType
     cannot :see_nice, Transaction
     cannot :manage, MemberAdditionalData
+    cannot :manage, EmailTemplate
 
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
@@ -85,6 +86,7 @@ class Ability
       can :api_change, TermsOfMembership
       can :api_sale, Member
       can :list, Communication
+      can :manage, EmailTemplate
     when 'representative' then
       can :manage, Member
       cannot :api_profile, Member
@@ -106,6 +108,7 @@ class Ability
       can :manage, MemberAdditionalData
       can :see_nice, Transaction
       can :show, TermsOfMembership
+      can :show, EmailTemplate
       can :refund, Transaction
       can :list, Membership
       can :list, Transaction
@@ -130,6 +133,7 @@ class Ability
       can :manage, ClubCashTransaction
       can :manage, MemberAdditionalData
       can :show, TermsOfMembership
+      can :show, EmailTemplate
       can :see_nice, Transaction
       can :list, Membership
       can :list, Communication
@@ -161,6 +165,7 @@ class Ability
       can :search_result, Member    
       can :show, Operation
       can :show, TermsOfMembership
+      can :show, EmailTemplate
       can :list, Membership
       can :list, Operation
       can :list, Transaction
@@ -189,6 +194,7 @@ class Ability
       can :manage, MemberNote
       can :manage, Fulfillment
       can :show, TermsOfMembership
+      can :show, EmailTemplate
       can :refund, Transaction
       can :list, Transaction
       can :list, ClubCashTransaction
