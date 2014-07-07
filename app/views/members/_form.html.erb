@@ -32,7 +32,7 @@
         <table class="hidden_table_border table-nohover">
           <tr class = "control-group">
             <th>
-              <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline required_asterick' %>
+              <%= f.label :first_name, t('activerecord.attributes.member.first_name'), :class => 'help-inline required_asterisk' %>
             </th>
             <td> 
               <%= f.text_field :first_name, :class => 'text_field' %> 
@@ -49,7 +49,7 @@
           </tr>        
           <tr class = "control-group">
             <th>
-              <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline required_asterick' %>
+              <%= f.label :address, t('activerecord.attributes.member.address'), :class => 'help-inline required_asterisk' %>
             </th>
             <td> 
               <%= f.text_field :address, :class => 'text_field' %> 
@@ -57,7 +57,7 @@
           </tr>
           <tr class = "control-group">
             <th>
-              <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline required_asterick' %>
+              <%= f.label :country, t('activerecord.attributes.member.country'), :class => 'help-inline required_asterisk' %>
             </th>
             <td> 
               <%= f.select(:country, Member.supported_countries.map { |cc| [Member.country_name(cc), cc]}, :prompt => t('buttons.select_country')) %>
@@ -65,7 +65,7 @@
           </tr>
           <tr class = "control-group">
             <th>
-              <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline required_asterick' %>
+              <%= f.label :state, t('activerecord.attributes.member.state'), :class => 'help-inline required_asterisk' %>
             </th>
             <td id="states_td"> 
               <%= render :partial => 'states', :locals => {:f => f, :state => (@current_member.state if @current_member)}  %>
@@ -77,7 +77,7 @@
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
-              <%= f.label :last_name, t('activerecord.attributes.member.last_name'), :class => 'help-inline required_asterick' %>
+              <%= f.label :last_name, t('activerecord.attributes.member.last_name'), :class => 'help-inline required_asterisk' %>
             </th>
             <td> 
               <%= f.text_field :last_name, :class => 'text_field' %> 
@@ -85,7 +85,7 @@
           </tr>
           <tr class = "control-group">
             <th>
-              <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline required_asterick' %>
+              <%= f.label :city, t('activerecord.attributes.member.city'), :class => 'help-inline required_asterisk' %>
             </th>
             <td> 
               <%= f.text_field :city, :class => 'text_field' %> 
@@ -93,7 +93,7 @@
           </tr>
           <tr class = "control-group">
             <th>
-              <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline required_asterick' %>
+              <%= f.label :zip, t('activerecord.attributes.member.zip'), :class => 'help-inline required_asterisk' %>
             </th>
             <td> 
               <%= f.text_field :zip, :class => 'text_field' %>       
@@ -124,7 +124,7 @@
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
-              <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline required_asterick' %>
+              <%= f.label :phone_number, t('activerecord.attributes.member.phone_number'), :class => 'help-inline required_asterisk' %>
             </th>
             <td> 
               <%= f.text_field :phone_country_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.member.phone_country_code') %> 
@@ -147,7 +147,7 @@
           <tr class = "control-group">
             <% if @member.new_record? %>
               <th>
-                <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline required_asterick' %>
+                <%= f.label :terms_of_membership_id, t('activerecord.attributes.member.terms_of_membership_id'), :class => 'help-inline required_asterisk' %>
               </th>
               <th id="th_terms_of_memberships"> 
                 <%= select_tag('member[terms_of_membership_id]', options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
@@ -171,7 +171,7 @@
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
-              <%= f.label :email, t('activerecord.attributes.member.email'), :class => 'help-inline required_asterick' %>
+              <%= f.label :email, t('activerecord.attributes.member.email'), :class => 'help-inline required_asterisk' %>
             </th>
             <td> 
               <%= f.text_field :email, :class => 'text_field'%>
@@ -202,20 +202,20 @@
             <table class="hidden_table_border">
               <tr class = "control-group">
                 <th>
-                  <%= credit_card.label :number, t('activerecord.attributes.credit_card.number'), :class => 'help-inline required_asterick' %>
+                  <%= credit_card.label :number, t('activerecord.attributes.credit_card.number'), :class => 'help-inline required_asterisk' %>
                 </th>
                 <td> 
                   <%= credit_card.text_field :number, :class => 'text_field input-medium', 
                                           :name => "member[credit_card][number]"%>
                 </td>  
                 <th>
-                  <%= credit_card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline required_asterick' %> 
+                  <%= credit_card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline required_asterisk' %> 
                 </th>
                 <td> 
                   <%= credit_card.select :expire_month, @months, :class => 'text_field input-small', :name => "member[credit_card][expire_month]", :include_blank => true  %>
                 </td>  
                 <th>
-                  <%= credit_card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline required_asterick' %>
+                  <%= credit_card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline required_asterisk' %>
                 </th>
                 <td> 
                   <%= credit_card.select :expire_year, @years, :class => 'text_field input-small', :name => "member[credit_card][expire_year]", :include_blank => true  %>

@@ -54,7 +54,8 @@ SacPlatform::Application.routes.draw do
         resources :email_templates, :path => 'communications'
         match '/external_attributes' => 'email_templates#external_attributes', via: :get
       end
-
+      resources :payment_gateway_configurations, :except => [:index, :destroy]
+      
       scope '/member/:member_prefix' do
         match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]

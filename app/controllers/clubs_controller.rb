@@ -27,6 +27,7 @@ class ClubsController < ApplicationController
     my_authorize!(:show, Club, params[:id])
     @club = Club.find(params[:id])
     @drupal_domain = Domain.find(@club.drupal_domain_id) if @club.drupal_domain_id
+    @payment_gateway_configuration = @club.payment_gateway_configurations.first
   end
 
   # GET /clubs/new

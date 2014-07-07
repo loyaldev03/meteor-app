@@ -1,0 +1,15 @@
+<%- model_class = @payment_gateway_configuration.class -%>
+<div class="page-header">
+	<h1><%=t '.title', :default => t('helpers.titles.new', :model => model_class.model_name.human,
+                               :default => "New #{model_class.model_name.human}") %></h1>
+</div>
+
+<%= form_for @payment_gateway_configuration, :url => payment_gateway_configurations_path , :html => { :class => 'form-horizontal', :method => "POST" } do |f| %>
+	<%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>
+
+<script>
+	var confirmationText = "<%= I18n.t('are_you_sure') %>";
+	var reConfirmationText = "<%= @current_club.payment_gateway_configuration.nil? ? I18n.t('pgc_are_you_sure') : I18n.t('pgc_are_you_sure_replace') %>";
+	$(document).ready(new_payment_gateway_configuration_functions());
+</script>

@@ -10,9 +10,9 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   validates :login, :presence => true
   validates :merchant_key, :presence => true
   validates :password, :presence => true
-  validates :gateway, :presence => true
+  validates :gateway, :presence => true, uniqueness_without_deleted: { scope: [ :club_id ], :message => "already created. There is a payment gateway already configured for this gateway." } 
   validates :club, :presence => true
-  
+
   before_create :only_one_is_allowed
   
   def mes?

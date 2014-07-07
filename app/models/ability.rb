@@ -20,6 +20,7 @@ class Ability
     cannot :manage, Prospect
     cannot :manage, TermsOfMembership
     cannot :manage, Transaction
+    cannot :manage, PaymentGatewayConfiguration
     cannot :manage_club_cash_api, ClubCashTransaction
     cannot :see_sync_status, Member
     cannot :see_cc_token, CreditCard
@@ -62,6 +63,7 @@ class Ability
       can :manage, MemberNote
       can :manage, TermsOfMembership
       can :manage, Transaction
+      can :manage, PaymentGatewayConfiguration
       cannot :see_nice, Transaction
       can :manage, ClubCashTransaction
       can :manage, DelayedJob

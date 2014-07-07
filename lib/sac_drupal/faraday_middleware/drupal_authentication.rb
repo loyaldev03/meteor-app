@@ -116,7 +116,12 @@ module Drupal
           'Accept'       => 'application/json'
         }
         # This is stoneacre:stoneacre Base64 encoded using http://www.motobit.com/util/base64-decoder-encoder.asp
-        headers['Authorization'] = 'Basic c3RvbmVhY3JlOnN0b25lYWNyZQ=='
+        has_http_basic_auth = @options[:url].index('@')
+        if has_http_basic_auth
+          url = @options[:url]
+          headers['Authorization'] = 'Basic ' + Base64.encode64(url[url.index('//')+2..has_http_basic_auth-1])
+        end
+
         headers    
       end
 

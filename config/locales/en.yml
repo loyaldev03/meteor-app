@@ -31,6 +31,8 @@ en:
   blacklisted: 'Blacklisted'
   search_results: 'Search results'
   are_you_sure: 'Are you sure?'
+  pgc_are_you_sure: "Are you really sure? You wont be able to change this Payment Gateway once there are enrolled members in the club."
+  pgc_are_you_sure_replace: "Are you really sure? This payment gateway will replace previous one and you wont be able to change it once there are enrolled members in the club."
   initial_date: 'Initial date'
   end_date: 'End date'
   all_times: 'All times'
@@ -90,6 +92,9 @@ en:
     return: 'Return'
     club_edit: 'Edit Club'
     show_communications: 'Communications'
+    club_show: 'Show Club'
+    new_payment_gateway: "New Payment Gateway"
+    replace_payment_gateway: "Replace Payment Gateway"
   admin:
     agents:
       index:
@@ -142,6 +147,8 @@ en:
     credit_card_gateway_differs_from_current: "Credit card does not have the same active gateway."
     search_member_is_out_of_service: "Members search is out of service. Please try again in a few minutes or contact the site admin if problem persist."
     fulfillment_file_not_ready_wait: "There is already one fulfillment file being created within this club with that product set. Please, wait until this fulfillment file has finished and proceed to create this new one. Sorry for the inconvenience."
+    pgc_cannot_be_created_club_has_members: "The club has members enrolled already. You cannot create a new payment gateway for this club."
+    club_payment_gateway_configuration_not_created: 'Payment Gateway Configuration is not configured within the club <a href="%{link}">Add Payment Gateway</a>'
   activerecord:
     errors:
       models:
@@ -156,6 +163,12 @@ en:
       fulfillment_files: 'Fulfillment Files'
       disposition_types: 'Disposition Types'
       subscription_plans: 'Subscription Plans'
+      payment_gateway_configuration: 'Payment Gateway Configuration'
+    gateway:
+      mes: 'Merchant e Solutions'
+      litle: Litle
+      authorize_net: 'Authorize Net'
+      first_data: 'First Data'
     member: 'Member'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
@@ -367,24 +380,28 @@ en:
           # Step 1
           step_1_instructions: '<STEP_1_INSTRUCTIONS_HERE>'
           plan_name: 'Subscription Plan Name'
-          plan_name_help: 'help'
+          plan_name_help: 'The name the subscription plan will be identified by.'
           external_code: 'External Code (optional)'
-          external_code_help: 'help'
+          external_code_help: 'A value to be used by an external system, usually a CMS. If you are using Drupal, this should be set as the role to be granted to the member in Drupal when enrolled with this subscription plan.'
           description: 'Description (optional)'
-          description_help: "help"
+          description_help: "Short text describing for what the subscription plan will be used to."
           step_1_button_next: 'Define Membership Terms'
           step_1_edit_button_next: 'Edit Membership Terms'
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
           needs_enrollment_approval: 'Needs Enrollment Approval'
+          needs_enrollment_approval_help: 'If this option is selected, a member enrolled with this subscription plan will need to be approved by an agent before a membership is granted.'
           initial_fee: 'Initial Fee'
           initial_fee_amount: 'Initial Fee Amount'
           trial_period: 'Trial Period'
+          trial_period_help: 'Trial period of the Subscription Plan.'
           lasting: 'lasting'
           at_the_end_of_trial: 'At the end of the Trial Period'
+          at_the_end_of_trial_help: 'Action expected to take place once the trial period expires.'
           payment_is_expected: 'Payment is Expected'
           no_pay_is_expected: 'No Payment is Expected'
           recurring_amount: 'Recurring Amount'
+          recurring_amount_help: 'Amount of money to bill at each installment period as defined by you, once the trial period expires.'
           every: 'every'
           subscription_terms: 'Subscription Terms'
           bill_until_cancelled: 'Bill until Member Cancelled'
@@ -395,7 +412,9 @@ en:
           step_2_edit_button_next: 'Edit Upgrades / Downgrades'
           club_cash_amount: 'Club Cash Amount'
           initial_club_cash_amount: 'Initial Club Cash Amount'
+          initial_club_cash_amount_help: 'The amount of club cash that should be granted to a subscriber upon enrollment.'
           club_cash_installment_amount: 'Club Cash Amount'
+          club_cash_installment_amount_help: 'Each time a successful membership billing takes place, grant this amount of club cash.'
           skip_first_club_cash: 'Skip adding club cash on first membership billing'
           # Step 3
           step_3_instructions: 'Configure whether you want to automatically upgrade or downgrade the memberships through this plan. These steps are optional'
@@ -403,7 +422,9 @@ en:
           cancel: 'Cancel'
           suspend_for: 'Suspend for'
           downgrade_to: 'Downgrade to'
+          downgrade_to_help: 'If a subscriber cannot be billed successfully, you can automatically downgrade them to a different subscription plan. If you have a freemium model, then this is the option for you.'
           upgrade_to: 'On successful billing, Upgrade to (optional)'
+          upgrade_to_help: 'Upgrade a subscriber to a new subscription plan after a set time frame as configured by you. Very useful if you want to automatically reward your best subscribers.'
           after: 'after'
           step_3_button_next: 'Create Plan'
           step_3_edit_button_next: 'Update Plan'
@@ -479,8 +500,28 @@ en:
         run_at: 'Run at'
         created_at: 'created_at'
         rescheduled_job: "re-scheduled Job: %{job}"
-
-  date:
+      payment_gateway_configuration:
+        report_group: 'Report Group'
+        report_group_help: 'The exact name of the report group set up in Litle that you want all orders to be added to.'
+        merchant_key: 'Merchant Key'
+        merchant_key_help: 'Key used to authenticate with the gateway configured.'
+        login: 'Login'
+        login_help: 'Login used to authenticate with the gateway.'
+        password: 'Password'
+        password_help: "Password used to authenticate with the gateway."
+        password_update_help: "Password used to authenticate with the gateway. Leaving this field empty will not change current password."
+        descriptor_name: 'Descriptor Name'
+        descriptor_name_help: 'Text that will appear on the credit card statement.'
+        descriptor_phone: 'Descriptor Phone'
+        descriptor_phone_help: 'The phone number that will appear on credit card statements for transactions'
+        order_mark: 'Order Mark'
+        order_mark_help: 'Not being used right now.'
+        aus_login: 'AUS Login'
+        aus_login_help: 'Account Updater Service service login'
+        aus_password: 'AUS password'
+        aus_password_help: 'Account Updater Service service password'
+        aus_password_update_help: "Account Updater Service service password. Leaving this field empty will not change current password."
+  date: 
     formats:
       default: "%m/%d/%Y"
       short: "%b %d"
