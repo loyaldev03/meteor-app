@@ -58,11 +58,15 @@ module SacExactTarget
       end
 
       def exact_target_member
-        SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
-        @exact_target_member ||= if !self.exact_target_sync?
-          nil
+        if self.club.marketing_tool_attributes and self.club.marketing_tool_attributes["et_username"].blank? or self.club.marketing_tool_attributes["et_password"].blank?
+          SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
+          @exact_target_member ||= if !self.exact_target_sync?
+            nil
+          else
+            SacExactTarget::MemberModel.new self
+          end
         else
-          SacExactTarget::MemberModel.new self
+          Auditory.report_issue("Member:exact_target_member", 'Exact Target not configured correctly', { :member => self.club.inspect })
         end
       end
 
