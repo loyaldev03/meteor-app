@@ -46,6 +46,7 @@ class ClubsController < ApplicationController
   def create
     my_authorize!(:create, Club)
     @club = Club.new(params[:club])
+    prepare_marketing_tool_attributes(params[:marketing_tool_client]) if params[:marketing_tool_client]
     @club.partner = @current_partner
     if @club.save
       redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully created."
@@ -58,6 +59,7 @@ class ClubsController < ApplicationController
   def update
     my_authorize!(:show, Club, params[:id])
     @club = Club.find(params[:id])
+    prepare_marketing_tool_attributes(params[:marketing_tool_client])
     unless check_domain_belongs_to_partner(params[:club][:drupal_domain_id])
       flash.now[:error] = "Agent can't assign domain. Domain not available."
       render action: "edit" 
@@ -82,9 +84,14 @@ class ClubsController < ApplicationController
     end 
   end
 
-  def marketing_tool_attributes_for_exact_target
-    @club = params[:id] ? Club.find(params[:id]) : Club.new
-    render :partial => "marketing_tool_attributes_for_exact_target", :locals => { :club => @club }
+  def marketing_tool_attributes
+    @club = params[:id].blank? ? Club.new : Club.find(params[:id])
+    case params[:client]
+    when 'exact_target'
+      render :partial => "exact_target_marketing_tool_attributes", :locals => { :club => @club }
+    else
+      render inline: "Does not need marketing tools"
+    end
   end
 
   def check_domain_belongs_to_partner(drupal_domain_id)
@@ -102,5 +109,17 @@ class ClubsController < ApplicationController
     end
     valid
   end
-end
 
+  private 
+    def prepare_marketing_tool_attributes(marketing_client_params)
+      unless marketing_client_params.nil?
+        unless @club.new_record?
+          if marketing_client_params[:et_password].blank?
+            marketing_client_params.delete(:et_password)
+            marketing_client_params.merge!({:et_password => @club.marketing_tool_attributes["et_password"]})
+          end
+        end
+      end
+      @club.marketing_tool_attributes = marketing_client_params
+    end
+end

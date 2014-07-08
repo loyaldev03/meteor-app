@@ -43,8 +43,7 @@ SacPlatform::Application.routes.draw do
     resources :clubs do
       match '/test_api_connection' => 'clubs#test_api_connection', :via => :get
     end
-    
-    match '/marketing_tool_attributes_for_exact_target' => 'clubs#marketing_tool_attributes_for_exact_target', :via => :get
+    match 'clubs/:client/marketing_tool_attributes' => 'clubs#marketing_tool_attributes', :via => :get
 
     scope '/club/:club_prefix' do
       match '/members/new' => 'members#new', as: 'new_member'

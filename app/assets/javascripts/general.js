@@ -307,19 +307,26 @@ function member_index_functions(){
 
 };
 
+function fetch_maketing_client_form(){
+  $.ajax({
+    type: 'GET',
+    data: {id:club_id},
+    url: '/partner/'+partner_prefix+'/clubs/'+$("#club_marketing_tool_client").val()+'/marketing_tool_attributes',
+    success: function(data){
+      $("#div_mkt_tool_attributes").empty();
+      $("#div_mkt_tool_attributes").append(data);
+    }
+  });
+};
+
 function clubs_form_functions(){
   $("#club_marketing_tool_client").change(function(){
-    $.ajax({
-      type: 'GET',
-      data: {id:club_id},
-      url: '/partner/'+partner_prefix+'/clubs/'+club_id+'/marketing_tool_attributes_for_exact_target',
-      success: function(data){
-        $("#div_mkt_tool_attributes").append(data);
-      }
-    });
+    if($(this).val()!= ''){
+      fetch_maketing_client_form(club_id, $(this).val());
+    }else
+      $("#div_mkt_tool_attributes").empty();
   })
-
-}
+};
 
 function retrieve_information(){
   var skus = [];
