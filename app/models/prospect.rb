@@ -8,7 +8,7 @@ class Prospect < ActiveRecord::Base
   serialize :preferences, JSON
   serialize :referral_parameters, JSON
 
-  before_create :set_exact_target_sync_as_needed
+  before_create :set_marketing_client_sync_as_needed
 
   attr_accessible :first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, 
    				  :phone_area_code ,:phone_local_number, :birth_date, :preferences, :gender, 
@@ -16,7 +16,7 @@ class Prospect < ActiveRecord::Base
             :product_sku, :user_id, :landing_url, :mega_channel, :user_agent, :joint,
             :campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, 
             :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description, :source,
-            :need_exact_target_sync
+            :need_sync_to_marketing_client
 
 
   def full_phone_number
@@ -43,7 +43,7 @@ class Prospect < ActiveRecord::Base
       marketing_tool_sync unless @skip_sync
     end
 
-    def set_exact_target_sync_as_needed
-      self.need_exact_target_sync = true if defined?(SacExactTarget::ProspectModel) and not self.email.blank?
+    def set_marketing_client_sync_as_needed
+      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::ProspectModel) and not self.email.blank?
     end
 end

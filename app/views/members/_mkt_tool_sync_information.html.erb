@@ -1,5 +1,5 @@
 <% if defined? SacExactTarget::MemberModel and @current_member.exact_target_sync? %>
-  <table id="table_pardot_sync" class="table table-bordered table-condensed">
+  <table id="exact_target_sync" class="table table-bordered table-condensed">
     <thead>
       <tr class="box_title">
         <th colspan="2"><h4>Exact Target sync</h4></th>
@@ -18,16 +18,16 @@
     </thead>
     <tbody>
       <tr>
-        <th><%= t("activerecord.attributes.member.synced_status") %></th>
-        <th><%= t("activerecord.attributes.member.last_synced_at") %></th>
-        <th><%= t("activerecord.attributes.member.last_sync_error") %></th>
-        <th><%= t("activerecord.attributes.member.last_sync_error_at") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_synced_status") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_last_synced_at") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_last_sync_error") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_last_sync_error_at") %></th>
       </tr>
       <tr>
-        <td><span class='label label-<%=t @current_member.pardot_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_priorities' -%>' id="span_mi_pardot_synced_status"><%=t @current_member.exact_target_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_captions' -%></span></td>
-        <td><%= l(@current_member.exact_target_last_synced_at, format: :dashed) if @current_member.exact_target_last_synced_at %></td>
-        <td><%= @current_member.exact_target_last_sync_error %></td>
-        <td><%= l(@current_member.exact_target_last_sync_error_at, format: :dashed) if @current_member.exact_target_last_sync_error_at %></td>
+        <td><span class='label label-<%=t @current_member.marketing_client_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_priorities' -%>' id="span_mi_pardot_synced_status"><%=t @current_member.marketing_client_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_captions' -%></span></td>
+        <td><%= l(@current_member.marketing_client_last_synced_at, format: :dashed) if @current_member.marketing_client_last_synced_at %></td>
+        <td><%= @current_member.marketing_client_last_sync_error %></td>
+        <td><%= l(@current_member.marketing_client_last_sync_error_at, format: :dashed) if @current_member.marketing_client_last_sync_error_at %></td>
       </tr>
     </tbody>
   </table>
@@ -52,18 +52,18 @@
     </thead>
     <tbody>
       <tr>
-        <th><%= t("activerecord.attributes.member.pardot_id") %></th>
-        <th><%= t("activerecord.attributes.member.pardot_synced_status") %></th>
-        <th><%= t("activerecord.attributes.member.pardot_last_synced_at") %></th>
-        <th><%= t("activerecord.attributes.member.pardot_last_sync_error") %></th>
-        <th><%= t("activerecord.attributes.member.pardot_last_sync_error_at") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_id") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_synced_status") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_last_synced_at") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_last_sync_error") %></th>
+        <th><%= t("activerecord.attributes.member.marketing_client_last_sync_error_at") %></th>
       </tr>
       <tr>
-        <td><%= @current_member.pardot_id %></td>
-        <td><span class='label label-<%=t @current_member.pardot_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_priorities' -%>' id="span_mi_pardot_synced_status"><%=t @current_member.pardot_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_captions' -%></span></td>
-        <td><%= l(@current_member.pardot_last_synced_at, format: :dashed) if @current_member.pardot_last_synced_at %></td>
-        <td><%= @current_member.pardot_last_sync_error %></td>
-        <td><%= l(@current_member.pardot_last_sync_error_at, format: :dashed) if @current_member.pardot_last_sync_error_at %></td>
+        <td><%= @current_member.marketing_client_id %></td>
+        <td><span class='label label-<%=t @current_member.marketing_client_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_priorities' -%>' id="span_mi_pardot_synced_status"><%=t @current_member.marketing_client_synced_status, scope: 'activerecord.attributes.member.pardot_synced_status_captions' -%></span></td>
+        <td><%= l(@current_member.marketing_client_last_synced_at, format: :dashed) if @current_member.marketing_client_last_synced_at %></td>
+        <td><%= @current_member.marketing_client_last_sync_error %></td>
+        <td><%= l(@current_member.marketing_client_last_sync_error_at, format: :dashed) if @current_member.marketing_client_last_sync_error_at %></td>
       </tr>
     </tbody>
   </table>

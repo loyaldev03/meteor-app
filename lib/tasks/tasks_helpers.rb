@@ -256,7 +256,7 @@ module TasksHelpers
   end
 
   def self.sync_to_exact_target
-    base = Member.where("need_exact_target_sync = 1")
+    base = Member.where("need_sync_to_marketing_client = 1")
     base.find_in_batches do |group|
       group.each_with_index do |member,index|
         tz = Time.zone.now

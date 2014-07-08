@@ -232,11 +232,11 @@ en:
       domain:
         url_help: 'Formats: http://xxxxx.xxx.xx or https://xxxxx.xxx.xx'
       member:
-        pardot_id: ID
-        pardot_last_synced_at: Last Success Sync
-        pardot_synced_status: Status
-        pardot_last_sync_error: Sync Error
-        pardot_last_sync_error_at: Sync Error Time
+        marketing_client_id: ID
+        marketing_client_last_synced_at: Last Success Sync
+        marketing_client_synced_status: Status
+        marketing_client_last_sync_error: Sync Error
+        marketing_client_last_sync_error_at: Sync Error Time
         cohort: Cohort
         api_id: 'Remote ID'
         id: 'Member ID'

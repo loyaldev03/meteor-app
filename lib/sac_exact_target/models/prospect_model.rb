@@ -77,12 +77,12 @@ module SacExactTarget
       unless res.nil?
         data = if res.OverallStatus != "OK"
           SacExactTarget::report_error("SacExactTarget:Prospect:save", res)
-          { exact_target_sync_result: res.Results.first.status_message }
+          { marketing_client_sync_result: res.Results.first.status_message }
         else
-          { exact_target_sync_result: 'Success' }
+          { marketing_client_sync_result: 'Success' }
         end
       end
-      data = data.merge(need_exact_target_sync: false)
+      data = data.merge(need_sync_to_marketing_client: false)
       ::Prospect.where(uuid: self.prospect.uuid).limit(1).update_all(data)
       self.prospect.reload rescue self.prospect
     end

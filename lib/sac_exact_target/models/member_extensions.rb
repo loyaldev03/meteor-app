@@ -8,7 +8,7 @@ module SacExactTarget
     module ClassMethods
       def sync_members_to_exact_target
         index = 0
-        base = Member.where(" exact_target_synced_status = 'not_synced' ")
+        base = Member.where(" marketing_client_synced_status = 'not_synced' ")
         Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_exact_target, processing #{base.count} members"
         base.find_in_batches do |group|
           group.each do |member|
@@ -58,11 +58,15 @@ module SacExactTarget
       end
 
       def exact_target_member
-        SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
-        @exact_target_member ||= if !self.exact_target_sync?
-          nil
+        if self.club.marketing_tool_attributes and self.club.marketing_tool_attributes["et_username"].blank? or self.club.marketing_tool_attributes["et_password"].blank?
+          SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
+          @exact_target_member ||= if !self.exact_target_sync?
+            nil
+          else
+            SacExactTarget::MemberModel.new self
+          end
         else
-          SacExactTarget::MemberModel.new self
+          Auditory.report_issue("Member:exact_target_member", 'Exact Target not configured correctly', { :member => self.club.inspect })
         end
       end
 

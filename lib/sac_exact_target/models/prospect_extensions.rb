@@ -10,9 +10,9 @@ module SacExactTarget
         club_base = Club.exact_target_related
         club_base.each do |club|
           tzc = Time.zone.now
-          prospect_club_count = club.prospects.where("need_exact_target_sync = 1").count
+          prospect_club_count = club.prospects.where("need_sync_to_marketing_client = 1").count
           Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_exact_target, processing #{prospect_club_count} prospects for club #{club.id}"
-          base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
+          base = club.prospects.where("need_sync_to_marketing_client = 1").order("created_at ASC").limit(1000)
           index = 0
           while not base.empty? do
             base.each do |prospect|
@@ -22,13 +22,13 @@ module SacExactTarget
                 prospect.exact_target_after_create_sync_to_remote_domain(club) if defined?(SacExactTarget::ProspectModel)
               rescue Exception => e
                 Auditory.report_issue("ExactTarget::ProspectSync", e, { :prospect => prospect.inspect} )
-                prospect.update_attribute :need_exact_target_sync, 0
+                prospect.update_attribute :need_sync_to_marketing_client, 0
                 Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
               end
               Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for prospect ##{prospect.id}"
               index+=1
             end
-            base = club.prospects.where("need_exact_target_sync = 1").order("created_at ASC").limit(1000)
+            base = club.prospects.where("need_sync_to_marketing_client = 1").order("created_at ASC").limit(1000)
           end
           Rails.logger.info "    ... took #{Time.zone.now - tzc}seconds for club ##{club.id}"
         end
