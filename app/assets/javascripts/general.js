@@ -307,6 +307,20 @@ function member_index_functions(){
 
 };
 
+function clubs_form_functions(){
+  $("#club_marketing_tool_client").change(function(){
+    $.ajax({
+      type: 'GET',
+      data: {id:club_id},
+      url: '/partner/'+partner_prefix+'/clubs/'+club_id+'/marketing_tool_attributes_for_exact_target',
+      success: function(data){
+        $("#div_mkt_tool_attributes").append(data);
+      }
+    });
+  })
+
+}
+
 function retrieve_information(){
   var skus = [];
   if ($('#kit_card_product_sku').is(':checked')) {
