@@ -109,8 +109,24 @@
     </div>
   </div>
 
+  <h3>Marketing Tool</h3>
+  <div class="control-group">
+    <%= f.label :marketing_tool_client, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :marketing_tool_client, options_for_select([['ExactTarget', 'exact_target'], ['ActionMailer', 'action_mailer']]), include_blank: true %>
+    </div>
+  </div>
+  <div id="div_mkt_tool_attributes"> 
+  </div>
+
+
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= link_to t('.cancel', :default => t("helpers.links.cancel")), clubs_path, :class => 'btn' %>
   </div>
 
+<script>
+  $('document').ready( clubs_form_functions());
+  var partner_prefix = "<%= @current_partner.prefix %>"
+  var club_id = "<%= @club.id %>"
+</script>

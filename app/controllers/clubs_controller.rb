@@ -82,6 +82,10 @@ class ClubsController < ApplicationController
     end 
   end
 
+  def marketing_tool_attributes_for_exact_target
+    @club = params[:id] ? Club.find(params[:id]) : Club.new
+    render :partial => "marketing_tool_attributes_for_exact_target", :locals => { :club => @club }
+  end
 
   def check_domain_belongs_to_partner(drupal_domain_id)
     valid = true
