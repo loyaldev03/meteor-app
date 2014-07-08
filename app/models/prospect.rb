@@ -8,7 +8,7 @@ class Prospect < ActiveRecord::Base
   serialize :preferences, JSON
   serialize :referral_parameters, JSON
 
-  before_create :set_exact_target_sync_as_needed
+  before_create :set_marketing_client_sync_as_needed
 
   attr_accessible :first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, 
    				  :phone_area_code ,:phone_local_number, :birth_date, :preferences, :gender, 
@@ -43,7 +43,7 @@ class Prospect < ActiveRecord::Base
       marketing_tool_sync unless @skip_sync
     end
 
-    def set_exact_target_sync_as_needed
+    def set_marketing_client_sync_as_needed
       self.need_sync_to_marketing_client = true if defined?(SacExactTarget::ProspectModel) and not self.email.blank?
     end
 end

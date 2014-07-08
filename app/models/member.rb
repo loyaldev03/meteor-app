@@ -38,7 +38,7 @@ class Member < ActiveRecord::Base
 
   before_create :record_date
   before_save :wrong_address_logic
-  before_save :set_exact_target_sync_as_needed
+  before_save :set_marketing_client_sync_as_needed
   after_create :solr_index_asyn_call
   after_update :solr_index_asyn_call
   after_update :after_save_sync_to_remote_domain
@@ -1396,7 +1396,7 @@ class Member < ActiveRecord::Base
       marketing_tool_sync
     end
 
-    def set_exact_target_sync_as_needed
+    def set_marketing_client_sync_as_needed
       self.need_sync_to_marketing_client = true if defined?(SacExactTarget::MemberModel)
     end
 end
