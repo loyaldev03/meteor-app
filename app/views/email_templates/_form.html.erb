@@ -20,7 +20,7 @@
 <div class="control-group" id="control_group_days_after_join_date" style="display:none;">
   <%= f.label :days_after_join_date, 'Days after Join Date*', :class => 'control-label' %>
   <div class="controls">
-    <%= f.number_field :days_after_join_date, :class => 'text_field input-small manual_validation' %>&nbsp;day(s)
+    <%= f.text_field :days_after_join_date, :class => 'text_field input-small manual_validation' %>&nbsp;day(s)
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.days_after_join_date'), 
         :content => t('activerecord.attributes.email_template.help_for_days_after_join_date') } %>

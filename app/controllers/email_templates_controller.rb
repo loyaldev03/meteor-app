@@ -4,8 +4,8 @@ class EmailTemplatesController < ApplicationController
 	before_filter :validate_club_presence
 	
 	def index
-		my_authorize! :list, EmailTemplate, @current_club.id
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
+		my_authorize! :list, EmailTemplate, @tom.club_id
 		respond_to do |format|
 			format.html # index.html.erb
 			format.json { render json: EmailTemplatesDatatable.new(view_context, @current_partner, @current_club, nil, @current_agent) }
@@ -16,18 +16,18 @@ class EmailTemplatesController < ApplicationController
 	end
 
 	def new
-		my_authorize! :new, EmailTemplate, @current_club.id
-		@et = EmailTemplate.new
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
+		my_authorize! :new, EmailTemplate, @tom.club_id
+		@et = EmailTemplate.new
 	rescue ActiveRecord::RecordNotFound 
 		flash[:error] = "Subscription Plan not found."
 		redirect_to terms_of_memberships_url 
 	end
 
 	def create
-		my_authorize! :create, EmailTemplate, @current_club.id
-		@et = EmailTemplate.new(params[:email_template])
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
+		my_authorize! :create, EmailTemplate, @tom.club_id
+		@et = EmailTemplate.new(params[:email_template])
 		@et.client = params[:email_template][:client]
 		@et.terms_of_membership_id = @tom.id
 		prepare_et_data_to_save(params)
@@ -109,6 +109,7 @@ class EmailTemplatesController < ApplicationController
 
 	private
 		def prepare_et_data_to_save(post_data)
+			@et.name = post_data[:email_template][:name]
 			@et.template_type = post_data[:email_template][:template_type]
 			if @et.template_type == 'pillar'
 				@et.days_after_join_date = post_data[:email_template][:days_after_join_date].to_i

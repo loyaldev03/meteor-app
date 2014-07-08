@@ -44,6 +44,17 @@
       <% if params[:controller] == 'terms_of_memberships' and params[:action] == 'new' %>
         <%= delimiter %><li class="active">New Subscription Plan</li>
       <% end %>
+      <% if params[:controller] == 'email_templates' %>
+        <%= delimiter %><a href="<%= terms_of_memberships_path %>">Subscription Plans</a>
+        <%= delimiter %><li class="active"> <%= @tom.name %> </li>
+        <%= delimiter %><a href="<%= terms_of_membership_email_templates_path %>">Communications</a>
+      <% end %>
+      <% if params[:controller] == 'email_templates' and params[:action] == 'new' %>
+        <%= delimiter %><li class="active">New Communication</li>
+      <% end %>
+      <% if params[:controller] == 'email_templates' and ['show', 'edit'].include? params[:action] %>
+        <%= delimiter %><li class="active"><%= @et.name %></li>
+      <% end %>
     <% end %>
 
     <% if @current_member %>

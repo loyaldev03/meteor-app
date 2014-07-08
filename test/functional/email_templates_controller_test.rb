@@ -5,7 +5,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   setup do
   	@admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @current_agent = FactoryGirl.create(:agent)
+    @agent = FactoryGirl.create(:agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @member = FactoryGirl.build(:member)
@@ -153,4 +153,99 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'agent with admin club role should get index' do
+    @club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test')
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @agent.id
+    club_role.role = 'admin'
+    club_role.save
+    get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
+    assert_response :success
+    get :index, :partner_prefix => @partner.prefix, :club_prefix => @club2.name, :terms_of_membership_id => @tom2.id
+    assert_response :unauthorized
+  end
+
+  test 'agent with club roles should not get index' do
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @agent.id
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
+      assert_response :unauthorized
+    end
+  end
+
+  test 'agent with admin club role should get new' do
+    @club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @agent.id
+    club_role.role = 'admin'
+    club_role.save
+    get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
+    assert_response :success
+  end
+
+  test 'agent with club roles should not get new' do
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @agent.id
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
+      assert_response :unauthorized
+    end
+  end
+
+  test 'agent with admin club role should get create' do
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @agent.id
+    club_role.role = 'admin'
+    club_role.save
+    comm = FactoryGirl.build(:email_template, :terms_of_membership_id => @tom.id)
+    post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: { 
+      name: comm.name, client: comm.client, external_attributes: comm.external_attributes }
+    assert_response :success
+  end
+
+  test 'agent with club roles should not get create' do
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @agent.id
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      post :create, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
+      assert_response :unauthorized
+    end
+  end
+
+
+  test 'agent with admin club role should get edit' do
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @agent.id
+    club_role.role = 'admin'
+    club_role.save
+    get :edit, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
+    assert_response :success
+  end
+
+  test 'agent with club roles should not get edit' do
+    sign_in(@agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @agent.id
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+      club_role.role = role
+      club_role.save
+      get :edit, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
+      assert_response :unauthorized
+    end
+  end
 end
