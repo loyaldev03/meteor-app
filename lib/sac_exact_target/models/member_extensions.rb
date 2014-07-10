@@ -58,7 +58,7 @@ module SacExactTarget
       end
 
       def exact_target_member
-        if self.club.marketing_tool_attributes and self.club.marketing_tool_attributes["et_username"].blank? and self.club.marketing_tool_attributes["et_password"].blank?
+        if self.club.marketing_tool_attributes and not self.club.marketing_tool_attributes["et_username"].blank? and not self.club.marketing_tool_attributes["et_password"].blank?
           SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
           @exact_target_member ||= if !self.exact_target_sync?
             nil

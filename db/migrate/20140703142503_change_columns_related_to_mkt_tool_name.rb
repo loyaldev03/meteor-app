@@ -2,7 +2,8 @@ class ChangeColumnsRelatedToMktToolName < ActiveRecord::Migration
   def up
   	remove_column :members, :pardot_id
   	remove_column :members, :pardot_last_synced_at
-  	remove_column :members, :pardot_synced_status
+    remove_column :members, :pardot_synced_status
+  	remove_column :members, :pardot_last_sync_error
   	remove_column :members, :pardot_last_sync_error_at
   	add_column :members, :marketing_client_id, :string
   	rename_column :members, :exact_target_last_synced_at, :marketing_client_last_synced_at
@@ -18,6 +19,7 @@ class ChangeColumnsRelatedToMktToolName < ActiveRecord::Migration
   	add_column :members, :pardot_id, :string
   	add_column :members, :pardot_last_synced_at, :datetime
   	add_column :members, :pardot_synced_status, :string
+    add_column :members, :pardot_last_sync_error, :string
   	add_column :members, :pardot_last_sync_error_at, :datetime
   	remove_column :members, :marketing_client_id
    	rename_column :members, :marketing_client_last_synced_at, :exact_target_last_synced_at
