@@ -42,12 +42,16 @@ class Communication < ActiveRecord::Base
   end
 
   def deliver_exact_target
-    result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
-    self.sent_success = (result.OverallStatus == "OK")
-    self.processed_at = Time.zone.now
-    self.response = result
-    self.save!
-    Auditory.audit(nil, self, "Communication '#{template_name}' scheduled", member, Settings.operation_types["#{template_type}_email"])
+    if self.member.exact_target_member
+      result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
+      self.sent_success = (result.OverallStatus == "OK")
+      self.processed_at = Time.zone.now
+      self.response = result
+      self.save!
+      Auditory.audit(nil, self, "Communication '#{template_name}' scheduled", member, Settings.operation_types["#{template_type}_email"])
+    else
+      update_attributes :sent_success => false, :response => I18n.t('error_messages.no_marketing_client_configure') , :processed_at => Time.zone.now
+    end
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now

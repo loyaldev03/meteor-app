@@ -1262,10 +1262,10 @@ function email_templates_functions() {
     var isValid = true;
     $('form input[type="text"], form select').each(function() {
       if($(this).hasClass('manual_validation')) {
-        $('#control_'+$(this).attr('id')+' div').remove();
+        $('#control_'+$(this).attr('id')+' div[id="error_inline"]').remove();
         if ($.trim($(this).val()) == '') {
           isValid = false;
-          $('#control_'+$(this).attr('id')).append('<div style="display:inline-block;"> can\'t be blank </div>');
+          $('#control_'+$(this).attr('id')).append('<div id="error_inline" style="display:inline-block;"> can\'t be blank </div>');
         }
       }
     });
