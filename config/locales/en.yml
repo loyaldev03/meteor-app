@@ -149,6 +149,7 @@ en:
     fulfillment_file_not_ready_wait: "There is already one fulfillment file being created within this club with that product set. Please, wait until this fulfillment file has finished and proceed to create this new one. Sorry for the inconvenience."
     pgc_cannot_be_created_club_has_members: "The club has members enrolled already. You cannot create a new payment gateway for this club."
     club_payment_gateway_configuration_not_created: 'Payment Gateway Configuration is not configured within the club <a href="%{link}">Add Payment Gateway</a>'
+    no_marketing_client_configure: 'This club does not have marketing club configured.'
   activerecord:
     errors:
       models:
