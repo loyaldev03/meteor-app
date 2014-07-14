@@ -339,6 +339,10 @@ en:
             et_business_unit: 'Business Unit'
             et_members_list: 'Member List'
             et_prospect_list: 'Prospect List'
+          mailchimp_mandrill:
+            mandrill_api_key: 'Mandrill ApiKey'
+            mailchimp_api_key: 'Mailchimp ApiKey'
+            mailchimp_list_id: 'Mailchimp ListID'
       credit_card:
         number: 'Number'
         expire_date: 'Expire date'
