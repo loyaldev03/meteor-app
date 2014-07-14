@@ -89,8 +89,10 @@ class ClubsController < ApplicationController
     case params[:client]
     when 'exact_target'
       render :partial => "exact_target_marketing_tool_attributes", :locals => { :club => @club }
+    when 'mailchimp_mandrill'
+      render :partial => "mailchimp_mandrill_marketing_tool_attributes", :locals => { :club => @club }
     else
-      render inline: "Does not need marketing tools"
+      render inline: "Does not need configuration."
     end
   end
 
@@ -113,7 +115,7 @@ class ClubsController < ApplicationController
   private 
     def prepare_marketing_tool_attributes(marketing_client_params)
       unless marketing_client_params.nil?
-        unless @club.new_record?
+        if not @club.new_record? and @club.marketing_tool_client == 'exact_target'
           if marketing_client_params[:et_password].blank?
             marketing_client_params.delete(:et_password)
             marketing_client_params.merge!({:et_password => @club.marketing_tool_attributes["et_password"]})

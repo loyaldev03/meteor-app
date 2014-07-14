@@ -26,26 +26,10 @@
         :content => t('activerecord.attributes.email_template.help_for_days_after_join_date') } %>
   </div>
 </div>
-<% if @et.new_record? %>
-  <div class="control-group">
-    <%= f.label :client, "Client*", :class => 'control-label' %>
-    <div class="controls" id="control_email_template_client">
-      <%= select_tag 'email_template[client]', options_for_select(clients_options, @et.client), :class => 'manual_validation', :include_blank => (@et.new_record?) %>
-      <%= render :partial => "shared/help", :locals => { 
-          :title => t('activerecord.attributes.email_template.client'), 
-          :content => t('activerecord.attributes.email_template.help_for_clients') } %>
-    </div>
-  </div>
-<% else %> 
-  <%= f.hidden_field :client, :value => @et.client %>
-<% end %>
 
-<h4>External Attributes
-<%= render :partial => "shared/help", :locals => { 
-  :title => t('activerecord.attributes.email_template.external_attributes'), 
-  :content => t('activerecord.attributes.email_template.help_for_external_attributes') } %></h4>
-<% # In the div below will be loaded the external attributes html rendered from partial %>
-<div id="external_attributes_group"></div>
+<div id="external_attributes_group">
+  <%= render :partial => "external_attributes", :locals => { :external_attributes => EmailTemplate.external_attributes_related_to_client(@et.client), :email_template => @et } %>
+</div>
 
 <div class="form-actions">
   <%= f.submit nil, :class => 'btn btn-primary' %>
@@ -55,7 +39,6 @@
 <script type="text/javascript">
   $(document).ready(function() {
     switch_days_after_join_date();
-    switch_external_attributes();
     email_templates_functions();
   });
   var external_attributes_data = "<%= @et.new_record? ? '' : @et.fetch_external_attributes_data %>";

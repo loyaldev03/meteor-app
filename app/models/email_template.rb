@@ -42,6 +42,12 @@ class EmailTemplate < ActiveRecord::Base
     end
   end
 
+  def self.clients_options
+    clients = [ ['Exact Target', 'exact_target'], ['Mailchimp/Mandrill', 'mailchimp_mandrill'] ]
+    clients << ['Action Mailer', 'action_mailer'] unless Rails.env.production?
+    clients
+  end
+
   def lyris?
     self.client == 'lyris'
   end

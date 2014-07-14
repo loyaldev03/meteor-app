@@ -73,6 +73,14 @@ class Club < ActiveRecord::Base
     [self.api_type, self.api_username, self.api_password].none?(&:blank?)
   end
 
+  def exact_target_client?
+    self.marketing_tool_client == 'exact_target'
+  end
+
+  def mailchimp_mandrill_client?
+    self.marketing_tool_client == 'mailchimp_mandrill'
+  end
+
   def pardot_sync?
     self.marketing_tool_attributes and 
     [ 
@@ -110,6 +118,18 @@ class Club < ActiveRecord::Base
     pgc = self.payment_gateway_configurations.first
     not pgc.nil? and pgc.authorize_net?
   end
+
+  def resync_members_and_prospects
+    subscribers = self.members+self.prospects
+    if subscribers.count > Settings.maximum_number_of_subscribers_to_automatically_resync
+      Auditory.report_club_changed_marketing_client(self, subscribers)
+    end
+    subscribers.each do |subscriber|
+      subscribers.update_attribute :need_sync_to_marketing_client, 1
+    end
+  end
+  handle_asynchronously :resync_members_and_prospects, :queue => :generic_queue
+
 
   private
     def add_default_member_groups
@@ -157,22 +177,11 @@ class Club < ActiveRecord::Base
       end
     end
 
-    def resync_members_and_prospects
-      subscribers = self.members+self.prospects
-      
-      if subscribers.count > Settings.maximum_number_of_subscribers_to_automatically_resync
-        Auditory.report_club_changed_marketing_client(self, subscribers)
-      end
-
-      subscribers.each do |subscriber|
-        subscribers.update_attribute :need_sync_to_marketing_client, 1
-      end
-    end
-    handle_asynchronously :resync_members_and_prospects, :queue => :generic_queue
-
     def resync_with_merketing_tool_process
       if self.changes.include? :marketing_tool_client
-        resync_members_and_prospects if ['action_mailer', ''].include?(self.changes[:marketing_tool_client].last)
+        unless ['action_mailer', ''].include?(self.changes[:marketing_tool_client].last)
+          resync_members_and_prospects 
+        end
       end
     end
 end

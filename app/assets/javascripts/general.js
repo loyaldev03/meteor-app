@@ -1232,30 +1232,11 @@ function switch_days_after_join_date() {
   }
 }
 
-function switch_external_attributes() {
-  if($("#email_template_client").val() == '') {
-    $("#external_attributes_group").html('Select a Client');
-  }
-  else {
-    $.ajax({
-      type: 'GET',
-      data: 'client=' + $("#email_template_client").val() + '&' + external_attributes_data,
-      url: "/partner/"+partner_prefix+"/club/"+club_prefix+"/subscription_plans/"+terms_of_membership_id+"/external_attributes",
-      success: function(data) { $("#external_attributes_group").html(data); }
-    });
-    $("#external_attributes_group").show(100)
-  }
-}
-
 function email_templates_functions() {
   $('.help').popover({offset: 10});
 
   $("#email_template_template_type").change(function() {
     switch_days_after_join_date();
-  });
-
-  $("#email_template_client").change(function() {
-    switch_external_attributes();
   });
 
   $("#et_form").submit(function(event) {

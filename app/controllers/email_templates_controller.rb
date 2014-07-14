@@ -18,7 +18,12 @@ class EmailTemplatesController < ApplicationController
 	def new
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
 		my_authorize! :new, EmailTemplate, @tom.club_id
-		@et = EmailTemplate.new
+		unless @tom.club.marketing_tool_client == ''
+			@et = EmailTemplate.new client: @tom.club.marketing_tool_client
+		else
+			flash[:error] = "Configure a marketing tool client before creating communication templates."
+			redirect_to club_path(id: @current_club.id)
+		end
 	rescue ActiveRecord::RecordNotFound 
 		flash[:error] = "Subscription Plan not found."
 		redirect_to terms_of_memberships_url 
@@ -27,10 +32,12 @@ class EmailTemplatesController < ApplicationController
 	def create
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
 		my_authorize! :create, EmailTemplate, @tom.club_id
+
 		@et = EmailTemplate.new(params[:email_template])
-		@et.client = params[:email_template][:client]
+		@et.client = @tom.club.marketing_tool_client
 		@et.terms_of_membership_id = @tom.id
 		prepare_et_data_to_save(params)
+		
 		if @et.save
 			redirect_to terms_of_membership_email_templates_url, :notice => "Your Communication #{@et.name} (ID: #{@et.id}) was successfully created"
 		else

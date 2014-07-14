@@ -1,0 +1,20 @@
+<div class="control-group">
+	<%= label_tag :mandrill_api_key, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.mandrill_api_key') ,:class => 'control-label' %>
+	<div class="controls">
+	  <%= text_field_tag 'marketing_tool_client[mandrill_api_key]', (@club.marketing_tool_attributes["mandrill_api_key"] if @club.marketing_tool_attributes)  %>
+	</div>
+</div>
+
+<div class="control-group">
+	<%= label_tag :mailchimp_api_key, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.mailchimp_api_key') ,:class => 'control-label' %>
+	<div class="controls">
+	  <%= text_field_tag 'marketing_tool_client[mailchimp_api_key]', (@club.marketing_tool_attributes["mailchimp_api_key"] if @club.marketing_tool_attributes)  %>
+	</div>
+</div>
+
+<div class="control-group">
+	<%= label_tag :mailchimp_list_id, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.mailchimp_list_id') ,:class => 'control-label' %>
+	<div class="controls">
+	  <%= text_field_tag 'marketing_tool_client[mailchimp_list_id]', (@club.marketing_tool_attributes["mailchimp_list_id"] if @club.marketing_tool_attributes)  %>
+	</div>
+</div>

@@ -43,7 +43,8 @@ private
 	end
 
 	def fetch_email_templates
-		email_templates = EmailTemplate.where(:terms_of_membership_id => params[:terms_of_membership_id])
+    tom = TermsOfMembership.find(params[:terms_of_membership_id])
+		email_templates = EmailTemplate.where(:terms_of_membership_id => tom.id, :client => tom.club.marketing_tool_client)
 		email_templates = email_templates.page(page).per_page(per_page)
 		if params[:sSearch].present?
 			email_templates = email_templates.where("id LIKE :search OR name LIKE :search OR template_type LIKE :search", search: "%#{params[:sSearch]}%")
