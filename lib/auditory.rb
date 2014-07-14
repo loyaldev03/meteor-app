@@ -47,10 +47,10 @@ class Auditory
   def self.report_club_changed_marketing_client(club, subscribers_count)
     unless ["test","development"].include? Rails.env  
       comment = "Club #{club.id} - #{club.name} changed it's marketing client. We have to manually resync every member and prospect (total amount: #{subscribers_count}). \n\n\n Steps to follow:"
-      comment = "Step 1: Ask tech leader or Charly to disable the following tasks (comment lines where we invoke those taks within file 'rake_task_runner' in application root folder):"
-      comment = "\n * members:sync_to_exact_target"
-      comment = "\n * mkt_tools:sync_prospects_to_exact_target"
-      comment = "Step 2: Ask tech leader or Charly to run manually those tasks. (Example: RAILS_ENV=production nohup rake members:sync_to_exact_target) This task should be started before the end of the day, and it should be done before the night since every member/prospect will be synced and this task may affect other scripts"
+      comment << "\n Step 1: Ask tech leader or Charly to disable the following tasks (comment lines where we invoke those taks within file 'rake_task_runner' in application root folder):"
+      comment << "\n * members:sync_to_exact_target"
+      comment << "\n * mkt_tools:sync_prospects_to_exact_target"
+      comment << "Step 2: Ask tech leader or Charly to run manually those tasks. (Example: RAILS_ENV=production nohup rake members:sync_to_exact_target) This task should be started before the end of the day, and it should be done before the night since every member/prospect will be synced and this task may affect other scripts"
 
       ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
         :subject => "[#{Rails.env}][IMMEDIATE] Club:marketing_client_changed",
