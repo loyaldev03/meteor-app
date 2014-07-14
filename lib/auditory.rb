@@ -50,7 +50,7 @@ class Auditory
       comment << "\n Step 1: Ask tech leader or Charly to disable the following tasks (comment lines where we invoke those taks within file 'rake_task_runner' in application root folder):"
       comment << "\n * members:sync_to_exact_target"
       comment << "\n * mkt_tools:sync_prospects_to_exact_target"
-      comment << "Step 2: Ask tech leader or Charly to run manually those tasks. (Example: RAILS_ENV=production nohup rake members:sync_to_exact_target) This task should be started before the end of the day, and it should be done before the night since every member/prospect will be synced and this task may affect other scripts"
+      comment << "\n Step 2: Ask tech leader or Charly to run manually those tasks. (Example: RAILS_ENV=production nohup rake members:sync_to_exact_target) This task should be started before the end of the day, and it should be done before the night since every member/prospect will be synced and this task may affect other scripts"
 
       ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
         :subject => "[#{Rails.env}][IMMEDIATE] Club:marketing_client_changed",
