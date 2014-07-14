@@ -335,14 +335,22 @@ en:
         marketing_tool_attributes:
           exact_target:
             et_username: 'Username'
+            et_username_help: 'Exact Target login username. (Eg: email).'
             et_password: 'Password'
+            et_password_help: 'Exact Target login password.'
             et_business_unit: 'Business Unit'
+            et_business_unit_help: 'Exact Target BusinessUnit id.'
             et_members_list: 'Member List'
+            et_members_list_help: 'Exact Target member list id.'
             et_prospect_list: 'Prospect List'
+            et_prospect_list_help: 'Exact Target prospect list id.'
           mailchimp_mandrill:
             mandrill_api_key: 'Mandrill ApiKey'
+            mandrill_api_key_help: "Mandrill's api key value."
             mailchimp_api_key: 'Mailchimp ApiKey'
+            mailchimp_api_key_help: "Mailchimp's api key value."
             mailchimp_list_id: 'Mailchimp ListID'
+            mailchimp_list_id_help: "Mailchimp subscriber's list id."
       credit_card:
         number: 'Number'
         expire_date: 'Expire date'
