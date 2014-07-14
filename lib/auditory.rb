@@ -44,9 +44,9 @@ class Auditory
     end
   end
 
-  def self.report_club_changed_marketing_client(club, subscribers)
+  def self.report_club_changed_marketing_client(club, subscribers_count)
     unless ["test","development"].include? Rails.env  
-      comment = "Club #{self.id} - #{self.name} changed it's marketing client. We have to manually resync every member and prospect. \n\n\n Steps to follow:"
+      comment = "Club #{club.id} - #{club.name} changed it's marketing client. We have to manually resync every member and prospect (total amount: #{subscribers_count}). \n\n\n Steps to follow:"
       comment = "Step 1: Ask tech leader or Charly to disable the following tasks (comment lines where we invoke those taks within file 'rake_task_runner' in application root folder):"
       comment = "\n * members:sync_to_exact_target"
       comment = "\n * mkt_tools:sync_prospects_to_exact_target"
