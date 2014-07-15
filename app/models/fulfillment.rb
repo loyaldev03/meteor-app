@@ -104,6 +104,7 @@ class Fulfillment < ActiveRecord::Base
     f.product_package = self.product_package
     f.member_id = self.member_id
     f.recurrent = true
+    f.club_id = self.club_id
     f.save
     f.decrease_stock! if status.nil?
   end
