@@ -39,8 +39,8 @@ class Auditory
         temp.write comment
         temp.close
         ticket.comment.uploads << file_url
-        File.delete(file_url)
         ticket.save
+        File.delete(file_url)
       rescue Exception => e
         Rails.logger.error " * * * * * CANT ATTACH FILE TO ZENDESK REPORT #{e}"
         ticket.comment.uploads = []
