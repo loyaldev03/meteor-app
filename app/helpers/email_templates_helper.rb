@@ -3,6 +3,7 @@ module EmailTemplatesHelper
 	def clients_options
 	clients = [ ['Exact Target', 'exact_target'] ]
 	clients << ['Action Mailer', 'action_mailer'] unless Rails.env.production?
+	clients
 	end
 	
 	def template_types_options(tom_id, current_type)
