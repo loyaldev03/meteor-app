@@ -17,6 +17,7 @@ gem 'delayed_job_active_record'
 
 gem 'turnout'
 gem 'exact_target_sdk', github: 'stoneacre/exact_target_sdk'
+gem 'gibbon'
 
 # Gems used only for assets and not required
 # in production environments by default.
