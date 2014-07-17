@@ -21,7 +21,7 @@ class EmailTemplate < ActiveRecord::Base
 
   validates :name, :template_type, :terms_of_membership_id, :client, :presence => :true
 
-  validates :name, uniqueness: { scope: [:terms_of_membership_id] }
+  validates :name, uniqueness: { scope: [:terms_of_membership_id, :client] }
 
   validates :template_type, uniqueness: { scope: [:terms_of_membership_id] }, :unless => :is_pillar?
   

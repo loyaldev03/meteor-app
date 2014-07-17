@@ -1,7 +1,7 @@
 <div class="control-group">
 	<%= label_tag :et_username, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_username') ,:class => 'control-label' %>
 	<div class="controls">
-	  <%= text_field_tag 'marketing_tool_client[et_username]', (@club.marketing_tool_attributes["et_username"] if @club.marketing_tool_attributes)  %>
+	  <%= text_field_tag 'marketing_tool_attributes[et_username]', (@club.marketing_tool_attributes["et_username"] if @club.marketing_tool_attributes)  %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_username'), 
         :content => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_username_help') } %>
@@ -11,7 +11,7 @@
 <div class="control-group">
 	<%= label_tag :et_password, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_password'), :class => 'control-label' %>
 	<div class="controls">
-	  <%= password_field_tag 'marketing_tool_client[et_password]' %>
+	  <%= password_field_tag 'marketing_tool_attributes[et_password]' %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_password'), 
         :content => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_password_help') } %>
@@ -21,7 +21,7 @@
 <div class="control-group">
 	<%= label_tag :et_business_unit, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_business_unit'), :class => 'control-label' %>
 	<div class="controls">
-	  <%= text_field_tag 'marketing_tool_client[et_business_unit]', (@club.marketing_tool_attributes["et_business_unit"] if @club.marketing_tool_attributes)  %>
+	  <%= text_field_tag 'marketing_tool_attributes[et_business_unit]', (@club.marketing_tool_attributes["et_business_unit"] if @club.marketing_tool_attributes)  %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_business_unit'), 
         :content => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_business_unit_help') } %>
@@ -31,7 +31,7 @@
 <div class="control-group">
 	<%= label_tag :et_members_list, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_members_list'), :class => 'control-label' %>
 	<div class="controls">
-	  <%= text_field_tag 'marketing_tool_client[et_members_list]', (@club.marketing_tool_attributes["et_members_list"] if @club.marketing_tool_attributes)  %>
+	  <%= text_field_tag 'marketing_tool_attributes[et_members_list]', (@club.marketing_tool_attributes["et_members_list"] if @club.marketing_tool_attributes)  %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_members_list'), 
         :content => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_members_list_help') } %>
@@ -41,7 +41,7 @@
 <div class="control-group">
 	<%= label_tag :et_prospect_list, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_prospect_list'), :class => 'control-label' %>
 	<div class="controls">
-	  <%= text_field_tag 'marketing_tool_client[et_prospect_list]', (@club.marketing_tool_attributes["et_prospect_list"] if @club.marketing_tool_attributes)  %>
+	  <%= text_field_tag 'marketing_tool_attributes[et_prospect_list]', (@club.marketing_tool_attributes["et_prospect_list"] if @club.marketing_tool_attributes)  %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_prospect_list'), 
         :content => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_prospect_list_help') } %>

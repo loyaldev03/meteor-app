@@ -46,7 +46,7 @@ class ClubsController < ApplicationController
   def create
     my_authorize!(:create, Club)
     @club = Club.new(params[:club])
-    prepare_marketing_tool_attributes(params[:marketing_tool_client]) if params[:marketing_tool_client]
+    prepare_marketing_tool_attributes(params[:marketing_tool_attributes], params[:club][:marketing_tool_client]) if params[:marketing_tool_attributes]
     @club.partner = @current_partner
     if @club.save
       redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully created."
@@ -59,7 +59,7 @@ class ClubsController < ApplicationController
   def update
     my_authorize!(:show, Club, params[:id])
     @club = Club.find(params[:id])
-    prepare_marketing_tool_attributes(params[:marketing_tool_client])
+    prepare_marketing_tool_attributes(params[:marketing_tool_attributes], params[:club][:marketing_tool_client])
     unless check_domain_belongs_to_partner(params[:club][:drupal_domain_id])
       flash.now[:error] = "Agent can't assign domain. Domain not available."
       render action: "edit" 
@@ -85,6 +85,7 @@ class ClubsController < ApplicationController
   end
 
   def marketing_tool_attributes
+    my_authorize!(:marketing_tool_attributes, Club, params[:id])
     @club = params[:id].blank? ? Club.new : Club.find(params[:id])
     case params[:client]
     when 'exact_target'
@@ -113,15 +114,15 @@ class ClubsController < ApplicationController
   end
 
   private 
-    def prepare_marketing_tool_attributes(marketing_client_params)
-      unless marketing_client_params.nil?
-        if not @club.new_record? and @club.marketing_tool_client == 'exact_target'
-          if marketing_client_params[:et_password].blank?
-            marketing_client_params.delete(:et_password)
-            marketing_client_params.merge!({:et_password => @club.marketing_tool_attributes["et_password"]})
+    def prepare_marketing_tool_attributes(marketing_tool_attributes, marketing_tool_client)
+      unless marketing_tool_attributes.nil?
+        if not @club.new_record? and marketing_tool_client == 'exact_target'
+          if marketing_tool_attributes[:et_password].blank?
+            marketing_tool_attributes.delete(:et_password)
+            marketing_tool_attributes.merge!({:et_password => @club.marketing_tool_attributes["et_password"]})
           end
         end
       end
-      @club.marketing_tool_attributes = marketing_client_params
+      @club.marketing_tool_attributes = marketing_tool_attributes
     end
 end

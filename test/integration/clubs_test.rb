@@ -13,6 +13,22 @@ class ClubTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
+  def configure_exact_target(et_username, et_password, et_business_unit, et_prospect_list, et_members_list)
+    select 'Exact Target', :from => 'club[marketing_tool_client]'
+    fill_in 'marketing_tool_attributes[et_username]', with: et_username
+    fill_in 'marketing_tool_attributes[et_password]', with: et_password
+    fill_in 'marketing_tool_attributes[et_business_unit]', with: et_business_unit
+    fill_in 'marketing_tool_attributes[et_prospect_list]', with: et_prospect_list
+    fill_in 'marketing_tool_attributes[et_members_list]', with: et_members_list
+  end
+
+  def configure_mailchimp_mandrill(mailchimp_api_key, mandrill_api_key, mailchimp_list_id)
+    select 'Mailchimp/Mandrill', :from => 'club[marketing_tool_client]'
+    fill_in 'marketing_tool_attributes[mandrill_api_key]', with: mandrill_api_key
+    fill_in 'marketing_tool_attributes[mailchimp_api_key]', with: mailchimp_api_key
+    fill_in 'marketing_tool_attributes[mailchimp_list_id]', with: mailchimp_list_id
+  end
+
   test "create club" do
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
@@ -166,4 +182,136 @@ class ClubTest < ActionController::IntegrationTest
     click_link_or_button 'members'
     assert page.has_no_content?("We're sorry, but something went wrong.")
   end
+
+  test "Configure and Update ET marketing gateway - Login by General Admin" do
+    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    visit clubs_path(@partner.prefix)
+    click_link_or_button 'New Club'
+    fill_in 'club[name]', :with => unsaved_club.name
+    fill_in 'club[description]', :with => unsaved_club.description
+    fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
+
+    configure_exact_target("et_username_test","et_password_test","et_business_unit_test", "et_prospect_list_test", "et_members_list_test")
+
+    assert_difference('Club.count', 1) do
+      click_link_or_button 'Create Club'
+      assert page.has_content?("The club #{unsaved_club.name} was successfully created")
+    end
+    assert page.has_content? "et_username_test"
+    assert page.has_content? "et_password_test"
+    assert page.has_content? "et_business_unit_test"
+    assert page.has_content? "et_prospect_list_test"
+    assert page.has_content? "et_members_list_test"
+
+    club = Club.last
+    assert club.exact_target_client?
+    click_link_or_button('Edit')
+
+    configure_exact_target("et_username_test_new","et_password_test_new","et_business_unit_test_new", "et_prospect_list_test_new", "et_members_list_test_new")
+    click_link_or_button 'Update Club'
+
+    assert page.has_content? "et_username_test_new"
+    assert page.has_content? "et_password_test_new"
+    assert page.has_content? "et_business_unit_test_new"
+    assert page.has_content? "et_prospect_list_test_new"
+    assert page.has_content? "et_members_list_test_new"
+  end
+
+  test "Configure and Update Mailchimp/Mandrill marketing gateway - Login by General Admin" do
+    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    visit clubs_path(@partner.prefix)
+    click_link_or_button 'New Club'
+    fill_in 'club[name]', :with => unsaved_club.name
+    fill_in 'club[description]', :with => unsaved_club.description
+    fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
+
+    configure_mailchimp_mandrill("mailchimp_api_key_test","mandrill_api_key_test","list_id_test")
+
+    assert_difference('Club.count', 1) do
+      click_link_or_button 'Create Club'
+      assert page.has_content?("The club #{unsaved_club.name} was successfully created")
+    end
+    assert page.has_content? "mailchimp_api_key_test"
+    assert page.has_content? "mandrill_api_key_test"
+    assert page.has_content? "list_id_test"
+
+    club = Club.last
+    assert club.mailchimp_mandrill_client?
+    click_link_or_button('Edit')
+    
+    configure_mailchimp_mandrill("mailchimp_api_key_test_new","mandrill_api_key_test_new","list_id_test_new")
+    click_link_or_button 'Update Club'
+  end
+
+  test "Configure and Update ET marketing gateway - Login by Admin by Club" do
+    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    visit clubs_path(@partner.prefix)
+    click_link_or_button 'New Club'
+    fill_in 'club[name]', :with => unsaved_club.name
+    fill_in 'club[description]', :with => unsaved_club.description
+    fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
+
+    configure_exact_target("et_username_test","et_password_test","et_business_unit_test", "et_prospect_list_test", "et_members_list_test")
+
+    assert_difference('Club.count', 1) do
+      click_link_or_button 'Create Club'
+      assert page.has_content?("The club #{unsaved_club.name} was successfully created")
+    end
+    assert page.has_content? "et_username_test"
+    assert page.has_content? "et_password_test"
+    assert page.has_content? "et_business_unit_test"
+    assert page.has_content? "et_prospect_list_test"
+    assert page.has_content? "et_members_list_test"
+
+    club = Club.last
+    assert club.exact_target_client?
+
+    @admin_agent.update_attribute :roles, ''
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @admin_agent.id
+    club_role.role = 'admin'
+    club_role.save
+
+    click_link_or_button('Edit')
+    configure_exact_target("et_username_test_new","et_password_test_new","et_business_unit_test_new", "et_prospect_list_test_new", "et_members_list_test_new")
+    click_link_or_button 'Update Club'
+
+    assert page.has_content? "et_username_test_new"
+    assert page.has_content? "et_password_test_new"
+    assert page.has_content? "et_business_unit_test_new"
+    assert page.has_content? "et_prospect_list_test_new"
+    assert page.has_content? "et_members_list_test_new"
+  end
+
+  test "Configure and Update Mailchimp/Mandrill marketing gateway - Login by Admin by Club" do
+    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    visit clubs_path(@partner.prefix)
+    click_link_or_button 'New Club'
+    fill_in 'club[name]', :with => unsaved_club.name
+    fill_in 'club[description]', :with => unsaved_club.description
+    fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
+
+    configure_mailchimp_mandrill("mailchimp_api_key_test","mandrill_api_key_test","list_id_test")
+
+    assert_difference('Club.count', 1) do
+      click_link_or_button 'Create Club'
+      assert page.has_content?("The club #{unsaved_club.name} was successfully created")
+    end
+    assert page.has_content? "mailchimp_api_key_test"
+    assert page.has_content? "mandrill_api_key_test"
+    assert page.has_content? "list_id_test"
+
+    club = Club.last
+    assert club.mailchimp_mandrill_client?
+    @admin_agent.update_attribute :roles, ''
+    club_role = ClubRole.new :club_id => club.id
+    club_role.agent_id = @admin_agent.id
+    club_role.role = 'admin'
+    club_role.save
+        
+    click_link_or_button('Edit')
+    configure_mailchimp_mandrill("mailchimp_api_key_test_new","mandrill_api_key_test_new","list_id_test_new")
+    click_link_or_button 'Update Club'
+  end
+
 end

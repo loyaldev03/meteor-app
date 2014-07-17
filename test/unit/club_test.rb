@@ -28,4 +28,32 @@ class ClubTest < ActiveSupport::TestCase
     end
   end
 
+  test "Update Marketing client in a club with more members than the treshold configured to sync with marketing client" do
+    @club.members_count = Settings.maximum_number_of_subscribers_to_automatically_resync + 1
+    @club.save
+
+    Delayed::Worker.delay_jobs = true
+    assert_difference("DelayedJob.count", 0) do
+      @club.description = "new description"
+      @club.save
+    end
+    assert_difference("DelayedJob.count", 1) do
+      @club.marketing_tool_client = 'exact_target'
+      @club.save
+    end
+    assert_difference("DelayedJob.count", 0) do
+      @club.marketing_tool_client = ''
+      @club.save
+    end
+    assert_difference("DelayedJob.count", 0) do
+      @club.marketing_tool_client = 'action_mailer'
+      @club.save
+    end
+    assert_difference("DelayedJob.count", 1) do
+      @club.marketing_tool_client = 'mailchimp_mandrill'
+      @club.save
+    end
+    Delayed::Worker.delay_jobs = false
+  end 
+
 end

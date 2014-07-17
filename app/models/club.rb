@@ -120,9 +120,9 @@ class Club < ActiveRecord::Base
   end
 
   def resync_members_and_prospects
-    subscribers = self.members.count + self.prospects.count
-    if subscribers > Settings.maximum_number_of_subscribers_to_automatically_resync
-      Auditory.report_club_changed_marketing_client(self, subscribers.count)
+    subscribers_count = self.members_count.to_i + self.prospects.count
+    if subscribers_count > Settings.maximum_number_of_subscribers_to_automatically_resync
+      Auditory.report_club_changed_marketing_client(self, subscribers_count)
     end
     self.members.update_all(:need_sync_to_marketing_client => 1)
     self.prospects.update_all(:need_sync_to_marketing_client => 1)
