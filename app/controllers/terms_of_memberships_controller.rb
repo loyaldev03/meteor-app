@@ -74,7 +74,7 @@ class TermsOfMembershipsController < ApplicationController
   def show
     @tom = TermsOfMembership.find(params[:id])
     my_authorize! :show, TermsOfMembership, @tom.club_id
-    @email_templates = EmailTemplate.find_all_by_terms_of_membership_id(params[:id])
+    @email_templates = @tom.email_templates.where(client: @tom.club.marketing_tool_client)
     @payment_gateway_configuration = @tom.club.payment_gateway_configuration
   rescue ActiveRecord::RecordNotFound 
     flash[:error] = "Subscription Plan not found."
