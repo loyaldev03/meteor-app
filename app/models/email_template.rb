@@ -23,7 +23,7 @@ class EmailTemplate < ActiveRecord::Base
 
   validates :name, uniqueness: { scope: [:terms_of_membership_id, :client] }
 
-  validates :template_type, uniqueness: { scope: [:terms_of_membership_id] }, :unless => :is_pillar?
+  validates :template_type, uniqueness: { scope: [:terms_of_membership_id, :client] }, :unless => :is_pillar?
   
   validates :external_attributes, length: { maximum: 2048 }
   

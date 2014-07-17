@@ -11,7 +11,7 @@
 <div class="control-group">
   <%= f.label :template_type, 'Template Type*', :class => 'control-label' %>
   <div class="controls" id="control_email_template_template_type">
-    <%= select_tag 'email_template[template_type]', options_for_select(template_types_options(@tom.id, @et.template_type), @et.template_type), :class => 'manual_validation', :include_blank => (@et.new_record?) %>
+    <%= select_tag 'email_template[template_type]', options_for_select(template_types_options(@tom.id, @et.template_type, @et.client), @et.template_type), :class => 'manual_validation', :include_blank => (@et.new_record?) %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.email_template.type'), 
         :content => t('activerecord.attributes.email_template.help_for_type') } %>
