@@ -1165,6 +1165,7 @@ class Member < ActiveRecord::Base
 
   def marketing_tool_sync_without_dj
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
+    self.mailchimp_after_create_sync_to_remote_domain if defined?(SacMailchimp::MemberModel)
   end
 
   def marketing_tool_sync
@@ -1177,6 +1178,9 @@ class Member < ActiveRecord::Base
     if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
       exact_target_after_create_sync_to_remote_domain
       exact_target_member.unsubscribe!
+    elsif defined?(SacMailchimp::MemberModel) and not mailchimp_member.nil?
+      mailchimp_after_create_sync_to_remote_domain
+      mailchimp_member.unsubscribe!
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
@@ -1187,6 +1191,7 @@ class Member < ActiveRecord::Base
   # used for member unblacklist
   def marketing_tool_sync_subscription
     exact_target_member.subscribe! if defined?(SacExactTarget::MemberModel)
+    mailchimp_member.subscribe! if defined?(SacMailchimp::MemberModel)
   end
   handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync, priority: 30
 
@@ -1398,6 +1403,6 @@ class Member < ActiveRecord::Base
     end
 
     def set_marketing_client_sync_as_needed
-      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::MemberModel)
+      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel)
     end
 end

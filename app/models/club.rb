@@ -92,6 +92,14 @@ class Club < ActiveRecord::Base
     ].none?(&:blank?)
   end
 
+  def mailchimp_sync?
+    self.marketing_tool_attributes and 
+    [ 
+      self.marketing_tool_attributes['mailchimp_api_key'], 
+      self.marketing_tool_attributes['mailchimp_list_id'] 
+    ].none?(&:blank?)
+  end
+
   def payment_gateway_configuration
     payment_gateway_configurations.first
   end

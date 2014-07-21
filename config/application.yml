@@ -100,6 +100,7 @@ defaults: &defaults
     bill_overdue_cancel: 244
     remote_club_cash_transaction_failed: 245
     tom_upgrade: 246
+    member_manually_synced_to_mailchimp: 247
     #communication
     active_email: 300     
     prebill_email: 301    
@@ -182,6 +183,8 @@ defaults: &defaults
     et_timeout_destroy: 5003
     et_timeout_trigger_create: 5004
     et_timeout_find: 5005
+    mailchimp_timeout_create: 5006
+    mailchimp_timeout_update: 5007
   error_codes:
     success: '000'
     wrong_data: '100'

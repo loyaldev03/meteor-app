@@ -13,10 +13,10 @@ Drupal.enable_integration! unless Rails.env.test? or Rails.env.development?
 #Pardot.enable_integration! unless Rails.env.test?
 
 require 'sac_exact_target/exact_target'
-require 'gibbon'
+require 'sac_mailchimp_mandrill/mailchimp'
 
 SacExactTarget.logger = Rails.logger
-Mailchimp.logger = Rails.logger
+SacMailchimp.logger = Rails.logger
 # in test env, integration should be manually enabled in specific tests
 SacExactTarget.enable_integration! unless Rails.env.test? or Rails.env.development?
-Mailchimp.enable_integration! unless Rails.env.test? or Rails.env.development?
+SacMailchimp.enable_integration!
