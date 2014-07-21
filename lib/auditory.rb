@@ -16,6 +16,17 @@ class Auditory
   rescue Exception => e
     Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
   end
+
+  def self.create_ticket(comment, error)
+    ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
+      :subject => "[#{Rails.env}] #{error}",
+      :comment => { :value => comment },
+      :submitter_id => ZENDESK_API_CLIENT.current_user.id,
+      :assignee_id => ZENDESK_API_CLIENT.current_user.id,
+      :type => "incident",
+      :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
+      :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
+  end
   
   def self.report_issue(error = "Special Error", message = '', params = {}, add_backtrace = true)
     unless ["test","development"].include? Rails.env  
@@ -29,14 +40,7 @@ class Auditory
       temp.write comment
       temp.close
 
-      ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
-        :subject => "[#{Rails.env}] #{error}",
-        :comment => { :value => comment.truncate(10000) },
-        :submitter_id => ZENDESK_API_CLIENT.current_user.id,
-        :assignee_id => ZENDESK_API_CLIENT.current_user.id,
-        :type => "incident",
-        :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
-        :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
+      ticket = Auditory.create_ticket(comment.truncate(10000), error)
 
       ticket.comment.uploads << file_url
       ticket.save
@@ -52,14 +56,7 @@ class Auditory
       comment << "\n * mkt_tools:sync_prospects_to_exact_target"
       comment << "\n Step 2: Ask tech leader or Charly to run manually those tasks. (Example: RAILS_ENV=production nohup rake members:sync_to_exact_target) This task should be started before the end of the day, and it should be done before the night since every member/prospect will be synced and this task may affect other scripts"
 
-      ticket = ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
-        :subject => "[#{Rails.env}][IMMEDIATE] Club:marketing_client_changed",
-        :comment => { :value => comment },
-        :submitter_id => ZENDESK_API_CLIENT.current_user.id,
-        :assignee_id => ZENDESK_API_CLIENT.current_user.id,
-        :type => "incident",
-        :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
-        :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
+      ticket = Auditory.create_ticket(comment, "[IMMEDIATE] Club:marketing_client_changed")
       ticket.save
     end
   end

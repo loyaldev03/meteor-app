@@ -18,7 +18,7 @@ class EmailTemplatesController < ApplicationController
 	def new
 		@tom = TermsOfMembership.find(params[:terms_of_membership_id])
 		my_authorize! :new, EmailTemplate, @tom.club_id
-		unless @tom.club.marketing_tool_client == ''
+		unless @tom.club.marketing_tool_client.blank?
 			@et = EmailTemplate.new client: @tom.club.marketing_tool_client
 		else
 			flash[:error] = "Configure a marketing tool client before creating communication templates."
