@@ -35,16 +35,21 @@ class Auditory
       comment = comment + "\n\n\n Parameters:\n" + params.collect{|k,v| "#{k}: #{v}" }.join("\n")
       comment = comment + "\nBacktrace:\n " + caller.join("\n").to_s if add_backtrace
 
-      file_url = "/tmp/error_description_#{Time.zone.now.to_i}.txt"
-      temp = File.open(file_url, 'w+')
-      temp.write comment
-      temp.close
-
       ticket = Auditory.create_ticket(comment.truncate(10000), error)
 
-      ticket.comment.uploads << file_url
-      ticket.save
-      File.delete(file_url)
+      begin
+        file_url = "/tmp/error_description_#{Time.zone.now.to_i}.txt"
+        temp = File.open(file_url, 'w+')
+        temp.write comment
+        temp.close
+        ticket.comment.uploads << file_url
+        ticket.save
+        File.delete(file_url)
+      rescue Exception => e
+        Rails.logger.error " * * * * * CANT ATTACH FILE TO ZENDESK REPORT #{e}"
+        ticket.comment.uploads = []
+        ticket.save
+      end
     end
   end
 
