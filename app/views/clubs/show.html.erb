@@ -75,15 +75,17 @@
 </p>
 
 
-<h3>Marketing Tool attributes</h3>
-<ul>
+<h3>Marketing Tool</h3>
+<% if @club.marketing_tool_client.blank? %>
+  It has no marketing tool assosiated
+<% else %>
+  <p>
+    <strong><%= model_class.human_attribute_name(:marketing_tool_client) %>:</strong> <br> <%= @club.marketing_tool_client %>
+  </p>
   <% @club.marketing_tool_attributes.each do |key,value| %>
-    <li>
-      <strong><%= key %>:</strong>&nbsp;<%= value %>
-    </li>
+    <p> <strong><%= key %>:</strong>&nbsp; <br> <%= value %> </p>
   <% end unless @club.marketing_tool_attributes.nil? %>
-</ul>
-
+<% end %>
 
 <div class="form-actions">
   <%= link_to t(:back),

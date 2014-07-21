@@ -5,9 +5,9 @@ class EmailTemplatesTest < ActionController::IntegrationTest
   setup do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id, :marketing_tool_client => "action_mailer")
     @tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
-    @communication = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id)
+    @communication = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
   end
 
 	def fill_in_form(options_for_texts = {}, options_for_selects = {}, options_for_checkboxs = [])
@@ -49,8 +49,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		end
 		click_link_or_button 'New Communication'
 		fill_in_form(
-			{email_template_name: 'Comm Name', customer_key: 45678}, 
-			{"email_template[template_type]" => "Pillar", "email_template[client]" => "Exact Target"}, [])
+			{email_template_name: 'Comm Name'}, 
+			{"email_template[template_type]" => "Pillar"}, [])
 		click_link_or_button 'Create Email template'
 
 		assert page.has_content?('was successfully created')
@@ -67,8 +67,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		click_link_or_button 'New Communication'
 		begin
 			fill_in_form(
-				{email_template_name: 'Comm Name', customer_key: 45678, email_template_days_after_join_date: '0'}, 
-				{"email_template[template_type]" => "Pillar", "email_template[client]" => "Exact Target"}, [])
+				{email_template_name: 'Comm Name', email_template_days_after_join_date: '0'}, 
+				{"email_template[template_type]" => "Pillar"}, [])
 			click_link_or_button 'Create Email template'
 		rescue Exception => e
 			assert page.has_content?('must be greater than or equal to 1')
@@ -86,8 +86,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		end
 		click_link_or_button 'New Communication'
 		fill_in_form(
-			{email_template_name: communication_name, customer_key: 45678}, 
-			{"email_template[template_type]" => "Pillar", "email_template[client]" => "Exact Target"}, [])
+			{email_template_name: communication_name}, 
+			{"email_template[template_type]" => "Pillar"}, [])
 		click_link_or_button 'Create Email template'
 		@et = EmailTemplate.find(:last)
 		visit terms_of_membership_email_template_path(@partner.prefix, @club.name, @tom.id, @et.id)	
@@ -106,8 +106,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		end
 		click_link_or_button 'New Communication'
 		fill_in_form(
-			{email_template_name: 'Comm Name', customer_key: 45678}, 
-			{"email_template[template_type]" => "Pillar", "email_template[client]" => "Exact Target"}, [])
+			{email_template_name: 'Comm Name'}, 
+			{"email_template[template_type]" => "Pillar"}, [])
 		click_link_or_button 'Create Email template'
 		assert page.has_content?('was successfully created')
 	end
@@ -144,8 +144,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		@tom.email_templates.where("template_type = 'cancellation'").first.delete
 		click_link_or_button 'New Communication'
 		fill_in_form(
-			{email_template_name: 'Comm Name', customer_key: 45678}, 
-			{"email_template[template_type]" => "Cancellation", "email_template[client]" => "Exact Target"}, [])
+			{email_template_name: 'Comm Name'}, 
+			{"email_template[template_type]" => "Cancellation"}, [])
 		click_link_or_button 'Create Email template'
 		assert page.has_content?('was successfully created')
 
@@ -158,6 +158,51 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		assert_not_nil communication
   end
 	
+  test "Show and create members comms only for marketing client configured - Login by General Admin" do
+  	@club.update_attributes :marketing_tool_client => 'exact_target'
+		sign_in_as(@admin_agent)
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			within("tr", :text => @tom.name) do
+				click_link_or_button "Communications"
+			end
+		end
+		click_link_or_button 'New Communication'
+		fill_in_form(
+			{email_template_name: 'Comm Name New', customer_key: 12345}, 
+			{"email_template[template_type]" => "Pillar"}, [])
+		click_link_or_button 'Create Email template'
+
+		assert page.has_content?('was successfully created')
+		@tom.email_templates.where(client: 'action_mailer').each do |email_template|
+			assert page.has_no_content? email_template.name
+		end
+		email_template = EmailTemplate.last
+		assert page.has_content? email_template.name
+		assert_equal @club.marketing_tool_client, email_template.client
+
+  	@club.update_attributes :marketing_tool_client => 'mailchimp_mandrill'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			within("tr", :text => @tom.name) do
+				click_link_or_button "Communications"
+			end
+		end
+		click_link_or_button 'New Communication'
+		fill_in_form(
+			{email_template_name: 'Mailchimp Comm'}, 
+			{"email_template[template_type]" => "Pillar"}, [])
+		click_link_or_button 'Create Email template'
+
+		assert page.has_content?('was successfully created')
+		@tom.email_templates.where("client in ('action_mailer','exact_target')").each do |email_template|
+			assert page.has_no_content? email_template.name
+		end
+		email_template = EmailTemplate.last
+		assert page.has_content? email_template.name
+		assert_equal @club.marketing_tool_client, email_template.client
+  end
+
 	test 'Edit member communications - Logged by Admin_by_club' do
     @agent = FactoryGirl.create(:agent)
     club_role = ClubRole.new :club_id => @club.id
@@ -267,8 +312,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		click_link_or_button 'New Communication'
 		begin
 			fill_in_form(
-				{email_template_name: 'Comm Name', customer_key: 45678, email_template_days_after_join_date: '0'}, 
-				{"email_template[template_type]" => "Pillar", "email_template[client]" => "Exact Target"}, [])
+				{email_template_name: 'Comm Name', email_template_days_after_join_date: '0'}, 
+				{"email_template[template_type]" => "Pillar"}, [])
 			click_link_or_button 'Create Email template'
 		rescue Exception => e
 			assert page.has_content?('must be greater than or equal to 1')
@@ -294,8 +339,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		end
 		click_link_or_button 'New Communication'
 		fill_in_form(
-			{email_template_name: 'Comm Name', customer_key: 45678}, 
-			{"email_template[template_type]" => "Pillar", "email_template[client]" => "Exact Target"}, [])
+			{email_template_name: 'Comm Name'}, 
+			{"email_template[template_type]" => "Pillar"}, [])
 		click_link_or_button 'Create Email template'
 		assert page.has_content?('was successfully created')
   end
@@ -320,8 +365,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		end
 		click_link_or_button 'New Communication'
 		fill_in_form(
-			{email_template_name: communication_name, customer_key: 45678}, 
-			{"email_template[template_type]" => "Pillar", "email_template[client]" => "Exact Target"}, [])
+			{email_template_name: communication_name}, 
+			{"email_template[template_type]" => "Pillar"}, [])
 		click_link_or_button 'Create Email template'
 		@et = EmailTemplate.find(:last)
 		visit terms_of_membership_email_template_path(@partner.prefix, @club.name, @club_tom.id, @et.id)	
@@ -373,8 +418,8 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		@tom.email_templates.where("template_type = 'cancellation'").first.delete
 		click_link_or_button 'New Communication'
 		fill_in_form(
-			{email_template_name: 'Comm Name', customer_key: 45678}, 
-			{"email_template[template_type]" => "Cancellation", "email_template[client]" => "Exact Target"}, [])
+			{email_template_name: 'Comm Name'}, 
+			{"email_template[template_type]" => "Cancellation"}, [])
 		click_link_or_button 'Create Email template'
 		assert page.has_content?('was successfully created')
 
@@ -385,5 +430,57 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		end
 		communication = @saved_member.communications.find_by_template_type "cancellation"
 		assert_not_nil communication
+  end
+
+  test "Show and create members comms only for marketing client configured - Login by Admin_by_club" do
+  	@club.update_attributes :marketing_tool_client => 'exact_target'
+		@club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    club_role = ClubRole.new :club_id => @club.id
+    club_role.agent_id = @club_admin.id
+    club_role.role = "admin"
+    club_role.save
+    @club_admin.roles = nil
+    @club_admin.save
+    sign_in_as(@club_admin)
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			within("tr", :text => @tom.name) do
+				click_link_or_button "Communications"
+			end
+		end
+		click_link_or_button 'New Communication'
+		fill_in_form(
+			{email_template_name: 'Comm Name New', customer_key: 12345}, 
+			{"email_template[template_type]" => "Pillar"}, [])
+		click_link_or_button 'Create Email template'
+
+		assert page.has_content?('was successfully created')
+		@tom.email_templates.where(client: 'action_mailer').each do |email_template|
+			assert page.has_no_content? email_template.name
+		end
+		email_template = EmailTemplate.last
+		assert page.has_content? email_template.name
+		assert_equal @club.marketing_tool_client, email_template.client
+
+  	@club.update_attributes :marketing_tool_client => 'mailchimp_mandrill'
+		visit terms_of_memberships_path(@partner.prefix, @club.name)
+		within('#terms_of_memberships_table') do
+			within("tr", :text => @tom.name) do
+				click_link_or_button "Communications"
+			end
+		end
+		click_link_or_button 'New Communication'
+		fill_in_form(
+			{email_template_name: 'Mailchimp Comm'}, 
+			{"email_template[template_type]" => "Pillar"}, [])
+		click_link_or_button 'Create Email template'
+
+		assert page.has_content?('was successfully created')
+		@tom.email_templates.where("client in ('action_mailer','exact_target')").each do |email_template|
+			assert page.has_no_content? email_template.name
+		end
+		email_template = EmailTemplate.last
+		assert page.has_content? email_template.name
+		assert_equal @club.marketing_tool_client, email_template.client
   end
 end

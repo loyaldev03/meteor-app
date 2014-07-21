@@ -11,7 +11,7 @@ class Communication < ActiveRecord::Base
       if template_type.class == EmailTemplate
         template = template_type
       else
-        template = EmailTemplate.find_by_terms_of_membership_id_and_template_type member.terms_of_membership_id, template_type
+        template = EmailTemplate.where(terms_of_membership_id: member.terms_of_membership_id, template_type: template_type, client: member.club.marketing_tool_client).first
       end
       if template.nil?
         message = "'#{template_type}' and TOMID ##{member.terms_of_membership_id}"

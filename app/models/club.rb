@@ -30,6 +30,7 @@ class Club < ActiveRecord::Base
   acts_as_paranoid
 
   after_create :add_default_member_groups, :add_default_product, :add_default_disposition_type
+  after_update :resync_with_merketing_tool_process
 
   validates :partner_id, :cs_phone_number, :presence => true
   validates :name, :presence => true, :uniqueness => true
@@ -72,6 +73,14 @@ class Club < ActiveRecord::Base
     [self.api_type, self.api_username, self.api_password].none?(&:blank?)
   end
 
+  def exact_target_client?
+    self.marketing_tool_client == 'exact_target'
+  end
+
+  def mailchimp_mandrill_client?
+    self.marketing_tool_client == 'mailchimp_mandrill'
+  end
+
   def pardot_sync?
     self.marketing_tool_attributes and 
     [ 
@@ -109,6 +118,17 @@ class Club < ActiveRecord::Base
     pgc = self.payment_gateway_configurations.first
     not pgc.nil? and pgc.authorize_net?
   end
+
+  def resync_members_and_prospects
+    subscribers_count = self.members_count.to_i
+    if subscribers_count > Settings.maximum_number_of_subscribers_to_automatically_resync
+      Auditory.report_club_changed_marketing_client(self, subscribers_count)
+    end
+    club.members.update_all(:need_sync_to_marketing_client => 1, :marketing_client_synced_status => "not_sinced", :marketing_client_last_synced_at => nil, :marketing_client_last_sync_error => nil, :marketing_client_last_sync_error_at => nil, :marketing_client_id => nil)
+    self.prospects.update_all(:need_sync_to_marketing_client => 1)
+  end
+  handle_asynchronously :resync_members_and_prospects, :queue => :generic_queue
+
 
   private
     def add_default_member_groups
@@ -152,6 +172,14 @@ class Club < ActiveRecord::Base
           if not url.blank? and not url.match(/^(http|https):\/\//)
             self.send field.to_s+"=", "http://"+url
           end
+        end
+      end
+    end
+
+    def resync_with_merketing_tool_process
+      if self.changes.include? :marketing_tool_client
+        unless ['action_mailer', ''].include?(self.changes[:marketing_tool_client].last)
+          resync_members_and_prospects 
         end
       end
     end
