@@ -185,6 +185,8 @@ defaults: &defaults
     et_timeout_find: 5005
     mailchimp_timeout_create: 5006
     mailchimp_timeout_update: 5007
+    mailchimp_timeout_retrieve: 5008
+    mandrill_timeout_trigger_create: 5009
   error_codes:
     success: '000'
     wrong_data: '100'

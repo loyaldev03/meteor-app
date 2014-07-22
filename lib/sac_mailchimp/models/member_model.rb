@@ -11,7 +11,7 @@ module SacMailchimp
       @subscriber = res
       @subscriber["success_count"] == 0
     rescue Exception  => e
-      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.et_timeout_retrieve) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
       raise e
     end
 
@@ -109,6 +109,7 @@ module SacMailchimp
 			{ id: mailchimp_list_id, :email => mailchimp_identification, :merge_vars => attributes }.merge!(options)
     end
 
+    #If any of these variables are changed, please check Mandrill's variable too.
 		def fieldmap
 		  { 
         'EMAIL' => 'email',

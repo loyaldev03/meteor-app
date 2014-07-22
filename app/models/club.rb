@@ -100,6 +100,13 @@ class Club < ActiveRecord::Base
     ].none?(&:blank?)
   end
 
+  def mandrill_sync?
+    self.marketing_tool_attributes and 
+    [ 
+      self.marketing_tool_attributes['mandrill_api_key']
+    ].none?(&:blank?)
+  end
+
   def payment_gateway_configuration
     payment_gateway_configurations.first
   end
