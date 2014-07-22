@@ -18,7 +18,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
 
     if create_new_member
       @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent })
-      @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'kit-card')
+      @fulfillment = FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'kit-card', :club_id => @club.id)
     end
 
     sign_in_as(@admin_agent)
@@ -1135,7 +1135,7 @@ test "Enroll a member with recurrent product and it on the list" do
   test "Fulfillments to be renewable with status canceled" do
     setup_member
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id)
+    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :club_id => @club.id)
 
     @fulfillment_renewable.set_as_canceled
     @fulfillment_renewable.reload
@@ -1179,7 +1179,7 @@ test "Enroll a member with recurrent product and it on the list" do
   test "fulfillments to be renewable with status sent" do
     setup_member
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
+    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true, :club_id => @club.id)
     @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
     @fulfillment_renewable.set_as_in_process
     @fulfillment_renewable.set_as_sent
@@ -1217,7 +1217,7 @@ test "Enroll a member with recurrent product and it on the list" do
   test "Fulfillments to be renewable with status out_of_stock" do
     setup_member
     @product_recurrent = FactoryGirl.create(:product_without_stock_and_recurrent, :club_id => @club.id)
-    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true)
+    @fulfillment_renewable = FactoryGirl.create(:fulfillment, :product_sku => @product_recurrent.sku, :member_id => @saved_member.id, :recurrent => true, :club_id => @club.id)
     @fulfillment_renewable.update_attribute(:renewable_at, Time.zone.now)
     
     TasksHelpers.process_fulfillments_up_today
@@ -1395,7 +1395,7 @@ test "Enroll a member with recurrent product and it on the list" do
     within("#my_clubs_table"){click_link_or_button("Fulfillments")}
     page.has_content?("Fulfillments")
 
-    fulfillment = Fulfillment.find_by_product_sku(product.sku)
+    fulfillment = Fulfillment.find_by_product_sku(@product.sku)
 
     within("#fulfillments_table")do
       select('not_processed', :from => 'status')
@@ -1421,7 +1421,7 @@ test "Enroll a member with recurrent product and it on the list" do
         assert page.has_content?('in_process') 
         assert page.has_selector?('#mark_as_sent')
       click_link_or_button('Mark as sent')
-      assert page.has_content?("Fulfillment #{product.sku} was set as sent.")
+      assert page.has_content?("Fulfillment #{@product.sku} was set as sent.")
     end
     fulfillment.reload
     assert_equal(fulfillment.status,'sent')
@@ -1786,7 +1786,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     search_fulfillments(true)
     within("#report_results")do
@@ -1816,7 +1816,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     @saved_member.fulfillments.each &:set_as_in_process
 
@@ -1848,7 +1848,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     @saved_member.fulfillments.each &:set_as_on_hold
 
@@ -1880,7 +1880,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     @saved_member.fulfillments.each &:set_as_sent
 
@@ -1912,7 +1912,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     @saved_member.fulfillments.each &:set_as_out_of_stock
 
@@ -1944,7 +1944,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     @saved_member.fulfillments.each &:set_as_returned
 
@@ -1976,7 +1976,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     @saved_member.fulfillments.each &:set_as_bad_address
 
@@ -2007,7 +2007,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_in_process
 
     search_fulfillments(false,nil,nil,'in_process')
@@ -2046,7 +2046,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     search_fulfillments(false,nil,nil,'not_processed')
     update_status_on_fulfillments(@saved_member.fulfillments, 'in_process', true)
@@ -2084,7 +2084,7 @@ test "Enroll a member with recurrent product and it on the list" do
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_on_hold
 
     search_fulfillments(false,nil,nil,'on_hold')
@@ -2123,7 +2123,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_sent
 
     search_fulfillments(false,nil,nil,'sent')
@@ -2162,7 +2162,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_out_of_stock
 
     search_fulfillments(false,nil,nil,'out_of_stock')
@@ -2201,7 +2201,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_returned
 
     search_fulfillments(false,nil,nil,'returned')
@@ -2240,7 +2240,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_bad_address
 
     search_fulfillments(false,nil,nil,'bad_address')
@@ -2279,7 +2279,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     fulfillments = @saved_member.fulfillments
     search_fulfillments(false,nil,nil,'not_processed')
@@ -2315,7 +2315,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_in_process
 
     fulfillments = @saved_member.fulfillments
@@ -2352,7 +2352,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_on_hold
 
     fulfillments = @saved_member.fulfillments
@@ -2389,7 +2389,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_sent
 
     fulfillments = @saved_member.fulfillments
@@ -2426,7 +2426,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_out_of_stock
 
     fulfillments = @saved_member.fulfillments
@@ -2463,7 +2463,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_returned
 
     fulfillments = @saved_member.fulfillments
@@ -2500,7 +2500,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_bad_address
 
     fulfillments = @saved_member.fulfillments
@@ -2586,7 +2586,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     fulfillments = []
     fulfillments << @saved_member.fulfillments.first
     fulfillments << @saved_member.fulfillments.last
@@ -2602,7 +2602,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     fulfillments = []
     fulfillments << @saved_member.fulfillments.first
     fulfillments << @saved_member.fulfillments.last
@@ -2619,7 +2619,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     fulfillments = []
     fulfillments << @saved_member.fulfillments.first
     
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     generate_fulfillment_files(true, fulfillments,nil, nil, nil, 'sloops')
   end
@@ -2631,7 +2631,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     fulfillments = []
     fulfillments << @saved_member.fulfillments.first
 
@@ -2644,7 +2644,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     all_fulfillments = @saved_member.fulfillments
     fulfillments = []
     fulfillments << @saved_member.fulfillments.first
@@ -2684,7 +2684,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     generate_fulfillment_files(false, @saved_member.fulfillments, nil, nil, 'not_processed', nil, false)
     
     visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -2709,7 +2709,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     active_merchant_stubs
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_member_throught_sloop(enrollment_info)
-    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
     assert find_field('input_first_name').value == @saved_member.first_name
@@ -2721,7 +2721,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Mark a member as 'wrong address' - Admin Role - not_processed status" do
     setup_member(true)
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
     set_as_undeliverable_member(@saved_member,'reason')
 
@@ -2737,7 +2737,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Mark a member as 'wrong address' - In Process status" do
     setup_member(true)
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_in_process
 
     set_as_undeliverable_member(@saved_member,'reason')
@@ -2754,7 +2754,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Mark a member as 'wrong address' - Out of stock status" do
     setup_member(true)
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_out_of_stock
 
     set_as_undeliverable_member(@saved_member,'reason')
@@ -2771,7 +2771,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Mark a member as 'wrong address' - Returned status" do
     setup_member(true)
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')}
+    3.times{FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_member.fulfillments.each &:set_as_returned
 
     set_as_undeliverable_member(@saved_member,'reason')
@@ -2822,7 +2822,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Change fulfillment status from Returned to Not Processed when removing undeliverable" do
     setup_member(true)
     stubs_solr_index
-    FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')
+    FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)
     @saved_member.fulfillments.each{ |x| x.update_status(nil,"returned","testing") }
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
@@ -2849,7 +2849,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Change fulfillment status from bad_addres to Not Processed when removing undeliverable" do
     setup_member(true)
     stubs_solr_index
-    FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD')
+    FactoryGirl.create(:fulfillment, :member_id => @saved_member.id, :product_sku => 'KIT-CARD', :club_id => @club.id)
     @saved_member.fulfillments.each{ |x| x.update_status(nil,"bad_address","testing") }
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     
