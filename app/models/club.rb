@@ -124,7 +124,7 @@ class Club < ActiveRecord::Base
     if subscribers_count > Settings.maximum_number_of_subscribers_to_automatically_resync
       Auditory.report_club_changed_marketing_client(self, subscribers_count)
     end
-    club.members.update_all(:need_sync_to_marketing_client => 1, :marketing_client_synced_status => "not_sinced", :marketing_client_last_synced_at => nil, :marketing_client_last_sync_error => nil, :marketing_client_last_sync_error_at => nil, :marketing_client_id => nil)
+    self.members.update_all(:need_sync_to_marketing_client => 1, :marketing_client_synced_status => "not_sinced", :marketing_client_last_synced_at => nil, :marketing_client_last_sync_error => nil, :marketing_client_last_sync_error_at => nil, :marketing_client_id => nil)
     self.prospects.update_all(:need_sync_to_marketing_client => 1)
   end
   handle_asynchronously :resync_members_and_prospects, :queue => :generic_queue

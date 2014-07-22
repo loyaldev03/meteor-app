@@ -29,6 +29,7 @@ FactoryGirl.define do
     time_zone { TZInfo::Timezone.all.sample.name }
     family_memberships_allowed false
     association :partner
+    marketing_tool_client :action_mailer
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
   end  
 
