@@ -1163,37 +1163,28 @@ class Member < ActiveRecord::Base
   end
   handle_asynchronously :desnormalize_preferences, :queue => :generic_queue, priority: 40
 
-  def marketing_tool_sync_without_dj
-    self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
-    self.mailchimp_after_create_sync_to_remote_domain if defined?(SacMailchimp::MemberModel)
-  end
-
   def marketing_tool_sync
-    marketing_tool_sync_without_dj
+    marketing_tool_exact_target_sync if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
+    marketing_tool_mailchimp_sync if defined?(SacMailchimp::MemberModel) and not mailchimp_member.nil?
   end
-  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync, priority: 30
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
-    if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
-      exact_target_after_create_sync_to_remote_domain
-      exact_target_member.unsubscribe!
-    elsif defined?(SacMailchimp::MemberModel) and not mailchimp_member.nil?
-      mailchimp_after_create_sync_to_remote_domain
-      mailchimp_member.unsubscribe!
-    end
+    self.exact_target_unsubscribe if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
+    self.mailchimp_unsubscribe if defined?(SacMailchimp::MemberModel) and not mailchimp_member.nil?
   rescue Exception => e
     logger.error "* * * * * #{e}"
     Auditory.report_issue("Member::unsubscribe", e, { :member => self.inspect })
   end
-  handle_asynchronously :marketing_tool_sync_unsubscription, :queue => :exact_target_sync, priority: 30
 
   # used for member unblacklist
   def marketing_tool_sync_subscription
-    exact_target_member.subscribe! if defined?(SacExactTarget::MemberModel)
-    mailchimp_member.subscribe! if defined?(SacMailchimp::MemberModel)
+    if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
+      self.exact_target_subscribe
+    elsif defined?(SacMailchimp::MemberModel) and not mailchimp_member.nil?
+      self.mailchimp_subscribe
+    end  
   end
-  handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync, priority: 30
 
   def get_offset_related
     Time.now.in_time_zone(get_club_timezone).formatted_offset

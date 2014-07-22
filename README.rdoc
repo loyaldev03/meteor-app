@@ -49,6 +49,7 @@ After that make sure to replace:
 - email_queue: Queue for email jobs. Used in communication (deliver_action_mailer), fulfillment_file (send_email_with_file) and member models (send_active_needs_approval_email_dj & send_recover_needs_approval_email_dj).
 - exact_target_email: Used in communication model in method deliver_exact_target.
 - exact_target_sync: Used to handle delayed jobs related to ET sync.
+- mailchimp_sync: Used to handle delayed jobs related to Mailchimp sync.
 - drupal_queue: Currently used for cancel_member_at_remote_domain method in member model.
 - generic_queue: To handle asorted delayed jobs.
 - lyris_email: Not used anymore since we currently don't use Lyris.

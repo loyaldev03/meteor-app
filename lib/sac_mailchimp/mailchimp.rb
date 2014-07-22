@@ -4,15 +4,17 @@ module SacMailchimp
   def self.enable_integration!
     logger.info " ** Initializing SAC Mailchimp integration"
 
-    require 'sac_mailchimp_mandrill/models/member_extensions'
-    require 'sac_mailchimp_mandrill/models/member_model'
-    require 'sac_mailchimp_mandrill/controllers/members_controller_extensions'
+    require 'sac_mailchimp/models/member_extensions'
+    require 'sac_mailchimp/models/member_model'
+    require 'sac_mailchimp/models/prospect_extensions'
+    require 'sac_mailchimp/models/prospect_model'
+    require 'sac_mailchimp/controllers/members_controller_extensions'
 
     Member.send :include, SacMailchimp::MemberExtensions
+    Prospect.send :include, SacMailchimp::ProspectExtensions
     MembersController.send :include, SacMailchimp::MembersControllerExtensions
-    # Prospect.send :include, SacExactTarget::ProspectExtensions
-
-    logger.info "  * extending Member and Club"
+    
+    logger.info "  * extending Member and Prospect"
 
     nil
   end

@@ -43,16 +43,29 @@ module SacExactTarget
         raise e
       end
 
-      def unsubscribe
+      def marketing_tool_exact_target_sync
+        exact_target_after_create_sync_to_remote_domain
+      end
+      handle_asynchronously :marketing_tool_exact_target_sync, :queue => :exact_target_sync, priority: 30
+
+      def exact_target_subscribe
+        exact_target_member.subscribe!
+      end
+      handle_asynchronously :exact_target_subscribe, :queue => :exact_target_sync, priority: 30
+
+      def exact_target_unsubscribe
         time_elapsed = Benchmark.ms do
-          exact_target_member.unsubscribe_subscriber!
+          exact_target_after_create_sync_to_remote_domain
+          exact_target_member.unsubscribe!
         end
         logger.info "SacExactTarget::unsubscribe_subscriber took #{time_elapsed}ms"
       rescue Exception => e
+        logger.error "* * * * * #{e}"
         Auditory.report_issue("Member:unsubscribe_subscriber", e, { :member => self.inspect }) unless e.to_s.include?("Timeout")
         raise e
       end
-        
+      handle_asynchronously :exact_target_unsubscribe, :queue => :exact_target_sync, priority: 30
+
       def exact_target_sync?
         self.club.exact_target_sync?
       end

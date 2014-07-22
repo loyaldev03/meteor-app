@@ -7,9 +7,9 @@ module SacMailchimp
 
     def new_record?
       # Find by subscriber key. We cant get the list of Lists to which this subscriber is subscribe it on. 
-      res = Gibbon::API.lists.member_info({ id: mailchimp_list_id, emails: [{email: self.member.email }] })
+      res = Gibbon::API.lists.member_info({ id: mailchimp_list_id, emails: [{email: self.member.email}] })
       @subscriber = res
-      @subscriber.nil?
+      @subscriber["success_count"] == 0
     rescue Exception  => e
       Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.et_timeout_retrieve) if e.to_s.include?("Timeout")
       raise e
@@ -31,7 +31,7 @@ module SacMailchimp
     def create!
 			options = {:double_optin => false}
       begin
-      	client.lists.subscribe( subscriber({:email => self.email}, options) )
+      	client.lists.subscribe( subscriber({:email => self.member.email}, options) )
       rescue Exception => e
         Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
         raise e
@@ -41,10 +41,14 @@ module SacMailchimp
     def update!
     	options = { :update_existing => true, :double_optin => false }
     	begin
-      	client.lists.subscribe( subscriber({ :leid => self.marketing_client_id}, options) )
-    	rescue 
+        # We check if the subscriber is a prospect or not. In case it is a prospect we make reference 
+        # to the leid we do not have saved. In case it is not prospect we use marketing_client we have.
+        # TODO: if we have a marketing_client_id in prospect too we would be avoiding this step.
+        mailchimp_identification = @subscriber["data"].first["merges"]["STATUS"] == "prospect" ?  @subscriber["data"].first["leid"] : self.member.marketing_client_id
+      	client.lists.subscribe( subscriber({:leid => mailchimp_identification}, options) )
+    	rescue Exception => e
 	      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
-	      raise e 
+	      raise e
     	end
     end
 

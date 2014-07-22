@@ -25,6 +25,7 @@ class Prospect < ActiveRecord::Base
 
   def marketing_tool_sync_without_dj
     self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel)
+    self.mailchimp_sync_to_remote_domain if defined?(SacMailchimp::ProspectModel)
     self.pardot_after_create_sync_to_remote_domain if defined?(Pardot::ProspectModel)
   end
 
@@ -44,6 +45,6 @@ class Prospect < ActiveRecord::Base
     end
 
     def set_marketing_client_sync_as_needed
-      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::ProspectModel) and not self.email.blank?
+      self.need_sync_to_marketing_client = true if (defined?(SacExactTarget::ProspectModel) and not self.email.blank?) or (defined?(SacMailchimp::ProspectModel) and not self.email.blank?)
     end
 end
