@@ -308,15 +308,17 @@ function member_index_functions(){
 };
 
 function fetch_maketing_client_form(){
-  $.ajax({
-    type: 'GET',
-    data: {id:club_id},
-    url: '/partner/'+partner_prefix+'/clubs/'+$("#club_marketing_tool_client").val()+'/marketing_tool_attributes',
-    success: function(data){
-      $("#div_mkt_tool_attributes").empty();
-      $("#div_mkt_tool_attributes").append(data);
-    }
-  });
+  if ($("#club_marketing_tool_client").val().length != 0) {
+    $.ajax({
+      type: 'GET',
+      data: {id:club_id},
+      url: '/partner/'+partner_prefix+'/clubs/'+$("#club_marketing_tool_client").val()+'/marketing_tool_attributes',
+      success: function(data){
+        $("#div_mkt_tool_attributes").empty();
+        $("#div_mkt_tool_attributes").append(data);
+      }
+    });
+  }
 };
 
 function clubs_form_functions(){
