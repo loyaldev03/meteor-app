@@ -48,17 +48,17 @@ class MembersSearchTest < ActionController::IntegrationTest
   # TESTS
   ##########################################################
 
-  test "Search members by token - Admin rol" do
-    setup_member(false)
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
-    saved_credit_card = @saved_member.active_credit_card
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    fill_in "member[cc_token]", :with => saved_credit_card.token
-    click_on 'Search'
-    assert page.has_content?("#{unsaved_member.first_name}")
-  end 
+  # test "Search members by token - Admin rol" do
+  #   setup_member(false)
+  #   unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+  #   @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+  #   saved_credit_card = @saved_member.active_credit_card
+  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  #   fill_in "member[cc_token]", :with => saved_credit_card.token
+  #   click_on 'Search'
+  #   assert page.has_content?("#{unsaved_member.first_name}")
+  # end 
 
   # test "Bill date filter" do
   #   setup_member(false)
@@ -193,62 +193,62 @@ class MembersSearchTest < ActionController::IntegrationTest
   #   end
   # end
 
-  test "Search members by token - Supervisor rol" do
-    setup_member(false)
-    @admin_agent.update_attribute(:roles,["supervisor"])
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
-    saved_credit_card = @saved_member.active_credit_card
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    fill_in "member[cc_token]", :with => saved_credit_card.token
-    click_on 'Search'
-    assert page.has_content?("#{unsaved_member.first_name}")
-  end 
+  # test "Search members by token - Supervisor rol" do
+  #   setup_member(false)
+  #   @admin_agent.update_attribute(:roles,["supervisor"])
+  #   unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+  #   @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+  #   saved_credit_card = @saved_member.active_credit_card
+  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  #   fill_in "member[cc_token]", :with => saved_credit_card.token
+  #   click_on 'Search'
+  #   assert page.has_content?("#{unsaved_member.first_name}")
+  # end 
 
-  test "Search members by token - Representative rol" do
-    setup_member(false)
-    @admin_agent.update_attribute(:roles,["representative"])
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
-    saved_credit_card = @saved_member.active_credit_card
-    visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    assert has_no_content?("CC Token")
-  end 
+  # test "Search members by token - Representative rol" do
+  #   setup_member(false)
+  #   @admin_agent.update_attribute(:roles,["representative"])
+  #   unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+  #   @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+  #   saved_credit_card = @saved_member.active_credit_card
+  #   visit members_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  #   assert has_no_content?("CC Token")
+  # end 
 
-  test "View token in member record - Admin rol" do
-    setup_member(false)
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
-    saved_credit_card = @saved_member.active_credit_card
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    within("#table_active_credit_card") do
-      assert page.has_content?("#{saved_credit_card.token}")
-    end
-    within(".nav-tabs"){ click_on("Credit Cards") }
-    within("#credit_cards") do
-    assert page.has_content?("#{saved_credit_card.token}")
-    end
-  end 
+  # test "View token in member record - Admin rol" do
+  #   setup_member(false)
+  #   unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+  #   @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+  #   saved_credit_card = @saved_member.active_credit_card
+  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+  #   within("#table_active_credit_card") do
+  #     assert page.has_content?("#{saved_credit_card.token}")
+  #   end
+  #   within(".nav-tabs"){ click_on("Credit Cards") }
+  #   within("#credit_cards") do
+  #   assert page.has_content?("#{saved_credit_card.token}")
+  #   end
+  # end 
 
-  test "View token in member record - Supervisor rol" do
-    setup_member(false)
-    @admin_agent.update_attribute(:roles,["supervisor"])
-    unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
-    saved_credit_card = @saved_member.active_credit_card
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
-    within("#table_active_credit_card") do
-      assert page.has_content?("#{saved_credit_card.token}")
-    end
-    within(".nav-tabs"){ click_on("Credit Cards") }
-    within("#credit_cards") do
-    assert page.has_content?("#{saved_credit_card.token}")
-    end
-  end 
+  # test "View token in member record - Supervisor rol" do
+  #   setup_member(false)
+  #   @admin_agent.update_attribute(:roles,["supervisor"])
+  #   unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+  #   @saved_member = create_member(unsaved_member,credit_card,@terms_of_membership_with_gateway.name,false)
+  #   saved_credit_card = @saved_member.active_credit_card
+  #   visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+  #   within("#table_active_credit_card") do
+  #     assert page.has_content?("#{saved_credit_card.token}")
+  #   end
+  #   within(".nav-tabs"){ click_on("Credit Cards") }
+  #   within("#credit_cards") do
+  #   assert page.has_content?("#{saved_credit_card.token}")
+  #   end
+  # end 
 
   test "View token in member record - Representative rol" do
     setup_member(false)
