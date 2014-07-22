@@ -96,11 +96,6 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
 	test 'Do not allow enter member communication duplicate where it is not Pillar type - Logged by General Admin' do
 		comm = EmailTemplate.where(:terms_of_membership_id => @tom.id, :template_type => 'birthday').first
-		if comm
-			comm.destroy
-		end
-		comm = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'birthday')
-		comm.save
 		sign_in(@admin_agent)
     assert_difference("EmailTemplate.count",0) do
   		post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: { 
@@ -135,9 +130,6 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Do not allow enter member communication duplicate - Logged by Admin_by_club' do
     comm = EmailTemplate.where(:terms_of_membership_id => @tom.id, :template_type => 'birthday').first
-    comm.destroy if comm
-    comm = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'birthday')
-    comm.save
     @agent = FactoryGirl.create(:agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
