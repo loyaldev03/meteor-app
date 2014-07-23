@@ -465,15 +465,18 @@ class MemberTest < ActiveSupport::TestCase
   test "Member email validation" do
     member = create_active_member(@terms_of_membership_with_gateway, :provisional_member)
     300.times do
-      member.update_attribute :email, Faker::Internet.email
+      member.email = Faker::Internet.email
+      member.save
       assert member.valid?, "Member with email #{member.email} is not valid."
     end
     ['name@do--main.com', 'name@do-ma-in.com.ar', 'name2@do.ma-in.com', 'name3@d.com'].each do |valid_email|
-      member.update_attribute :email, valid_email
+      member.email = valid_email
+      member.save
       assert member.valid?, "Member with email #{member.email} is not valid"
     end
     ['name@do--main..com', 'name@-do-ma-in.com.ar', '', nil, 'name@domain@domain.com', '..'].each do |wrong_email|
-      member.update_attribute :email, wrong_email
+      member.email = wrong_email
+      member.save
       assert !member.valid?, "Member with email #{member.email} is valid when it should not be."
     end   
   end
