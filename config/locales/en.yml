@@ -337,7 +337,7 @@ en:
             et_username: 'Username'
             et_username_help: 'Exact Target login username. (Eg: email).'
             et_password: 'Password'
-            et_password_help: 'Exact Target login password.'
+            et_password_help: 'Exact Target login password. When updating leave this field empty if you dont want to change the password'
             et_business_unit: 'Business Unit'
             et_business_unit_help: 'Exact Target BusinessUnit id.'
             et_members_list: 'Member List'

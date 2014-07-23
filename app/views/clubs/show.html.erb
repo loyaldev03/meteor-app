@@ -83,7 +83,7 @@
     <strong><%= model_class.human_attribute_name(:marketing_tool_client) %>:</strong> <br> <%= @club.marketing_tool_client %>
   </p>
   <% @club.marketing_tool_attributes.each do |key,value| %>
-    <p> <strong><%= key %>:</strong>&nbsp; <br> <%= value %> </p>
+    <p> <strong><%= t("activerecord.attributes.club.marketing_tool_attributes.#{@club.marketing_tool_client}.#{key}")  %>:</strong>&nbsp; <br> <%= value %> </p>
   <% end unless @club.marketing_tool_attributes.nil? %>
 <% end %>
 

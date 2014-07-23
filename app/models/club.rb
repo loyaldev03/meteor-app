@@ -101,6 +101,16 @@ class Club < ActiveRecord::Base
     ].none?(&:blank?)
   end
 
+
+  def marketing_tool_correctly_configured? 
+    case marketing_tool_client
+    when "exact_target"
+      exact_target_sync?
+    when "pardot"
+      pardot_sync?
+    end
+  end
+    
   def payment_gateway_configuration
     payment_gateway_configurations.first
   end

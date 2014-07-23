@@ -28,6 +28,7 @@ class ClubsController < ApplicationController
     @club = Club.find(params[:id])
     @drupal_domain = Domain.find(@club.drupal_domain_id) if @club.drupal_domain_id
     @payment_gateway_configuration = @club.payment_gateway_configurations.first
+    flash[:error] = "Marketing client is not correctly configured" unless @club.marketing_tool_correctly_configured? 
   end
 
   # GET /clubs/new
@@ -119,7 +120,7 @@ class ClubsController < ApplicationController
         if not @club.new_record? and marketing_tool_client == 'exact_target'
           if marketing_tool_attributes[:et_password].blank?
             marketing_tool_attributes.delete(:et_password)
-            marketing_tool_attributes.merge!({:et_password => @club.marketing_tool_attributes["et_password"]})
+            marketing_tool_attributes.merge!({:et_password => @club.marketing_tool_attributes["et_password"]}) if @club.marketing_tool_attributes
           end
         end
       end
