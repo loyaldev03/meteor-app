@@ -1,4 +1,4 @@
-module SacMailchimp
+module SacMandrill
 	class MemberModel < Struct.new(:member)
 
     def send_email(template_name)
