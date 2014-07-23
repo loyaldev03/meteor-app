@@ -67,7 +67,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     assert_equal @saved_member.status, "active"
     
     prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
-    prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => false }
+    prods.each do |p| 
+      p.stock = 0 
+      p.allow_backorder = false
+      p.save
+    end
 
     assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
@@ -81,7 +85,11 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     assert_equal @saved_member.status, "active"
     
     prods = Product.find_all_by_sku @saved_member.enrollment_infos.first.product_sku.split(',')
-    prods.each {|p| p.update_attributes :stock =>  0, :allow_backorder => true }
+    prods.each do |p| 
+      p.stock = 0 
+      p.allow_backorder = false
+      p.save
+    end
 
     assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do

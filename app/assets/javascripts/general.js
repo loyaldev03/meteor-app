@@ -307,6 +307,29 @@ function member_index_functions(){
 
 };
 
+function fetch_maketing_client_form(){
+  if ($("#club_marketing_tool_client").val().length != 0) {
+    $.ajax({
+      type: 'GET',
+      data: {id:club_id},
+      url: '/partner/'+partner_prefix+'/clubs/'+$("#club_marketing_tool_client").val()+'/marketing_tool_attributes',
+      success: function(data){
+        $("#div_mkt_tool_attributes").empty();
+        $("#div_mkt_tool_attributes").append(data);
+      }
+    });
+  }
+};
+
+function clubs_form_functions(){
+  $("#club_marketing_tool_client").change(function(){
+    if($(this).val()!= ''){
+      fetch_maketing_client_form(club_id, $(this).val());
+    }else
+      $("#div_mkt_tool_attributes").empty();
+  })
+};
+
 function retrieve_information(){
   var skus = [];
   if ($('#kit_card_product_sku').is(':checked')) {
@@ -1211,30 +1234,11 @@ function switch_days_after_join_date() {
   }
 }
 
-function switch_external_attributes() {
-  if($("#email_template_client").val() == '') {
-    $("#external_attributes_group").html('Select a Client');
-  }
-  else {
-    $.ajax({
-      type: 'GET',
-      data: 'client=' + $("#email_template_client").val() + '&' + external_attributes_data,
-      url: "/partner/"+partner_prefix+"/club/"+club_prefix+"/subscription_plans/"+terms_of_membership_id+"/external_attributes",
-      success: function(data) { $("#external_attributes_group").html(data); }
-    });
-    $("#external_attributes_group").show(100)
-  }
-}
-
 function email_templates_functions() {
   $('.help').popover({offset: 10});
 
   $("#email_template_template_type").change(function() {
     switch_days_after_join_date();
-  });
-
-  $("#email_template_client").change(function() {
-    switch_external_attributes();
   });
 
   $("#et_form").submit(function(event) {

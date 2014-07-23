@@ -5,6 +5,7 @@ defaults: &defaults
   days_to_wait_to_cancel_fulfillments: 2
   next_retry_on_missing_decline: 20.days
   number_of_retries_on_missing_decline: 4
+  maximum_number_of_subscribers_to_automatically_resync: 2000
   call_these_members_recipients: platformadmins@xagax.com
   email_to_send_product_list: 'platformadmins@xagax.com'
   email_to_use_on_action_mailer_as_recipient: platformadmins@xagax.com
