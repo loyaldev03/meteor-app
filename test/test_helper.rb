@@ -161,7 +161,7 @@ module ActionController
     setup do
       stubs_solr_index
       DatabaseCleaner.start
-      FactoryGirl.create(:batch_agent) unless Agent.find_by_email("batch@xagax.com")
+      FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by_email("batch@xagax.com")
       page.driver.browser.manage.window.resize_to(1024,720)
     end
 

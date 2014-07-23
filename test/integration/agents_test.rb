@@ -539,8 +539,6 @@ class AgentsTest < ActionController::IntegrationTest
 
   test "Global Admin should recover agents. global role to club role" do
     setup_environment
-    require 'ruby-debug'
-    debugger
     create_agent_destroy_it_and_recover_it(false, true)
   end  
 

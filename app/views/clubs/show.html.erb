@@ -36,7 +36,11 @@
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:logo) %>:</strong><br>
-  <%= image_tag(@club.logo(:small)) %>
+  <% if @club.logo_file_name %>
+    <%= image_tag(@club.logo(:small)) %>
+  <% else %>
+    Logo was not set.
+  <% end %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:member_banner_url) %>:</strong><br>
