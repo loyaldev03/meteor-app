@@ -8,7 +8,7 @@ module SacMandrill
     require 'sac_mandrill/models/member_extensions'
     require 'sac_mandrill/models/member_model'
 
-    Member.send :include, SacMailchimp::MemberExtensions
+    Member.send :include, SacMandrill::MemberExtensions
     
     logger.info "  * extending Member and Prospect"
 

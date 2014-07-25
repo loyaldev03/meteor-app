@@ -122,6 +122,8 @@ class Club < ActiveRecord::Base
       exact_target_sync?
     when "pardot"
       pardot_sync?
+    when "mailchimp_mandrill"
+      mailchimp_sync? and mandrill_configured?
     end
   end
     

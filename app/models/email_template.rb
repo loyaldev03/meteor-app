@@ -35,6 +35,8 @@ class EmailTemplate < ActiveRecord::Base
       []
     when 'exact_target'
       ['customer_key']
+    when 'mailchimp_mandrill'
+      ['template_name']
     when 'lyris'
       ['trigger_id', 'mlid', 'site_id']
     else
@@ -58,6 +60,10 @@ class EmailTemplate < ActiveRecord::Base
 
   def exact_target?
     self.client == 'exact_target'
+  end
+
+  def mandrill?
+    self.client == 'mailchimp_mandrill'
   end
 
   def self.datatable_columns

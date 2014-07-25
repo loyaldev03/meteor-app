@@ -530,4 +530,37 @@ class MemberTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test "Send communication with marketing client selected" do
+    member = create_active_member(@terms_of_membership_with_gateway, :provisional_member_with_cc)    
+    email_template_for_exact_target = FactoryGirl.create(:email_template_for_exact_target , :terms_of_membership_id => @terms_of_membership_with_gateway.id)
+    email_template_for_mailchimp_mandrill = FactoryGirl.create(:email_template_for_mailchimp_mandrill, :terms_of_membership_id => @terms_of_membership_with_gateway.id)
+    #configure exact target
+    member.club.update_attributes :marketing_tool_client => "exact_target", :marketing_tool_attributes => { "et_business_unit" => "12345", "et_prospect_list" => "1235", "et_members_list" => "12345", "et_username" => "12345", "et_password" => "12345" }
+    excecute_like_server(@club.time_zone) do 
+      Timecop.travel(member.join_date + email_template_for_exact_target.days_after_join_date.days) do
+        assert_difference("Communication.count",1) do
+          TasksHelpers.send_pillar_emails 
+        end
+      end
+    end
+    member.reload
+    communication = member.communications.where("client = 'exact_target'").first
+    assert_equal "exact_target", communication.client
+    assert_equal "pillar", communication.template_type
+
+    #configure mandrill
+    member.club.update_attributes :marketing_tool_client => "mailchimp_mandrill", :marketing_tool_attributes => { "mailchimp_api_key" => "12345", "mailchimp_list_id" => "1235", "mandrill_api_key" => "12345" }
+    excecute_like_server(@club.time_zone) do 
+      Timecop.travel(member.join_date + email_template_for_mailchimp_mandrill.days_after_join_date.days) do
+        assert_difference("Communication.count",1) do
+          TasksHelpers.send_pillar_emails
+        end
+      end
+    end
+    member.reload
+    communication = member.communications.where("client = 'mailchimp_mandrill'").first
+    assert_equal "mailchimp_mandrill", communication.client
+    assert_equal "pillar", communication.template_type
+  end
 end

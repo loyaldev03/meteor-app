@@ -120,7 +120,7 @@ class Api::MembersControllerTest < ActionController::TestCase
             assert_difference('MemberPreference.count',@preferences.size) do 
               assert_difference('Member.count') do
                 Delayed::Worker.delay_jobs = true
-                assert_difference('DelayedJob.count',8)do
+                assert_difference('DelayedJob.count',7)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x4, :assign_club_cash_without_delay
                   generate_post_message
                   assert_response :success
                 end

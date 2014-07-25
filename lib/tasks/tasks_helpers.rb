@@ -43,13 +43,15 @@ module TasksHelpers
   end
 
   def self.send_pillar_emails 
-    base = ActiveRecord::Base.connection.execute("SELECT memberships.member_id,email_templates.id FROM memberships INNER JOIN terms_of_memberships ON terms_of_memberships.id = memberships.terms_of_membership_id INNER JOIN email_templates ON email_templates.terms_of_membership_id = terms_of_memberships.id WHERE (email_templates.template_type = 'pillar' AND date(join_date) = DATE_SUB(CURRENT_DATE(), INTERVAL email_templates.days_after_join_date DAY) AND status IN ('active','provisional'))")
+    base = Membership.joins(:member).joins(:terms_of_membership).joins(:terms_of_membership => :club).joins(:terms_of_membership => :email_templates).
+           where("email_templates.template_type = 'pillar' AND email_templates.client = clubs.marketing_tool_client AND date(join_date) = DATE_SUB(?, INTERVAL email_templates.days_after_join_date DAY) AND members.status IN ('active','provisional')", Time.zone.now.to_date).
+           select("memberships.member_id, email_templates.id")
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
     base.to_enum.with_index.each do |res,index|
       begin
         tz = Time.zone.now
-        member = Member.find res[0]
-        template = EmailTemplate.find res[1]
+        member = Member.find res.member_id
+        template = EmailTemplate.find res.id
         Rails.logger.info "   *[#{index+1}] processing member ##{member.id}"
         Communication.deliver!(template, member)
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"

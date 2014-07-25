@@ -3,43 +3,40 @@ module SacMandrill
 
     def send_email(template_name)
 			message = {"to" => [{ "email" => self.member.email }]}
-			
-			message.merge!({ "global_merge_vars" => [ subscriber_variables ] })
-      trigger_to_send = ExactTargetSDK::TriggeredSend.new(
-        'TriggeredSendDefinition' => trigger_definition, 
-        'Client' => client_id,
-        'Subscribers' => [s] )
-      client.Create(trigger_to_send)
+      message.merge!({ "global_merge_vars" => subscriber_variables })
+      template_content = {}
+      result = client.messages.send_template template_name, template_content, message
+      result.first
     rescue Exception => e
       Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mandrill_timeout_trigger_create) if e.to_s.include?("Timeout")
       raise e
     end
 
     def subscriber_variables
-			attributes = {}
+			attributes = []
 			fieldmap.each do |api_field, our_field| 
-				attributes.merge!(SacMailchimp.format_attribute(self.member, api_field, our_field))
+				attributes << SacMandrill.format_attribute(self.member, api_field, our_field)
 			end
 			membership = self.member.current_membership
 			membership_fieldmap.each do |api_field, our_field| 
-			  attributes.merge!(SacMailchimp.format_attribute(membership, api_field, our_field))
+			  attributes << SacMandrill.format_attribute(membership, api_field, our_field)
 			end
 			terms_of_membership = membership.terms_of_membership
 			terms_of_membership_fieldmap.each do |api_field, our_field| 
-			  attributes.merge!(SacMailchimp.format_attribute(terms_of_membership, api_field, our_field))
+			  attributes << SacMandrill.format_attribute(terms_of_membership, api_field, our_field)
 			end
 			enrollment_info = membership.enrollment_info
 			enrollment_fieldmap.each do |api_field, our_field| 
-			  attributes.merge!(SacMailchimp.format_attribute(enrollment_info, api_field, our_field))
+			  attributes << SacMandrill.format_attribute(enrollment_info, api_field, our_field)
 			end
 			if Rails.env.production? and self.member.preferences and preferences_fieldmap
 			  member_preferences = self.member.member_preferences
 			  preferences_fieldmap.each do |api_field, our_field|
-			    attributes.merge!({ api_field => self.member.preferences[our_field].to_s })
+			    attributes << {"name" => api_field, "content" => self.member.preferences[our_field].to_s}
 			  end
 			elsif Rails.env.prototype? and self.member.preferences
-			  attributes.merge!({ "PREF1" => self.member.preferences["example_color"].to_s })
-			  attributes.merge!({ "PREF2" => self.member.preferences["example_team"].to_s })
+        attributes << {"name" => "PREF1", "content" => self.member.preferences["example_color"].to_s}
+        attributes << {"name" => "PREF1", "content" => self.member.preferences["example_team"].to_s}
 			end
 			attributes
     end

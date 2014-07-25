@@ -131,10 +131,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		assert page.has_content?('was successfully updated')
 	end
 
-	test 'CS send a member communication - Logged by General Acmin' do
-		sign_in_as(@admin_agent)
-    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id    
-    @club_tom.save
+	def create_email_template_and_send_communication(opt_for_texts = {}, opt_for_selects = {}, options_for_checkboxs = [])
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		within('#terms_of_memberships_table') do
 			within("tr", :text => @tom.name) do
@@ -143,9 +140,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		end
 		@tom.email_templates.where("template_type = 'cancellation'").first.delete
 		click_link_or_button 'New Communication'
-		fill_in_form(
-			{email_template_name: 'Comm Name'}, 
-			{"email_template[template_type]" => "Cancellation"}, [])
+		fill_in_form(opt_for_texts, opt_for_selects, [])
 		click_link_or_button 'Create Email template'
 		assert page.has_content?('was successfully created')
 
@@ -156,6 +151,25 @@ class EmailTemplatesTest < ActionController::IntegrationTest
 		end
 		communication = @saved_member.communications.find_by_template_type "cancellation"
 		assert_not_nil communication
+		visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    within(".nav-tabs"){ click_on("Communications") }
+    within("#communications") do
+     	assert page.has_content? communication.template_name
+    end
+	end
+
+	test 'CS send a member communication - Logged by General Admin' do
+		sign_in_as(@admin_agent)
+    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @club_tom.save
+    #action_mailer
+    create_email_template_and_send_communication({email_template_name: 'Comm Name New'}, {"email_template[template_type]" => "Cancellation"}, [])
+    #exat_target
+    @club.update_attributes :marketing_tool_client => "exact_target", :marketing_tool_attributes => { "et_business_unit" => "12345", "et_prospect_list" => "1235", "et_members_list" => "12345", "et_username" => "12345", "et_password" => "12345" }
+    create_email_template_and_send_communication({email_template_name: 'Comm Name New', customer_key: 12345}, {"email_template[template_type]" => "Cancellation"}, [])
+    #mandrill
+    @club.update_attributes :marketing_tool_client => "mailchimp_mandrill", :marketing_tool_attributes => { "mailchimp_api_key" => "12345", "mailchimp_list_id" => "1235", "mandrill_api_key" => "12345" }
+    create_email_template_and_send_communication({email_template_name: 'Comm Name New', template_name: "cancellation2"}, {"email_template[template_type]" => "Cancellation"}, [])
   end
 	
   test "Show and create members comms only for marketing client configured - Login by General Admin" do
@@ -409,27 +423,14 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     sign_in_as(@club_admin)
     @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id    
     @club_tom.save
-		visit terms_of_memberships_path(@partner.prefix, @club.name)
-		within('#terms_of_memberships_table') do
-			within("tr", :text => @tom.name) do
-				click_link_or_button "Communications"
-			end
-		end
-		@tom.email_templates.where("template_type = 'cancellation'").first.delete
-		click_link_or_button 'New Communication'
-		fill_in_form(
-			{email_template_name: 'Comm Name'}, 
-			{"email_template[template_type]" => "Cancellation"}, [])
-		click_link_or_button 'Create Email template'
-		assert page.has_content?('was successfully created')
-
-		@saved_member = create_active_member(@tom, :active_member)
-
-		assert_difference("Communication.count",1) do
-			@saved_member.set_as_canceled!
-		end
-		communication = @saved_member.communications.find_by_template_type "cancellation"
-		assert_not_nil communication
+    #action_mailer
+    create_email_template_and_send_communication({email_template_name: 'Comm Name New'}, {"email_template[template_type]" => "Cancellation"}, [])
+    #exat_target
+    @club.update_attributes :marketing_tool_client => "exact_target", :marketing_tool_attributes => { "et_business_unit" => "12345", "et_prospect_list" => "1235", "et_members_list" => "12345", "et_username" => "12345", "et_password" => "12345" }
+    create_email_template_and_send_communication({email_template_name: 'Comm Name New', customer_key: 12345}, {"email_template[template_type]" => "Cancellation"}, [])
+    #mandrill
+    @club.update_attributes :marketing_tool_client => "mailchimp_mandrill", :marketing_tool_attributes => { "mailchimp_api_key" => "12345", "mailchimp_list_id" => "1235", "mandrill_api_key" => "12345" }
+    create_email_template_and_send_communication({email_template_name: 'Comm Name New', template_name: "cancellation2"}, {"email_template[template_type]" => "Cancellation"}, [])
   end
 
   test "Show and create members comms only for marketing client configured - Login by Admin_by_club" do

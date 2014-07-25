@@ -1,8 +1,8 @@
 module SacMandrill
 	module MemberExtensions
 
-    def mandrill_sync?
-      self.club.mandrill_sync?
+    def mandrill_configured?
+      self.club.mandrill_configured?
     end
 
     def mandrill_member

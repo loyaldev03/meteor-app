@@ -44,7 +44,7 @@ module SacMailchimp
         # We check if the subscriber is a prospect or not. In case it is a prospect we make reference 
         # to the leid we do not have saved. In case it is not prospect we use marketing_client we have.
         # TODO: if we have a marketing_client_id in prospect too we would be avoiding this step.
-        mailchimp_identification = @subscriber["data"].first["merges"]["STATUS"] == "prospect" ?  @subscriber["data"].first["leid"] : self.member.marketing_client_id
+        mailchimp_identification = self.member.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.member.marketing_client_id
       	client.lists.subscribe( subscriber({:leid => mailchimp_identification}, options) )
     	rescue Exception => e
 	      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
