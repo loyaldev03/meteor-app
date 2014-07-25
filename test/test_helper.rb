@@ -11,6 +11,7 @@ require 'database_cleaner'
 require 'mocha/setup'
 require "timeout"
 require 'tasks/tasks_helpers'
+#require 'capybara-screenshot'
 
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
@@ -173,8 +174,10 @@ module ActionController
 
     def sign_in_as(user)
       visit '/'
-      fill_in 'agent_login', :with => user.email
-      fill_in 'agent_password', :with => user.password
+      within("#new_agent") do
+        fill_in 'agent_login', :with => user.email
+        fill_in 'agent_password', :with => user.password
+      end
       click_link_or_button('Sign in')
     end
 
