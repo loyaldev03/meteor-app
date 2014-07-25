@@ -5,7 +5,6 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		@admin_agent = FactoryGirl.create(:confirmed_admin_agent)
 		@partner = FactoryGirl.create(:partner)
 		@club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-		sign_in_as(@admin_agent)
 	end
 
 	def fill_in_form(options = {}, options_for_select = {}, options_for_check = [])
@@ -38,6 +37,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# NEW
 
 	test "Create subcription plan with Initial Fee distinct of 0" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -55,6 +55,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create subcription plan with Initial Fee equal to 0" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Initial Fee equal to 0'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -72,6 +73,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create subcription plan with Free Trial Period in Days" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Trial Period in Days'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -88,6 +90,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create subcription plan with Free Trial Period in Months" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Trial Period in Months'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -105,6 +108,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create subcription plan with Paid Trial Period in Days" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM with Paid Trial Period in Days'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -122,6 +126,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create subcription plan with Paid Trial Period in Months" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM with Paid Trial Period in Months'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -139,6 +144,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create subcription plan with Recurring Amount in Months" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM with Recurring Amount in Months'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -156,6 +162,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create subcription plan with Recurring Amount in Years" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM with Recurring Amount in Years'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -174,6 +181,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 	# Create a member with TOM before created
 	test "Create a TOM with 'no payment is expected' selected - with Trial Period and Initial Club cash" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM with No payment expected'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -206,6 +214,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 	#Create a member with TOM before created
 	test "Create a TOM with 'no payment is expected' selected - with Trial Period and NOT Initial Club Cash" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM with No payment expected'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -238,6 +247,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 	# Create a member with TOM before created
 	test "Create a TOM with 'no payment is expected' selected - without Trial Period and Initial Club Cash" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM with No payment expected'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -270,6 +280,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 	# Create a member with TOM before created
 	test "Create a TOM with 'no payment is expected' selected - without Trial Period and without Initial Club Cash" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM with No payment expected'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -335,6 +346,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# # end
 
 	test "Create a member at TOM created by Subscription Plan" do
+		sign_in_as(@admin_agent)
 		# First, create the TOM
 		tom_name = 'TOM To Create the Member'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -396,6 +408,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# end
 
 	test "Create subcription plan with Downgrade to option" do
+		sign_in_as(@admin_agent)
 		tom_to_downgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
 		tom_name = 'TOM with Downgrade To'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -415,6 +428,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create a new TOM with club cash and enroll a member with it" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name with club cash'
 		initial_amount_of_club_cash = 80
 		club_cash_installment_amount = 100
@@ -433,16 +447,17 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 
 		@terms_of_membership = TermsOfMembership.find_by_name tom_name
-	unsaved_member =  FactoryGirl.build(:active_member, :club_id => @terms_of_membership.club_id)
-	credit_card = FactoryGirl.build(:credit_card_master_card)
-	enrollment_info = FactoryGirl.build(:enrollment_info)
-	create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership)
-	@saved_member = Member.find_by_email(unsaved_member.email)  
-	visit show_member_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :member_prefix => @saved_member.id)
-	within("#td_mi_club_cash_amount") { assert page.has_content?(initial_amount_of_club_cash) }
+		unsaved_member =  FactoryGirl.build(:active_member, :club_id => @terms_of_membership.club_id)
+		credit_card = FactoryGirl.build(:credit_card_master_card)
+		enrollment_info = FactoryGirl.build(:enrollment_info)
+		create_member_by_sloop(@admin_agent, unsaved_member, credit_card, enrollment_info, @terms_of_membership)
+		@saved_member = Member.find_by_email(unsaved_member.email)  
+		visit show_member_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :member_prefix => @saved_member.id)
+		within("#td_mi_club_cash_amount") { assert page.has_content?(initial_amount_of_club_cash) }
 	end
 
 	test "Create a member with TOM upgrate to = 1" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name with upgrade'
 		tom_to_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Upgraded TOM')
 
@@ -475,6 +490,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# # EDIT
 
 	test "Edit subcription plan with Initial Fee distinct of 0 - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -498,6 +514,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Edit subcription plan with Initial Fee at 0 - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -521,6 +538,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Update subcription plan with Free Trial Period by days - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -568,6 +586,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Update subcription plan with Paid Trial Period by days - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -591,6 +610,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Update subcription plan with Paid Trial Period by month - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -614,6 +634,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Update subcription plan with Recurring Amount by month - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -637,6 +658,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Update subcription plan with Recurring Amount by year - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -660,6 +682,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Update subcription plan with No payment is expected - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -844,6 +867,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# end
 
 	test "Update subcription plan with external code and description - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -870,6 +894,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Do not edit TOM with active (active, applied and provisional) membership" do
+		sign_in_as(@admin_agent)
 		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		the_member = create_active_member(the_tom, :active_member, nil, {}, { :created_by => @admin_agent })
@@ -885,6 +910,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Do not edit TOM with inactive (lapsed) membership" do
+		sign_in_as(@admin_agent)
 		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		the_lapsed_member = create_active_member(the_tom, :lapsed_member, nil, {}, { :created_by => @admin_agent })
@@ -900,6 +926,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Edit TOM without members and add club cash" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -923,6 +950,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Delete club cash at TOM - TOM without members" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -949,6 +977,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Edit TOM without members and add club cash " do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		initial_club_cash_amount = 50
 		club_cash_installment_amount = 150
@@ -979,6 +1008,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# # # # DELETE
 
 	test "Delete unused TOM" do
+		sign_in_as(@admin_agent)
 		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -993,6 +1023,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Do not delete a TOM with inactive memberships" do
+		sign_in_as(@admin_agent)
 		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		the_lapsed_member = create_active_member(the_tom, :lapsed_member, nil, {}, { :created_by => @admin_agent })
@@ -1008,6 +1039,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Do not delete a TOM with active memberships" do
+		sign_in_as(@admin_agent)
 		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		the_active_member = create_active_member(the_tom, :active_member, nil, {}, { :created_by => @admin_agent })
@@ -1023,6 +1055,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create a TOM that Requires Approval" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM that Requires Approval'
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
 		click_link_or_button 'Add New Plan'
@@ -1043,6 +1076,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 
 	test "Edit a TOM that doesn't Require Approval" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM that doesnt Require Approval'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -1069,6 +1103,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 
 	test "Edit a TOM that Requires Approval" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM that Requires Approval'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -1094,6 +1129,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Delete a TOM that Requires Approval" do
+		sign_in_as(@admin_agent)
 		27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :name => "test#{n}" ,:club_id => @club.id) }
 		the_tom = TermsOfMembership.last
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -1108,6 +1144,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Create a member a TOM that Requires Approval" do
+		sign_in_as(@admin_agent)
 		the_tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => 'TOM that Requires Approval')
 		unsaved_member =  FactoryGirl.build(:active_member, :club_id => the_tom.club_id)
 		credit_card = FactoryGirl.build(:credit_card_master_card)
