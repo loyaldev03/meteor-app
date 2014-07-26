@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ProductsTests < ActionController::IntegrationTest
+class ProductsTest < ActionController::IntegrationTest
 
   setup do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)

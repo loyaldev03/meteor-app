@@ -1,6 +1,6 @@
 require 'test_helper'
  
-class MembersSyncronize < ActionController::IntegrationTest
+class MembersSyncronizeTest < ActionController::IntegrationTest
 
   ############################################################
   # SETUP
