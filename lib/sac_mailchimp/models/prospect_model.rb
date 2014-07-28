@@ -14,7 +14,7 @@ module SacMailchimp
           Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
           raise e
         end
-      elsif SacMailchimp::ProspectModel.email_belongs_to_prospect?(subscriber["data"].first["email"], club_id)
+      elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_member?(subscriber["data"].first["email"], club_id)
         begin
           options = { :update_existing => true, :double_optin => false }
           client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
@@ -22,12 +22,14 @@ module SacMailchimp
           Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
           raise e
         end
+      else
+        res = { "error" => "Email already saved as member." }
       end
       update_prospect(res)
     end
 
-    def self.email_belongs_to_prospect?(email, club_id)
-      Prospect.find_by_email_and_club_id(email, club_id)
+    def self.email_belongs_to_prospect_and_no_member?(email, club_id)
+      Prospect.find_by_email_and_club_id(email, club_id).nil? and not Member.find_by_email_and_club_id(email, club_id).nil?
     end
 
     def update_prospect(res)
