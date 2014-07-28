@@ -60,7 +60,7 @@ namespace :mkt_tools do
   # MAILCHIMP
   ######################################
 
-  desc "Sync members to exact target"
+  desc "Sync members to mailchimp"
   # This task should be run each day at 3 am ?
   task :sync_members_to_mailchimp => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/mkt_tools_sync_members_to_mailchimp.log")
@@ -76,7 +76,7 @@ namespace :mkt_tools do
     end
   end
 
-  desc "Sync prospects to exact target"
+  desc "Sync prospects to mailchimp"
   # This task should be run each day at 3 am ?
   task :sync_prospects_to_mailchimp => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/mkt_tools_sync_prospects_to_mailchimp.log")

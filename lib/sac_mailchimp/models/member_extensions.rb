@@ -16,7 +16,7 @@ module SacMailchimp
               Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
               member.marketing_tool_mailchimp_sync_without_delay
             rescue Exception => e
-              Auditory.report_issue("Member::SyncExactTargetWithBatch", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect }) unless e.to_s.include?("Timeout")
+              Auditory.report_issue("Member::sync_members_to_mailchimp", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect }) unless e.to_s.include?("Timeout")
               Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
             end
             Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
@@ -69,7 +69,9 @@ module SacMailchimp
       end
 
       def mailchimp_member
-        if self.club.marketing_tool_attributes and not self.club.marketing_tool_attributes["mailchimp_api_key"].blank? and not self.club.marketing_tool_attributes["mailchimp_list_id"].blank?
+        if not self.club.mailchimp_mandrill_client?
+          nil
+        elsif self.club.marketing_tool_attributes and not self.club.marketing_tool_attributes["mailchimp_api_key"].blank? and not self.club.marketing_tool_attributes["mailchimp_list_id"].blank?
           SacMailchimp.config_integration(self.club.marketing_tool_attributes["mailchimp_api_key"])
           @mailchimp_member ||= if !self.mailchimp_sync?
             nil
