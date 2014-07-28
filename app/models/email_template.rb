@@ -65,7 +65,7 @@ class EmailTemplate < ActiveRecord::Base
   end
 
   def is_pillar?
-    self.template_type == 'pillar'
+    self.template_type.to_s == 'pillar'
   end
 
   def fetch_external_attributes_data

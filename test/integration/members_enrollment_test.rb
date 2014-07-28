@@ -32,31 +32,31 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
   end
 
   def setup_email_templates
-    et = EmailTemplate.new :name => "Day 7 - Trial", :client => :lyris, :template_type => :pillar
+    et = EmailTemplate.new :name => "Day 7 - Trial", :client => :lyris, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27648, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 7
     et.save!
 
-    et = EmailTemplate.new :name => "Day 35 - News", :client => :lyris, :template_type => :pillar
+    et = EmailTemplate.new :name => "Day 35 - News", :client => :lyris, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27647, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 35
     et.save!
 
-    et = EmailTemplate.new :name => "Day 40 - Deals", :client => :lyris, :template_type => :pillar
+    et = EmailTemplate.new :name => "Day 40 - Deals", :client => :lyris, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27651, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 40
     et.save!
     
-    et = EmailTemplate.new :name => "Day 45 - Local Chapters", :client => :lyris, :template_type => :pillar
+    et = EmailTemplate.new :name => "Day 45 - Local Chapters", :client => :lyris, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27650, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 45
     et.save!
     
-    et = EmailTemplate.new :name => "Day 50 - VIP", :client => :lyris, :template_type => :pillar
+    et = EmailTemplate.new :name => "Day 50 - VIP", :client => :lyris, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27649, :mlid => 226095, :site_id => 123 }
     et.days_after_join_date = 50
@@ -81,10 +81,12 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     end
     within("#table_email_template")do
       EmailTemplate::TEMPLATE_TYPES.each do |type|
-        if saved_member.current_membership.terms_of_membership.needs_enrollment_approval        
-          assert page.has_content?("Test #{type}") 
-        else
-          assert page.has_content?("Test #{type}") if type != :rejection 
+        if type != :pillar
+          if saved_member.current_membership.terms_of_membership.needs_enrollment_approval        
+            assert page.has_content?("Test #{type}") 
+          else
+            assert page.has_content?("Test #{type}") if type != :rejection 
+          end
         end
       end 
       EmailTemplate.find_all_by_terms_of_membership_id(saved_member.terms_of_membership.id).each do |et|
