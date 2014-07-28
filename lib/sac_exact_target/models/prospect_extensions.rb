@@ -19,7 +19,7 @@ module SacExactTarget
               tz = Time.zone.now
               begin
                 Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
-                prospect.mailchimp_after_create_sync_to_remote_domain(club) if defined?(SacExactTarget::ProspectModel)
+                prospect.exact_target_after_create_sync_to_remote_domain(club) if defined?(SacExactTarget::ProspectModel)
               rescue Exception => e
                 Auditory.report_issue("ExactTarget::ProspectSync", e, { :prospect => prospect.inspect} )
                 prospect.update_attribute :need_sync_to_marketing_client, 0

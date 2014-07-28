@@ -85,6 +85,7 @@ class Communication < ActiveRecord::Base
       Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
     end
   end
+  handle_asynchronously :deliver_mandrill, :queue => :mandrill_email, priority: 15
 
   def deliver_lyris
     lyris = LyrisService.new
