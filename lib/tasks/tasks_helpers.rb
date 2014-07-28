@@ -257,23 +257,6 @@ module TasksHelpers
     Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
-  def self.sync_to_exact_target
-    base = Member.where("need_sync_to_marketing_client = 1")
-    base.find_in_batches do |group|
-      group.each_with_index do |member,index|
-        tz = Time.zone.now
-        begin
-          Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-          member.marketing_tool_sync_without_dj
-        rescue Exception => e
-          Auditory.report_issue("Member::SyncExactTargetWithBatch", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect }) unless e.to_s.include?("Timeout")
-          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
-        end
-        Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
-      end
-    end
-  end
-
   def self.send_hot_rod_magazine_cancellation_email
     require 'csv'
     if Rails.env=='prototype'

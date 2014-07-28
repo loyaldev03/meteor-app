@@ -37,7 +37,8 @@ class Club < ActiveRecord::Base
   validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url,
             :format =>  /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
 
-  scope :exact_target_related, lambda { where("marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes like '%et_prospect_list%' AND marketing_tool_attributes like '%et_members_list%' ") }
+  scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' and marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes like '%et_prospect_list%' AND marketing_tool_attributes like '%et_members_list%' ") }
+  scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' and marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes like '%mailchimp_list_id%'") }
 
   has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            :url => "/system/:attachment/:id/:style/:filename",

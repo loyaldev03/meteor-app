@@ -7,18 +7,16 @@ module SacExactTarget
 
     module ClassMethods
       def sync_members_to_exact_target
-        index = 0
-        base = Member.where(" marketing_client_synced_status = 'not_synced' ")
+        base = Member.joins(:club).where("need_sync_to_marketing_client = 1 and marketing_tool_client = 'exact_target'")
         Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_exact_target, processing #{base.count} members"
         base.find_in_batches do |group|
-          group.each do |member|
+          group.each_with_index do |member, index|
             tz = Time.zone.now
             begin
-              index = index+1
-              Rails.logger.info "  *[#{index}] processing member ##{member.id}"
-              member.marketing_tool_sync
+              Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
+              member.marketing_tool_exact_target_sync_without_delay
             rescue Exception => e
-              Airbrake.notify(:error_class => "Pardot::MemberSync", :error_message => "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", :parameters => { :member => member.inspect })
+              Auditory.report_issue("Member::sync_members_to_exact_target", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect }) unless e.to_s.include?("Timeout")
               Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
             end
             Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
@@ -79,7 +77,7 @@ module SacExactTarget
             SacExactTarget::MemberModel.new self
           end
         else
-          Auditory.report_issue("Member:exact_target_member", 'Exact Target not configured correctly', { :member => self.club.inspect })
+          Auditory.report_issue("Member:exact_target_member", 'Exact Target not configured correctly', { :club => self.club.inspect, :member => self.inspect })
           nil
         end
       end

@@ -1,7 +1,28 @@
 module SacMailchimp
 	module MemberExtensions
     def self.included(base)
+      base.send :extend, ClassMethods
       base.send :include, InstanceMethods
+    end
+
+    module ClassMethods
+      def sync_members_to_mailchimp
+        base = Member.joins(:club)where("need_sync_to_marketing_client = 1 and marketing_tool_client = 'mailchimp_mandrill'")
+        Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_mailchimp, processing #{base.count} members"
+        base.find_in_batches do |group|
+          group.each_with_index do |member,index|
+            tz = Time.zone.now
+            begin
+              Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
+              member.marketing_tool_mailchimp_sync_without_delay
+            rescue Exception => e
+              Auditory.report_issue("Member::SyncExactTargetWithBatch", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :member => member.inspect }) unless e.to_s.include?("Timeout")
+              Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
+            end
+            Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
+          end
+        end
+      end
     end
 
     module InstanceMethods
@@ -56,7 +77,7 @@ module SacMailchimp
             SacMailchimp::MemberModel.new self
           end
         else
-          Auditory.report_issue("Member:mailchimp_member", 'Mandrill not configured correctly', { :club => self.club.inspect })
+          Auditory.report_issue("Member:mailchimp_member", 'Mailchimp not configured correctly', { :club => self.club.inspect, :member => self.inspect })
           nil
         end
       end

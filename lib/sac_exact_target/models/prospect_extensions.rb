@@ -19,7 +19,7 @@ module SacExactTarget
               tz = Time.zone.now
               begin
                 Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
-                prospect.exact_target_after_create_sync_to_remote_domain(club) if defined?(SacExactTarget::ProspectModel)
+                prospect.mailchimp_after_create_sync_to_remote_domain(club) if defined?(SacExactTarget::ProspectModel)
               rescue Exception => e
                 Auditory.report_issue("ExactTarget::ProspectSync", e, { :prospect => prospect.inspect} )
                 prospect.update_attribute :need_sync_to_marketing_client, 0
@@ -37,7 +37,17 @@ module SacExactTarget
 
     module InstanceMethods
       def exact_target_prospect
-        @exact_target_prospect ||= SacExactTarget::ProspectModel.new self
+        if self.club.marketing_tool_attributes and not self.club.marketing_tool_attributes["et_username"].blank? and not self.club.marketing_tool_attributes["et_password"].blank?
+          SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
+          @exact_target_prospect ||= if !self.exact_target_sync?
+            nil
+          else
+            SacExactTarget::ProspectModel.new self
+          end
+        else
+          Auditory.report_issue("Prospect:exact_target_prospect", 'Exact Target not configured correctly', { :club => self.club.inspect, :prospect => self.inspect })
+          nil
+        end
       end
 
       def exact_target_after_create_sync_to_remote_domain(club = nil)

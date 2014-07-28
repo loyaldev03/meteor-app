@@ -144,19 +144,6 @@ namespace :members do
     end 
   end
 
-  desc "Process to sync members updated today to exact target"
-  task :sync_to_exact_target => :environment do
-    Rails.logger = Logger.new("#{Rails.root}/log/sync_to_exact_target.log")
-    Rails.logger.level = Logger::DEBUG
-    ActiveRecord::Base.logger = Rails.logger
-    tall = Time.zone.now
-    begin
-      TasksHelpers.sync_to_exact_target
-    ensure 
-      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:sync_to_exact_target task"
-    end 
-  end
-
   desc "Sync all members available"
   task :sync_all_to_drupal => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/sync_all.log")
