@@ -57,9 +57,14 @@ class Auditory
     unless ["test","development"].include? Rails.env  
       comment = "Club #{club.id} - #{club.name} changed it's marketing client. We have to manually resync every member and prospect (total amount: #{subscribers_count}). \n\n\n Steps to follow:"
       comment << "\n Step 1: Ask tech leader or Charly to disable the following tasks (comment lines where we invoke those taks within file 'rake_task_runner' in application root folder):"
-      comment << "\n * members:sync_to_exact_target"
-      comment << "\n * mkt_tools:sync_prospects_to_exact_target"
-      comment << "\n Step 2: Ask tech leader or Charly to run manually those tasks. (Example: RAILS_ENV=production nohup rake members:sync_to_exact_target) This task should be started before the end of the day, and it should be done before the night since every member/prospect will be synced and this task may affect other scripts"
+      if club.exact_target_client?
+        comment << "\n * mkt_tools:sync_members_to_exact_target"
+        comment << "\n * mkt_tools:sync_prospects_to_exact_target"
+      elsif club.mailchimp_mandrill_client?
+        comment << "\n * mkt_tools:sync_members_to_mailchimp"
+        comment << "\n * mkt_tools:sync_prospects_to_mailchimp"        
+      end
+      comment << "\n Step 2: Ask tech leader or Charly to run manually tasks that were commented in previous step. (Example: RAILS_ENV=production nohup rake mkt_tools:sync_prospects_to_exact_target) This task should be started before the end of the day, and it should be done before the night since every member/prospect will be synced and this task may affect other scripts"
 
       ticket = Auditory.create_ticket(comment, "[IMMEDIATE] Club:marketing_client_changed")
       ticket.save
