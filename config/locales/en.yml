@@ -463,6 +463,17 @@ en:
         help_for_days_after_join_date: 'Number of days after which the email will be sent. Only seteable when the communication type is Pillar.'
         help_for_clients: 'Client that will be used to send the communication.'
         help_for_external_attributes: 'Attributes related to the selected client that must be configured to be able to send the email.'
+        external_attributes_params:
+          customer_key: 'Customer Key'
+          customer_key_help: 'Template ID on Exact Target side.'
+          template_name: 'Template Name'
+          template_name_help: "Template name configured on Mandrill."
+          trigger_id: 'Trigger ID'
+          trigger_id_help: "Template's id on Lyris side."
+          mlid: 'MLID'
+          mlid_help: 'List ID on Lyris side.'
+          site_id: 'Site ID'
+          site_id_help: 'Site ID on Lyris side.'
       fulfillment:
         id: 'ID'
         tracking_code: 'Tracking code'
