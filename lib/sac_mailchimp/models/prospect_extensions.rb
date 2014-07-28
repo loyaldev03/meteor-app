@@ -19,7 +19,7 @@ module SacMailchimp
               tz = Time.zone.now
               begin
                 Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
-                prospect.exact_target_after_create_sync_to_remote_domain(club) if defined?(SacMailchimp::ProspectModel)
+                prospect.mailchimp_after_create_sync_to_remote_domain(club) if defined?(SacMailchimp::ProspectModel)
               rescue Exception => e
                 Auditory.report_issue("Mailchimp::ProspectSync", e, { :prospect => prospect.inspect} )
                 prospect.update_attribute :need_sync_to_marketing_client, 0
@@ -37,10 +37,10 @@ module SacMailchimp
 
     module InstanceMethods
       def mailchimp_after_create_sync_to_remote_domain(club = nil)
-        exact_target_sync_to_remote_domain(club) unless mailchimp_prospect.nil?
+        mailchimp_sync_to_remote_domain(club) unless mailchimp_prospect.nil?
       end
 
-      def mailchimp_sync_to_remote_domain
+      def mailchimp_sync_to_remote_domain(club = nil)
         return if @skip_mailchimp_sync
         time_elapsed = Benchmark.ms do
           mailchimp_prospect.save!(club)
