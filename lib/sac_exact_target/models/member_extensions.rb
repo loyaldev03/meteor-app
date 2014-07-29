@@ -27,7 +27,7 @@ module SacExactTarget
 
     module InstanceMethods
       def exact_target_after_create_sync_to_remote_domain
-        exact_target_sync_to_remote_domain unless exact_target_member.nil?
+        exact_target_sync_to_remote_domain if exact_target_member
       end
 
       def exact_target_sync_to_remote_domain
@@ -47,7 +47,7 @@ module SacExactTarget
       handle_asynchronously :marketing_tool_exact_target_sync, :queue => :exact_target_sync, priority: 30
 
       def exact_target_subscribe
-        exact_target_member.subscribe!
+        exact_target_member.subscribe! if exact_target_member
       end
       handle_asynchronously :exact_target_subscribe, :queue => :exact_target_sync, priority: 30
 
@@ -69,18 +69,19 @@ module SacExactTarget
       end
 
       def exact_target_member
+        return @exact_target_member unless @exact_target_member.nil?
         if not self.club.exact_target_client?
-          nil
-        elsif self.club.marketing_tool_attributes and not self.club.marketing_tool_attributes["et_username"].blank? and not self.club.marketing_tool_attributes["et_password"].blank?
+          false
+        elsif club.exact_target_sync?
           SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
           @exact_target_member ||= if !self.exact_target_sync?
-            nil
+            false
           else
             SacExactTarget::MemberModel.new self
           end
         else
           Auditory.report_issue("Member:exact_target_member", 'Exact Target not configured correctly', { :club => self.club.inspect, :member => self.inspect })
-          nil
+          false
         end
       end
 

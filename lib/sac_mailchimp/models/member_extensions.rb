@@ -27,7 +27,7 @@ module SacMailchimp
 
     module InstanceMethods
       def mailchimp_after_create_sync_to_remote_domain
-        mailchimp_sync_to_remote_domain unless mailchimp_member.nil?
+        mailchimp_sync_to_remote_domain if mailchimp_member
       end
 
       def mailchimp_sync_to_remote_domain
@@ -47,13 +47,13 @@ module SacMailchimp
       handle_asynchronously :marketing_tool_mailchimp_sync, :queue => :mailchimp_sync, priority: 30
 
       def mailchimp_subscribe
-        mailchimp_member.subscribe!
+        mailchimp_member.subscribe! if mailchimp_member
       end
       handle_asynchronously :mailchimp_subscribe, :queue => :mailchimp_sync, priority: 30
 
       def mailchimp_unsubscribe
         time_elapsed = Benchmark.ms do
-          mailchimp_after_create_sync_to_remote_domain
+          mailchimp_after_create_sync_to_remote_domain 
           mailchimp_member.unsubscribe!
         end
         logger.info "SacMailchimp::unsubscribe_subscriber took #{time_elapsed}ms"
@@ -69,18 +69,19 @@ module SacMailchimp
       end
 
       def mailchimp_member
+        return @mailchimp_member unless @mailchimp_member.nil?
         if not self.club.mailchimp_mandrill_client?
-          nil
-        elsif self.club.marketing_tool_attributes and not self.club.marketing_tool_attributes["mailchimp_api_key"].blank? and not self.club.marketing_tool_attributes["mailchimp_list_id"].blank?
+          false
+        elsif club.mailchimp_sync?
           SacMailchimp.config_integration(self.club.marketing_tool_attributes["mailchimp_api_key"])
           @mailchimp_member ||= if !self.mailchimp_sync?
-            nil
+            false
           else
             SacMailchimp::MemberModel.new self
           end
         else
           Auditory.report_issue("Member:mailchimp_member", 'Mailchimp not configured correctly', { :club => self.club.inspect, :member => self.inspect })
-          nil
+          false
         end
       end
 

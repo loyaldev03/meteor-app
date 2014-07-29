@@ -124,8 +124,7 @@ module SacMailchimp
 		    'BILLDATE' => 'next_retry_bill_date',
 		    'EXTERNALID' => 'external_id',
 		    'GENDER' => 'gender',
-		    'PHONE' => 'full_phone_number',
-        'CLUBID' => 'club_id'
+		    'PHONE' => 'full_phone_number'
 		  }
 		end
 
@@ -141,7 +140,7 @@ module SacMailchimp
     def enrollment_fieldmap
       { 
         'MKTCODE' => 'marketing_code',
-        'MCHANEL' => 'mega_channel',
+        'MCHANNEL' => 'mega_channel',
         'FCODE' => 'fulfillment_code',
         'CMEDIUM' => 'campaign_medium',
         'PRODUCTSKU' => 'product_sku',

@@ -56,7 +56,7 @@ module SacMailchimp
       end
 
       def mailchimp_prospect
-        if self.club.marketing_tool_attributes and not self.club.marketing_tool_attributes["mailchimp_api_key"].blank? and not self.club.marketing_tool_attributes["mailchimp_list_id"].blank?
+        if self.club.mailchimp_sync?
           SacMailchimp.config_integration(self.club.marketing_tool_attributes["mailchimp_api_key"])
           @mailchimp_prospect ||= if !self.mailchimp_sync?
             nil

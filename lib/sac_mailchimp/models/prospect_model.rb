@@ -78,7 +78,7 @@ module SacMailchimp
         'TOMID' => 'terms_of_membership_id',
         'JOINDATE' => 'created_at',
         'MKTCODE' => 'marketing_code',
-        'MCHANEL' => 'mega_channel',
+        'MCHANNEL' => 'mega_channel',
         'FCODE' => 'fulfillment_code',
         'CMEDIUM' => 'campaign_medium',
         'PRODUCTSKU' => 'product_sku',

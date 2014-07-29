@@ -1164,14 +1164,22 @@ class Member < ActiveRecord::Base
   handle_asynchronously :desnormalize_preferences, :queue => :generic_queue, priority: 40
 
   def marketing_tool_sync
-    marketing_tool_exact_target_sync if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
-    marketing_tool_mailchimp_sync if defined?(SacMailchimp::MemberModel) and not mailchimp_member.nil?
+    case(club.marketing_tool_client)
+    when 'exact_target'
+      marketing_tool_exact_target_sync if defined?(SacExactTarget::MemberModel)
+    when 'mailchimp_member'
+      marketing_tool_mailchimp_sync if defined?(SacMailchimp::MemberModel)
+    end
   end
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
-    self.exact_target_unsubscribe if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
-    self.mailchimp_unsubscribe if defined?(SacMailchimp::MemberModel) and not mailchimp_member.nil?
+    case(club.marketing_tool_client)
+    when 'exact_target'
+      exact_target_unsubscribe if defined?(SacExactTarget::MemberModel)
+    when 'mailchimp_member'
+      mailchimp_unsubscribe if defined?(SacMailchimp::MemberModel)
+    end
   rescue Exception => e
     logger.error "* * * * * #{e}"
     Auditory.report_issue("Member::unsubscribe", e, { :member => self.inspect })
@@ -1179,11 +1187,12 @@ class Member < ActiveRecord::Base
 
   # used for member unblacklist
   def marketing_tool_sync_subscription
-    if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
-      self.exact_target_subscribe
-    elsif defined?(SacMailchimp::MemberModel) and not mailchimp_member.nil?
-      self.mailchimp_subscribe
-    end  
+    case(club.marketing_tool_client)
+    when 'exact_target'
+      exact_target_subscribe if defined?(SacExactTarget::MemberModel)
+    when 'mailchimp_member'
+      mailchimp_subscribe if defined?(SacMailchimp::MemberModel)
+    end
   end
 
   def get_offset_related

@@ -133,4 +133,8 @@
   });
   var partner_prefix = "<%= @current_partner.prefix %>"
   var club_id = "<%= @club.id %>"
+  var error_messages = "<%= @club.errors.messages %>"
 </script>
+
+
+<%= @club.errors.messages %>
