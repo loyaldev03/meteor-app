@@ -316,6 +316,14 @@ function fetch_maketing_client_form(){
       success: function(data){
         $("#div_mkt_tool_attributes").empty();
         $("#div_mkt_tool_attributes").append(data);
+
+        if(mkt_tool_errors.length != 0){
+          mkt_tool_errors = mkt_tool_errors.split(",");
+          for(index=0; index < mkt_tool_errors.length; index++){
+            array = mkt_tool_errors[index].split(";");
+            $('#div_marketing_tool_attributes_'+array[1]).append('<div id="error_inline" style="display:inline-block;"> '+ array[2].substring(0, array[2].length - 5) +' </div>');
+          }
+        }
       }
     });
   }

@@ -131,10 +131,7 @@
     clubs_form_functions();
     fetch_maketing_client_form();
   });
-  var partner_prefix = "<%= @current_partner.prefix %>"
-  var club_id = "<%= @club.id %>"
-  var error_messages = "<%= @club.errors.messages %>"
+  var partner_prefix = "<%= @current_partner.prefix %>";
+  var club_id = "<%= @club.id %>";
+  var mkt_tool_errors = "<%= @club.errors.messages.nil? ? @club.errors.messages : @club.errors.messages[:marketing_tool_attributes] %>";
 </script>
-
-
-<%= @club.errors.messages %>

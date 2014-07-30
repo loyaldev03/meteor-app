@@ -29,6 +29,8 @@ class Club < ActiveRecord::Base
 
   acts_as_paranoid
 
+  before_validation :complete_urls
+  before_save :not_allow_multiple_mailchimp_clients_with_same_list_id
   after_create :add_default_member_groups, :add_default_product, :add_default_disposition_type
   after_update :resync_with_merketing_tool_process
 
@@ -43,8 +45,6 @@ class Club < ActiveRecord::Base
   has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            :url => "/system/:attachment/:id/:style/:filename",
                            :styles => { :header => "120x40", :thumb => "100x100#", :small  => "150x150>" }
-
-  before_validation :complete_urls
 
   DEFAULT_PRODUCT = ['KIT-CARD']
 
@@ -156,7 +156,6 @@ class Club < ActiveRecord::Base
   end
   handle_asynchronously :resync_members_and_prospects, :queue => :generic_queue
 
-
   private
     def add_default_member_groups
       ['VIP', 'Celebrity', 'Notable', 'Charter Member'].each do |name|
@@ -210,4 +209,20 @@ class Club < ActiveRecord::Base
         end
       end
     end
+
+    def not_allow_multiple_mailchimp_clients_with_same_list_id
+      if self.mailchimp_mandrill_client? and self.changes.include?(:marketing_tool_attributes) and not self.changes['marketing_tool_attributes'].last["mailchimp_list_id"].blank?
+        mailchimp_list_id = self.changes['marketing_tool_attributes'].last["mailchimp_list_id"]
+        already_configured = Club.mailchimp_related.where("marketing_tool_attributes like ? and id != ?", "%#{mailchimp_list_id}%", id.to_i)
+        unless already_configured.empty?
+          already_configured.each do |club|
+            if club.marketing_tool_attributes["mailchimp_list_id"] == mailchimp_list_id
+              errors[:marketing_tool_attributes] << "mailchimp_list_id;List ID #{mailchimp_list_id} is already configured in another club."
+              return false
+            end
+          end
+        end
+      end
+    end
+
 end
