@@ -562,6 +562,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 	test "Update subcription plan with Free Trial Period by months - No membership associated" do
+		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
 		visit terms_of_memberships_path(@partner.prefix, @club.name)
