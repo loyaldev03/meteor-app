@@ -54,6 +54,14 @@ class ClubTest < ActiveSupport::TestCase
       @club.save
     end
     Delayed::Worker.delay_jobs = false
+  end
+
+  test "Do not allow to configurate two clubs with the same Mailchimp list" do
+    @mailchimp_club = FactoryGirl.create(:club, marketing_tool_client: 'mailchimp_mandrill', marketing_tool_attributes: {'mailchimp_list_id'=>"12345"})
+    @club.marketing_tool_client = 'mailchimp_mandrill'
+    @club.marketing_tool_attributes = {'mailchimp_list_id'=>"12345"}
+    assert !@club.save
+    assert @club.errors.messages[:marketing_tool_attributes].include? "mailchimp_list_id;List ID 12345 is already configured in another club."
   end 
 
 end
