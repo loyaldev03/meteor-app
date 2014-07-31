@@ -27,7 +27,7 @@ class Prospect < ActiveRecord::Base
     case(club.marketing_tool_client)
     when 'exact_target'
       exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel) and exact_target_prospect
-    when 'mailchimp_member'
+    when 'mailchimp_mandrill'
       mailchimp_sync_to_remote_domain if defined?(SacMailchimp::ProspectModel) and mailchimp_prospect
     end
   end
