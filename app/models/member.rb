@@ -1167,7 +1167,7 @@ class Member < ActiveRecord::Base
     case(club.marketing_tool_client)
     when 'exact_target'
       marketing_tool_exact_target_sync if defined?(SacExactTarget::MemberModel)
-    when 'mailchimp_member'
+    when 'mailchimp_mandrill'
       marketing_tool_mailchimp_sync if defined?(SacMailchimp::MemberModel)
     end
   end
@@ -1177,7 +1177,7 @@ class Member < ActiveRecord::Base
     case(club.marketing_tool_client)
     when 'exact_target'
       exact_target_unsubscribe if defined?(SacExactTarget::MemberModel)
-    when 'mailchimp_member'
+    when 'mailchimp_mandrill'
       mailchimp_unsubscribe if defined?(SacMailchimp::MemberModel)
     end
   rescue Exception => e
@@ -1190,7 +1190,7 @@ class Member < ActiveRecord::Base
     case(club.marketing_tool_client)
     when 'exact_target'
       exact_target_subscribe if defined?(SacExactTarget::MemberModel)
-    when 'mailchimp_member'
+    when 'mailchimp_mandrill'
       mailchimp_subscribe if defined?(SacMailchimp::MemberModel)
     end
   end
