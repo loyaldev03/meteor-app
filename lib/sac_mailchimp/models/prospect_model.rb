@@ -31,7 +31,7 @@ module SacMailchimp
     end
 
     def self.email_belongs_to_prospect_and_no_member?(email, club_id)
-      Prospect.find_by_email_and_club_id(email, club_id).nil? and not Member.find_by_email_and_club_id(email, club_id).nil?
+      not Prospect.find_by_email_and_club_id(email, club_id).nil? and Member.find_by_email_and_club_id(email, club_id).nil?
     end
 
     def update_prospect(res)
