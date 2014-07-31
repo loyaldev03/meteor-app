@@ -6,14 +6,16 @@ module SacMailchimp
       setup_club(club)
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       subscriber = SacMailchimp::ProspectModel.find_by_email self.prospect.email, mailchimp_list_id
-      res = if subscriber["success_count"] == 0
+      res = if subscriber["status"]=='error'
+        subscriber
+      elsif subscriber["success_count"] == 0
         begin 
           options = {:double_optin => false}
           client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
         rescue Exception => e
           Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
           raise e
-        end
+        end       
       elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_member?(subscriber["data"].first["email"], club_id)
         begin
           options = { :update_existing => true, :double_optin => false }

@@ -21,7 +21,6 @@ module SacMailchimp
                 Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
                 prospect.mailchimp_after_create_sync_to_remote_domain(club) if defined?(SacMailchimp::ProspectModel)
               rescue Exception => e
-                Auditory.report_issue("Mailchimp::ProspectSync", e, { :prospect => prospect.inspect} )
                 prospect.update_attribute :need_sync_to_marketing_client, 0
                 Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
               end
