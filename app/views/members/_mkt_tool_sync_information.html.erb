@@ -1,17 +1,29 @@
-<% if defined? SacExactTarget::MemberModel and @current_member.exact_target_sync? %>
-  <table id="exact_target_sync" class="table table-bordered table-condensed">
+<% if (defined? SacExactTarget::MemberModel and @current_member.exact_target_sync?) or (defined? SacMailchimp::MemberModel and @current_member.mailchimp_sync?) %>
+  <table id="marketing_sync_table" class="table table-bordered table-condensed">
     <thead>
       <tr class="box_title">
-        <th colspan="2"><h4>Exact Target sync</h4></th>
+        <th colspan="2"><h4> <%= @current_member.exact_target_sync? ? "Exact Target sync" : "Mailchimp sync" %></h4></th>
         <td style="border: none; text-align: right;" colspan="2">
-          <%= 
-            link_to member_exact_target_sync_path, 
-              method: :post, 
-              class: 'btn btn-mini btn-warning', 
-              id: "sync_to_remote",
-              confirm: 'Are you sure?' do %>
-            <i class='icon-retweet'></i>
-            <%= t('buttons.sync_to_remote') %>
+          <% if @current_member.exact_target_sync? %>
+            <%= 
+              link_to member_exact_target_sync_path, 
+                method: :post, 
+                class: 'btn btn-mini btn-warning', 
+                id: "sync_to_remote",
+                confirm: 'Are you sure?' do %>
+              <i class='icon-retweet'></i>
+              <%= t('buttons.sync_to_remote') %>
+            <% end %>
+          <% else %>
+            <%= 
+              link_to member_mailchimp_sync_path, 
+                method: :post, 
+                class: 'btn btn-mini btn-warning', 
+                id: "sync_to_remote",
+                confirm: 'Are you sure?' do %>
+              <i class='icon-retweet'></i>
+              <%= t('buttons.sync_to_remote') %>
+            <% end %>
           <% end %>
         </td>
       </tr>

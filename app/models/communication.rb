@@ -30,6 +30,8 @@ class Communication < ActiveRecord::Base
           c.deliver_lyris
         elsif template.exact_target?
           c.deliver_exact_target
+        elsif template.mandrill?
+          c.deliver_mandrill
         elsif template.action_mailer?
           c.deliver_action_mailer
         else
@@ -62,6 +64,28 @@ class Communication < ActiveRecord::Base
     end
   end  
   handle_asynchronously :deliver_exact_target, :queue => :exact_target_email, priority: 15
+
+  def deliver_mandrill
+    if self.member.mandrill_member
+      result = self.member.mandrill_member.send_email(external_attributes[:template_name])
+      self.sent_success = (result["status"]=="sent")
+      self.processed_at = Time.zone.now
+      self.response = result
+      self.save!
+      Auditory.audit(nil, self, "Communication '#{template_name}' scheduled", member, Settings.operation_types["#{template_type}_email"])
+    else
+      update_attributes :sent_success => false, :response => I18n.t('error_messages.no_marketing_client_configure') , :processed_at => Time.zone.now
+    end
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
+    unless e.to_s.include?("Timeout")
+      Auditory.report_issue("Communication deliver_mandrill", e, { :member => member.inspect, 
+        :current_membership => member.current_membership.inspect, :communication => self.inspect })
+      Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
+    end
+  end
+  handle_asynchronously :deliver_mandrill, :queue => :mandrill_email, priority: 15
 
   def deliver_lyris
     lyris = LyrisService.new

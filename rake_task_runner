@@ -31,8 +31,10 @@ cd /var/www/$2/current && rake billing:for_today  >> $LOGFILE 2>&1
 cd /var/www/$2/current && rake members:process_fulfillments  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:process_email_sync_error  >> $LOGFILE 2>&1 &
 
-cd /var/www/$2/current && rake members:sync_to_exact_target  >> $LOGFILE 2>&1
+cd /var/www/$2/current && rake mkt_tools:sync_members_to_exact_target  >> $LOGFILE 2>&1
 cd /var/www/$2/current && rake mkt_tools:sync_prospects_to_exact_target  >> $LOGFILE 2>&1
+cd /var/www/$2/current && rake mkt_tools:sync_members_to_mailchimp  >> $LOGFILE 2>&1
+cd /var/www/$2/current && rake mkt_tools:sync_prospects_to_mailchimp  >> $LOGFILE 2>&1
 
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS

@@ -9,6 +9,9 @@
 		<%= label_tag attribute_name, attribute_name + '*', :class => 'control-label' %>
 	  <div class="controls" id=<%="control_#{attribute_name}"%>>
 	    <%= text_field_tag attribute_name, '', :class => 'text_field input-small manual_validation', :value => (email_template.external_attributes[attribute_name.to_sym] unless email_template.new_record?) %>
+        <%= render :partial => "shared/help", :locals => { 
+	        :title => t("activerecord.attributes.email_template.external_attributes_params.#{attribute_name}"), 
+	        :content => t("activerecord.attributes.email_template.external_attributes_params.#{attribute_name}_help") } %>
 	    <div id="<%= attribute_name %>_error_message" style='display:inline-block;'></div>
 	  </div>
 	</div>

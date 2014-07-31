@@ -1163,32 +1163,37 @@ class Member < ActiveRecord::Base
   end
   handle_asynchronously :desnormalize_preferences, :queue => :generic_queue, priority: 40
 
-  def marketing_tool_sync_without_dj
-    self.exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
-  end
-
   def marketing_tool_sync
-    marketing_tool_sync_without_dj
+    case(club.marketing_tool_client)
+    when 'exact_target'
+      marketing_tool_exact_target_sync if defined?(SacExactTarget::MemberModel)
+    when 'mailchimp_member'
+      marketing_tool_mailchimp_sync if defined?(SacMailchimp::MemberModel)
+    end
   end
-  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync, priority: 30
 
   # used for member blacklist
   def marketing_tool_sync_unsubscription
-    if defined?(SacExactTarget::MemberModel) and not exact_target_member.nil?
-      exact_target_after_create_sync_to_remote_domain
-      exact_target_member.unsubscribe!
+    case(club.marketing_tool_client)
+    when 'exact_target'
+      exact_target_unsubscribe if defined?(SacExactTarget::MemberModel)
+    when 'mailchimp_member'
+      mailchimp_unsubscribe if defined?(SacMailchimp::MemberModel)
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
     Auditory.report_issue("Member::unsubscribe", e, { :member => self.inspect })
   end
-  handle_asynchronously :marketing_tool_sync_unsubscription, :queue => :exact_target_sync, priority: 30
 
   # used for member unblacklist
   def marketing_tool_sync_subscription
-    exact_target_member.subscribe! if defined?(SacExactTarget::MemberModel)
+    case(club.marketing_tool_client)
+    when 'exact_target'
+      exact_target_subscribe if defined?(SacExactTarget::MemberModel)
+    when 'mailchimp_member'
+      mailchimp_subscribe if defined?(SacMailchimp::MemberModel)
+    end
   end
-  handle_asynchronously :marketing_tool_sync_subscription, :queue => :exact_target_sync, priority: 30
 
   def get_offset_related
     Time.now.in_time_zone(get_club_timezone).formatted_offset
@@ -1398,6 +1403,6 @@ class Member < ActiveRecord::Base
     end
 
     def set_marketing_client_sync_as_needed
-      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::MemberModel)
+      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel)
     end
 end

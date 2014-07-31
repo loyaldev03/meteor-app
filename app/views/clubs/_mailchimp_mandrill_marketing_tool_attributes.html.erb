@@ -1,16 +1,16 @@
 <div class="control-group">
 	<%= label_tag :mandrill_api_key, t('activerecord.attributes.club.marketing_tool_attributes.mailchimp_mandrill.mandrill_api_key') ,:class => 'control-label' %>
-	<div class="controls">
+	<div class="controls" id="div_marketing_tool_attributes_mandrill_api_key">
 	  <%= text_field_tag 'marketing_tool_attributes[mandrill_api_key]', (@club.marketing_tool_attributes["mandrill_api_key"] if @club.marketing_tool_attributes)  %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.club.marketing_tool_attributes.mailchimp_mandrill.mandrill_api_key'), 
         :content => t('activerecord.attributes.club.marketing_tool_attributes.mailchimp_mandrill.mandrill_api_key_help') } %>
 	</div>
 </div>
-
+	
 <div class="control-group">
 	<%= label_tag :mailchimp_api_key, t('activerecord.attributes.club.marketing_tool_attributes.mailchimp_mandrill.mailchimp_api_key') ,:class => 'control-label' %>
-	<div class="controls">
+	<div class="controls" id="div_marketing_tool_attributes_mailchimp_api_key">
 	  <%= text_field_tag 'marketing_tool_attributes[mailchimp_api_key]', (@club.marketing_tool_attributes["mailchimp_api_key"] if @club.marketing_tool_attributes)  %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.club.marketing_tool_attributes.mailchimp_mandrill.mailchimp_api_key'), 
@@ -20,7 +20,7 @@
 
 <div class="control-group">
 	<%= label_tag :mailchimp_list_id, t('activerecord.attributes.club.marketing_tool_attributes.mailchimp_mandrill.mailchimp_list_id') ,:class => 'control-label' %>
-	<div class="controls">
+	<div class="controls" id="div_marketing_tool_attributes_mailchimp_list_id">
 	  <%= text_field_tag 'marketing_tool_attributes[mailchimp_list_id]', (@club.marketing_tool_attributes["mailchimp_list_id"] if @club.marketing_tool_attributes)  %>
     <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.club.marketing_tool_attributes.mailchimp_mandrill.mailchimp_list_id'), 

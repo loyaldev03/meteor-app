@@ -37,7 +37,16 @@ module SacExactTarget
 
     module InstanceMethods
       def exact_target_prospect
-        @exact_target_prospect ||= SacExactTarget::ProspectModel.new self
+        if self.club.club.exact_target_sync?
+          @exact_target_prospect ||= if !self.exact_target_sync?
+            nil
+          else
+            SacExactTarget::ProspectModel.new self
+          end
+        else
+          Auditory.report_issue("Prospect:exact_target_prospect", 'Exact Target not configured correctly', { :club => self.club.inspect, :prospect => self.inspect })
+          nil
+        end
       end
 
       def exact_target_after_create_sync_to_remote_domain(club = nil)

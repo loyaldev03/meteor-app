@@ -92,6 +92,7 @@ SacPlatform::Application.routes.draw do
         get  '/sync' => 'members#sync_data', as: 'member_sync_data'
         post '/pardot_sync' => 'members#pardot_sync', as: 'member_pardot_sync'
         post '/exact_target_sync' => 'members#exact_target_sync', as: 'member_exact_target_sync'
+        post '/mailchimp_sync' => 'members#mailchimp_sync', as: 'member_mailchimp_sync'
         post '/reset_password' => 'members#reset_password', as: 'member_reset_password'
         post '/resend_welcome' => 'members#resend_welcome', as: 'member_resend_welcome'
         get  '/login_as_member' => 'members#login_as_member', as: 'login_as_member'

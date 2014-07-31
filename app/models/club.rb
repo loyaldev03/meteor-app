@@ -29,6 +29,8 @@ class Club < ActiveRecord::Base
 
   acts_as_paranoid
 
+  before_validation :complete_urls
+  before_save :not_allow_multiple_mailchimp_clients_with_same_list_id
   after_create :add_default_member_groups, :add_default_product, :add_default_disposition_type
   after_update :resync_with_merketing_tool_process
 
@@ -37,13 +39,12 @@ class Club < ActiveRecord::Base
   validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url,
             :format =>  /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
 
-  scope :exact_target_related, lambda { where("marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes like '%et_prospect_list%' AND marketing_tool_attributes like '%et_members_list%' ") }
+  scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target'") }
+  scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill'") }
 
   has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            :url => "/system/:attachment/:id/:style/:filename",
                            :styles => { :header => "120x40", :thumb => "100x100#", :small  => "150x150>" }
-
-  before_validation :complete_urls
 
   DEFAULT_PRODUCT = ['KIT-CARD']
 
@@ -101,6 +102,20 @@ class Club < ActiveRecord::Base
     ].none?(&:blank?)
   end
 
+  def mailchimp_sync?
+    self.marketing_tool_attributes and 
+    [ 
+      self.marketing_tool_attributes['mailchimp_api_key'], 
+      self.marketing_tool_attributes['mailchimp_list_id'] 
+    ].none?(&:blank?)
+  end
+
+  def mandrill_configured?
+    self.marketing_tool_attributes and 
+    [ 
+      self.marketing_tool_attributes['mandrill_api_key']
+    ].none?(&:blank?)
+  end
 
   def marketing_tool_correctly_configured? 
     case marketing_tool_client
@@ -108,6 +123,8 @@ class Club < ActiveRecord::Base
       exact_target_sync?
     when "pardot"
       pardot_sync?
+    when "mailchimp_mandrill"
+      mailchimp_sync? and mandrill_configured?
     end
   end
     
@@ -138,7 +155,6 @@ class Club < ActiveRecord::Base
     self.prospects.update_all(:need_sync_to_marketing_client => 1)
   end
   handle_asynchronously :resync_members_and_prospects, :queue => :generic_queue
-
 
   private
     def add_default_member_groups
@@ -193,4 +209,20 @@ class Club < ActiveRecord::Base
         end
       end
     end
+
+    def not_allow_multiple_mailchimp_clients_with_same_list_id
+      if self.mailchimp_mandrill_client? and self.changes.include?(:marketing_tool_attributes) and not self.changes['marketing_tool_attributes'].last["mailchimp_list_id"].blank?
+        mailchimp_list_id = self.changes['marketing_tool_attributes'].last["mailchimp_list_id"]
+        already_configured = Club.mailchimp_related.where("marketing_tool_attributes like ? and id != ?", "%#{mailchimp_list_id}%", id.to_i)
+        unless already_configured.empty?
+          already_configured.each do |club|
+            if club.marketing_tool_attributes["mailchimp_list_id"] == mailchimp_list_id
+              errors[:marketing_tool_attributes] << "mailchimp_list_id;List ID #{mailchimp_list_id} is already configured in another club."
+              return false
+            end
+          end
+        end
+      end
+    end
+
 end
