@@ -74,7 +74,6 @@ module SacMailchimp
 		    'BIRTHDATE' => 'birth_date',
 		    'GENDER' => 'gender',
 		    'PHONE' => 'full_phone_number',
-        'CLUBID' => 'club_id',
         'TOMID' => 'terms_of_membership_id',
         'JOINDATE' => 'created_at',
         'MKTCODE' => 'marketing_code',

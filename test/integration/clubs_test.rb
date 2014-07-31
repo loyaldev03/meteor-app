@@ -47,7 +47,6 @@ class ClubTest < ActionController::IntegrationTest
     end
   end
 
-
   test "Search option in My Clubs should not affect front end perfomance" do
     saved_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     visit my_clubs_path
@@ -313,5 +312,4 @@ class ClubTest < ActionController::IntegrationTest
     configure_mailchimp_mandrill("mailchimp_api_key_test_new","mandrill_api_key_test_new","list_id_test_new")
     click_link_or_button 'Update Club'
   end
-
 end
