@@ -7,7 +7,8 @@ module SacMailchimp
 
     def new_record?
       # Find by subscriber key. We cant get the list of Lists to which this subscriber is subscribe it on. 
-      res = Gibbon::API.lists.member_info({ id: mailchimp_list_id, emails: [{email: self.member.email}] })
+      mailchimp_identification = self.member.marketing_client_id.nil? ? {email: self.member.email} : {euid: self.member.marketing_client_id}
+      res = Gibbon::API.lists.member_info({ id: mailchimp_list_id, emails: [mailchimp_identification] })
       @subscriber = res
       @subscriber["success_count"] == 0
     rescue Exception  => e
