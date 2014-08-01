@@ -6,7 +6,7 @@ module SacMandrill
     end
 
     def mandrill_member
-      return @mandrill_member if @mandrill_member.nil?
+      return @mandrill_member unless @mandrill_member.nil?
       if self.club.mandrill_configured?
         @mandrill_member ||= if !self.mandrill_configured?
           false
