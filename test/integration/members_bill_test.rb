@@ -384,7 +384,7 @@ class MembersBillTest < ActionController::IntegrationTest
     
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     within("#table_membership_information") do
-      within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_amount}") }
+      within("#td_mi_club_cash_amount") { assert page.has_content?("#{@terms_of_membership_with_gateway.club_cash_installment_amount.to_i + @terms_of_membership_with_gateway.initial_club_cash_amount.to_i}") }
     end
 
     within('.nav-tabs'){ click_on 'Transactions'}
