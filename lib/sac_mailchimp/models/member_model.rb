@@ -46,7 +46,7 @@ module SacMailchimp
         # to the leid we do not have saved. In case it is not prospect we use marketing_client we have.
         # TODO: if we have a marketing_client_id in prospect too we would be avoiding this step.
         mailchimp_identification = self.member.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.member.marketing_client_id
-      	client.lists.subscribe( subscriber({:leid => mailchimp_identification}, options) )
+      	client.lists.subscribe( subscriber({:euid => mailchimp_identification}, options) )
     	rescue Exception => e
 	      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
 	      raise e
@@ -72,7 +72,7 @@ module SacMailchimp
           marketing_client_synced_status: 'synced',
           marketing_client_last_sync_error: nil,
           marketing_client_last_sync_error_at: nil,
-          marketing_client_id: res["leid"]
+          marketing_client_id: res["euid"]
         }
       end
       data = data.merge(need_sync_to_marketing_client: false)
