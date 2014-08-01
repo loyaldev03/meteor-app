@@ -19,7 +19,7 @@ class PaymentGatewayConfigurationTest < ActionController::IntegrationTest
     fill_in "payment_gateway_configuration[aus_login]", with: new_pgc.aus_login if new_pgc.aus_login
     fill_in "payment_gateway_configuration[aus_password]", with: new_pgc.aus_password if new_pgc.aus_password
     confirm_ok_js
-  end
+      end
 
   test "Add PGC, Show a PGC and Edit PGC- Login by General Admin" do
     visit club_path(@partner.prefix, @club.id)
@@ -75,18 +75,15 @@ class PaymentGatewayConfigurationTest < ActionController::IntegrationTest
     assert page.has_content? new_pgc.login
   end
 
-
   test "Do not allow enter PGC duplicated - Login by General Admin" do
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     visit club_path(@partner.prefix, @club.id)
     click_link_or_button "Payment Gateway Configuration"
     new_pgc = FactoryGirl.build(:payment_gateway_configuration)
     click_link_or_button "Replace Payment Gateway"
-
-    fill_in_payment_gateway_configuration(new_pgc)
-    confirm_ok_js
-    click_link_or_button "Create Payment gateway configuration"
-    assert page.has_content? "Gateway already created. There is a payment gateway already configured for this gateway"
+    assert page.has_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="authorize_net"]'
+    assert page.has_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="litle"]'
+    assert page.has_no_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="mes"]'
   end
 
   test "Do not allow to edit a PGC if it has members - Login by General Admin" do
