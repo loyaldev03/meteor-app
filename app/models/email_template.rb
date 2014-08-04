@@ -5,7 +5,6 @@ class EmailTemplate < ActiveRecord::Base
   serialize :external_attributes
 
   TEMPLATE_TYPES = [
-    :active,                  # Sent when member changes its status to active
     :cancellation,            # Sent when member changes its status to lapsed
     :rejection,               # Sent when member is in applied status, and it is rejected by one of our agents
     :prebill,                 # Sent 7 days before we bill member
@@ -41,6 +40,29 @@ class EmailTemplate < ActiveRecord::Base
       ['trigger_id', 'mlid', 'site_id']
     else
       []
+    end
+  end
+
+  def self.template_types_helper(type)
+    case type
+    when :cancellation
+      "Sent when member changes its status to lapsed."
+    when :rejection
+      "Sent when member is in applied status, and it is rejected by one of our agents."
+    when :prebill
+      "Sent 7 days before billing the member."
+    when :manual_payment_prebill
+      "Sent 14 days before next billing day."
+    when :refund
+      "Sent when doing a refund."
+    when :birthday
+      "Sent if birthday is on enrollment_info"
+    when :pillar
+      "Emails sent a certain amount of days after join date on active and provisional members."
+    when :hard_decline
+      "Emails sent when hard decline happens"
+    when :soft_decline
+      "Emails sent when soft decline happens"
     end
   end
 

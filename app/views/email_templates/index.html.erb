@@ -1,7 +1,7 @@
 <section>
   <div class="page-header">
     <h1>Communications</h1>
-    <h3>Plan: <%= @tom.name %></h3>
+    <h3>Subscription Plan: <%= @tom.name %></h3>
     <% if can? :create, EmailTemplate %>
       <%= link_to(new_terms_of_membership_email_template_path, :class => "btn btn-primary btn_on_header", :id => "new_communication") do %> 
         <i class="icon-plus"></i> New Communication
