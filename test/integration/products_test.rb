@@ -140,7 +140,7 @@ class ProductsTest < ActionController::IntegrationTest
 	test "Duplicate product in the same club" do
 		unsaved_product = FactoryGirl.create(:product, :club_id => @club.id )
 		create_product unsaved_product, false
-		assert page.has_content?("has already been taken")
+		assert page.has_content?("Product with sku '#{unsaved_product.sku}' already exists within this club.")
 	end
 	
 	test "Create a product with package limit - 19 chars length" do
@@ -180,5 +180,4 @@ class ProductsTest < ActionController::IntegrationTest
 		unsaved_product = FactoryGirl.build(:product, :club_id => @club.id, :allow_backorder => true )
 		create_product(unsaved_product)
 	end
-
 end
