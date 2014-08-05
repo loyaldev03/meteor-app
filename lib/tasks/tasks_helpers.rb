@@ -294,9 +294,9 @@ module TasksHelpers
           end
         end
       end
+      Notifier.hot_rod_magazine_cancellation(File.read(temp_file), members.count).deliver!
+      File.delete(temp_file)
     end
-    Notifier.hot_rod_magazine_cancellation(File.read(temp_file), members.count).deliver!
-    File.delete(temp_file)
   end
 
   #######################################################
