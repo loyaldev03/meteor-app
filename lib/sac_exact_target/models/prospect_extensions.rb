@@ -37,7 +37,7 @@ module SacExactTarget
 
     module InstanceMethods
       def exact_target_prospect
-        if self.club.club.exact_target_sync?
+        if self.club.exact_target_sync?
           @exact_target_prospect ||= if !self.exact_target_sync?
             nil
           else
