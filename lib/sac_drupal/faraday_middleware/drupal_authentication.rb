@@ -69,7 +69,7 @@ module Drupal
         conn.headers['Cookie'] = self.cookie
         res = conn.get TOKEN_PATH
         if res.status == 200
-          res.body.strip
+          res.body.to_s.strip
         else
           Drupal.logger.error AuthError.new("HTTP #{res.status} when getting token") 
           nil
