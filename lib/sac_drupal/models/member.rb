@@ -189,20 +189,14 @@ module Drupal
           ]          
         },
         roles: role_list,
+        field_phoenix_member_id: {
+          und: [ { value: m.reload.id } ]
+        }
       }
 
       if self.new_record?
         map.merge!({
           pass: SecureRandom.hex, 
-          field_phoenix_member_id: {
-            und: [ { value: m.id } ]
-          }
-        })
-      else
-        map.merge!({
-          field_profile_member_id: { 
-            und: [ { value: m.reload.id } ] 
-          }
         })
       end
 
