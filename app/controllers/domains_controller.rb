@@ -74,7 +74,7 @@ class DomainsController < ApplicationController
     if @domain.destroy
       redirect_to domains_url, notice: "Domain #{@domain.url} was successfully destroyed"
     else
-      redirect_to domains_path(:id => @domain), :flash => { error: "The domain #{@domain.url} cannot be destroyed. You must have at least one domain."}
+      redirect_to domains_path(:id => @domain), :flash => { error: @domain.errors[:base].first[:error] }
     end
   end
 
