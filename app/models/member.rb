@@ -425,13 +425,13 @@ class Member < ActiveRecord::Base
 
   def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = {})
     if can_change_tom?
-      former_membership = current_membership
       new_tom = TermsOfMembership.find new_tom_id
 
       if new_tom.club_id == self.club_id
         if new_tom_id.to_i == terms_of_membership.id
           response = { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
         else
+          previous_membership = current_membership
           response = if prorated
             prorated_enroll(new_tom, agent, credit_card_params, self.current_membership.enrollment_info)
           else 
@@ -439,8 +439,8 @@ class Member < ActiveRecord::Base
           end
           if response[:code] == Settings.error_codes.success
             Auditory.audit(agent, new_tom, operation_message, self, operation_type)
-            Membership.find(former_membership.id).cancel_because_of_membership_change
-            self.current_membership.update_attribute :parent_membership_id, former_membership.id
+            Membership.find(previous_membership.id).cancel_because_of_membership_change
+            self.current_membership.update_attribute :parent_membership_id, previous_membership.id
           # update manually this fields because we cant cancel member
           end
         end
