@@ -427,9 +427,10 @@ class Member < ActiveRecord::Base
     if can_change_tom?
       former_membership = current_membership
       new_tom = TermsOfMembership.find new_tom_id
+
       if new_tom.club_id == self.club_id
         if new_tom_id.to_i == terms_of_membership.id
-          { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
+          response = { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
         else
           response = if prorated
             prorated_enroll(new_tom, agent, credit_card_params, self.current_membership.enrollment_info)
