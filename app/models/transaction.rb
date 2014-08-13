@@ -122,6 +122,8 @@ class Transaction < ActiveRecord::Base
         credit
       when "refund"
         refund
+      when "balance"
+        balance
       # when "void"
       #   void
       #when "authorization_capture"
@@ -181,8 +183,7 @@ class Transaction < ActiveRecord::Base
     end
   end
 
-
-  def self.refund(amount, sale_transaction_id, agent=nil)
+  def self.refund(amount, sale_transaction_id, agent=nil, update_refunded_amount = true)
     # Lock transaction, so no one can use this record while we refund this member.
     sale_transaction = Transaction.find sale_transaction_id, :lock => true
     if not sale_transaction.has_same_pgc_as_current?
@@ -200,7 +201,7 @@ class Transaction < ActiveRecord::Base
         trans.fill_transaction_type_for_credit(sale_transaction)
         answer = trans.process
         if trans.success?
-          sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount
+          sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount if update_refunded_amount
           sale_transaction.save
           Auditory.audit(agent, trans, "Refund success $#{amount} on transaction #{sale_transaction.id}", sale_transaction.member, Settings.operation_types.credit)
           Communication.deliver!(:refund, sale_transaction.member)
@@ -212,6 +213,14 @@ class Transaction < ActiveRecord::Base
         answer
       end
     end
+  end
+
+  def self.generate_balance_transaction(agent, member, amount, membership, transaction_to_refund = nil)
+    trans = Transaction.obtain_transaction_by_gateway!(membership.terms_of_membership.payment_gateway_configuration.gateway)
+    trans.transaction_type = "balance"
+    trans.prepare(member, member.active_credit_card, amount, membership.terms_of_membership.payment_gateway_configuration, membership.terms_of_membership.id, membership, Settings.operation_types.membership_balance_transfer)
+    trans.process
+    transaction_to_refund.update_attribute :refunded_amount, amount.abs if transaction_to_refund
   end
 
   def amount_available_to_refund
@@ -292,6 +301,10 @@ class Transaction < ActiveRecord::Base
     def sale_manual
       purchase_response = { :message => "Manual transaction success. Amount $#{self.amount}", :code => Settings.error_codes.success }
       save_custom_response(purchase_response, true)
+    end
+
+    def balance
+      save_custom_response({ :message => "Balance transaction.", :code => Settings.error_codes.success }, true)
     end
 
     def save_custom_response(answer, trans_success=false)

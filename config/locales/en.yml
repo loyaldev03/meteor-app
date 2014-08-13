@@ -188,6 +188,7 @@ en:
           refund: Credit
           credit: Credit
           void: Credit
+          balance: Balance
           authorization_capture: 'Authorization-Capture'
           chargeback: Chargeback
         transaction_types_messages:

@@ -54,6 +54,8 @@ defaults: &defaults
     credit_error_gateway_differs_from_current: 124
     chargeback_rebutted: 125
     unprocessed_chargeback: 126
+    tom_change_billing: 127
+    membership_balance_transfer: 128
     #profile
     cancel: 200 
     future_cancel: 201
@@ -215,6 +217,7 @@ defaults: &defaults
     credit_card_blank: '9509'
     credit_card_gateway_differs_from_current: '9510'
     credit_amount_invalid: '9785'
+    error_on_prorated_enroll: '9784'
     member_not_expecting_billing: '9787'
     refund_invalid: '9788'
     transaction_gateway_differs_from_current: '9786'

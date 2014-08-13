@@ -506,13 +506,21 @@ class Api::MembersController < ApplicationController
   end
 
   ##
-  # Change actual terms of membership related to a member.
+  # Change actual terms of membership related to a member, with the option to prorate it.
   #
-  # @resource /api/v1/members/:id/change_terms_of_membership
+  # @resource /api/v1/members/:id/update_terms_of_membership
   # @action POST
   #
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Integer] terms_of_membership_id New Terms of membership's ID to set on members.
+  # @optional [Boolean] prorate Boolean value to define if we will proceed with the prorate logic, or not. (1= follow prorate logic, 0= do not follow prorate logic). Default value is 1 (true)
+  # @optional [Hash] credit_card Hash with credit cards information. It must have the following information:
+  #     <ul>
+  #       <li><strong>set_active</strong> Boolean value to decide whether or not we will set the credit card as active. (1= set credit card as active, 0= do not set credit card as active) </li>
+  #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
+  #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
+  #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
+  #     </ul>
   #
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
@@ -532,12 +540,13 @@ class Api::MembersController < ApplicationController
   #     <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
   #   </ul> 
   #
-  def change_terms_of_membership
-    tom = TermsOfMembership.find(params[:terms_of_membership_id])
+  def update_terms_of_membership
+    new_tom = TermsOfMembership.find(params[:terms_of_membership_id])
     member = Member.find(params[:id])
-    my_authorize! :api_change, TermsOfMembership, tom.club_id
-    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.save_the_sale_through_api, @current_agent)
-  rescue ActiveRecord::RecordNotFound => e 
+    my_authorize! :api_change, TermsOfMembership, new_tom.club_id
+    
+    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.save_the_sale_through_api, @current_agent, params[:prorated].to_s.to_bool, params[:credit_card])
+  rescue ActiveRecord::RecordNotFound => e
     if e.to_s.include? "TermsOfMembership"
       message = "Terms of membership not found"
     elsif e.to_s.include? "Member"
@@ -547,6 +556,9 @@ class Api::MembersController < ApplicationController
   rescue NoMethodError => e
     Auditory.report_issue("API::TermsOfMembership::change", e, { :params => params.inspect })
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
+  rescue Exception => e
+    Auditory.report_issue("API::TermsOfMembership::change", e, { :params => params.inspect })
+    render json: { :message => I18n.t('error_messages.unrecoverable_error'), :code => Settings.error_codes.wrong_data }
   end
 
   ##
@@ -574,7 +586,7 @@ class Api::MembersController < ApplicationController
     member = Member.find(params[:id])
     my_authorize! :api_sale, Member, member.club_id
     render json: member.no_recurrent_billing(params[:amount], params[:description], params[:type])
-  rescue ActiveRecord::RecordNotFound => e 
+  rescue ActiveRecord::RecordNotFound => e
     if e.to_s.include? "TermsOfMembership"
       message = "Terms of membership not found"
     elsif e.to_s.include? "Member"
