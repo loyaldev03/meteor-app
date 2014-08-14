@@ -545,7 +545,7 @@ class Api::MembersController < ApplicationController
     member = Member.find(params[:id])
     my_authorize! :api_change, TermsOfMembership, new_tom.club_id
     
-    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.save_the_sale_through_api, @current_agent, params[:prorated].to_s.to_bool, params[:credit_card])
+    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, params[:prorated].to_s.to_bool, params[:credit_card])
   rescue ActiveRecord::RecordNotFound => e
     if e.to_s.include? "TermsOfMembership"
       message = "Terms of membership not found"
@@ -554,10 +554,10 @@ class Api::MembersController < ApplicationController
     end
     render json: { :message => message, :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
-    Auditory.report_issue("API::TermsOfMembership::change", e, { :params => params.inspect })
+    Auditory.report_issue("API::TermsOfMembership::update", e, { :params => params.inspect })
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   rescue Exception => e
-    Auditory.report_issue("API::TermsOfMembership::change", e, { :params => params.inspect })
+    Auditory.report_issue("API::TermsOfMembership::update", e, { :params => params.inspect })
     render json: { :message => I18n.t('error_messages.unrecoverable_error'), :code => Settings.error_codes.wrong_data }
   end
 

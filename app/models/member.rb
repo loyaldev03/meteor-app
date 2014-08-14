@@ -283,7 +283,7 @@ class Member < ActiveRecord::Base
       self.bill_date = next_bill_date
       self.recycled_times = 0
       self.save(:validate => false)
-      message = "Next bill date changed to #{next_bill_date.to_date}" + " #{concept.to_s}"
+      message = "Next bill date changed to #{next_bill_date.to_date} #{concept.to_s}"
       Auditory.audit(current_agent, self, message, self, Settings.operation_types.change_next_bill_date)
       answer = {:message => message, :code => Settings.error_codes.success }
     else
@@ -746,38 +746,36 @@ class Member < ActiveRecord::Base
   end
 
   def prorated_enroll(tom, agent = nil, credit_card_params = nil, member_params = nil)
-    if credit_card_params
+    if credit_card_params 
       response = self.update_credit_card_from_drupal(credit_card_params, agent) 
       if response[:code] != Settings.error_codes.success
-        return response 
+        return response
       end
+      credit_card = CreditCard.find(response[:credit_card_id])
+    else
+      credit_card = self.active_credit_card
     end
-    credit_card = self.active_credit_card
-    former_membership = self.current_membership
-    former_tom = self.terms_of_membership
-    trans = nil
-    last_sale_transaction = nil
-    prorated_club_cash = nil
+
+    unless self.valid?
+      return { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, :errors => self.errors.to_hash }
+    end
+
+
     new_membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent)
-    self.current_membership = new_membership
-    
     if self.active?
-      days_until_nbd = if self.recycled_times == 0 and next_retry_bill_date > Time.zone.now 
-        (self.next_retry_bill_date.to_date - Time.zone.now.to_date).to_i
-      else
-        0
-      end
-      sales_transactions = transactions.where('terms_of_membership_id = ? and operation_type in (?)', self.terms_of_membership.id, Settings.operation_types.membership_billing)
-      if sales_transactions.empty? or sales_transactions.last.refunded_amount != 0.0
-        return { :message => "We cannot process your request. Please call member services at: #{self.club.cs_phone_number}.", :code => Settings.error_codes.error_on_prorated_enroll }
+      former_membership = self.current_membership
+      former_tom = self.terms_of_membership
+      days_until_nbd = (self.recycled_times == 0 and next_retry_bill_date > Time.zone.now) ? (self.next_retry_bill_date.to_date - Time.zone.now.to_date).to_i : 0
+
+      sales_transactions_count = transactions.where('terms_of_membership_id = ? and operation_type in (?)', self.terms_of_membership.id, Settings.operation_types.membership_billing).count 
+      sale_transaction = transactions.where('terms_of_membership_id = ? and operation_type in (?)', self.terms_of_membership.id, Settings.operation_types.membership_billing).last
+      if sale_transaction.nil? or (sale_transaction and sale_transaction.refunded_amount != 0.0)
+        return { :message => I18n.t('error_messages.prorated_enroll_failure', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.error_on_prorated_enroll }
       end
 
       amount_in_favor = (former_tom.installment_amount*(days_until_nbd/former_tom.installment_period))
       amount_to_process = (tom.installment_amount) - amount_in_favor
-      last_sale_transaction = sales_transactions.last
-      prorated_club_cash = if former_tom.club_cash_installment_amount == 0.0
-        0.0
-      elsif sales_transactions.count == 1
+      prorated_club_cash = if sales_transactions_count == 1
         former_tom.skip_first_club_cash ? 0.0 : (former_tom.club_cash_installment_amount*(days_until_nbd/former_tom.installment_period))
       else
         (former_tom.club_cash_installment_amount*(days_until_nbd/former_tom.installment_period))
@@ -789,12 +787,12 @@ class Member < ActiveRecord::Base
         trans.transaction_type = "sale"
         trans.prepare(self, credit_card, amount_to_process, tom.payment_gateway_configuration, tom.id, nil, operation_type)
         answer = trans.process
-        message = "Memberhip prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{former_tom.id}) -#{former_tom.name}-. Final amount billed: $#{amount_to_process}"
+        message = "Membership prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{former_tom.id}) -#{former_tom.name}-. Final amount billed: $#{amount_to_process}"
       else
-        answer = Transaction.refund(amount_to_process.abs, last_sale_transaction, agent, false)
+        answer = Transaction.refund(amount_to_process.abs, sale_transaction, agent, false)
         self.reload
         trans = self.transactions.last
-        message = "Memberhip prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{former_tom.id}) -#{former_tom.name}-. Final amount refunded: $#{amount_to_process}"
+        message = "Membership prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{former_tom.id}) -#{former_tom.name}-. Final amount refunded: $#{amount_to_process}"
       end
 
       unless trans.success?
@@ -807,6 +805,7 @@ class Member < ActiveRecord::Base
       end
       Auditory.audit(agent, trans, message, self, operation_type)
     else
+      operation_type = Settings.operation_types.enrollment_billing
       days_already_in_provisional = (Time.zone.now.to_date - Time.zone.now.to_date ).to_i
     end
 
@@ -816,7 +815,7 @@ class Member < ActiveRecord::Base
       self.enrollment_infos << enrollment_info
       self.memberships << new_membership
       self.current_membership = new_membership
-      self.save!
+      self.save
       enrollment_info.membership = new_membership
       enrollment_info.save
       if trans
@@ -828,7 +827,7 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, 0.0, enrollment_info, operation_type)
       
       if trans
-        proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, prorated_club_cash, last_sale_transaction)
+        proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, prorated_club_cash, sale_transaction)
       else
         new_next_bill_date = (self.join_date + tom.provisional_days.days) - days_already_in_provisional.days
         new_next_bill_date = Time.zone.now if new_next_bill_date.to_date < Time.zone.now.to_date
@@ -842,7 +841,7 @@ class Member < ActiveRecord::Base
       logger.error e.inspect
       Auditory.report_issue("Member:prorated_enroll -- member turned invalid while enrolling", e, { :member => self.inspect, :credit_card => credit_card.inspect, :enrollment_info => enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
-      Auditory.audit(agent, self, "Member:enroll", self, Settings.operation_types.error_on_enrollment_billing)
+      Auditory.audit(agent, self, "Member:prorated_enroll", self, Settings.operation_types.error_on_prorated_enroll)
       { :message => I18n.t('error_messages.member_not_saved', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.member_not_saved }
     end
   end
@@ -1152,7 +1151,6 @@ class Member < ActiveRecord::Base
   end
 
   def validate_if_credit_card_already_exist(tom, number, new_year, new_month, only_validate = true, allow_cc_blank = false, current_agent = nil, set_active = true)
-      
     answer = { :message => "Credit card valid", :code => Settings.error_codes.success}
     family_memberships_allowed = tom.club.family_memberships_allowed
     new_credit_card = CreditCard.new(:number => number, :expire_month => new_month, :expire_year => new_year)
@@ -1176,16 +1174,16 @@ class Member < ActiveRecord::Base
     # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in inactive status?
     elsif not credit_cards.select { |cc| cc.member_id == self.id and not cc.active }.empty? and (family_memberships_allowed or credit_cards.select { |cc| cc.member_id != self.id and cc.active }.empty?)
       unless only_validate
-        new_active_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
+        new_credit_card = CreditCard.find credit_cards.select { |cc| cc.member_id == self.id }.first.id
         CreditCard.transaction do 
           begin
-            answer = new_active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
+            answer = new_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
             if answer[:code] == Settings.error_codes.success
               # activate new credit card ONLY if expire date was updated.
-              new_active_credit_card.set_as_active! if set_active
+              new_credit_card.set_as_active! if set_active
             end
           rescue Exception => e
-            Auditory.report_issue("Members::update_credit_card_from_drupal", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :new_active_credit_card => new_active_credit_card.inspect, :member => self.inspect })
+            Auditory.report_issue("Members::update_credit_card_from_drupal", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :new_active_credit_card => new_credit_card.inspect, :member => self.inspect })
             raise ActiveRecord::Rollback
           end
         end
@@ -1198,7 +1196,7 @@ class Member < ActiveRecord::Base
     else
       answer = { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
     end
-    answer
+    answer[:code]==Settings.error_codes.success ? answer.merge!(:credit_card_id => new_credit_card.id) : answer
   end
 
   def update_credit_card_from_drupal(credit_card, current_agent = nil)
@@ -1214,7 +1212,8 @@ class Member < ActiveRecord::Base
       { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card'), :errors => { :number => "Credit card is blank." }}
     elsif credit_card[:number].include?('X')
       if active_credit_card.last_digits.to_s == credit_card[:number][-4..-1].to_s # lets update expire month
-        active_credit_card.update_expire(new_year, new_month, current_agent)
+        answer = active_credit_card.update_expire(new_year, new_month, current_agent)
+        answer.merge!(:credit_card_id => new_credit_card.id)
       else # do not update nothing, credit cards do not match or its expired
         { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card'), :errors => { :number => "Credit card do not match the active one." }}
       end
@@ -1228,7 +1227,7 @@ class Member < ActiveRecord::Base
     CreditCard.transaction do 
       begin    
         new_credit_card.member = self
-        new_credit_card.activ e = set_active
+        new_credit_card.active = set_active
         new_credit_card.gateway = self.terms_of_membership.payment_gateway_configuration.gateway if new_credit_card.gateway.nil?
         if new_credit_card.errors.size == 0
           new_credit_card.save!
@@ -1392,11 +1391,11 @@ class Member < ActiveRecord::Base
       { :message => message, :code => Settings.error_codes.success, :member_id => self.id }
     end
 
-    def proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, club_cash_to_substract, last_sale_transaction)
+    def proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, club_cash_to_substract, sale_transaction)
       unless set_as_active
         Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
-      Transaction.generate_balance_transaction(agent, self, -amount_in_favor, former_membership, last_sale_transaction)
+      Transaction.generate_balance_transaction(agent, self, -amount_in_favor, former_membership, sale_transaction)
       Transaction.generate_balance_transaction(agent, self, amount_in_favor, current_membership)
 
       club_cash_to_substract = self.club_cash_amount if self.club_cash_amount < club_cash_to_substract.abs
