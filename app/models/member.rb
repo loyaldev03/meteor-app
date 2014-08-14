@@ -760,26 +760,26 @@ class Member < ActiveRecord::Base
       return { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, :errors => self.errors.to_hash }
     end
 
-
     new_membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent)
     if self.active?
       former_membership = self.current_membership
       former_tom = self.terms_of_membership
-      days_until_nbd = (self.recycled_times == 0 and next_retry_bill_date > Time.zone.now) ? (self.next_retry_bill_date.to_date - Time.zone.now.to_date).to_i : 0
+      days_until_nbd = if (self.recycled_times == 0 and next_retry_bill_date > Time.zone.now) 
+        (self.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+      else
+        0
+      end
 
       sales_transactions_count = transactions.where('terms_of_membership_id = ? and operation_type in (?)', self.terms_of_membership.id, Settings.operation_types.membership_billing).count 
       sale_transaction = transactions.where('terms_of_membership_id = ? and operation_type in (?)', self.terms_of_membership.id, Settings.operation_types.membership_billing).last
       if sale_transaction.nil? or (sale_transaction and sale_transaction.refunded_amount != 0.0)
         return { :message => I18n.t('error_messages.prorated_enroll_failure', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.error_on_prorated_enroll }
       end
-
-      amount_in_favor = (former_tom.installment_amount*(days_until_nbd/former_tom.installment_period))
-      amount_to_process = (tom.installment_amount) - amount_in_favor
-      prorated_club_cash = if sales_transactions_count == 1
-        former_tom.skip_first_club_cash ? 0.0 : (former_tom.club_cash_installment_amount*(days_until_nbd/former_tom.installment_period))
-      else
-        (former_tom.club_cash_installment_amount*(days_until_nbd/former_tom.installment_period))
-      end
+      
+      amount_in_favor = ((former_tom.installment_amount.to_f*(days_until_nbd/former_tom.installment_period.to_f)) * 100).round / 100.0
+      amount_to_process = ((tom.installment_amount - amount_in_favor)*100).round / 100.0
+      prorated_club_cash = (former_tom.club_cash_installment_amount*(days_until_nbd/former_tom.installment_period.to_f)*100).round / 100.0
+      prorated_club_cash = 0.0 if sales_transactions_count == 1 and former_tom.skip_first_club_cash
 
       operation_type = Settings.operation_types.tom_change_billing
       if amount_to_process >= 0
