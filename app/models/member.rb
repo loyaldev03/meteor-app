@@ -141,7 +141,7 @@ class Member < ActiveRecord::Base
     after_transition :provisional => 
                         :active, :do => [:assign_first_club_cash]
     after_transition :active => 
-                        :active, :do => [:assign_club_cash]
+                        :active, :do => 'assign_club_cash'
     ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
@@ -976,7 +976,7 @@ class Member < ActiveRecord::Base
   handle_asynchronously :assign_club_cash, :queue => :club_cash_queue, :run_at => Proc.new { 5.minutes.from_now }, priority: 5
 
   # Adds club cash transaction. 
-  def add_club_cash(agent, amount = 0,description = nil)
+  def add_club_cash(agent, amount = 0, description = nil)
     answer = { :code => Settings.error_codes.club_cash_transaction_not_successful, :message => "Could not save club cash transaction"  }
     begin
       if not club.allow_club_cash_transaction?
