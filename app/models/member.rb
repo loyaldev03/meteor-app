@@ -760,14 +760,20 @@ class Member < ActiveRecord::Base
   end
 
   def club_cash_not_used(tom, first_sale = false)
-    if first_sale and tom.skip_first_club_cash
+    club_cash = if first_sale and tom.skip_first_club_cash
       0.0
     else
       (tom.club_cash_installment_amount*(days_until_next_bill_date/tom.installment_period.to_f)*100).round / 100.0
     end
   end
 
+  def skip_assign_club_cash
+    @skip_assign_club_cash = true
+  end
+
   def prorated_enroll(tom, agent = nil, credit_card_params = nil, member_params = nil)
+    return { :message => I18n.t('error_messages.prorated_enroll_failure', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.error_on_prorated_enroll } if tom.needs_enrollment_approval
+
     if credit_card_params 
       response = self.update_credit_card_from_drupal(credit_card_params, agent) 
       if response[:code] != Settings.error_codes.success
@@ -797,6 +803,10 @@ class Member < ActiveRecord::Base
       amount_in_favor = installment_amount_not_used(former_tom)
       amount_to_process = ((tom.installment_amount - amount_in_favor)*100).round / 100.0
       prorated_club_cash = club_cash_not_used(former_tom, sales_transactions_count == 1)
+      if self.club_cash_amount < prorated_club_cash
+        skip_assign_club_cash
+        club_cash_to_substract = self.club_cash_amount 
+      end
 
       operation_type = Settings.operation_types.tom_change_billing
       if amount_to_process >= 0
@@ -977,11 +987,13 @@ class Member < ActiveRecord::Base
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing", enroll = false)
-    amount = enroll ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount
-    self.add_club_cash(nil, amount, message)
-    if is_not_drupal?
-      if self.club_cash_expire_date.nil? # first club cash assignment
-        self.update_attribute :club_cash_expire_date, join_date + 1.year
+    unless @skip_assign_club_cash
+      amount = enroll ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount
+      self.add_club_cash(nil, amount, message)
+      if is_not_drupal?
+        if self.club_cash_expire_date.nil? # first club cash assignment
+          self.update_attribute :club_cash_expire_date, join_date + 1.year
+        end
       end
     end
   rescue Exception => e
@@ -1414,8 +1426,6 @@ class Member < ActiveRecord::Base
       end
       Transaction.generate_balance_transaction(agent, self, -amount_in_favor, former_membership, sale_transaction)
       Transaction.generate_balance_transaction(agent, self, amount_in_favor, current_membership)
-
-      club_cash_to_substract = self.club_cash_amount if self.club_cash_amount < club_cash_to_substract
       self.add_club_cash(agent, -club_cash_to_substract, "Prorating club cash. Removing #{club_cash_to_substract} from previous Subscription plan.")
 
       if check_upgradable
