@@ -423,7 +423,7 @@ class Member < ActiveRecord::Base
 
   ###############################################
 
-  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = {})
+  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil)
     if can_change_tom?
       new_tom = TermsOfMembership.find new_tom_id
 
@@ -432,7 +432,7 @@ class Member < ActiveRecord::Base
           response = { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
         else
           previous_membership = current_membership
-          response = if prorated
+          response = if prorated           
             prorated_enroll(new_tom, agent, credit_card_params, self.current_membership.enrollment_info)
           else 
             enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
@@ -745,6 +745,28 @@ class Member < ActiveRecord::Base
     end
   end
 
+
+  def days_until_next_bill_date
+    @days_until_nbd ||= if (self.recycled_times == 0 and next_retry_bill_date > Time.zone.now) 
+      (self.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+    else
+      0
+    end
+    @days_until_nbd
+  end
+
+  def installment_amount_not_used(tom)
+    ((tom.installment_amount.to_f*(days_until_next_bill_date/tom.installment_period.to_f))*100).round / 100.0
+  end
+
+  def club_cash_not_used(tom, first_sale = false)
+    if first_sale and tom.skip_first_club_cash
+      0.0
+    else
+      (tom.club_cash_installment_amount*(days_until_next_bill_date/tom.installment_period.to_f)*100).round / 100.0
+    end
+  end
+
   def prorated_enroll(tom, agent = nil, credit_card_params = nil, member_params = nil)
     if credit_card_params 
       response = self.update_credit_card_from_drupal(credit_card_params, agent) 
@@ -764,22 +786,17 @@ class Member < ActiveRecord::Base
     if self.active?
       former_membership = self.current_membership
       former_tom = self.terms_of_membership
-      days_until_nbd = if (self.recycled_times == 0 and next_retry_bill_date > Time.zone.now) 
-        (self.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
-      else
-        0
-      end
-
-      sales_transactions_count = transactions.where('terms_of_membership_id = ? and operation_type in (?)', self.terms_of_membership.id, Settings.operation_types.membership_billing).count 
-      sale_transaction = transactions.where('terms_of_membership_id = ? and operation_type in (?)', self.terms_of_membership.id, Settings.operation_types.membership_billing).last
+      
+      base = transactions.where('terms_of_membership_id = ? and operation_type in (?)', terms_of_membership_id, Settings.operation_types.membership_billing)
+      sales_transactions_count = base.count 
+      sale_transaction = base.last
       if sale_transaction.nil? or (sale_transaction and sale_transaction.refunded_amount != 0.0)
         return { :message => I18n.t('error_messages.prorated_enroll_failure', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.error_on_prorated_enroll }
       end
       
-      amount_in_favor = ((former_tom.installment_amount.to_f*(days_until_nbd/former_tom.installment_period.to_f)) * 100).round / 100.0
+      amount_in_favor = installment_amount_not_used(former_tom)
       amount_to_process = ((tom.installment_amount - amount_in_favor)*100).round / 100.0
-      prorated_club_cash = (former_tom.club_cash_installment_amount*(days_until_nbd/former_tom.installment_period.to_f)*100).round / 100.0
-      prorated_club_cash = 0.0 if sales_transactions_count == 1 and former_tom.skip_first_club_cash
+      prorated_club_cash = club_cash_not_used(former_tom, sales_transactions_count == 1)
 
       operation_type = Settings.operation_types.tom_change_billing
       if amount_to_process >= 0
@@ -1393,12 +1410,12 @@ class Member < ActiveRecord::Base
 
     def proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, club_cash_to_substract, sale_transaction)
       unless set_as_active
-        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
+        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member after prorated update of terms of membership.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
       Transaction.generate_balance_transaction(agent, self, -amount_in_favor, former_membership, sale_transaction)
       Transaction.generate_balance_transaction(agent, self, amount_in_favor, current_membership)
 
-      club_cash_to_substract = self.club_cash_amount if self.club_cash_amount < club_cash_to_substract.abs
+      club_cash_to_substract = self.club_cash_amount if self.club_cash_amount < club_cash_to_substract
       self.add_club_cash(agent, -club_cash_to_substract, "Prorating club cash. Removing #{club_cash_to_substract} from previous Subscription plan.")
 
       if check_upgradable
