@@ -183,7 +183,7 @@ class Transaction < ActiveRecord::Base
     end
   end
 
-  def self.refund(amount, sale_transaction_id, agent=nil, update_refunded_amount = true)
+  def self.refund(amount, sale_transaction_id, agent=nil, update_refunded_amount = true, operation_type_to_set = Settings.operation_types.credit)
     # Lock transaction, so no one can use this record while we refund this member.
     sale_transaction = Transaction.find sale_transaction_id, :lock => true
     if not sale_transaction.has_same_pgc_as_current?
@@ -197,7 +197,7 @@ class Transaction < ActiveRecord::Base
           return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
         end
         trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
-        trans.prepare(sale_transaction.member, sale_transaction.credit_card, -amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, Settings.operation_types.credit)
+        trans.prepare(sale_transaction.member, sale_transaction.credit_card, -amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, operation_type_to_set)
         trans.fill_transaction_type_for_credit(sale_transaction)
         answer = trans.process
         if trans.success?

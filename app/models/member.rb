@@ -137,12 +137,6 @@ class Member < ActiveRecord::Base
     after_transition [ :none, :provisional, :active ] => # none is new join. provisional and active are save the sale
                         :applied, :do => [:set_join_date, :send_active_needs_approval_email]
     ###### <<<<<<========
-    ###### member gets active =====>>>>
-    after_transition :provisional => 
-                        :active, :do => [:assign_first_club_cash]
-    after_transition :active => 
-                        :active, :do => 'assign_club_cash'
-    ###### <<<<<<========
     ###### member gets provisional =====>>>>
     after_transition [ :none, :lapsed ] => # enroll and reactivation
                         :provisional, :do => ['schedule_first_membership(true, false, false, false)','after_marketing_tool_sync']
@@ -802,11 +796,7 @@ class Member < ActiveRecord::Base
       
       amount_in_favor = installment_amount_not_used(former_tom)
       amount_to_process = ((tom.installment_amount - amount_in_favor)*100).round / 100.0
-      prorated_club_cash = club_cash_not_used(former_tom, sales_transactions_count == 1)
-      if self.club_cash_amount < prorated_club_cash
-        skip_assign_club_cash
-        club_cash_to_substract = self.club_cash_amount 
-      end
+      club_cash_to_deduct = club_cash_not_used(former_tom, sales_transactions_count == 1)
 
       operation_type = Settings.operation_types.tom_change_billing
       if amount_to_process >= 0
@@ -816,7 +806,7 @@ class Member < ActiveRecord::Base
         answer = trans.process
         message = "Membership prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{former_tom.id}) -#{former_tom.name}-. Final amount billed: $#{amount_to_process}"
       else
-        answer = Transaction.refund(amount_to_process.abs, sale_transaction, agent, false)
+        answer = Transaction.refund(amount_to_process.abs, sale_transaction, agent, false, operation_type)
         self.reload
         trans = self.transactions.last
         message = "Membership prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{former_tom.id}) -#{former_tom.name}-. Final amount refunded: $#{amount_to_process}"
@@ -833,7 +823,7 @@ class Member < ActiveRecord::Base
       Auditory.audit(agent, trans, message, self, operation_type)
     else
       operation_type = Settings.operation_types.enrollment_billing
-      days_already_in_provisional = (Time.zone.now.to_date - Time.zone.now.to_date ).to_i
+      days_already_in_provisional = (Time.zone.now.to_date - join_date.to_date ).to_i
     end
 
     begin
@@ -854,7 +844,7 @@ class Member < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, 0.0, enrollment_info, operation_type)
       
       if trans
-        proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, prorated_club_cash, sale_transaction)
+        proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, club_cash_to_deduct, sale_transaction)
       else
         new_next_bill_date = (self.join_date + tom.provisional_days.days) - days_already_in_provisional.days
         new_next_bill_date = Time.zone.now if new_next_bill_date.to_date < Time.zone.now.to_date
@@ -1247,7 +1237,8 @@ class Member < ActiveRecord::Base
         { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card'), :errors => { :number => "Credit card do not match the active one." }}
       end
     else # drupal or CS sends the complete credit card number.
-      validate_if_credit_card_already_exist(terms_of_membership, credit_card[:number], new_year, new_month, false, false, current_agent, credit_card[:set_active].to_s.to_bool)
+      set_as_active = credit_card[:set_active].nil? ? true : credit_card[:set_active].to_s.to_bool
+      validate_if_credit_card_already_exist(terms_of_membership, credit_card[:number], new_year, new_month, false, false, current_agent, set_as_active)
     end
   end
 
@@ -1397,9 +1388,11 @@ class Member < ActiveRecord::Base
     end
 
     def proceed_with_manual_billing_logic(trans, operation_type)
+      first_time = self.provisional?
       unless set_as_active
         Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
+      first_time ? assign_first_club_cash : assign_club_cash
       message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
       Auditory.audit(nil, trans, message, self, operation_type)
       if check_upgradable 
@@ -1409,9 +1402,12 @@ class Member < ActiveRecord::Base
     end
 
     def proceed_with_billing_logic(trans)
+      first_time = self.provisional?
       unless set_as_active
         Auditory.report_issue("Billing::set_as_active", "we cant set as active this member.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
+      first_time ? assign_first_club_cash : assign_club_cash
+
       if check_upgradable 
         schedule_renewal
       end
@@ -1424,9 +1420,14 @@ class Member < ActiveRecord::Base
       unless set_as_active
         Auditory.report_issue("Billing::set_as_active", "we cant set as active this member after prorated update of terms of membership.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
+      club_cash_balance = terms_of_membership.club_cash_installment_amount - club_cash_to_substract 
+      if club_cash_balance < 0 and club_cash_balance.abs > self.club_cash_amount
+        club_cash_balance = -self.club_cash_amount 
+      end
+
       Transaction.generate_balance_transaction(agent, self, -amount_in_favor, former_membership, sale_transaction)
       Transaction.generate_balance_transaction(agent, self, amount_in_favor, current_membership)
-      self.add_club_cash(agent, -club_cash_to_substract, "Prorating club cash. Removing #{club_cash_to_substract} from previous Subscription plan.")
+      self.add_club_cash(agent, club_cash_balance, "Prorating club cash. Adding #{terms_of_membership.club_cash_installment_amount} minus #{club_cash_to_substract} from previous Subscription plan.")
 
       if check_upgradable
         schedule_renewal

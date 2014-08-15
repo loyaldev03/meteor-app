@@ -560,7 +560,7 @@ class Api::MembersController < ApplicationController
   # @optional [Boolean] prorate Boolean value to define if we will proceed with the prorate logic, or not. (1= follow prorate logic, 0= do not follow prorate logic). Default value is 1 (true)
   # @optional [Hash] credit_card Hash with credit cards information. It must have the following information:
   #     <ul>
-  #       <li><strong>set_active</strong> Boolean value to decide whether or not we will set the credit card as active. (1= set credit card as active, 0= do not set credit card as active) </li>
+  #       <li><strong>set_active</strong> Boolean value to decide whether or not we will set the credit card as active. (1= set credit card as active, 0= do not set credit card as active). Default value 1 </li>
   #       <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
   #       <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
   #       <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
