@@ -102,6 +102,14 @@ class Api::MembersControllerTest < ActionController::TestCase
     post( :get_banner_by_email, { email: email } )
   end
 
+  def generate_post_update_terms_of_membership(member_id, terms_of_membership_id, credit_card = {}, prorated = true)
+    post(:update_terms_of_membership, { :id => member_id, 
+                                        :terms_of_membership_id => terms_of_membership_id,
+                                        :credit_card => credit_card,
+                                        :prorated => prorated, 
+                                        :format => :json} )
+  end
+
   # Store the membership id at enrollment_infos table when enrolling a new member
   # Admin should enroll/create member with preferences
   # Billing membership by Provisional amount
@@ -1703,7 +1711,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
-    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
     assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.save_the_sale_through_api
@@ -1713,7 +1721,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
-    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
   end
 
@@ -1721,7 +1729,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
-    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
     assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.save_the_sale_through_api
@@ -1731,7 +1739,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
-    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @saved_member.terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
   end
 
@@ -1739,7 +1747,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
-    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
   end
 
@@ -1747,8 +1755,370 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
-    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
+  end
+
+  def prepare_upgrade_downgrade_toms(yearly = true, blank_credit_card = false)
+    sign_in @admin_user
+    @tom_yearly = FactoryGirl.create :terms_of_membership_with_gateway_yearly, :club_id => @club.id, 
+                                     :name => "YearlyTom", installment_amount: 100, provisional_days: 90,
+                                     club_cash_installment_amount: 300
+    @tom_monthly = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, 
+                                     :name => "MonthlyTom", installment_amount: 10
+    @credit_card = FactoryGirl.build :credit_card
+    @second_credit_card = FactoryGirl.build :credit_card_master_card
+    @member = FactoryGirl.build :member_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    @terms_of_membership = yearly ? @tom_yearly : @tom_monthly
+    if blank_credit_card
+      @enrollment_info = FactoryGirl.build :enrollment_info, :enrollment_amount => 0.0
+      @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
+      generate_post_message({}, {setter: { cc_blank: true }})
+    else
+      generate_post_message
+    end
+    @saved_member = Member.find_by_email @member.email
+  end
+
+  def validate_transactions_upon_tom_update(previous_membership, new_membership, amount_to_process, amount_in_favor)
+    #tom_change_billing
+    tom_change_billing_transaction = @saved_member.transactions.where("operation_type = ?", Settings.operation_types.tom_change_billing).last
+    assert_equal tom_change_billing_transaction.amount, amount_to_process
+    assert_equal tom_change_billing_transaction.terms_of_membership_id, new_membership.terms_of_membership_id
+    assert_equal tom_change_billing_transaction.membership_id, new_membership.id
+    #membership_balance_transfer
+    transaction_balance_refund = @saved_member.transactions.where("operation_type = ? and amount < 0", Settings.operation_types.membership_balance_transfer).last
+    transaction_balance_sale = @saved_member.transactions.where("operation_type = ? and amount > 0", Settings.operation_types.membership_balance_transfer).last
+    if amount_in_favor and amount_in_favor > 0
+      assert_equal transaction_balance_refund.amount, -amount_in_favor
+      assert_equal transaction_balance_refund.terms_of_membership_id, previous_membership.terms_of_membership_id
+      assert_equal transaction_balance_refund.membership_id, previous_membership.id
+      assert_equal transaction_balance_sale.amount, amount_in_favor
+      assert_equal transaction_balance_sale.terms_of_membership_id, new_membership.terms_of_membership_id
+      assert_equal transaction_balance_sale.membership_id, new_membership.id
+    else
+      assert_nil transaction_balance_refund
+      assert_nil transaction_balance_sale
+    end
+  end
+
+  test "Do not upgrade if we enter a wrong CC - Provisional Status" do
+    prepare_upgrade_downgrade_toms 
+    credit_card_params = {:number => "4111111111111112", :expire_month => "2", :expire_year => "2014" }
+    generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id, credit_card_params)
+    assert @response.body.include? I18n.t('error_messages.invalid_credit_card')
+  end
+
+  test "Do not upgrade if we enter a wrong CC - Active Status" do
+    prepare_upgrade_downgrade_toms 
+
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+    
+    Timecop.travel(first_nbd + (@saved_member.terms_of_membership.installment_period/2).days) do
+      credit_card_params = {:number => "4111111111111112", :expire_month => "2", :expire_year => "2014" }
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id, credit_card_params)
+    end
+    assert @response.body.include? I18n.t('error_messages.invalid_credit_card')
+  end
+
+  test "Upgrade a Member if it add a new valid CC -when the member has CC blank - Set active = True" do
+    prepare_upgrade_downgrade_toms false, true
+    previous_membership = @saved_member.current_membership
+
+    generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id, {:set_active => 1, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+
+    @saved_member.reload
+    assert_equal @saved_member.terms_of_membership.id, @tom_yearly.id
+    assert_equal @saved_member.active_credit_card.last_digits, @second_credit_card.number.last(4)
+  end
+
+  test "Downgrade a Member if it add a new valid CC-when the member has CC blank - Set active = True" do
+    prepare_upgrade_downgrade_toms true, true
+    previous_membership = @saved_member.current_membership
+
+    generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id, {:set_active => 1, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+
+    @saved_member.reload
+    assert_equal @saved_member.terms_of_membership.id, @tom_monthly.id
+    assert_equal @saved_member.active_credit_card.last_digits, @second_credit_card.number.last(4)
+  end
+
+  test "Upgrade a Member if it add a new valid CC - Set active = False" do
+    prepare_upgrade_downgrade_toms false
+    previous_membership = @saved_member.current_membership
+    amount_in_favor = 0
+    amount_to_process = 0
+    prorated_club_cash = 0
+
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+    
+    Timecop.travel(first_nbd + (@saved_member.terms_of_membership.installment_period/2).days) do
+      days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+      amount_in_favor = ((@tom_monthly.installment_amount.to_f*(days_until_nbd/@tom_monthly.installment_period.to_f)) * 100).round / 100.0
+      amount_to_process = ((@tom_yearly.installment_amount - amount_in_favor)*100).round / 100.0
+      prorated_club_cash = (@tom_monthly.club_cash_installment_amount*(days_until_nbd/@tom_monthly.installment_period.to_f)*100).round / 100.0
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+    end
+
+    @saved_member.reload
+    assert_equal @saved_member.terms_of_membership.id, @tom_yearly.id
+    assert_equal @saved_member.active_credit_card.last_digits, @credit_card.number.last(4)
+    validate_transactions_upon_tom_update(previous_membership, @saved_member.current_membership, amount_to_process, amount_in_favor)
+  end
+
+  test "Downgrade a Member if it add a new valid CC - Set active = False" do
+    prepare_upgrade_downgrade_toms
+    previous_membership = @saved_member.current_membership
+    amount_in_favor = 0
+    amount_to_process = 0
+    prorated_club_cash = 0
+
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+    
+    Timecop.travel(first_nbd + (@saved_member.terms_of_membership.installment_period/2).days) do
+      days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+      amount_in_favor = ((@tom_yearly.installment_amount.to_f*(days_until_nbd/@tom_yearly.installment_period.to_f)) * 100).round / 100.0
+      amount_to_process = ((@tom_monthly.installment_amount - amount_in_favor)*100).round / 100.0
+      prorated_club_cash = (@tom_yearly.club_cash_installment_amount*(days_until_nbd/@tom_yearly.installment_period.to_f)*100).round / 100.0
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+    end
+
+    @saved_member.reload
+    validate_transactions_upon_tom_update(previous_membership, @saved_member.current_membership, amount_to_process, amount_in_favor)
+  end
+
+  # Upgrade Member with Basic membership level by prorate logic - Active Member
+  test "Upgrade a Member if it add a update valid CC (prorated logic) - Active Member " do 
+    Delayed::Worker.delay_jobs = true
+    prepare_upgrade_downgrade_toms false
+    previous_membership = @saved_member.current_membership
+    amount_in_favor = 0
+    amount_to_process = 0
+    prorated_club_cash = 0
+
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+    Delayed::Job.all.each{ |x| x.invoke_job }
+    Delayed::Job.all.each{ |x| x.destroy }
+    
+    @saved_member.reload
+    previous_club_cash_amount = @saved_member.club_cash_amount
+    Timecop.travel(first_nbd + (@saved_member.terms_of_membership.installment_period/2).days) do
+      days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+      amount_in_favor = ((@tom_monthly.installment_amount.to_f*(days_until_nbd/@tom_monthly.installment_period.to_f)) * 100).round / 100.0
+      amount_to_process = ((@tom_yearly.installment_amount - amount_in_favor)*100).round / 100.0
+      prorated_club_cash = (@tom_monthly.club_cash_installment_amount*(days_until_nbd/@tom_monthly.installment_period.to_f)*100).round / 100.0
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id, {:set_active => 1, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+    end
+    Delayed::Job.all.each{ |x| x.invoke_job }
+    Delayed::Worker.delay_jobs = false
+
+    @saved_member.reload
+    assert_equal @saved_member.terms_of_membership.id, @tom_yearly.id
+    assert_equal @saved_member.active_credit_card.last_digits, @second_credit_card.number.last(4)
+    validate_transactions_upon_tom_update(previous_membership, @saved_member.current_membership, amount_to_process, amount_in_favor)
+    assert_not_nil @saved_member.operations.where("description like ?", "%Prorating club cash. Adding #{@tom_yearly.club_cash_installment_amount} minus #{prorated_club_cash} from previous Subscription plan.%")
+    assert_equal @saved_member.club_cash_amount, previous_club_cash_amount + @tom_yearly.club_cash_installment_amount - prorated_club_cash
+  end
+
+  # Downgrade Member with PREMIUM membership level by prorate logic - Active Member
+  test "Downgrade a Member if it add a update valid CC (prorated logic) - Active Member" do
+    Delayed::Worker.delay_jobs = true
+    prepare_upgrade_downgrade_toms
+    previous_membership = @saved_member.current_membership
+    amount_in_favor = 0
+    amount_to_process = 0
+    prorated_club_cash = 0
+
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+    Delayed::Job.all.each{ |x| x.invoke_job }
+    Delayed::Job.all.each{ |x| x.destroy }
+    
+    @saved_member.reload
+    previous_club_cash_amount = @saved_member.club_cash_amount
+    Timecop.travel(first_nbd + (@saved_member.terms_of_membership.installment_period/2).days) do
+      days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+      amount_in_favor = ((@tom_yearly.installment_amount.to_f*(days_until_nbd/@tom_yearly.installment_period.to_f)) * 100).round / 100.0
+      amount_to_process = ((@tom_monthly.installment_amount - amount_in_favor)*100).round / 100.0
+      prorated_club_cash = (@tom_yearly.club_cash_installment_amount*(days_until_nbd/@tom_yearly.installment_period.to_f)*100).round / 100.0
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id, {:set_active => 1, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+    end
+    Delayed::Job.all.each{ |x| x.invoke_job }
+    Delayed::Worker.delay_jobs = false
+
+    @saved_member.reload
+    assert_equal @saved_member.terms_of_membership.id, @tom_monthly.id
+    assert_equal @saved_member.active_credit_card.last_digits, @second_credit_card.number.last(4)
+    validate_transactions_upon_tom_update(previous_membership, @saved_member.current_membership, amount_to_process, amount_in_favor)
+    assert_not_nil @saved_member.operations.where("description like ?", "%Prorating club cash. Adding #{@tom_yearly.club_cash_installment_amount} minus #{prorated_club_cash} from previous Subscription plan.%")
+    assert_equal @saved_member.club_cash_amount, previous_club_cash_amount + @tom_monthly.club_cash_installment_amount - prorated_club_cash
+  end
+
+  test "Do not upgrade/downgrade if  the member has a refund already done" do
+    prepare_upgrade_downgrade_toms false
+    previous_membership = @saved_member.current_membership
+
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+
+    membership_transaction = @saved_member.transactions.where("operation_type = ?", Settings.operation_types.membership_billing).last
+    Transaction.refund(membership_transaction.amount/2, membership_transaction)
+    
+    Timecop.travel(first_nbd + (@saved_member.terms_of_membership.installment_period/2).days) do
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id)
+    end
+    assert @response.body.include? I18n.t('error_messages.prorated_enroll_failure', :cs_phone_number => @saved_member.club.cs_phone_number)
+  end
+
+  test "Do not upgrade/downgrade if the member is at Lapsed or applied status" do
+    prepare_upgrade_downgrade_toms false
+
+    @saved_member.set_as_canceled
+    generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+    assert @response.body.include? "Member status does not allows us to change the terms of membership"
+    @saved_member.set_as_applied
+    generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+    assert @response.body.include? "Member status does not allows us to change the terms of membership"
+  end
+
+  test "Upgrade a Member Basic membership level by prorate logic - Provisional Member - NewProvisionalDays > OldProvisionalDays" do
+    prepare_upgrade_downgrade_toms false
+
+    days_in_provisional = @saved_member.terms_of_membership.installment_period/2
+    middle_of_provisional_days = Time.zone.now + days_in_provisional.days
+    nbd = middle_of_provisional_days + @tom_yearly.provisional_days.days
+    Timecop.travel(middle_of_provisional_days) do
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id)
+    end
+
+    @saved_member.reload
+    assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
+    assert_equal @saved_member.next_retry_bill_date.to_date, nbd.to_date - nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc.to_date - days_in_provisional.days 
+  end
+
+  test "Upgrade/Downgrade a Member Basic membership level by prorate logic - Provisional Member - NewProvisionalDays > OldProvisionalDays" do
+    prepare_upgrade_downgrade_toms false
+
+    days_in_provisional = @saved_member.terms_of_membership.provisional_days/2
+    middle_of_provisional_days = Time.zone.now + days_in_provisional.days
+    nbd = middle_of_provisional_days + @tom_yearly.provisional_days.days
+
+    Timecop.travel(middle_of_provisional_days) do
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id)
+    end
+
+    @saved_member.reload
+    assert @saved_member.provisional?
+    assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
+    assert_equal @saved_member.next_retry_bill_date.to_date, nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc.to_date - days_in_provisional.days 
+  end
+
+  test "Upgrade/Downgrade a Member Basic membership level by prorate logic - Provisional Member - NewProvisionalDays < OldProvisionalDays" do
+    prepare_upgrade_downgrade_toms
+    days_in_provisional = @saved_member.terms_of_membership.provisional_days/2
+    middle_of_provisional_days = Time.zone.now + days_in_provisional.days
+    nbd = middle_of_provisional_days + @tom_monthly.provisional_days.days
+    Timecop.travel(middle_of_provisional_days) do
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id)
+    end
+
+    @saved_member.reload
+    assert @saved_member.active?
+    assert_not_nil @saved_member.operations.where("description like ?", "%Membership reached end of provisional period after Subscription Plan change. Billing $#{@tom_monthly.installment_amount}%").last
+    assert_equal @saved_member.next_retry_bill_date.to_date, (middle_of_provisional_days + @tom_monthly.installment_period.days).to_date
+  end
+
+  test "Upgrade/Downgrade Member with Basic membership level by prorate logic (NewProvisionalDays > OldProvisionalDays)- Softdecline Member (Provisional status)" do
+    prepare_upgrade_downgrade_toms false
+    previous_membership = @saved_member.current_membership
+    sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
+    
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+    active_merchant_stubs
+
+    rand_date = @saved_member.bill_date + rand(1..6).days
+    days_in_provisional = (rand_date.to_date - @saved_member.join_date.to_date).to_i
+    nbd = rand_date + @tom_yearly.provisional_days.days
+    Timecop.travel(rand_date) do
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id)
+    end
+    @saved_member.reload
+    assert @saved_member.provisional?
+    assert_equal @saved_member.terms_of_membership.id, @tom_yearly.id
+    assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
+    assert_equal @saved_member.next_retry_bill_date.to_date, nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc.to_date - days_in_provisional.days
+  end
+
+  test "Upgrade/Downgrade Member with Basic membership level by prorate logic (OldProvisionalDays > NewProvisionalDays)- Softdecline Member (Provisional status)" do
+    prepare_upgrade_downgrade_toms
+    previous_membership = @saved_member.current_membership
+    sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
+    
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+    active_merchant_stubs
+
+    Timecop.travel(@saved_member.bill_date + rand(1..6).days) do
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id)
+    end
+    @saved_member.reload
+    @saved_member.active?
+    assert_equal @saved_member.terms_of_membership.id, @tom_monthly.id
+    validate_transactions_upon_tom_update(previous_membership, @saved_member.current_membership, @tom_monthly.installment_amount, 0.0)
+  end
+
+  test "Upgrade/Downgrade Member with Basic membership level by prorate logic - Softdecline Member (Active status)" do
+    prepare_upgrade_downgrade_toms false
+    previous_membership = @saved_member.current_membership
+    sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+
+    active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
+    Timecop.travel(@saved_member.next_retry_bill_date) do
+      @saved_member.bill_membership
+    end
+    active_merchant_stubs
+
+    rand_date = @saved_member.bill_date + rand(1..6).days
+    days_in_provisional = (rand_date.to_date - @saved_member.join_date.to_date).to_i
+    nbd = rand_date + @tom_yearly.provisional_days.days
+    Timecop.travel(rand_date) do
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id)
+    end
+    @saved_member.reload
+    assert @saved_member.active?
+    assert_equal @saved_member.terms_of_membership.id, @tom_yearly.id
+    validate_transactions_upon_tom_update(previous_membership, @saved_member.current_membership, @tom_yearly.installment_amount, 0.0)
   end
 
   test "One time billing throught API." do
