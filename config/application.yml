@@ -99,11 +99,12 @@ defaults: &defaults
     downgrade_member: 240
     unblacklisted: 241
     member_manually_synced_to_exact_target: 242
-    update_terms_of_membership: 243
+    save_the_sale_through_api: 243
     bill_overdue_cancel: 244
     remote_club_cash_transaction_failed: 245
     tom_upgrade: 246
     member_manually_synced_to_mailchimp: 247
+    update_terms_of_membership: 248
     #communication
     active_email: 300     
     prebill_email: 301    
