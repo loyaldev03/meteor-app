@@ -1747,7 +1747,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
   end
 
@@ -1803,6 +1803,58 @@ class Api::MembersControllerTest < ActionController::TestCase
       assert_nil transaction_balance_refund
       assert_nil transaction_balance_sale
     end
+  end
+
+  test "Update TOM throught API - different TOM - active member" do
+    sign_in @admin_user
+    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    @saved_member.reload
+    assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
+    assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.update_terms_of_membership
+  end
+
+  test "Do not allow update TOM throught API to same TOM - active member" do
+    sign_in @admin_user
+    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
+    assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
+  end
+
+  test "Update TOM throught API - different TOM - provisional member" do
+    sign_in @admin_user
+    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    @saved_member.reload
+    assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
+    assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.update_terms_of_membership
+  end
+
+  test "Do not allow update TOM throught API to same TOM - provisional member" do
+    sign_in @admin_user
+    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @saved_member.terms_of_membership.id, :format => :json} )
+    assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
+  end
+
+  test "Do not allow update TOM throught API - applied member" do
+    sign_in @admin_user
+    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    assert @response.body.include? "Member status does not allows us to change the terms of membership."
+  end
+
+  test "Do not allow update TOM throught API - lapsed member" do
+    sign_in @admin_user
+    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
+    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    assert @response.body.include? "Member status does not allows us to change the terms of membership."
   end
 
   test "Do not upgrade if we enter a wrong CC - Provisional Status" do
