@@ -1470,7 +1470,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 		</div>	
     
 		<div class="method">
-			<p class="method_desc">Change actual terms of membership related to a member.</p>
+			<p class="method_desc">Change actual terms of membership related to a member. (DEPRECATED by 'update_terms_of_membership')</p>
 			<h3 class="resource_url"><strong>/api/v1/members/:id/change_terms_of_membership</strong> [POST]</h3>
 
 			<div class="parameters">	
@@ -1497,6 +1497,146 @@ It will also send a welcome email and charge the enrollment to the member's cred
 					</div>
 				
 
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">message</span>
+								<span class="type">String</span>
+								<span class="text">Shows the method results and also informs the errors.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">String</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">member_id</span>
+								<span class="type">Integer</span>
+								<span class="text">Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">errors</span>
+								<span class="type">Hash</span>
+								<span class="text">A hash with members and credit card errors.
+<ul>
+  <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). In the particular case that one or more of credit_card's field are wrong, the key will be "credit_card", and the value will be a hash that follows the same logic as this error hash. (Eg: "credit_card":{"number":["is required"],"expire_month":["is required"],"expire_year":["is required"]})  </li>
+  <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank","is invalid"]). </li>
+</ul></span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">autologin_url</span>
+								<span class="type">String</span>
+								<span class="text">Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">api_role</span>
+								<span class="type">String</span>
+								<span class="text">Only for drupal. We will send the members's api role id within this field.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">bill_date</span>
+								<span class="type">String</span>
+								<span class="text">Only for drupal. Date when the billing will be done. In case bill date is not set (for example for applied member) the date will be send as blank.</span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">status</span>
+								<span class="type">String</span>
+								<span class="text">Member's membership status after enrolling. There are two possibles status when the member is enrolled:
+<ul>
+  <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
+</ul></span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+		</div>	
+    
+		<div class="method">
+			<p class="method_desc">Change actual terms of membership related to a member, with the option to prorate it.</p>
+			<h3 class="resource_url"><strong>/api/v1/members/:id/update_terms_of_membership</strong> [POST]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">id</span>
+									<span class="type">Integer</span>
+									<span class="text">Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">terms_of_membership_id</span>
+									<span class="type">Integer</span>
+									<span class="text">New Terms of membership's ID to set on members.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+					<div class="optional">
+						<h4>Optional Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">prorate</span>
+									<span class="type">Boolean</span>
+									<span class="text">Boolean value to define if we will proceed with the prorate logic, or not. (1= follow prorate logic, 0= do not follow prorate logic). Default value is 1 (true)</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">credit_card</span>
+									<span class="type">Hash</span>
+									<span class="text">Hash with credit cards information. It must have the following information:
+<ul>
+  <li><strong>set_active</strong> Boolean value to decide whether or not we will set the credit card as active. (1= set credit card as active, 0= do not set credit card as active). Default value 1 </li>
+  <li><strong>number</strong> Number of member's credit card, from where we will charge the membership or any other service. This value won't be save, but instead we will save a token obtained from the payment gateway. (We accept numbers and characters like "-", whitespaces and "/") </li>
+  <li><strong>expire_month</strong> The month (in numbers) in which the credit card will expire. Eg. For june it would be 6. </li>
+  <li><strong>expire_year</strong> The year (in numbers) in which the credit card will expire. Have in mind it is the complete year with four digits (Eg. 2014) </li>
+</ul></span>
+								</li>
+							</ul>
+						
+					</div>
 				
 			</div><!-- parameters -->
 			
@@ -1829,7 +1969,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Thu Mar 20 10:58:23 2014 with ruby-1.9.3
+  Generated on Tue Aug 19 12:59:15 2014 with ruby-1.9.3
 </div>
 
   </body>

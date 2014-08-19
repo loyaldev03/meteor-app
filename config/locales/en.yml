@@ -109,6 +109,7 @@ en:
     invalid_credit_card: "There was an error with your credit card information. Please verify your information and resubmit."
     blacklisted: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}."
     member_not_saved: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}."
+    prorated_enroll_failure: "We cannot process your request. Please call member services at: %{cs_phone_number}."
     member_set_wrong_address_error: "Could not set member's address as undeliverable. %{errors}"
     member_already_set_wrong_address: "Member's address already set as wrong address."
     member_set_as_blacklisted: "Operation cannot be done. Member is set as blacklisted."
@@ -188,6 +189,7 @@ en:
           refund: Credit
           credit: Credit
           void: Credit
+          balance: Balance
           authorization_capture: 'Authorization-Capture'
           chargeback: Chargeback
         transaction_types_messages:

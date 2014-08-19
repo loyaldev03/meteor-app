@@ -16,6 +16,7 @@ SacPlatform::Application.routes.draw do
       match 'members/:id/club_cash' => 'members#club_cash', as: 'club_cash', :via => [:put]
       match 'members/:id/cancel' => 'members#cancel', as: 'cancel', :via => [:put]
       match 'members/:id/change_terms_of_membership' => 'members#change_terms_of_membership', as: 'change_terms_of_membership', :via => [:post]
+      match 'members/:id/update_terms_of_membership' => 'members#update_terms_of_membership', as: 'update_terms_of_membership', :via => [:post]
       match 'members/:id/sale' => 'members#sale', as: 'sale', :via => [:post]
       match 'members/get_banner_by_email' => 'members#get_banner_by_email', as: 'get_banner_by_email', :via => [:post]
       match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get, :post]
