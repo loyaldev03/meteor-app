@@ -739,31 +739,6 @@ class Member < ActiveRecord::Base
     end
   end
 
-  def days_until_next_bill_date
-    @days_until_nbd ||= if (self.recycled_times == 0 and next_retry_bill_date > Time.zone.now) 
-      (self.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
-    else
-      0
-    end
-    @days_until_nbd
-  end
-
-  def installment_amount_not_used
-    if self.active?
-      ((terms_of_membership.installment_amount.to_f*(days_until_next_bill_date/terms_of_membership.installment_period.to_f))*100).round / 100.0
-    else
-      0.0
-    end
-  end
-
-  def club_cash_not_used(first_sale = false)
-    club_cash = if first_sale and terms_of_membership.skip_first_club_cash
-      0.0
-    else
-      (terms_of_membership.club_cash_installment_amount*(days_until_next_bill_date/terms_of_membership.installment_period.to_f)*100).round / 100.0
-    end
-  end
-
   def proceed_to_bill_prorated_amount(agent, tom, amount_in_favor, credit_card, sale_transaction = nil, operation_type)
     amount_to_process = ((tom.installment_amount - amount_in_favor)*100).round / 100.0
 
@@ -1559,5 +1534,30 @@ class Member < ActiveRecord::Base
 
     def set_marketing_client_sync_as_needed
       self.need_sync_to_marketing_client = true if defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel)
+    end
+    
+    def days_until_next_bill_date
+      @days_until_nbd ||= if (self.recycled_times == 0 and next_retry_bill_date > Time.zone.now) 
+        (self.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+      else
+        0
+      end
+      @days_until_nbd
+    end
+
+    def installment_amount_not_used
+      if self.active?
+        ((terms_of_membership.installment_amount.to_f*(days_until_next_bill_date/terms_of_membership.installment_period.to_f))*100).round / 100.0
+      else
+        0.0
+      end
+    end
+
+    def club_cash_not_used(first_sale = false)
+      club_cash = if first_sale and terms_of_membership.skip_first_club_cash
+        0.0
+      else
+        (terms_of_membership.club_cash_installment_amount*(days_until_next_bill_date/terms_of_membership.installment_period.to_f)).round
+      end
     end
 end

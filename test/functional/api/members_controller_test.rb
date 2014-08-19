@@ -1711,7 +1711,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
     assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.save_the_sale_through_api
@@ -1721,7 +1721,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
+    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
   end
 
@@ -1729,7 +1729,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
     assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.save_the_sale_through_api
@@ -1739,7 +1739,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @saved_member.terms_of_membership.id, :format => :json} )
+    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @saved_member.terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
   end
 
@@ -1755,7 +1755,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :applied_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:change_terms_of_membership, { :id => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
   end
 
@@ -1865,7 +1865,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
       amount_in_favor = ((@tom_monthly.installment_amount.to_f*(days_until_nbd/@tom_monthly.installment_period.to_f)) * 100).round / 100.0
       amount_to_process = ((@tom_yearly.installment_amount - amount_in_favor)*100).round / 100.0
-      prorated_club_cash = (@tom_monthly.club_cash_installment_amount*(days_until_nbd/@tom_monthly.installment_period.to_f)*100).round / 100.0
+      prorated_club_cash = (@tom_monthly.club_cash_installment_amount*(days_until_nbd/@tom_monthly.installment_period.to_f)).round
       generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
     end
 
@@ -1891,7 +1891,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
       amount_in_favor = ((@tom_yearly.installment_amount.to_f*(days_until_nbd/@tom_yearly.installment_period.to_f)) * 100).round / 100.0
       amount_to_process = ((@tom_monthly.installment_amount - amount_in_favor)*100).round / 100.0
-      prorated_club_cash = (@tom_yearly.club_cash_installment_amount*(days_until_nbd/@tom_yearly.installment_period.to_f)*100).round / 100.0
+      prorated_club_cash = (@tom_yearly.club_cash_installment_amount*(days_until_nbd/@tom_yearly.installment_period.to_f)).round
       generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
     end
 
@@ -1921,7 +1921,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
       amount_in_favor = ((@tom_monthly.installment_amount.to_f*(days_until_nbd/@tom_monthly.installment_period.to_f)) * 100).round / 100.0
       amount_to_process = ((@tom_yearly.installment_amount - amount_in_favor)*100).round / 100.0
-      prorated_club_cash = (@tom_monthly.club_cash_installment_amount*(days_until_nbd/@tom_monthly.installment_period.to_f)*100).round / 100.0
+      prorated_club_cash = (@tom_monthly.club_cash_installment_amount*(days_until_nbd/@tom_monthly.installment_period.to_f)).round
       generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id, {:set_active => 1, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
     end
     Delayed::Job.all.each{ |x| x.invoke_job }
@@ -1957,7 +1957,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
       amount_in_favor = ((@tom_yearly.installment_amount.to_f*(days_until_nbd/@tom_yearly.installment_period.to_f)) * 100).round / 100.0
       amount_to_process = ((@tom_monthly.installment_amount - amount_in_favor)*100).round / 100.0
-      prorated_club_cash = (@tom_yearly.club_cash_installment_amount*(days_until_nbd/@tom_yearly.installment_period.to_f)*100).round / 100.0
+      prorated_club_cash = (@tom_yearly.club_cash_installment_amount*(days_until_nbd/@tom_yearly.installment_period.to_f)).round
       generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id, {:set_active => 1, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
     end
     Delayed::Job.all.each{ |x| x.invoke_job }
@@ -1969,6 +1969,41 @@ class Api::MembersControllerTest < ActionController::TestCase
     validate_transactions_upon_tom_update(previous_membership, @saved_member.current_membership, amount_to_process, amount_in_favor)
     assert_not_nil @saved_member.operations.where("description like ?", "%Prorating club cash. Adding #{@tom_yearly.club_cash_installment_amount} minus #{prorated_club_cash} from previous Subscription plan.%")
     assert_equal @saved_member.club_cash_amount, previous_club_cash_amount + @tom_monthly.club_cash_installment_amount - prorated_club_cash
+  end
+
+  test "Upgrade/Downgrade should leave 0 club cash when we have to remove more club cash amount than available" do
+    Delayed::Worker.delay_jobs = true
+    prepare_upgrade_downgrade_toms
+    previous_membership = @saved_member.current_membership
+    amount_in_favor = 0
+    amount_to_process = 0
+    prorated_club_cash = 0
+
+    first_nbd = @saved_member.next_retry_bill_date
+    Timecop.travel(first_nbd) do
+      @saved_member.bill_membership
+    end
+    Delayed::Job.all.each{ |x| x.invoke_job }
+    Delayed::Job.all.each{ |x| x.destroy }
+
+    @saved_member.reload
+    @saved_member.club_cash_amount = 0
+    @saved_member.save
+
+    previous_club_cash_amount = @saved_member.club_cash_amount
+    Timecop.travel(first_nbd + (@saved_member.terms_of_membership.installment_period/2).days) do
+      days_until_nbd = (@saved_member.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+      amount_in_favor = ((@tom_monthly.installment_amount.to_f*(days_until_nbd/@tom_monthly.installment_period.to_f)) * 100).round / 100.0
+      amount_to_process = ((@tom_yearly.installment_amount - amount_in_favor)*100).round / 100.0
+      prorated_club_cash = (@tom_monthly.club_cash_installment_amount*(days_until_nbd/@tom_monthly.installment_period.to_f)).round
+      generate_post_update_terms_of_membership(@saved_member.id, @tom_monthly.id)
+    end
+    Delayed::Job.all.each{ |x| x.invoke_job }
+    Delayed::Worker.delay_jobs = false
+
+    @saved_member.reload
+    assert_equal @saved_member.terms_of_membership.id, @tom_monthly.id
+    assert_equal @saved_member.club_cash_amount, 0
   end
 
   test "Do not upgrade/downgrade if  the member has a refund already done" do
@@ -2012,7 +2047,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     @saved_member.reload
     assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
-    assert_equal @saved_member.next_retry_bill_date.to_date, nbd.to_date - nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc.to_date - days_in_provisional.days 
+    assert_equal @saved_member.next_retry_bill_date.to_date, (nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc.to_date - days_in_provisional.days).to_date
   end
 
   test "Upgrade/Downgrade a Member Basic membership level by prorate logic - Provisional Member - NewProvisionalDays > OldProvisionalDays" do
@@ -2043,7 +2078,8 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     @saved_member.reload
     assert @saved_member.active?
-    assert_not_nil @saved_member.operations.where("description like ?", "%Membership reached end of provisional period after Subscription Plan change. Billing $#{@tom_monthly.installment_amount}%").last
+
+    assert_not_nil @saved_member.operations.where("description like ?", "%Membership reached end of provisional period after Subscription Plan change to TOM(#{@tom_monthly.id}) -#{@tom_monthly.name}-. Billing $#{@tom_monthly.installment_amount}%").last
     assert_equal @saved_member.next_retry_bill_date.to_date, (middle_of_provisional_days + @tom_monthly.installment_period.days).to_date
   end
 
