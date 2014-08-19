@@ -2116,7 +2116,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     @saved_member.reload
     assert @saved_member.provisional?
     assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
-    assert_equal @saved_member.next_retry_bill_date.to_date, nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc.to_date - days_in_provisional.days 
+    nbd_should_have_set = nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc - days_in_provisional.days
+    assert_equal @saved_member.next_retry_bill_date.to_date, nbd_should_have_set.to_date, "Expecting #{@saved_member.next_retry_bill_date.to_date} but was #{nbd_should_have_set.to_date}. Dates: #{@saved_member.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}"
   end
 
   test "Upgrade/Downgrade a Member Basic membership level by prorate logic - Provisional Member - NewProvisionalDays < OldProvisionalDays" do
@@ -2157,7 +2158,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @saved_member.provisional?
     assert_equal @saved_member.terms_of_membership.id, @tom_yearly.id
     assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
-    assert_equal @saved_member.next_retry_bill_date.to_date, nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc.to_date - days_in_provisional.days
+    nbd_should_have_set = nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc - days_in_provisional.days
+    assert_equal @saved_member.next_retry_bill_date.to_date, nbd_should_have_set.to_date, "Expecting #{@saved_member.next_retry_bill_date.to_date} but was #{nbd_should_have_set.to_date}. Dates: #{@saved_member.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
   end
 
   test "Upgrade/Downgrade Member with Basic membership level by prorate logic (OldProvisionalDays > NewProvisionalDays)- Softdecline Member (Provisional status)" do
