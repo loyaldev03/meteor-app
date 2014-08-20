@@ -1808,8 +1808,8 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update TOM throught API - sending Email" do
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
-    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
     @saved_member_2 = create_active_member(@terms_of_membership_with_family, :active_member, nil, {}, { :created_by => @admin_user })
+    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
     @saved_member_2.update_attribute :email, @saved_member.email
     post(:update_terms_of_membership, { :id => @saved_member.email, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_member.reload

@@ -587,7 +587,7 @@ class Api::MembersController < ApplicationController
   def update_terms_of_membership
     new_tom = TermsOfMembership.find(params[:terms_of_membership_id])
     member = Member.find_by_id(params[:id])
-    member = Member.find_by_email!(params[:id]) if member.nil?
+    member = Member.find_by_email_and_club_id!(params[:id], new_tom.club_id) if member.nil?
     my_authorize! :api_change, TermsOfMembership, new_tom.club_id
     
     render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, params[:prorated].to_s.to_bool, params[:credit_card])
