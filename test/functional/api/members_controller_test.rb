@@ -1805,6 +1805,18 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
 
+  test "Update TOM throught API - sending Email" do
+    sign_in @admin_user
+    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
+    @saved_member_2 = create_active_member(@terms_of_membership_with_family, :active_member, nil, {}, { :created_by => @admin_user })
+    @saved_member_2.update_attribute :email, @saved_member.email
+    post(:update_terms_of_membership, { :id => @saved_member.email, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    @saved_member.reload
+    assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
+    assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.update_terms_of_membership
+  end
+
   test "Update TOM throught API - different TOM - active member" do
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
@@ -2158,8 +2170,8 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @saved_member.provisional?
     assert_equal @saved_member.terms_of_membership.id, @tom_yearly.id
     assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
-    nbd_should_have_set = nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc - days_in_provisional.days
-    assert_equal @saved_member.next_retry_bill_date.to_date, nbd_should_have_set.to_date, "Expecting #{@saved_member.next_retry_bill_date.to_date} but was #{nbd_should_have_set.to_date}. Dates: #{@saved_member.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
+    nbd_should_have_set = nbd.to_datetime.change(:offset => @saved_member.get_offset_related) - days_in_provisional.days
+    assert_equal @saved_member.next_retry_bill_date.to_date, nbd_should_have_set.utc.to_date, "Dates: #{@saved_member.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
   end
 
   test "Upgrade/Downgrade Member with Basic membership level by prorate logic (OldProvisionalDays > NewProvisionalDays)- Softdecline Member (Provisional status)" do
