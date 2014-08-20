@@ -552,10 +552,10 @@ class Api::MembersController < ApplicationController
   ##
   # Change actual terms of membership related to a member, with the option to prorate it.
   #
-  # @resource /api/v1/members/:id_or_email/update_terms_of_membership
+  # @resource /api/v1/members/update_terms_of_membership
   # @action POST
   #
-  # @required [Integer] id_or_email Member's ID or Member's email. You can either send id or email within this value. The ID is an integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @required [String] id_or_email Member's ID or Member's email. You can either send id or email within this value. The ID is an integer autoincrement value that is used by platform.
   # @required [Integer] terms_of_membership_id New Terms of membership's ID to set on members.
   # @optional [Boolean] prorate Boolean value to define if we will proceed with the prorate logic, or not. (1= follow prorate logic, 0= do not follow prorate logic). Default value is 1 (true)
   # @optional [Hash] credit_card Hash with credit cards information. It must have the following information:
