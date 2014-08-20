@@ -552,10 +552,10 @@ class Api::MembersController < ApplicationController
   ##
   # Change actual terms of membership related to a member, with the option to prorate it.
   #
-  # @resource /api/v1/members/:id/update_terms_of_membership
+  # @resource /api/v1/members/:id_or_email/update_terms_of_membership
   # @action POST
   #
-  # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url. (Optionaly, you can send member's email instead of member's id within this field)
+  # @required [Integer] id_or_email Member's ID or Member's email. You can either send id or email within this value. The ID is an integer autoincrement value that is used by platform. Have in mind this is part of the url.
   # @required [Integer] terms_of_membership_id New Terms of membership's ID to set on members.
   # @optional [Boolean] prorate Boolean value to define if we will proceed with the prorate logic, or not. (1= follow prorate logic, 0= do not follow prorate logic). Default value is 1 (true)
   # @optional [Hash] credit_card Hash with credit cards information. It must have the following information:
@@ -586,8 +586,8 @@ class Api::MembersController < ApplicationController
   #
   def update_terms_of_membership
     new_tom = TermsOfMembership.find(params[:terms_of_membership_id])
-    member = Member.find_by_id(params[:id])
-    member = Member.find_by_email_and_club_id!(params[:id], new_tom.club_id) if member.nil?
+    member = Member.find_by_id(params[:id_or_email])
+    member = Member.find_by_email_and_club_id!(params[:id_or_email], new_tom.club_id) if member.nil?
     my_authorize! :api_change, TermsOfMembership, new_tom.club_id
     
     render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, params[:prorated].to_s.to_bool, params[:credit_card])

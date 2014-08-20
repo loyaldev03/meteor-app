@@ -1584,7 +1584,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
     
 		<div class="method">
 			<p class="method_desc">Change actual terms of membership related to a member, with the option to prorate it.</p>
-			<h3 class="resource_url"><strong>/api/v1/members/:id/update_terms_of_membership</strong> [POST]</h3>
+			<h3 class="resource_url"><strong>/api/v1/members/:id_or_email/update_terms_of_membership</strong> [POST]</h3>
 
 			<div class="parameters">	
 				
@@ -1593,9 +1593,9 @@ It will also send a welcome email and charge the enrollment to the member's cred
 						
 							<ul>
 								<li>
-									<span class="name">id</span>
+									<span class="name">id_or_email</span>
 									<span class="type">Integer</span>
-									<span class="text">Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url. (Optionaly, you can send member's email instead of member's id within this field)</span>
+									<span class="text">Member's ID or Member's email. You can either send id or email within this value. The ID is an integer autoincrement value that is used by platform. Have in mind this is part of the url.</span>
 								</li>
 							</ul>
 						
@@ -1969,7 +1969,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Wed Aug 20 10:13:33 2014 with ruby-1.9.3
+  Generated on Wed Aug 20 11:03:15 2014 with ruby-1.9.3
 </div>
 
   </body>
