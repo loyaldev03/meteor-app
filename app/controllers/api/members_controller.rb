@@ -586,10 +586,13 @@ class Api::MembersController < ApplicationController
   #
   def update_terms_of_membership
     new_tom = TermsOfMembership.find(params[:terms_of_membership_id])
+    my_authorize! :api_change, TermsOfMembership, new_tom.club_id
+
     member = Member.find(:first, :conditions => ["club_id = ? AND ( id = ? OR email = ? )", new_tom.club_id, params[:id_or_email], params[:id_or_email]])
     raise ActiveRecord::RecordNotFound if member.nil?
-    my_authorize! :api_change, TermsOfMembership, new_tom.club_id
-    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, params[:prorated].to_s.to_bool, params[:credit_card])
+    prorated = params[:prorated].nil? ? true : params[:prorated].to_s.to_bool
+
+    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card])
   rescue ActiveRecord::RecordNotFound => e
     message = (e.to_s.include? "TermsOfMembership") ? "Terms of membership not found" : "Member not found"
     render json: { :message => message, :code => Settings.error_codes.not_found }
