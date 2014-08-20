@@ -1811,7 +1811,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @saved_member_2 = create_active_member(@terms_of_membership_with_family, :active_member, nil, {}, { :created_by => @admin_user })
     @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
     @saved_member_2.update_attribute :email, @saved_member.email
-    post(:update_terms_of_membership, { :id_or_email => @saved_member.email, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:update_terms_of_membership, { :id_or_email => @saved_member.email, :terms_of_membership_id => @terms_of_membership_second.id, :prorated => 0, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
     assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.update_terms_of_membership
@@ -1821,7 +1821,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id_or_email => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:update_terms_of_membership, { :id_or_email => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :prorated => 0 ,:format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
     assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.update_terms_of_membership
@@ -1831,7 +1831,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :active_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id_or_email => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
+    post(:update_terms_of_membership, { :id_or_email => @saved_member.id, :terms_of_membership_id => @terms_of_membership.id, :prorated => 0, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
   end
 
@@ -1839,7 +1839,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_member = create_active_member(@terms_of_membership, :provisional_member, nil, {}, { :created_by => @admin_user })
-    post(:update_terms_of_membership, { :id_or_email => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
+    post(:update_terms_of_membership, { :id_or_email => @saved_member.id, :terms_of_membership_id => @terms_of_membership_second.id, :prorated => 0, :format => :json} )
     @saved_member.reload
     assert_equal @saved_member.current_membership.terms_of_membership_id, @terms_of_membership_second.id
     assert_equal @saved_member.operations.where(description: "Change of TOM from API from TOM(#{@terms_of_membership.id}) to TOM(#{@terms_of_membership_second.id})").first.operation_type, Settings.operation_types.update_terms_of_membership
