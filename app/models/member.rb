@@ -828,6 +828,7 @@ class Member < ActiveRecord::Base
       else
         new_next_bill_date = (self.join_date + tom.provisional_days.days) - days_already_in_provisional.days
         new_next_bill_date = Time.zone.now if new_next_bill_date.to_date < Time.zone.now.to_date
+        new_next_bill_date = new_next_bill_date.in_time_zone(self.club.time_zone)
         change_next_bill_date(new_next_bill_date, agent, "Moved next bill date due to Tom change. Already spend #{days_already_in_provisional} days in previous membership.")
       end
 
