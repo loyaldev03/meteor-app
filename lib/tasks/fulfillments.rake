@@ -1,5 +1,5 @@
 namespace :fulfillments do  
-  desc "Create fulfillment report for Brian Miller."
+  desc "NO LONGER USED (https://www.pivotaltracker.com/story/show/76527736) - Create fulfillment report for Brian Miller."
   task :generate_fulfillment_naamma_report => :environment do
     begin
       Rails.logger = Logger.new("#{Rails.root}/log/fulfillment_naamma_report.log")
@@ -78,7 +78,7 @@ namespace :fulfillments do
   end
 
 
-  desc "Create fulfillment report for sloops products reated to Naamma."
+  desc "NO LONGER USED (https://www.pivotaltracker.com/story/show/76527736) - Create fulfillment report for sloops products reated to Naamma."
   task :generate_sloop_naamma_report => :environment do
     begin 
       require 'csv'

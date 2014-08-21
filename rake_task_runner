@@ -57,7 +57,6 @@ cd /var/www/$2/current && rake clubs:count_members_in_clubs >> $LOGFILE 2>&1
 DATE=`date +"%u"` # 1 monday
 if [ "$1" == "production" ]; then
   if [ "$DATE" == "1" ]; then
-    cd /var/www/$2/current && rake fulfillments:generate_fulfillment_naamma_report >> $LOGFILE 2>&1 
     cd /var/www/$2/current && rake fulfillments:send_print_magazine_hot_rod_file >> $LOGFILE 2>&1 
     cd /var/www/$2/current && rake members:send_magazine_cancellation_email >> $LOGFILE 2>&1 
     # cd /var/www/$2/current && rake fulfillments:generate_nfla_report >> $LOGFILE 2>&1 
