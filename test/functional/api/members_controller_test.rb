@@ -2103,7 +2103,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     prepare_upgrade_downgrade_toms false
 
     days_in_provisional = @saved_member.terms_of_membership.installment_period/2
-    middle_of_provisional_days = Time.zone.now + days_in_provisional.days
+    middle_of_provisional_days = Time.zone.now.in_time_zone(@saved_member.club.time_zone) + days_in_provisional.days
     nbd = middle_of_provisional_days + @tom_yearly.provisional_days.days
     Timecop.travel(middle_of_provisional_days) do
       generate_post_update_terms_of_membership(@saved_member.id, @tom_yearly.id)
@@ -2113,12 +2113,12 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
     assert_equal @saved_member.next_retry_bill_date.to_date, (nbd.to_datetime.change(:offset => @saved_member.get_offset_related).utc.to_date - days_in_provisional.days).to_date
   end
-
+  
   test "Upgrade/Downgrade a Member Basic membership level by prorate logic - Provisional Member - NewProvisionalDays > OldProvisionalDays" do
     prepare_upgrade_downgrade_toms false
 
     days_in_provisional = @saved_member.terms_of_membership.provisional_days/2
-    middle_of_provisional_days = Time.zone.now + days_in_provisional.days
+    middle_of_provisional_days = Time.zone.now.in_time_zone(@saved_member.club.time_zone) + days_in_provisional.days
     nbd = middle_of_provisional_days + @tom_yearly.provisional_days.days
 
     Timecop.travel(middle_of_provisional_days) do
@@ -2171,7 +2171,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal @saved_member.terms_of_membership.id, @tom_yearly.id
     assert_not_nil @saved_member.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
     nbd_should_have_set = nbd.to_datetime.change(:offset => @saved_member.get_offset_related) - days_in_provisional.days
-    assert_equal @saved_member.next_retry_bill_date.to_date, nbd_should_have_set.utc.to_date, "Dates: #{@saved_member.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
+    assert_equal @saved_member.next_retry_bill_date.utc.to_date, nbd_should_have_set.utc.to_date, "Dates: #{@saved_member.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
   end
 
   test "Upgrade/Downgrade Member with Basic membership level by prorate logic (OldProvisionalDays > NewProvisionalDays)- Softdecline Member (Provisional status)" do
