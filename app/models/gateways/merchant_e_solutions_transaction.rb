@@ -22,12 +22,7 @@ class MerchantESolutionsTransaction < Transaction
   def new_chargeback(sale_transaction, args)
     trans = MerchantESolutionsTransaction.find_by_response args.to_json
     if trans.nil?
-      if args[:adjudication_date].blank?
-        chargeback_amount = -args[:transaction_amount].to_f
-        operation_description = "Unprocessed Chargeback processed $#{chargeback_amount}"
-        chargeback_operation_type = Settings.operation_types.unprocessed_chargeback
-        chargeback_success = false
-      elsif args[:adjudication_date].last == '+'
+      if args[:adjudication_date].last == '+'
         chargeback_amount = args[:transaction_amount].to_f
         operation_description = "Rebutted Chargeback processed $#{chargeback_amount}"
         chargeback_operation_type = Settings.operation_types.chargeback_rebutted
