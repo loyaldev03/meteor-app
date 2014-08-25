@@ -19,15 +19,17 @@
   </div>
 <% end %>
 
-<div class="control-group"  id="div_merchant_key">
-  <%= f.label :merchant_key, :class => 'control-label required_asterisk' %>
-  <div class="controls">
-    <%= f.text_field :merchant_key, :class => 'text_field' %>
-    <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.payment_gateway_configuration.merchant_key'), 
-        :content => t('activerecord.attributes.payment_gateway_configuration.merchant_key_help') } %> 
+<% if @payment_gateway_configuration.new_record? or @payment_gateway_configuration.litle? or @payment_gateway_configuration.mes?%>
+  <div class="control-group"  id="div_merchant_key">
+    <%= f.label :merchant_key, :class => 'control-label required_asterisk' %>
+    <div class="controls">
+      <%= f.text_field :merchant_key, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.payment_gateway_configuration.merchant_key'), 
+          :content => t('activerecord.attributes.payment_gateway_configuration.merchant_key_help') } %> 
+    </div>
   </div>
-</div>
+<% end %>
 
 <div class="control-group">
   <%= f.label :login, :class => 'control-label required_asterisk' %>
@@ -98,7 +100,6 @@
 	<%= f.submit nil, :class => 'btn btn-primary' %>
 	<%= link_to t(:cancel), club_path(:id => @current_club.id), :class => 'btn' %>
 </div>
-
 
 
 <script>
