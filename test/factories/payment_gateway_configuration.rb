@@ -25,7 +25,7 @@ FactoryGirl.define do
 
   factory :first_data_payment_gateway_configuration, class: PaymentGatewayConfiguration do
     login  "AE6691-05"
-    password "fJmFbJ3AA"
+    password "0i5n761o"
     gateway "first_data"
     report_group "SAC_STAGING_TEST"
   end
