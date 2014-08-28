@@ -44,7 +44,7 @@ cd /var/www/$2/current && rake billing:send_prebill  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:send_happy_birthday  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:send_pillar_emails  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake products:send_product_list_email  >> $LOGFILE 2>&1 &
-# club cash should be processed before billing. Because _if we reset club cash and then we bill, new CC should not be resetted
+# club cash should be processed before billing. Because if we reset club cash and then we bill, new CC should not be resetted
 cd /var/www/$2/current && rake members:process_club_cash  >> $LOGFILE 2>&1 &
 
 
