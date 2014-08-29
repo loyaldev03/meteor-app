@@ -222,7 +222,7 @@ module MesAccountUpdater
       lines = body.split("\n")
       lines.each do |line|
         columns = line.split(',')
-        next if columns[0].include?('Merchant Id')
+        next if columns[0].include?('Merchant Id') or columns[12].blank?
         columns.each { |x| x.gsub!('"', '') }
         args = { :control_number => columns[2], :incomming_date => columns[3],
           :reference_number => columns[5].gsub("'", ''), :transaction_date => columns[6], :transaction_amount => columns[7],

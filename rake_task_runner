@@ -47,8 +47,11 @@ wait $WAIT_PIDS
 cd /var/www/$2/current && rake billing:send_prebill  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:send_happy_birthday  >> $LOGFILE 2>&1 &
 cd /var/www/$2/current && rake members:send_pillar_emails  >> $LOGFILE 2>&1 &
+cd /var/www/$2/current && rake products:send_product_list_email  >> $LOGFILE 2>&1 &
 # club cash should be processed before billing. Because if we reset club cash and then we bill, new CC should not be resetted
 cd /var/www/$2/current && rake members:process_club_cash  >> $LOGFILE 2>&1 &
+
+
 
 # after this script we should do the BK and reports
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
@@ -60,10 +63,9 @@ cd /var/www/$2/current && rake clubs:count_members_in_clubs >> $LOGFILE 2>&1
 DATE=`date +"%u"` # 1 monday
 if [ "$1" == "production" ]; then
   if [ "$DATE" == "1" ]; then
-    cd /var/www/$2/current && rake fulfillments:generate_fulfillment_naamma_report >> $LOGFILE 2>&1 
     cd /var/www/$2/current && rake fulfillments:send_print_magazine_hot_rod_file >> $LOGFILE 2>&1 
     cd /var/www/$2/current && rake members:send_magazine_cancellation_email >> $LOGFILE 2>&1 
     # cd /var/www/$2/current && rake fulfillments:generate_nfla_report >> $LOGFILE 2>&1 
   fi
-  ssh deploy@50.116.28.74 -p 30003 '/home/deploy/sac-platform-reporting/current/generate_reporting_database >> /home/deploy/sac-platform-reporting/current/log/nightly.log 2>&1'
+  ssh deploy@50.116.28.74 -p 30003 '/home/deploy/sac-platform-reporting/current/scripts/distribute_production_data.sh >> /home/deploy/sac-platform-reporting/current/log/nightly.log 2>&1'
 fi

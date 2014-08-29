@@ -11,7 +11,7 @@ class PaymentGatewayConfigurationTest < ActionController::IntegrationTest
   def fill_in_payment_gateway_configuration(new_pgc, new=true)
     select(I18n.t("activerecord.gateway.#{new_pgc.gateway}"), :from => 'payment_gateway_configuration[gateway]') if new
     fill_in "payment_gateway_configuration[report_group]", with: new_pgc.report_group if new_pgc.report_group and new_pgc.litle?
-    fill_in "payment_gateway_configuration[merchant_key]", with: new_pgc.merchant_key if new_pgc.merchant_key
+    fill_in "payment_gateway_configuration[merchant_key]", with: new_pgc.merchant_key if new_pgc.merchant_key and (new_pgc.litle? or new_pgc.mes?)
     fill_in "payment_gateway_configuration[login]", with: new_pgc.login if new_pgc.login
     fill_in "payment_gateway_configuration[password]", with: new_pgc.password if new_pgc.password
     fill_in "payment_gateway_configuration[descriptor_name]", with: new_pgc.descriptor_name if new_pgc.descriptor_name and new_pgc.litle?

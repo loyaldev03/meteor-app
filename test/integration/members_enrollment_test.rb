@@ -1140,6 +1140,7 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content?("number: is required")
 
     fill_in_member(unsaved_member, credit_card)
+    sleep 3
     assert find_field('input_first_name').value == unsaved_member.first_name
 
     created_member = Member.find_by_email(unsaved_member.email) 
