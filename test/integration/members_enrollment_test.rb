@@ -76,7 +76,6 @@ class MembersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_content?(@terms_of_membership_with_gateway.description) if @terms_of_membership_with_gateway.description
       assert page.has_content?(@terms_of_membership_with_gateway.provisional_days.to_s) if @terms_of_membership_with_gateway.provisional_days
       assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s) if @terms_of_membership_with_gateway.installment_amount
-      assert page.has_content?(@terms_of_membership_with_gateway.installment_type) if @terms_of_membership_with_gateway.installment_type
       # assert page.has_content?(@terms_of_membership_with_gateway.grace_period.to_s) if @terms_of_membership_with_gateway.grace_period
     end
     within("#table_email_template")do
