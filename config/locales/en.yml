@@ -371,7 +371,6 @@ en:
         name: 'Name'
         mode: 'Mode'
         installment_amount: 'Installment amount'
-        installment_type: 'Installment type'
         grace_period: 'Grace period'
         provisional_days: 'Provisional days'
         has_payment_gateway: 'The club has payment gateway configuration'
