@@ -290,14 +290,21 @@ module ActionController
       within("#ui-datepicker-div") do
         if date.month != Time.zone.now.month
           if (date.month > Time.zone.now.month)
-            (date.month-Time.zone.now.month).times{ find(".ui-icon-circle-triangle-e").click }
+            (date.month-Time.zone.now.month).times do 
+              date = date + 1.month
+              find(".ui-icon-circle-triangle-e").click
+            end
           end
           if (date.month < Time.zone.now.month)
-            (Time.zone.now.month-date.month).times{ find(".ui-icon-circle-triangle-w").click }
+            (Time.zone.now.month-date.month).times do
+              date = date - 1.month
+              find(".ui-icon-circle-triangle-w").click 
+            end
           end
         end
         first(:link, date.day.to_s).click
       end
+      date
     end
 
     def fill_in_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])

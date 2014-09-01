@@ -120,7 +120,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     cancel_date = Time.zone.now+1.day
     visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
     click_link_or_button 'cancel'
-    select_from_datepicker("cancel_date", cancel_date)
+    cancel_date = select_from_datepicker("cancel_date", cancel_date)
     select(@member_cancel_reason.name, :from => 'reason')
 
     confirm_ok_js
@@ -130,7 +130,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     cancel_date = Time.zone.now+2.day
 
     click_link_or_button 'cancel'
-    select_from_datepicker("cancel_date", cancel_date)
+    cancel_date = select_from_datepicker("cancel_date", cancel_date)
     select(@member_cancel_reason.name, :from => 'reason')
     confirm_ok_js
     click_link_or_button 'Cancel member'
@@ -145,7 +145,7 @@ class MembersCancelTest < ActionController::IntegrationTest
     click_on 'Cancel'
     date_time = Time.zone.now + 1.day
 
-    select_from_datepicker("cancel_date", date_time)
+    date_time = select_from_datepicker("cancel_date", date_time)
     select(@member_cancel_reason.name, :from => 'reason')
     confirm_ok_js
     click_on 'Cancel member'
