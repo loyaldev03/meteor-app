@@ -7,7 +7,7 @@ require "exceptions"
 
 # # We are commenting log writing due to https://www.pivotaltracker.com/story/show/68819072 since how logs are written is not pci compliant (Only for production).
 
-if Rails.env.staging? or Rails.env.prorotype?
+if Rails.env.staging? or Rails.env.prototype?
 	ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant.log", "a+")
 	ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device.sync = true
 
