@@ -1,0 +1,25 @@
+
+Member ID to send communications: <%= text_field_tag "reason", nil, :class => 'text_field input-medium', :id => "member_id"%>
+
+<table  class="table table-bordered table-condensed tablesorter">
+	<thead>
+		<tr>
+			<th class="span1"> Template ID </th>
+			<th class="span2"> Template Name </th>
+			<th class="span2"> Template Type </th>
+			<th class="span1"> Action </th>
+			<th class="span2"> Result </th>
+		</tr>
+	</thead>
+	<tbody>
+		<% @tom.email_templates.each do |email_template| %>
+			<tr>
+				<td> <%= email_template.id %> </td>
+				<td> <%= email_template.name %> </td>
+				<td> <%= email_template.template_type %> </td>
+				<td> <%= link_to "send", "#", :class => "btn btn-mini"  %> </td>
+				<td id= <%= "result_#{email_template.id}" %>> </td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>
