@@ -1287,3 +1287,40 @@ function email_templates_table_index_functions(column_count) {
     "sAjaxSource": $('#email_templates_table').data('source')
   });
 }
+
+function test_communications_functions() {
+  $("#send").live("click", function(event){
+    event.preventDefault();
+    is_processing = false;
+    $('[id=send]').each( function(){
+      if($(this).attr('disabled') == 'disabled')
+        is_processing = true;
+    });
+    if(is_processing == false){
+      button = $(this)
+      member_id = $("#member_id").val();
+      template_id = button.attr('name');
+      if(member_id == "")
+        alert("Please, insert a valid member ID.");
+      else{
+        button.attr('disabled', 'disabled');
+        startAjaxLoader();
+        $.ajax({
+          type: "POST",
+          url: "",
+          data: { email_template_id:template_id, member_id:member_id },
+          success: function(data){
+            $("#result_"+template_id).empty();
+            if (data.success == true){
+              $("#result_"+template_id).append("<div class='alert-info alert'>"+data.message+"</div>")
+            }else{
+              $("#result_"+template_id).append("<div class='error-info alert'>"+data.message+"</div>")
+            };
+            endAjaxLoader();
+            button.removeAttr("disabled");
+          },
+        })
+      };
+    }
+  });
+}

@@ -111,10 +111,20 @@ class EmailTemplatesController < ApplicationController
   end
 
   def test_communications
-    @tom = TermsOfMembership.find(params[:terms_of_membership_id])
-    my_authorize! :test_communications, EmailTemplate, @tom.club_id
-    if request.post?
-    
+    if request.post? 
+      template = EmailTemplate.find_by_id (params[:email_template_id]) 
+      my_authorize! :test_communications, EmailTemplate, template.terms_of_membership.club_id
+      # member = Member.find_by_id params[:member_id]
+      # response = if template and member 
+      #   Communication.test_deliver!(template, member)        
+      # else
+      #   { success: false, message: "Member or Template not found."}
+      # end
+      # render json: response
+      render json: { success: true, message: "Testing answer." }
+    else
+      @tom = TermsOfMembership.find(params[:terms_of_membership_id])
+      my_authorize! :test_communications, EmailTemplate, @tom.club_id
     end
   end
 

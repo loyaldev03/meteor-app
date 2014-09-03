@@ -1271,7 +1271,7 @@ class Member < ActiveRecord::Base
   def marketing_tool_sync
     case(club.marketing_tool_client)
     when 'exact_target'
-      marketing_tool_exact_target_sync if defined?(SacExactTarget::MemberModel)
+      exact_target_sync_to_remote_domain if defined?(SacExactTarget::MemberModel)
     when 'mailchimp_mandrill'
       marketing_tool_mailchimp_sync if defined?(SacMailchimp::MemberModel)
     end

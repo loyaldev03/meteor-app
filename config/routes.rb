@@ -55,7 +55,7 @@ SacPlatform::Application.routes.draw do
         get :resumed_information
         resources :email_templates, :path => 'communications'
         match '/external_attributes' => 'email_templates#external_attributes', via: :get
-        match '/test_communications' => 'email_templates#test_communications', via: :get 
+        match '/test_communications' => 'email_templates#test_communications', via: [:get, :post] 
       end
       resources :payment_gateway_configurations, :except => [:index, :destroy]
       

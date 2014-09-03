@@ -65,6 +65,22 @@ class Communication < ActiveRecord::Base
   end  
   handle_asynchronously :deliver_exact_target, :queue => :exact_target_email, priority: 15
 
+  def test_deliver_exact_target
+    if self.member.exact_target_member
+      result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
+      self.sent_success = (result.OverallStatus == "OK")
+      self.response = result
+    else
+      self.sent_success = false
+      self.response = I18n.t('error_messages.no_marketing_client_configure')
+    end
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
+    self.sent_success = false
+    self.response = e
+  end
+
   def deliver_mandrill
     if self.member.mandrill_member
       result = self.member.mandrill_member.send_email(external_attributes[:template_name])
@@ -86,6 +102,22 @@ class Communication < ActiveRecord::Base
     end
   end
   handle_asynchronously :deliver_mandrill, :queue => :mandrill_email, priority: 15
+
+  def test_deliver_mandrill
+    if self.member.mandrill_member
+      result = self.member.mandrill_member.send_email(external_attributes[:template_name])
+      self.sent_success = (result["status"]=="sent")
+      self.response = result
+    else
+      self.sent_success = false
+      self.response = I18n.t('error_messages.no_marketing_client_configure')
+    end
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
+    self.sent_success = false
+    self.response = e
+  end
 
   def deliver_lyris
     lyris = LyrisService.new
@@ -112,6 +144,24 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_lyris, :queue => :lyris_email, priority: 15
 
+  def test_deliver_lyris
+    lyris = LyrisService.new
+    lyris.site_id = external_attributes[:site_id]
+    lyris.subscribe_user!(self)
+    if lyris.unsubscribed?(external_attributes[:mlid], email)
+      self.sent_success = false
+      self.response = "Member requested unsubscription to mlid #{external_attributes[:mlid]} at lyris"
+    else
+      response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
+      self.sent_success = true
+      self.response = response
+    end
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    Auditory.report_issue("Testing::Communication deliver_lyris", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
+    self.sent_success = false
+    self.response = e
+  end
 
   def deliver_action_mailer
     response = case template_type.to_sym
@@ -147,5 +197,32 @@ class Communication < ActiveRecord::Base
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_action_mailer, :queue => :email_queue, priority: 15
+
+  def self.test_deliver!(template, member)
+    if member.email.include?("@noemail.com")
+      { success: false ,message: "The email contains '@noemail.com' which is an empty email. The email won't be sent."}
+    else
+      c = Communication.new :email => member.email
+      c.member_id = member.id
+      c.template_name = template.name
+      c.client = template.client
+      c.external_attributes = template.external_attributes
+
+      if template.lyris?
+        c.test_deliver_lyris
+      elsif template.exact_target?
+        c.test_deliver_exact_target
+      elsif template.mandrill?
+        c.test_deliver_mandrill
+      elsif template.action_mailer?
+        c.test_deliver_action_mailer
+      else
+        c.sent_success = false
+        c.response "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
+      end
+      { success: c.sent_success, message: c.response }
+    end
+  end
+
 
 end
