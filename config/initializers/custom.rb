@@ -5,17 +5,18 @@ require 'lyris_service'
 require 'axlsx'
 require "exceptions"
 
-# # We are commenting log writing due to https://www.pivotaltracker.com/story/show/68819072 since how logs are written is not pci compliant
+# # We are commenting log writing due to https://www.pivotaltracker.com/story/show/68819072 since how logs are written is not pci compliant (Only for production).
 
-# # ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant.log", "a+")  
-# # ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device.sync = true
-# 
-# LitleOnline::Configuration.logger = Logger.new("#{Rails.root}/log/active_merchant_litle.log")  
-# LitleOnline::Configuration.logger.level = Logger::DEBUG
-# 
-# ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_auth_net.log", "a+")  
-# ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device.sync = true
+if Rails.env.staging? or Rails.env.prototype?
+	ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant.log", "a+")
+	ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device.sync = true
 
+	LitleOnline::Configuration.logger = Logger.new("#{Rails.root}/log/active_merchant_litle.log")  
+	LitleOnline::Configuration.logger.level = Logger::DEBUG
+
+	ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_auth_net.log", "a+")  
+	ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device.sync = true
+end
 
 # config/initializers/delayed_job_config.rb
 Delayed::Worker.destroy_failed_jobs = false
