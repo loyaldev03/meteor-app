@@ -70,7 +70,7 @@ class Communication < ActiveRecord::Base
       member.exact_target_member.save! unless member.marketing_client_sync_status == 'synced'
       result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
       self.sent_success = (result.OverallStatus == "OK")
-      self.response = result
+      self.response = sent_success ? "Successfully sent" : result.to_s
     else
       self.sent_success = false
       self.response = I18n.t('error_messages.no_marketing_client_configure')
@@ -108,7 +108,7 @@ class Communication < ActiveRecord::Base
     if self.member.mandrill_member
       result = self.member.mandrill_member.send_email(external_attributes[:template_name])
       self.sent_success = (result["status"]=="sent")
-      self.response = result
+      self.response = sent_success ? "Successfully sent" : result.to_s
     else
       self.sent_success = false
       self.response = I18n.t('error_messages.no_marketing_client_configure')
@@ -155,7 +155,7 @@ class Communication < ActiveRecord::Base
     else
       response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
       self.sent_success = true
-      self.response = response
+      self.response = "Successfully sent"
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
@@ -255,7 +255,7 @@ class Communication < ActiveRecord::Base
         c.response "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
       end
       success = c.sent_success ? Settings.error_codes.success : Settings.error_codes.test_communication_error
-      { success: success, message: c.response }
+      { success: success, message: c.response.to_s }
     end
   end
 

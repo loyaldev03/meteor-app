@@ -130,6 +130,7 @@ class EmailTemplatesController < ApplicationController
     else
       @tom = TermsOfMembership.find(params[:terms_of_membership_id])
       my_authorize! :test_communications, EmailTemplate, @tom.club_id
+      @email_templates = EmailTemplate.where(:terms_of_membership_id => @tom.id, :client => @tom.club.marketing_tool_client)
     end
   end
 

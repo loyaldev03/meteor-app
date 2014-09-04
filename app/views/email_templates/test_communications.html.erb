@@ -6,13 +6,13 @@ Member ID to send communications: <%= text_field_tag "reason", nil, :class => 't
     <tr>
       <th class="span1"> Template ID </th>
       <th class="span2"> Template Name </th>
-      <th class="span2"> Template Type </th>
+      <th class="span1"> Template Type </th>
       <th class="span1"> Action </th>
-      <th class="span2"> Result </th>
+      <th class="span4"> Result </th>
     </tr>
   </thead>
   <tbody>
-    <% @tom.email_templates.each do |email_template| %>
+    <% @email_templates.each do |email_template| %>
       <tr>
         <td> <%= email_template.id %> </td>
         <td> <%= email_template.name %> </td>
