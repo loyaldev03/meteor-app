@@ -124,7 +124,7 @@ class EmailTemplatesController < ApplicationController
           Communication.test_deliver!(template, member)
         end
         render json: response
-      rescue Exception = e
+      rescue Exception => e
         render json: { success: Settings.error_codes.unrecoverable_error, message: e}
       end
     else
