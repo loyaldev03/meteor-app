@@ -1311,7 +1311,7 @@ function test_communications_functions() {
           data: { email_template_id:template_id, member_id:member_id },
           success: function(data){
             $("#result_"+template_id).empty();
-            if (data.success == true){
+            if (data.code == "000"){
               $("#result_"+template_id).append("<div class='alert-info alert'>Successfully send</div>")
             }else{
               $("#result_"+template_id).append("<div class='error-info alert'>"+data.message+"</div>")

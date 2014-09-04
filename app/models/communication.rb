@@ -117,7 +117,7 @@ class Communication < ActiveRecord::Base
     logger.error "* * * * * #{e}"
     Auditory.report_issue("Testing::Communication deliver_mandrill", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
     self.sent_success = false
-    self.response = e
+    self.response = e.to_s
   end
 
   def deliver_lyris
@@ -161,7 +161,7 @@ class Communication < ActiveRecord::Base
     logger.error "* * * * * #{e}"
     Auditory.report_issue("Testing::Communication deliver_lyris", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
     self.sent_success = false
-    self.response = e
+    self.response = e.to_s
   end
 
   def deliver_action_mailer
@@ -200,7 +200,9 @@ class Communication < ActiveRecord::Base
   handle_asynchronously :deliver_action_mailer, :queue => :email_queue, priority: 15
 
   def test_deliver_action_mailer
-    response = case template_type.to_sym
+    self.sent_success = true
+    self.response = "Successfully send"
+    case template_type.to_sym
     when :cancellation
       Notifier.cancellation(email).deliver!
     when :rejection
@@ -220,21 +222,23 @@ class Communication < ActiveRecord::Base
     when :soft_decline
       Notifier.soft_decline(member).deliver!
     else
-      { success: false, message: "Deliver action could not be done."}
+      self.sent_success = false
+      self.response = "Deliver action could not be done."
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-
+      self.sent_success = false
+      self.response = e.to_s
   end
 
   def self.test_deliver!(template, member)
     if member.email.include?("@noemail.com")
       { success: false ,message: "The email contains '@noemail.com' which is an empty email. The email won't be sent."}
     else
-
       c = Communication.new :email => member.email
       c.member_id = member.id
       c.template_name = template.name
+      c.template_type = template.template_type
       c.client = template.client
       c.external_attributes = template.external_attributes
 

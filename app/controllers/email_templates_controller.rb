@@ -118,14 +118,14 @@ class EmailTemplatesController < ApplicationController
         member = Member.find_by_id params[:member_id]
         response = if template.nil? or member.nil?
           { code: Settings.error_codes.not_found, message: "Member or Template not found."}
-        elsif member.club_id != template.club_id
+        elsif member.club_id != template.terms_of_membership.club_id
           { code: Settings.error_codes.wrong_data, message: "Member does not belong to same club as the Template."}
         else 
           Communication.test_deliver!(template, member)
         end
         render json: response
       rescue Exception => e
-        render json: { success: Settings.error_codes.unrecoverable_error, message: e}
+        render json: { code: Settings.error_codes.unrecoverable_error, message: e.to_s}
       end
     else
       @tom = TermsOfMembership.find(params[:terms_of_membership_id])
