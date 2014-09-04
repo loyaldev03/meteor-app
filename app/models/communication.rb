@@ -67,7 +67,7 @@ class Communication < ActiveRecord::Base
 
   def test_deliver_exact_target
     if self.member.exact_target_member
-      member.exact_target_member.save! unless member.marketing_client_sync_status == 'synced'
+      member.exact_target_member.save! unless member.marketing_client_synced_status == 'synced'
       result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
       self.sent_success = (result.OverallStatus == "OK")
       self.response = sent_success ? "Successfully sent" : result.to_s
