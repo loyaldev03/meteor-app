@@ -70,7 +70,7 @@ class Communication < ActiveRecord::Base
       member.exact_target_member.save! unless member.marketing_client_synced_status == 'synced'
       result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
       self.sent_success = (result.OverallStatus == "OK")
-      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result.to_s
+      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result
     else
       self.sent_success = false
       self.response = I18n.t('error_messages.no_marketing_client_configure')
@@ -79,7 +79,7 @@ class Communication < ActiveRecord::Base
     logger.error "* * * * * #{e}"
     Auditory.report_issue("Testing::Communication deliver_exact_target", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
     self.sent_success = false
-    self.response = e
+    self.response = e.to_s
   end
 
   def deliver_mandrill
@@ -108,7 +108,7 @@ class Communication < ActiveRecord::Base
     if self.member.mandrill_member
       result = self.member.mandrill_member.send_email(external_attributes[:template_name])
       self.sent_success = (result["status"]=="sent")
-      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result.to_s
+      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result
     else
       self.sent_success = false
       self.response = I18n.t('error_messages.no_marketing_client_configure')
