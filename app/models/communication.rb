@@ -70,7 +70,7 @@ class Communication < ActiveRecord::Base
       member.exact_target_member.save! unless member.marketing_client_synced_status == 'synced'
       result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
       self.sent_success = (result.OverallStatus == "OK")
-      self.response = sent_success ? "Successfully sent" : result.to_s
+      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result.to_s
     else
       self.sent_success = false
       self.response = I18n.t('error_messages.no_marketing_client_configure')
@@ -108,7 +108,7 @@ class Communication < ActiveRecord::Base
     if self.member.mandrill_member
       result = self.member.mandrill_member.send_email(external_attributes[:template_name])
       self.sent_success = (result["status"]=="sent")
-      self.response = sent_success ? "Successfully sent" : result.to_s
+      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result.to_s
     else
       self.sent_success = false
       self.response = I18n.t('error_messages.no_marketing_client_configure')
@@ -155,7 +155,7 @@ class Communication < ActiveRecord::Base
     else
       response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
       self.sent_success = true
-      self.response = "Successfully sent"
+      self.response = I18n.t('error_messages.testing_communication_send')
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
@@ -164,44 +164,7 @@ class Communication < ActiveRecord::Base
     self.response = e.to_s
   end
 
-  def deliver_action_mailer
-    response = case template_type.to_sym
-    when :cancellation
-      Notifier.cancellation(email).deliver!
-    when :rejection
-      Notifier.rejection(email).deliver!
-    when :prebill
-      Notifier.pre_bill(email).deliver!
-    when :manual_payment_prebill
-      Notifier.manual_payment_pre_bill(email).deliver!
-    when :refund
-      Notifier.refund(email).deliver!
-    when :birthday
-      Notifier.birthday(email).deliver!
-    when :pillar
-      Notifier.pillar(email).deliver!
-    when :hard_decline
-      Notifier.hard_decline(member).deliver!
-    when :soft_decline
-      Notifier.soft_decline(member).deliver!
-    else
-      message = "Deliver action could not be done."
-      Auditory.report_issue("Communication deliver_action_mailer", message, { :member => member.inspect, :communication => self.inspect })
-      logger.error "Template type #{template_type} not supported."
-    end
-    update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
-    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member, Settings.operation_types["#{template_type}_email"])
-  rescue Exception => e
-    logger.error "* * * * * #{e}"
-    update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
-    Auditory.report_issue("Communication deliver_action_mailer", e, { :member => member.inspect, :communication => self.inspect })
-    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
-  end
-  handle_asynchronously :deliver_action_mailer, :queue => :email_queue, priority: 15
-
-  def test_deliver_action_mailer
-    self.sent_success = true
-    self.response = "Successfully send"
+  def send_action_mailer!
     case template_type.to_sym
     when :cancellation
       Notifier.cancellation(email).deliver!
@@ -221,6 +184,31 @@ class Communication < ActiveRecord::Base
       Notifier.hard_decline(member).deliver!
     when :soft_decline
       Notifier.soft_decline(member).deliver!
+    else
+      nil
+    end
+  end
+
+  def deliver_action_mailer
+    unless send_action_mailer!
+      message = "Deliver action could not be done."
+      Auditory.report_issue("Communication deliver_action_mailer", message, { :member => member.inspect, :communication => self.inspect })
+      logger.error "Template type #{template_type} not supported."
+    end
+    update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
+    Auditory.audit(nil, self, "Communication '#{template_name}' sent", member, Settings.operation_types["#{template_type}_email"])
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+    update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
+    Auditory.report_issue("Communication deliver_action_mailer", e, { :member => member.inspect, :communication => self.inspect })
+    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", member, Settings.operation_types["#{template_type}_email"])
+  end
+  handle_asynchronously :deliver_action_mailer, :queue => :email_queue, priority: 15
+
+  def test_deliver_action_mailer
+    if send_action_mailer!
+      self.sent_success = true
+      self.response = I18n.t('error_messages.testing_communication_send')
     else
       self.sent_success = false
       self.response = "Deliver action could not be done."
