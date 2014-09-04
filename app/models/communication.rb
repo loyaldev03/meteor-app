@@ -67,6 +67,7 @@ class Communication < ActiveRecord::Base
 
   def test_deliver_exact_target
     if self.member.exact_target_member
+      member.exact_target_member.save! unless member.marketing_client_sync_status == 'synced'
       result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
       self.sent_success = (result.OverallStatus == "OK")
       self.response = result
@@ -198,10 +199,39 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_action_mailer, :queue => :email_queue, priority: 15
 
+  def test_deliver_action_mailer
+    response = case template_type.to_sym
+    when :cancellation
+      Notifier.cancellation(email).deliver!
+    when :rejection
+      Notifier.rejection(email).deliver!
+    when :prebill
+      Notifier.pre_bill(email).deliver!
+    when :manual_payment_prebill
+      Notifier.manual_payment_pre_bill(email).deliver!
+    when :refund
+      Notifier.refund(email).deliver!
+    when :birthday
+      Notifier.birthday(email).deliver!
+    when :pillar
+      Notifier.pillar(email).deliver!
+    when :hard_decline
+      Notifier.hard_decline(member).deliver!
+    when :soft_decline
+      Notifier.soft_decline(member).deliver!
+    else
+      { success: false, message: "Deliver action could not be done."}
+    end
+  rescue Exception => e
+    logger.error "* * * * * #{e}"
+
+  end
+
   def self.test_deliver!(template, member)
     if member.email.include?("@noemail.com")
       { success: false ,message: "The email contains '@noemail.com' which is an empty email. The email won't be sent."}
     else
+
       c = Communication.new :email => member.email
       c.member_id = member.id
       c.template_name = template.name
@@ -220,7 +250,8 @@ class Communication < ActiveRecord::Base
         c.sent_success = false
         c.response "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
       end
-      { success: c.sent_success, message: c.response }
+      success = c.sent_success ? Settings.error_codes.success : Settings.error_codes.test_communication_error
+      { success: success, message: c.response }
     end
   end
 

@@ -1312,7 +1312,7 @@ function test_communications_functions() {
           success: function(data){
             $("#result_"+template_id).empty();
             if (data.success == true){
-              $("#result_"+template_id).append("<div class='alert-info alert'>"+data.message+"</div>")
+              $("#result_"+template_id).append("<div class='alert-info alert'>Successfully send</div>")
             }else{
               $("#result_"+template_id).append("<div class='error-info alert'>"+data.message+"</div>")
             };
