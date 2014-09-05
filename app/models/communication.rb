@@ -70,7 +70,7 @@ class Communication < ActiveRecord::Base
       member.exact_target_member.save! unless member.marketing_client_synced_status == 'synced'
       result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
       self.sent_success = (result.OverallStatus == "OK")
-      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result
+      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result.inspect
     else
       self.sent_success = false
       self.response = I18n.t('error_messages.no_marketing_client_configure')
