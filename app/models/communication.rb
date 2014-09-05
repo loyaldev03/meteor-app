@@ -222,7 +222,7 @@ class Communication < ActiveRecord::Base
         c.response "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
       end
       success = c.sent_success ? Settings.error_codes.success : Settings.error_codes.test_communication_error
-      { success: success, message: c.response.to_s }
+      { code: success, message: c.response.to_s }
     end
   end
 

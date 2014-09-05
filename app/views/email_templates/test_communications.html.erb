@@ -18,7 +18,7 @@ Member ID to send communications: <%= text_field_tag "member_id", nil, :class =>
         <td> <%= email_template.name %> </td>
         <td> <%= email_template.template_type %> </td>
         <td> <%= link_to "send", "#", :class => "btn btn-mini", :id => "send", :name => email_template.id %> </td>
-        <td class="alert" id= <%= "result_#{email_template.id}" %>> </td>
+        <td id= <%= "result_#{email_template.id}" %>> </td>
       </tr>
     <% end %>
   </tbody>
