@@ -145,25 +145,6 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_lyris, :queue => :lyris_email, priority: 15
 
-  def test_deliver_lyris
-    lyris = LyrisService.new
-    lyris.site_id = external_attributes[:site_id]
-    lyris.subscribe_user!(self)
-    if lyris.unsubscribed?(external_attributes[:mlid], email)
-      self.sent_success = false
-      self.response = "Member requested unsubscription to mlid #{external_attributes[:mlid]} at lyris"
-    else
-      response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
-      self.sent_success = true
-      self.response = I18n.t('error_messages.testing_communication_send')
-    end
-  rescue Exception => e
-    logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_lyris", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
-    self.sent_success = false
-    self.response = e.to_s
-  end
-
   def send_action_mailer!
     case template_type.to_sym
     when :cancellation
@@ -230,9 +211,7 @@ class Communication < ActiveRecord::Base
       c.client = template.client
       c.external_attributes = template.external_attributes
 
-      if template.lyris?
-        c.test_deliver_lyris
-      elsif template.exact_target?
+      if template.exact_target?
         c.test_deliver_exact_target
       elsif template.mandrill?
         c.test_deliver_mandrill

@@ -96,6 +96,12 @@ div.dataTables_filter input {
   margin-top: -25px;
 }
 
+.btn_on_header_additional{
+  float:right;
+  margin-top: -25px;
+  margin-right: 5px;
+}
+
 .box_title {
   background-color: #C80F0E;
 }
