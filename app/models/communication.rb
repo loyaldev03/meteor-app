@@ -235,7 +235,7 @@ class Communication < ActiveRecord::Base
     result = if template.exact_target?
       Communication.test_deliver_exact_target(template, member)
     elsif template.mandrill?
-      Communication.test_deliver_mandrilself.l(template, member)
+      Communication.test_deliver_mandrill(template, member)
     elsif template.action_mailer?
       Communication.test_deliver_action_mailer(template, member)
     else
