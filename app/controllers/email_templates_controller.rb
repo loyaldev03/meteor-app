@@ -124,13 +124,17 @@ class EmailTemplatesController < ApplicationController
           Communication.test_deliver!(template, member)
         end
         render json: response
+      rescue CanCan::AccessDenied => e
+        raise e
       rescue Exception => e
+        Auditory.report_issue("EmailTemplate::test_communication", e, { :member => member.inspect, :template => template.inspect })
         render json: { code: Settings.error_codes.unrecoverable_error, message: e.to_s}
       end
     else
       @tom = TermsOfMembership.find(params[:terms_of_membership_id])
       my_authorize! :test_communications, EmailTemplate, @tom.club_id
       @email_templates = EmailTemplate.where(:terms_of_membership_id => @tom.id, :client => @tom.club.marketing_tool_client)
+      @et = EmailTemplate.new
     end
   end
 

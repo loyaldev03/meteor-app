@@ -116,7 +116,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
       @agent = FactoryGirl.create agent
       sign_in @agent
       post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id
-      assert @response.body.include? "You are not authorized to access this page."
+      assert_response :unauthorized
     end
   end
 

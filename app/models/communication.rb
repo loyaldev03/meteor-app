@@ -65,21 +65,19 @@ class Communication < ActiveRecord::Base
   end  
   handle_asynchronously :deliver_exact_target, :queue => :exact_target_email, priority: 15
 
-  def test_deliver_exact_target
-    if self.member.exact_target_member
+  def self.test_deliver_exact_target(template, member)
+    if member.exact_target_member
       member.exact_target_member.save! unless member.marketing_client_synced_status == 'synced'
-      result = self.member.exact_target_member.send_email(external_attributes[:customer_key])
-      self.sent_success = (result.OverallStatus == "OK")
-      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result.inspect
+      result = member.exact_target_member.send_email(template.external_attributes[:customer_key])
+      sent_success = (result.OverallStatus == "OK")
+      { sent_success: sent_success, response: (sent_success ? I18n.t('error_messages.testing_communication_send') : result.inspect) }
     else
-      self.sent_success = false
-      self.response = I18n.t('error_messages.no_marketing_client_configure')
+      { sent_success: false, response: I18n.t('error_messages.no_marketing_client_configure') }
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
-    self.sent_success = false
-    self.response = e.to_s
+    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { :member => member.inspect, :template => template.inspect })
+    { sent_success: false, response: e.to_s }
   end
 
   def deliver_mandrill
@@ -104,20 +102,18 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_mandrill, :queue => :mandrill_email, priority: 15
 
-  def test_deliver_mandrill
-    if self.member.mandrill_member
-      result = self.member.mandrill_member.send_email(external_attributes[:template_name])
-      self.sent_success = (result["status"]=="sent")
-      self.response = sent_success ? I18n.t('error_messages.testing_communication_send') : result
+  def test_deliver_mandrill(template, member)
+    if member.mandrill_member
+      result = member.mandrill_member.send_email(template.external_attributes[:template_name])
+      sent_success = (result["status"]=="sent")
+      { sent_success: sent_success, response: (sent_success ? I18n.t('error_messages.testing_communication_send') : result) }
     else
-      self.sent_success = false
-      self.response = I18n.t('error_messages.no_marketing_client_configure')
+      { sent_success: false, response: I18n.t('error_messages.no_marketing_client_configure') }
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { :member => member.inspect, :current_membership => member.current_membership.inspect, :communication => self.inspect })
-    self.sent_success = false
-    self.response = e.to_s
+    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { :member => member.inspect, :template => template.inspect })
+    { sent_success: false, response: e.to_s }
   end
 
   def deliver_lyris
@@ -171,7 +167,26 @@ class Communication < ActiveRecord::Base
   end
 
   def deliver_action_mailer
-    unless send_action_mailer!
+    case template_type.to_sym
+    when :cancellation
+      Notifier.cancellation(email).deliver!
+    when :rejection
+      Notifier.rejection(email).deliver!
+    when :prebill
+      Notifier.pre_bill(email).deliver!
+    when :manual_payment_prebill
+      Notifier.manual_payment_pre_bill(email).deliver!
+    when :refund
+      Notifier.refund(email).deliver!
+    when :birthday
+      Notifier.birthday(email).deliver!
+    when :pillar
+      Notifier.pillar(email).deliver!
+    when :hard_decline
+      Notifier.hard_decline(member).deliver!
+    when :soft_decline
+      Notifier.soft_decline(member).deliver!
+    else
       message = "Deliver action could not be done."
       Auditory.report_issue("Communication deliver_action_mailer", message, { :member => member.inspect, :communication => self.inspect })
       logger.error "Template type #{template_type} not supported."
@@ -186,44 +201,48 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_action_mailer, :queue => :email_queue, priority: 15
 
-  def test_deliver_action_mailer
-    if send_action_mailer!
-      self.sent_success = true
-      self.response = I18n.t('error_messages.testing_communication_send')
+  def self.test_deliver_action_mailer(template, member)
+    success = true
+    case template.template_type.to_sym
+    when :cancellation
+      Notifier.cancellation(member.email).deliver!
+    when :rejection
+      Notifier.rejection(member.email).deliver!
+    when :prebill
+      Notifier.pre_bill(member.email).deliver!
+    when :manual_payment_prebill
+      Notifier.manual_payment_pre_bill(member.email).deliver!
+    when :refund
+      Notifier.refund(member.email).deliver!
+    when :birthday
+      Notifier.birthday(member.email).deliver!
+    when :pillar
+      Notifier.pillar(member.email).deliver!
+    when :hard_decline
+      Notifier.hard_decline(member).deliver!
+    when :soft_decline
+      Notifier.soft_decline(member).deliver!
     else
-      self.sent_success = false
-      self.response = "Deliver action could not be done."
+      success = false 
     end
+    success ? { sent_success: true, response: I18n.t('error_messages.testing_communication_send') } : { sent_success: false, response: "Deliver action could not be done." }
   rescue Exception => e
     logger.error "* * * * * #{e}"
-      self.sent_success = false
-      self.response = e.to_s
+    { sent_success: false, response: e.to_s }
   end
 
   def self.test_deliver!(template, member)
-    if member.email.include?("@noemail.com")
-      { success: false ,message: "The email contains '@noemail.com' which is an empty email. The email won't be sent."}
+    result = if template.exact_target?
+      Communication.test_deliver_exact_target(template, member)
+    elsif template.mandrill?
+      Communication.test_deliver_mandrill(template, member)
+    elsif template.action_mailer?
+      Communication.test_deliver_action_mailer(template, member)
     else
-      c = Communication.new :email => member.email
-      c.member_id = member.id
-      c.template_name = template.name
-      c.template_type = template.template_type
-      c.client = template.client
-      c.external_attributes = template.external_attributes
-
-      if template.exact_target?
-        c.test_deliver_exact_target
-      elsif template.mandrill?
-        c.test_deliver_mandrill
-      elsif template.action_mailer?
-        c.test_deliver_action_mailer
-      else
-        c.sent_success = false
-        c.response "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}"
-      end
-      success = c.sent_success ? Settings.error_codes.success : Settings.error_codes.test_communication_error
-      { code: success, message: c.response.to_s }
+      { sent_success: false, response: "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}" }
     end
+    success = result[:sent_success] ? Settings.error_codes.success : Settings.error_codes.test_communication_error
+    { code: success, message: result[:response] }
   end
 
 
