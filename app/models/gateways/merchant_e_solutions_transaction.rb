@@ -1,10 +1,10 @@
 class MerchantESolutionsTransaction < Transaction
 
-  def member=(member)
-    super(member)
+  def user=(user)
+    super(user)
     # MeS supports only 17 characters on order_id
-    # litle had "#{Date.today}-#{order_mark}#{@transaction.member_id}"
-    self.invoice_number = member.id
+    # litle had "#{Date.today}-#{order_mark}#{@transaction.user_id}"
+    self.invoice_number = user.id
   end
 
   # answer credit card token
@@ -35,7 +35,7 @@ class MerchantESolutionsTransaction < Transaction
       end
 
       self.transaction_type = "chargeback"
-      self.prepare(sale_transaction.member, sale_transaction.credit_card, chargeback_amount, 
+      self.prepare(sale_transaction.user, sale_transaction.credit_card, chargeback_amount, 
                     sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
       self.response_auth_code = args[:auth_code]
       self.response_result = args[:reason]
@@ -45,7 +45,7 @@ class MerchantESolutionsTransaction < Transaction
       self.membership_id = sale_transaction.membership_id
       self.operation_type = chargeback_operation_type
       self.save
-      Auditory.audit(nil, self, operation_description, sale_transaction.member, chargeback_operation_type)
+      Auditory.audit(nil, self, operation_description, sale_transaction.user, chargeback_operation_type)
     end
   end
 
@@ -80,7 +80,7 @@ class MerchantESolutionsTransaction < Transaction
     def load_gateway(recurrent = false)
       @login_data = { :login => login, :password => password, :merchant_key => merchant_key }
       @gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(@login_data)
-      @options[:customer] = member_id 
+      @options[:customer] = user_id 
       @options[:moto_ecommerce_ind] = 2 if recurrent
     end
 

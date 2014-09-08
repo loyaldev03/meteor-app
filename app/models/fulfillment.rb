@@ -9,7 +9,7 @@
 class Fulfillment < ActiveRecord::Base
   attr_accessible :product_sku
 
-  belongs_to :member
+  belongs_to :user
   belongs_to :club
   has_and_belongs_to_many :fulfillment_files
 
@@ -29,13 +29,13 @@ class Fulfillment < ActiveRecord::Base
 
   scope :not_renewed, lambda { where("renewed = false") }
 
-  scope :to_be_renewed, lambda { joins(:member => :club).readonly(false).where([ 
+  scope :to_be_renewed, lambda { joins(:user => :club).readonly(false).where([ 
     " date(renewable_at) <= ? AND fulfillments.status NOT IN ('canceled', 'in_process') 
       AND recurrent = true AND renewed = false AND clubs.billing_enable = true 
-      AND members.status = 'active' AND members.recycled_times = 0",  
+      AND users.status = 'active' AND users.recycled_times = 0",  
     Time.zone.now.to_date]) }
 
-  delegate :club, :to => :member
+  delegate :club, :to => :user
 
   state_machine :status, :initial => :not_processed do
 
@@ -86,7 +86,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def renew!
-    if recurrent and member.can_renew_fulfillment? and not renewed?
+    if recurrent and user.can_renew_fulfillment? and not renewed?
       if self.bad_address?
         self.new_fulfillment('bad_address')
       else
@@ -102,7 +102,7 @@ class Fulfillment < ActiveRecord::Base
     f.status = status  unless status.nil?
     f.product_sku = self.product_sku
     f.product_package = self.product_package
-    f.member_id = self.member_id
+    f.user_id = self.user_id
     f.recurrent = true
     f.club_id = self.club_id
     f.save
@@ -133,7 +133,7 @@ class Fulfillment < ActiveRecord::Base
       if reason.blank?
         return {:message => I18n.t("error_messages.fulfillment_reason_blank"), :code => Settings.error_codes.fulfillment_reason_blank}
       else
-        answer = ( member.wrong_address.nil? ? member.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success, :message => "Member already set as wrong address."} )
+        answer = ( user.wrong_address.nil? ? user.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success, :message => "Member already set as wrong address."} )
       end
     elsif new_status == 'not_processed'
       answer = decrease_stock! 
@@ -156,11 +156,11 @@ class Fulfillment < ActiveRecord::Base
     else
       message = "Changed status on File ##{file} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     end
-    Auditory.audit(agent, self, message, member, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
+    Auditory.audit(agent, self, message, user, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
     return { :message => message, :code => Settings.error_codes.success }
   rescue Exception => e
     message = I18n.t('error_messages.fulfillment_error')
-    Auditory.audit(agent, self, message, member, Settings.error_codes.fulfillment_error )
+    Auditory.audit(agent, self, message, user, Settings.error_codes.fulfillment_error )
     return { :message => message, :code => Settings.error_codes.fulfillment_error }
   end
 
@@ -188,20 +188,20 @@ class Fulfillment < ActiveRecord::Base
     if change_status
       Fulfillment.find(self.id).update_status(fulfillment_file.agent_id, "in_process", "Fulfillment file generated", fulfillment_file.id) unless self.in_process? or self.renewed?
     end
-    member = self.member
+    user = self.user
     if fulfillment_file.kit_kard_type?
-      [ member.id, member.first_name, member.last_name, (I18n.l member.member_since_date, :format => :only_date_short),
-              (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), member.address, member.city,
-              member.state,"=\"#{member.zip}\"", self.product_sku, ('C' if member.member_group_type_id) ]
+      [ user.id, user.first_name, user.last_name, (I18n.l user.member_since_date, :format => :only_date_short),
+              (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), user.address, user.city,
+              user.state,"=\"#{user.zip}\"", self.product_sku, ('C' if user.member_group_type_id) ]
     else
-      [ self.tracking_code, self.product.cost_center, member.full_name, member.address, member.city,
-            member.state, member.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
+      [ self.tracking_code, self.product.cost_center, user.full_name, user.address, user.city,
+            user.state, user.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
             self.product.weight, 'MID']
     end
   end
 
   def product
-    @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.member.club_id)
+    @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.user.club_id)
   end
 
   private
@@ -211,7 +211,7 @@ class Fulfillment < ActiveRecord::Base
       if self.recurrent and self.renewable_at.nil?
         self.renewable_at = self.assigned_at + 1.year 
       end
-      self.tracking_code = self.product_package.to_s + self.member.id.to_s
+      self.tracking_code = self.product_package.to_s + self.user.id.to_s
     end
 
 end

@@ -6,7 +6,7 @@ defaults: &defaults
   next_retry_on_missing_decline: 20.days
   number_of_retries_on_missing_decline: 4
   maximum_number_of_subscribers_to_automatically_resync: 2000
-  call_these_members_recipients: platformadmins@xagax.com
+  call_these_users_recipients: platformadmins@xagax.com
   email_to_send_product_list: 'platformadmins@xagax.com'
   email_to_use_on_action_mailer_as_recipient: platformadmins@xagax.com
   hot_rod_cancellation_emails: 'sonia@xagax.com,clawler@stoneacreinc.com'
@@ -69,24 +69,24 @@ defaults: &defaults
     reset_club_cash: 211
     credit_card_in_use: 212
     credit_card_blacklisted: 213
-    member_email_blacklisted: 214
+    user_email_blacklisted: 214
     aus_recycle_credit_card: 215
     credit_card_updated: 216
     credit_card_activated: 217
-    member_address_set_as_undeliverable: 218
-    member_drupal_account_destroyed_batch: 219
-    member_drupal_account_synced_batch: 220
+    user_address_set_as_undeliverable: 218
+    user_drupal_account_destroyed_batch: 219
+    user_drupal_account_synced_batch: 220
     credit_card_added: 221
     renewal_scheduled: 222
     profile_updated: 223
     profile_update_error: 224
     phone_number_set_unreachable: 225
-    member_approved: 226
-    member_rejected: 227
-    member_manually_synced_to_drupal: 228
-    member_manually_synced_to_pardot: 229
-    member_drupal_remote_id_set: 230
-    member_manually_synced_to_drupal_error: 231
+    user_approved: 226
+    user_rejected: 227
+    user_manually_synced_to_drupal: 228
+    user_manually_synced_to_pardot: 229
+    user_drupal_remote_id_set: 230
+    user_manually_synced_to_drupal_error: 231
     reset_password: 232
     reset_password_error: 233
     resend_welcome: 234
@@ -95,14 +95,14 @@ defaults: &defaults
     operation_updated: 237
     note_added: 238
     remote_club_cash_transaction: 239    
-    downgrade_member: 240
+    downgrade_user: 240
     unblacklisted: 241
-    member_manually_synced_to_exact_target: 242
+    user_manually_synced_to_exact_target: 242
     save_the_sale_through_api: 243
     bill_overdue_cancel: 244
     remote_club_cash_transaction_failed: 245
     tom_upgrade: 246
-    member_manually_synced_to_mailchimp: 247
+    user_manually_synced_to_mailchimp: 247
     update_terms_of_membership: 248
     #communication
     active_email: 300     
@@ -194,13 +194,13 @@ defaults: &defaults
     success: '000'
     wrong_data: '100'
     not_found: '401'
-    member_data_invalid: '405'
+    user_data_invalid: '405'
     prospect_data_invalid: '403'
-    member_not_saved: '404'
+    user_not_saved: '404'
     blacklisted: '406'
-    cant_recover_member: '407'
-    member_enrollment_error: '408'
-    member_already_active: '409'
+    cant_recover_user: '407'
+    user_enrollment_error: '408'
+    user_already_active: '409'
     club_is_not_enable_for_new_enrollments: '410'
     unrecoverable_error: '411'
     club_cash_cant_be_fixed: '412'
@@ -218,29 +218,29 @@ defaults: &defaults
     credit_card_gateway_differs_from_current: '9510'
     credit_amount_invalid: '9785'
     error_on_prorated_enroll: '9784'
-    member_not_expecting_billing: '9787'
+    user_not_expecting_billing: '9787'
     refund_invalid: '9788'
     transaction_gateway_differs_from_current: '9786'
     manual_billing_with_less_amount_than_permitted: '9880'
     manual_billing_error: '9881'
     membership_billing_error: '9882' 
     no_reccurent_billing_error: '9883'
-    member_club_dont_allow: '9884'
+    user_club_dont_allow: '9884'
     nothing_to_change_tom: '9885'
-    member_status_dont_allow: '9886'
+    user_status_dont_allow: '9886'
     no_amount: '9887'    
-    member_already_set_wrong_address: '9888'
-    member_set_wrong_address_error: '9889'
+    user_already_set_wrong_address: '9888'
+    user_set_wrong_address_error: '9889'
     cancel_reason_blank: 9990
     cancel_date_blank: 9991
-    could_not_get_member_list: 9992
+    could_not_get_user_list: 9992
     could_not_change_next_bill_date: 9993
     next_bill_date_prior_actual_date: 9994
     next_bill_date_blank: 9995
     credit_card_blank_without_grace: '9997'
     billing_date_not_reached: '9999'
-    member_email_blacklisted: '9996'
-    member_could_no_be_blacklisted: '9998'
+    user_email_blacklisted: '9996'
+    user_could_no_be_blacklisted: '9998'
     tom_wihtout_gateway_configured: '9789'
     tom_to_downgrade_belongs_to_different_club: '9790'
     club_cash_transaction_not_successful: '9791'
@@ -362,7 +362,7 @@ test:
 
 production:
   <<: *defaults
-  call_these_members_recipients: 'ndavid@stoneacreinc.com,lhabig@stoneacreinc.com,rcorner@stoneacreinc.com,loesing@stoneacreinc.com,kflynn@stoneacreinc.com'
+  call_these_users_recipients: 'ndavid@stoneacreinc.com,lhabig@stoneacreinc.com,rcorner@stoneacreinc.com,loesing@stoneacreinc.com,kflynn@stoneacreinc.com'
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   email_to_send_product_list: 'kflynn@stoneacreinc.com,tbrady@stoneacreinc.com'
   hot_rod_cancellation_emails: 'ggoldberg@zinio.com'

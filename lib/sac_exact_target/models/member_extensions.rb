@@ -7,7 +7,7 @@ module SacExactTarget
 
     module ClassMethods
       def sync_members_to_exact_target
-        base = Member.joins(:club).where("need_sync_to_marketing_client = 1 and marketing_tool_client = 'exact_target'")
+        base = User.joins(:club).where("need_sync_to_marketing_client = 1 and marketing_tool_client = 'exact_target'")
         Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_exact_target, processing #{base.count} members"
         base.find_in_batches do |group|
           group.each_with_index do |member, index|

@@ -55,9 +55,9 @@ class FulfillmentFile < ActiveRecord::Base
 
   def send_email_with_file(only_in_progress)
     if only_in_progress
-      fulfillments = self.fulfillments.where_in_process.includes(:member)
+      fulfillments = self.fulfillments.where_in_process.includes(:user)
     else
-      fulfillments = self.fulfillments.includes(:member)
+      fulfillments = self.fulfillments.includes(:user)
     end
     xls_package = self.generateXLS(false)
     temp_file = Tempfile.new("fulfillment_file_#{self.id}.xls")

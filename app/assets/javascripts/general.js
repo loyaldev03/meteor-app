@@ -241,7 +241,7 @@ function new_product_functions(){
   $('.help').popover({offset: 10});
 }
 
-function member_index_functions(){
+function user_index_functions(){
   $('#index_search_form').submit(function (event){
     var atLeastOneFilled = false;
     $('form :text, form select').each( function(){
@@ -262,7 +262,7 @@ function member_index_functions(){
 
     $.ajax({
         type: "GET",
-        url: "members/search_result",
+        url: "users/search_result",
         dataType: 'script',
         contentType: 'application/javascript',
         data: $(this).serialize(),
@@ -289,7 +289,7 @@ function member_index_functions(){
   $(".datepicker_for_search_billed_date").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd", 
                                            showOn: "both", buttonImage: "/icon-calendar.png", 
                                            buttonImageOnly: true});
-  $('#members .pagination a').on('click', function () {  
+  $('#users .pagination a').on('click', function () {  
     update_select_only = false;
     $.getScript(this.href);  
     return false;  
@@ -299,8 +299,8 @@ function member_index_functions(){
     $("#index_search_form input[type=text]").each(function() { $(this).val(''); }); 
   });
 
-  $('#member_country').on('change',  function(){
-    country = $('#member_country').val();
+  $('#user_country').on('change',  function(){
+    country = $('#user_country').val();
     update_select_only = true;
     $.get(this.action, { country_code:country, only_select:update_select_only }, null, 'script'); 
   })
@@ -346,43 +346,43 @@ function retrieve_information(){
   if ($('#product_sku option:selected').text().length > 0) {
     skus.push($('#product_sku option:selected').text());
   }
-  $('#member_product_sku').val(skus.join(','));
+  $('#user_product_sku').val(skus.join(','));
 
   data = {
     member:{  
-      first_name: $("#member_first_name").val(),
-      gender: $("#member_gender").val()=="" ? null : $("#member_gender").val(),
-      address: $("#member_address").val(),
-      country: $("#member_country").val(),
-      state: $("#member_state").val(),
-      last_name: $("#member_last_name").val(),
-      city: $("#member_city").val(),
-      zip: $("#member_zip").val(),
-      birth_date: $("#member_birth_date").val(),
-      phone_country_code: $("#member_phone_country_code").val(),
-      phone_area_code: $("#member_phone_area_code").val(),
-      phone_local_number: $("#member_phone_local_number").val(),
-      type_of_phone_number: $("#member_type_of_phone_number").val(),
-      terms_of_membership_id: $("#member_terms_of_membership_id").val(),
-      manual_payment: $("#member_manual_payment").is(":checked") ? 1 : 0,
-      email: $("#member_email").val(),
-      external_id: $("#member_external_id").val()=="" ? null : $("#member_external_id").val(),
-      product_sku: $('#member_product_sku').val(),
-      enrollment_amount: $("#member_enrollment_amount").val(),
-      mega_channel: $("#member_mega_channel").val(),
-      campaign_medium: $("#member_campaign_medium").val(),
-      landing_url: $("#member_landing_url").val(),
-      referral_path: $("#member_referral_path").val(),
-      ip_address: $("#member_ip_address").val(),
-      campaign_description: $("#member_campaign_description").val(),
-      member_group_type_id: $("#member_member_group_type_id").val()
+      first_name: $("#user_first_name").val(),
+      gender: $("#user_gender").val()=="" ? null : $("#user_gender").val(),
+      address: $("#user_address").val(),
+      country: $("#user_country").val(),
+      state: $("#user_state").val(),
+      last_name: $("#user_last_name").val(),
+      city: $("#user_city").val(),
+      zip: $("#user_zip").val(),
+      birth_date: $("#user_birth_date").val(),
+      phone_country_code: $("#user_phone_country_code").val(),
+      phone_area_code: $("#user_phone_area_code").val(),
+      phone_local_number: $("#user_phone_local_number").val(),
+      type_of_phone_number: $("#user_type_of_phone_number").val(),
+      terms_of_membership_id: $("#user_terms_of_membership_id").val(),
+      manual_payment: $("#user_manual_payment").is(":checked") ? 1 : 0,
+      email: $("#user_email").val(),
+      external_id: $("#user_external_id").val()=="" ? null : $("#user_external_id").val(),
+      product_sku: $('#user_product_sku').val(),
+      enrollment_amount: $("#user_enrollment_amount").val(),
+      mega_channel: $("#user_mega_channel").val(),
+      campaign_medium: $("#user_campaign_medium").val(),
+      landing_url: $("#user_landing_url").val(),
+      referral_path: $("#user_referral_path").val(),
+      ip_address: $("#user_ip_address").val(),
+      campaign_description: $("#user_campaign_description").val(),
+      user_group_type_id: $("#user_user_group_type_id").val()
     }
   }
-  if( $("#member_credit_card_number").length > 0 ){
+  if( $("#user_credit_card_number").length > 0 ){
     var credit_card_params = {}
-    credit_card_params["number"] = $("#member_credit_card_number").val(),
-    credit_card_params["expire_month"] = $("#member_credit_card_expire_month").val(),
-    credit_card_params["expire_year"] = $("#member_credit_card_expire_year").val(),
+    credit_card_params["number"] = $("#user_credit_card_number").val(),
+    credit_card_params["expire_month"] = $("#user_credit_card_expire_month").val(),
+    credit_card_params["expire_year"] = $("#user_credit_card_expire_year").val(),
     data["member"]["credit_card"] = credit_card_params;
   }
   if( $("#setter_cc_blank").length > 0 )
@@ -435,7 +435,7 @@ function new_payment_gateway_configuration_functions(){
   });
 }
 
-function new_member_functions(){
+function new_user_functions(){
   $('#error_explanation').hide();
   $(".datepicker").datepicker({ constrainInput: true, 
                                 maxDate: 0, 
@@ -446,7 +446,7 @@ function new_member_functions(){
                                 changeYear: true,
                                 yearRange: '1900',
                                 buttonImageOnly: true});
-  $('#new_member').submit( function(event) {
+  $('#new_user').submit( function(event) {
     startAjaxLoader();
     $('#error_explanation').hide();
     $('#submit_button').attr('disabled', 'disabled');
@@ -464,7 +464,7 @@ function new_member_functions(){
         $('input').parent().parent().removeClass("error");
         if (data.code == 000) {
           alert (data.message);
-          window.location.replace('../member/'+data.member_id);
+          window.location.replace('../user/'+data.member_id);
         }else{
           $('#error_explanation').show();
           $('#error_explanation ul').empty();
@@ -474,14 +474,14 @@ function new_member_functions(){
           for (var key in data.errors){
             if (data.errors.hasOwnProperty(key)) {
               if (key != 'credit_card'){
-                $('#member_'+key).parent().parent().addClass("error");
+                $('#user_'+key).parent().parent().addClass("error");
                 $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
               }
               else{
                 for (var key2 in data.errors[key]){
                   if (data.errors[key].hasOwnProperty(key2)){
                     if (key2 != 0){
-                      $('#member_credit_card_'+key2).parent().parent().addClass("error");
+                      $('#user_credit_card_'+key2).parent().parent().addClass("error");
                       $('#error_explanation ul').append("<li>"+key2+': '+data.errors[key][key2]+"</li>");                  
                     }
                   }
@@ -502,31 +502,31 @@ function new_member_functions(){
   today = new Date()
   $('#setter_cc_blank').click(function(){
     if ($('#setter_cc_blank').attr('checked')) {
-      $('#member_credit_card_number').val('0000000000');
-      $('#member_credit_card_expire_month').val(today.getMonth() + 1);
-      $('#member_credit_card_expire_year').val(today.getFullYear());
-      $('#member_credit_card_number').attr('readonly', true);
-      $('#member_credit_card_expire_month').attr('readonly', true);
-      $('#member_credit_card_expire_year').attr('readonly', true);
+      $('#user_credit_card_number').val('0000000000');
+      $('#user_credit_card_expire_month').val(today.getMonth() + 1);
+      $('#user_credit_card_expire_year').val(today.getFullYear());
+      $('#user_credit_card_number').attr('readonly', true);
+      $('#user_credit_card_expire_month').attr('readonly', true);
+      $('#user_credit_card_expire_year').attr('readonly', true);
     }else{
-      $('#member_credit_card_number').val('');
-      $('#member_credit_card_expire_month').val('');
-      $('#member_credit_card_expire_year').val('');
-      $('#member_credit_card_number').attr('readonly', false);
-      $('#member_credit_card_expire_month').attr('readonly', false);
-      $('#member_credit_card_expire_year').attr('readonly', false);
+      $('#user_credit_card_number').val('');
+      $('#user_credit_card_expire_month').val('');
+      $('#user_credit_card_expire_year').val('');
+      $('#user_credit_card_number').attr('readonly', false);
+      $('#user_credit_card_expire_month').attr('readonly', false);
+      $('#user_credit_card_expire_year').attr('readonly', false);
     }
   });  
 
   $('#zip_help').popover({offset: 10});
   $('.help').popover({offset: 10});
   
-  $('#member_country').on('change',  function(){
-    country = $('#member_country').val();
+  $('#user_country').on('change',  function(){
+    country = $('#user_country').val();
     $.get(this.action, { country_code:country }, null, 'script'); 
   });
 
-  $("#member_terms_of_membership_id").change(function(){
+  $("#user_terms_of_membership_id").change(function(){
     $.ajax({
       type: 'GET',
       url: "../subscription_plans/"+$(this).val()+"/resumed_information",
@@ -537,7 +537,7 @@ function new_member_functions(){
   });
 };
 
-function edit_member_functions(){
+function edit_user_functions(){
   $('#error_explanation').hide();
   $(".datepicker").datepicker({ constrainInput: true, 
                                 maxDate: 0, 
@@ -575,7 +575,7 @@ function edit_member_functions(){
           $('#error_explanation ul').append("<b>"+data.message+"</b>");
           for (var key in data.errors){
             if (data.errors.hasOwnProperty(key)) {
-              $('#member_'+key).parent().parent().addClass("error");
+              $('#user_'+key).parent().parent().addClass("error");
               $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
             }     
           }       
@@ -586,8 +586,8 @@ function edit_member_functions(){
 
   $('.help').popover({offset: 10});
 
-  $('#member_country').on('change',  function(){
-    country = $('#member_country').val();
+  $('#user_country').on('change',  function(){
+    country = $('#user_country').val();
     $.get('', { country_code:country }, null, 'script'); 
   })
 };
@@ -643,7 +643,7 @@ function club_cash_functions(){
   });
 }
 
-function sync_status_member_functions(column_count){
+function sync_status_user_functions(column_count){
   $('.toggler').each(function() {
     var self = $(this);
     var target = $(self.data('target'));
@@ -660,7 +660,7 @@ function sync_status_member_functions(column_count){
   });
 }
 
-function operation_member_functions(column_count){
+function operation_user_functions(column_count){
   oTable2 = $('#operations_table').dataTable({
     "oLanguage": {"sSearch": "Filtered by:"},
     "bJQueryUI": false,
@@ -681,7 +681,7 @@ function operation_member_functions(column_count){
   });
 };
 
-function transactions_member_functions(column_count){
+function transactions_user_functions(column_count){
   $('#transactions_table').dataTable({
     "bJQueryUI": false,
     "bProcessing": true,
@@ -695,7 +695,7 @@ function transactions_member_functions(column_count){
   });
 }
 
-function memberships_member_functions(column_count){
+function memberships_user_functions(column_count){
   $('#memberships_table').dataTable({
     "bJQueryUI": false,
     "bProcessing": true,
@@ -757,7 +757,7 @@ function club_cash_transactions_functions(column_count){
   });
 }
 
-function show_member_functions(){
+function show_user_functions(){
 
   var objectsFetch = {transactions:true, notes:false, fulfillments:false, communications:false, operations:false, credit_cards:false, club_cash_transactions:false, memberships:false }
 
@@ -771,7 +771,7 @@ function show_member_functions(){
   resend_fulfillment("../fulfillments/");
 
   $.ajax({
-    url: member_prefix+"/transactions_content",
+    url: user_prefix+"/transactions_content",
       success: function(html){
         $(".tab-content #transactions .tab_body_padding div").remove();
         $(".tab-content #transactions .tab_body_padding").append(html);
@@ -785,7 +785,7 @@ function show_member_functions(){
         if(!objectsFetch[objects_to_search]){
           startAjaxLoader();
           $.ajax({
-            url: member_prefix+"/"+objects_to_search+"_content",
+            url: user_prefix+"/"+objects_to_search+"_content",
             success: function(html){
               $(".tab-content #"+objects_to_search+" .tab_body_padding").children().remove();
               $(".tab-content #"+objects_to_search+" .tab_body_padding").append(html);
@@ -801,10 +801,10 @@ function show_member_functions(){
   });
 };
 
-function member_cancellation_functions(){
-  $("#member_cancelation_form").validate({
+function user_cancellation_functions(){
+  $("#user_cancelation_form").validate({
      submitHandler: function(form) {
-      if (confirm('This member will be canceled. Are you really sure?')) {
+      if (confirm('This user will be canceled. Are you really sure?')) {
         form.submit();            
       }else
       return false;
@@ -813,10 +813,10 @@ function member_cancellation_functions(){
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
 };
 
-function blacklist_member_functions(){
+function blacklist_user_functions(){
   $("form").validate({
      submitHandler: function(form) {
-      if (confirm('This member will be blacklisted. Are you really sure?')) {
+      if (confirm('This user will be blacklisted. Are you really sure?')) {
         form.submit();            
       } else {
         return false;
@@ -825,15 +825,15 @@ function blacklist_member_functions(){
   })
 }
 
-function member_note_functions(){
-  $('#new_member_note').validate();
+function user_note_functions(){
+  $('#new_user_note').validate();
 };
 
-function member_change_next_bill_date(){
+function user_change_next_bill_date(){
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
 };
 
-function refund_member_functions(){
+function refund_user_functions(){
   $('form').submit( function(event) {
     $('input:submit').attr("disabled", true);
     if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
@@ -1046,7 +1046,7 @@ function save_the_sale_functions(){
   });
 }
 
-function recover_member_functions(){
+function recover_user_functions(){
   $('form').submit( function(event) {
   $('#recover_button').attr('disabled', 'disabled');
   $('#cancel_button').hide();

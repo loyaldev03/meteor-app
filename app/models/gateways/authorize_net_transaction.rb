@@ -1,8 +1,8 @@
 class AuthorizeNetTransaction < Transaction
 
-  def member=(member)
-    super(member)
-    self.invoice_number = self.member_id
+  def user=(user)
+    super(user)
+    self.invoice_number = self.user_id
   end
 
   # answer credit card token

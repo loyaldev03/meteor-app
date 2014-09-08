@@ -1,0 +1,311 @@
+<div id="error_explanation">
+  <h2> Errors </h2>
+  <ul>
+  </ul>
+</div>
+
+
+<% unless @user.new_record? %>
+  <table class="table table-condensed"> 
+   <tr class="control-group"> 
+      <td colspan="4">
+      <%= t('activerecord.attributes.user.user_classification_type') %>:
+      <% if !@user_group_types.nil? %>
+        <%= f.select :user_group_type_id, 
+                    options_from_collection_for_select(@user_group_types, "id","name", 
+                    {:selected => @user.user_group_type_id }), :include_blank => '' %>
+      <% else %>
+        <%= t('activerecord.attributes.user.does_not_have_user_groups')  %>
+      <% end %>
+      </td>
+    </tr> 
+  </table>
+<% end %>
+
+<table id="table_demographic_information" class="table table-bordered table-condensed table-nohover">
+  <thead>
+    <tr class="box_title"><th colspan="2"><h4>Demographic information</h4></th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="width: 50%;">
+        <table class="hidden_table_border table-nohover">
+          <tr class = "control-group">
+            <th>
+              <%= f.label :first_name, t('activerecord.attributes.user.first_name'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td> 
+              <%= f.text_field :first_name, :class => 'text_field' %> 
+            </td>  
+          </tr>
+          <tr class = "control-group">
+            <th>
+              <%= f.label :gender, t('activerecord.attributes.user.gender'), :class => 'help-inline' %>
+            </th>
+            <td> 
+              <% selected = @current_user ? @current_user.gender : nil%>
+              <%= f.select :gender, [['Male', 'M'],['Female', 'F'],], :class => 'select_field', :include_blank => true %>
+            </td>  
+          </tr>        
+          <tr class = "control-group">
+            <th>
+              <%= f.label :address, t('activerecord.attributes.user.address'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td> 
+              <%= f.text_field :address, :class => 'text_field' %> 
+            </td>  
+          </tr>
+          <tr class = "control-group">
+            <th>
+              <%= f.label :country, t('activerecord.attributes.user.country'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td> 
+              <%= f.select(:country, User.supported_countries.map { |cc| [User.country_name(cc), cc]}, :prompt => t('buttons.select_country')) %>
+            </td>  
+          </tr>
+          <tr class = "control-group">
+            <th>
+              <%= f.label :state, t('activerecord.attributes.user.state'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td id="states_td"> 
+              <%= render :partial => 'states', :locals => {:f => f, :state => (@current_user.state if @current_user)}  %>
+            </td>  
+          </tr>
+        </table>
+      </td>
+      <td style="width: 50%;">
+        <table class="hidden_table_border">
+          <tr class = "control-group">
+            <th>
+              <%= f.label :last_name, t('activerecord.attributes.user.last_name'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td> 
+              <%= f.text_field :last_name, :class => 'text_field' %> 
+            </td>  
+          </tr>
+          <tr class = "control-group">
+            <th>
+              <%= f.label :city, t('activerecord.attributes.user.city'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td> 
+              <%= f.text_field :city, :class => 'text_field' %> 
+            </td>  
+          </tr>
+          <tr class = "control-group">
+            <th>
+              <%= f.label :zip, t('activerecord.attributes.user.zip'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td> 
+              <%= f.text_field :zip, :class => 'text_field' %>       
+              <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.user.zip_help')} %> 
+            </td>  
+          </tr>
+          <tr class = "control-group">
+            <th>
+              <%= f.label :birth_date, t('activerecord.attributes.user.birth_date'), :class => 'help-inline' %>
+            </th>
+            <td> 
+              <%= f.text_field :birth_date, :class => 'datepicker', :readonly => 'readonly' %> 
+            </td>  
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table id="table_contact_information" class="table table-bordered table-condensed table-nohover">
+  <thead>
+    <tr class="box_title"><th colspan="2"><h4>Contact Information</h4></th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="width: 50%;">
+        <table class="hidden_table_border">
+          <tr class = "control-group">
+            <th>
+              <%= f.label :phone_number, t('activerecord.attributes.user.phone_number'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td> 
+              <%= f.text_field :phone_country_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_country_code') %> 
+              <%= f.text_field :phone_area_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_area_code') %> 
+              <%= f.text_field :phone_local_number, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_local_number') %> 
+              <% if !@user.new_record? && !@user.wrong_phone_number.nil? %>
+              <br><%= t('activerecord.attributes.user.unset_wrong_phone_number') %>
+                  <%= check_box :setter, :wrong_phone_number %>
+              <% end %>
+            </td>  
+          </tr>
+          <tr class = "control-group">
+            <th>
+              <%= f.label :type_of_phone_number, t('activerecord.attributes.user.type_of_phone_number'), :class => 'help-inline' %>
+            </th>
+            <td> 
+              <%= f.select :type_of_phone_number, [['Mobile', 'mobile'],['Home', 'home'],['Other','other']], :class => 'select_field', :include_blank => true %>
+            </td>  
+          </tr>
+          <tr class = "control-group">
+            <% if @user.new_record? %>
+              <th>
+                <%= f.label :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline required_asterisk' %>
+              </th>
+              <th id="th_terms_of_memberships"> 
+                <%= select_tag('user[terms_of_membership_id]', options_from_collection_for_select(@terms_of_memberships, "id", "name")) %>
+                <% unless @terms_of_memberships.empty? %>
+                  <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.model.subscription_plans'), :content => ( render :partial => "terms_of_memberships/resumed_information", :locals => {:tom => @terms_of_memberships.first})} %>
+                <% end %>
+              </th>  
+            <% elsif can? :manual_billing, User and not @user.manual_payment %>
+              <th>
+              <%= f.label :manual_payment, t('activerecord.attributes.user.manual_payment'), :class => 'help-inline' %>
+              </th>
+              <th> 
+                <%= check_box :user, :manual_payment %>              
+                <%= render :partial => "shared/help", :locals => { :title => t('activerecord.attributes.user.manual_payment'), :content => t('activerecord.attributes.user.manual_payment_help')} %>
+              </th>
+            <% end %>
+          </tr>
+        </table>
+      </td>
+      <td style="width: 50%;">
+        <table class="hidden_table_border">
+          <tr class = "control-group">
+            <th>
+              <%= f.label :email, t('activerecord.attributes.user.email'), :class => 'help-inline required_asterisk' %>
+            </th>
+            <td> 
+              <%= f.text_field :email, :class => 'text_field'%>
+            </td>  
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<% if @user.new_record? %>
+  <table id="table_credit_card" class="table table-bordered table-condensed table-nohover">
+    <thead>
+      <tr class="box_title">
+        <th>
+          <h4>Credit Card
+          <%= f.label :allow_cc_blank,t('Allow blank credit card?'), :class => 'help-inline' %>
+          <%= check_box :setter, :cc_blank %>
+          </h4>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= f.fields_for :credit_card do |credit_card| %>
+        <tr>
+          <td>
+            <table class="hidden_table_border">
+              <tr class = "control-group">
+                <th>
+                  <%= credit_card.label :number, t('activerecord.attributes.credit_card.number'), :class => 'help-inline required_asterisk' %>
+                </th>
+                <td> 
+                  <%= credit_card.text_field :number, :class => 'text_field input-medium', 
+                                          :name => "user[credit_card][number]"%>
+                </td>  
+                <th>
+                  <%= credit_card.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline required_asterisk' %> 
+                </th>
+                <td> 
+                  <%= credit_card.select :expire_month, @months, :class => 'text_field input-small', :name => "user[credit_card][expire_month]", :include_blank => true  %>
+                </td>  
+                <th>
+                  <%= credit_card.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline required_asterisk' %>
+                </th>
+                <td> 
+                  <%= credit_card.select :expire_year, @years, :class => 'text_field input-small', :name => "user[credit_card][expire_year]", :include_blank => true  %>
+                </td>  
+              </tr>
+            </table>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <table id="table_fulfillments" class="table table-bordered table-condensed table-nohover">
+    <thead>
+      <tr class="box_title">
+        <th>
+          <h4>Fulfillment</h4>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <table class="hidden_table_border">
+            <tr class = "control-group">
+              <th>
+                <%= f.label :kit_card_product_sku, t('activerecord.attributes.enrollment_info.kit_card_product_sku') %>
+              </th>
+              <td> 
+                <%= check_box_tag :kit_card_product_sku %>
+              </td>  
+              <th>
+                <%= f.label :product_sku, t('activerecord.attributes.enrollment_info.product_sku') %>
+              </th>
+              <td> 
+                <%= select_tag :product_sku, options_from_collection_for_select(@current_club.products.with_stock.not_kit_card, "id", "sku"),  :include_blank => true %>
+              </td>  
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<% end %>
+Please, have in mind that fields with ' * ' are required. 
+<br>
+<br>
+<% if @current_club.requires_external_id %>
+  <table id="external_id" class="table table-bordered table-condensed table-nohover">
+    <thead>
+      <tr class="box_title">
+        <th><h4>Additional Information</h4> </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <table class="hidden_table_border">
+            <tr class = "control-group">
+              <th>
+                <%= f.label :external_id, t('activerecord.attributes.credit_card.external_id'), :class => 'help-inline' %>
+              </th>
+              <td> 
+                <%= f.text_field :external_id, :class => 'text_field input-small' %>
+              </td>
+            </tr>
+          </table>
+        </td>  
+      </tr>
+    </tbody>
+  </table>
+<% end %>
+
+<div class="form-actions">
+  <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
+  <% if @user.new_record? %>
+    <%= link_to t(:cancel), :back, :class => 'btn', :id => 'cancel_button' %>  
+  <% else %>
+    <%= link_to t('buttons.cancel_update'), show_user_path, :class => 'btn', :id => "cancel_button" %> 
+  <% end %>
+</div>
+
+<% if @user.new_record? %>
+  <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
+  <%= f.hidden_field :product_sku, :value => '' %>
+  <%= f.hidden_field :mega_channel, :value => EnrollmentInfo::CS_MEGA_CHANNEL %>
+  <%= f.hidden_field :campaign_medium, :value => EnrollmentInfo::CS_CAMPAIGN_MEDIUM %>
+  <%= f.hidden_field :landing_url, :value => request.env['HTTP_HOST'] %>
+  <%= f.hidden_field :referral_path, :value => request.env['REQUEST_URI'] %>
+  <%= f.hidden_field :ip_address, :value => request.env['REMOTE_ADDR'] %>
+  <%= f.hidden_field :campaign_description, :value => EnrollmentInfo::CS_CAMPAIGN_DESCRIPTION %>
+<% end %>
+

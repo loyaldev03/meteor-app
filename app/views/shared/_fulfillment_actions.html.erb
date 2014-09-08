@@ -2,25 +2,25 @@
   <%= t('activerecord.attributes.fulfillment.renewed')%>
 <% else %>
   <% if fulfillment.in_process? %>
-    <% unless fulfillment.member.wrong_address %>
+    <% unless fulfillment.user.wrong_address %>
       <%= (link_to 'Mark as sent', '#', :id => "mark_as_sent", :name => fulfillment.id, :class=> "btn btn-small") if can? :mark_as_sent, Fulfillment %>
-      <% unless member_show %>
+      <% unless user_show %>
       <%= (link_to 'Set as wrong address','#', :id => "set_as_wrong_address", 
-        :name => fulfillment.member.id, :class=> "btn btn-small", :remote => true)  if can? :mark_as_undeliverable, Member %>
+        :name => fulfillment.user.id, :class=> "btn btn-small", :remote => true)  if can? :mark_as_undeliverable, User %>
   	  <% end %>
     <% else %>
-      <% unless member_show %>
-      <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.id) %>
+      <% unless user_show %>
+      <%= link_to t('activerecord.attributes.user.undeliverable'), show_user_path(:user_prefix => fulfillment.user.id) %>
       <% else %>
-  		<%= t('activerecord.attributes.member.undeliverable') %>
+  		<%= t('activerecord.attributes.user.undeliverable') %>
       <% end %>
   	<% end %>
   <% elsif fulfillment.out_of_stock? or fulfillment.bad_address? %>
-    <% if fulfillment.member.wrong_address %>
-      <% unless member_show %>
-      <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.id)%>
+    <% if fulfillment.user.wrong_address %>
+      <% unless user_show %>
+      <%= link_to t('activerecord.attributes.user.undeliverable'), show_user_path(:user_prefix => fulfillment.user.id)%>
       <% else %>
-      <%= t('activerecord.attributes.member.undeliverable') %>
+      <%= t('activerecord.attributes.user.undeliverable') %>
       <% end %>	
     <% else %>
       <% unless fulfillment.product.nil? %>
@@ -32,13 +32,13 @@
     <% end %>
   <% elsif fulfillment.sent? %>
     <% if fulfillment.product_sku == 'KIT' or fulfillment.product_sku == 'CARD' %>
-      <% if fulfillment.member.lapsed? %>
-        <%= t('activerecord.attributes.member.is_lapsed') %>
-      <% elsif fulfillment.member.wrong_address %>
-        <% unless member_show %>
-          <%= link_to t('activerecord.attributes.member.undeliverable'), show_member_path(:member_prefix => fulfillment.member.id)%>
+      <% if fulfillment.user.lapsed? %>
+        <%= t('activerecord.attributes.user.is_lapsed') %>
+      <% elsif fulfillment.user.wrong_address %>
+        <% unless user_show %>
+          <%= link_to t('activerecord.attributes.user.undeliverable'), show_user_path(:user_prefix => fulfillment.user.id)%>
           <% else %>
-            <%= t('activerecord.attributes.member.undeliverable') %>
+            <%= t('activerecord.attributes.user.undeliverable') %>
         <% end %> 
       <% else %>      
         <%= (link_to 'Resend','#', :id => 'resend', :name => fulfillment.id ,:class=> "btn btn-small") if can? :resend, Fulfillment %>

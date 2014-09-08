@@ -8,9 +8,9 @@ module SacMandrill
     require 'sac_mandrill/models/member_extensions'
     require 'sac_mandrill/models/member_model'
 
-    Member.send :include, SacMandrill::MemberExtensions
+    User.send :include, SacMandrill::MemberExtensions
     
-    logger.info "  * extending Member and Prospect"
+    logger.info "  * extending User and Prospect"
 
     nil
   end

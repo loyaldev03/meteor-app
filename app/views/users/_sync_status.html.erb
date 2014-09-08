@@ -1,0 +1,132 @@
+
+<div class="">
+  <% if @current_user.can_be_synced_to_remote? %>
+    <div class='tab-toolbar'>
+      <%= render :partial => 'shared/login_remotely_button', :locals => { use_large_button: false } %>
+      
+      <%= render :partial => 'shared/resend_welcome_email_button', :locals => { use_large_button: false } %>
+
+      <% if @current_user.lapsed? || !@current_user.api_user %>
+        <%= 
+          link_to "#", 
+            method: :post, 
+            id: "sync_to_remote",
+            class: 'btn btn-warning disabled' do %>
+          <i class='icon-retweet'></i>
+          <%= t('buttons.sync_to_remote') %>
+        <% end %>
+      <% else %>
+        <%= 
+          link_to user_sync_path, 
+            method: :post, 
+            class: 'btn btn-warning', 
+            id: "sync_to_remote",
+            confirm: 'Are you sure?' do %>
+          <i class='icon-retweet'></i>
+          <%= t('buttons.sync_to_remote') %>
+        <% end %>
+      <% end %>
+      
+      <%= render :partial => 'shared/reset_password_button', :locals => { use_large_button: false } %>
+
+      <% if @current_user.lapsed? || !@current_user.api_user || @current_user.api_id.blank? %>
+        <%= 
+          link_to "#", 
+            class: "btn btn-success disabled",
+            id: "show_remote_data",
+            style: 'float: right;' do %>
+          <i class='icon-download-alt'></i>
+          <%= t('buttons.show_remote_data') %>
+        <% end %>  
+      <% else %>
+        <%= 
+          link_to user_sync_data_path, 
+            remote: true, 
+            class: "btn btn-success",
+            id: "show_remote_data",
+            style: 'float: right;',
+            data: { replace: '#sync-data' } do %>
+          <i class='icon-download-alt'></i>
+          <%= t('buttons.show_remote_data') %>
+        <% end %>    
+      <% end %>
+    </div>
+  <% end %>
+
+  <table class='hidden_table_border'>
+    <tr>
+      <td NOWRAP><%= t('activerecord.attributes.user.api_id') %>:</td>
+      <td>
+        <span class='toggler-content default active' id="span_api_id">
+          <% if @current_user.api_id.present? %>
+            <%= @current_user.api_id %>
+          <% else %>
+            <em>none</em>
+          <% end %>
+          <span class='label label-<%=t @current_user.sync_status, scope: 'activerecord.attributes.user.sync_status_priorities' -%>' id="span_mi_sync_status">
+            <%=t @current_user.get_sync_status, scope: 'activerecord.attributes.user.sync_status_captions' -%>
+          </span>
+        </span>
+        <% if @current_user.can_be_synced_to_remote? %>
+          <span class='toggler-content'>
+            <%= form_for @current_user, url: user_update_sync_path, html: { class: 'form-inline', style: 'display: inline;' } do |f| %>
+              <%= f.text_field :api_id, :class => 'text_field' %>
+              <%= f.submit 'Update', class: 'btn-danger', confirm: 'Are you sure?' %>
+            <% end %>
+          </span>
+          &nbsp;
+          <%= link_to '#', :id=>"edit_api_id" ,class: 'btn btn-success toggler', data: { target: '.toggler-content' } do %>
+            <i class='icon-pencil'></i>
+            <span class='toggler-content default active'><%= t('buttons.edit') %></span>
+            <span class='toggler-content'><%= t('buttons.stop_editing') %></span>
+          <% end %>
+          <% if @current_user.api_id.present? %>
+            <%= link_to user_update_sync_path(user: { api_id: '' }), method: :put, confirm: 'Are you sure?', class: 'btn btn-warning' do %>
+              <i class='icon-remove'></i>
+              <%= t('buttons.unset') %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= t('activerecord.attributes.user.last_synced_at') %>:</td>
+      <td colspan='999' id="td_mi_last_synced_at">
+        <%= 
+          @current_user.last_synced_at && 
+          l(@current_user.last_synced_at, format: :dashed) 
+        %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= t('activerecord.attributes.user.last_sync_error') %>:</td>
+      <td colspan='999' id="td_mi_last_sync_error_at">
+        <% if @current_user.last_sync_error_at %>
+          <code><%= @current_user.last_sync_error ? @current_user.last_sync_error.html_safe : '' %></code>
+          on
+          <em>
+            <%=l @current_user.last_sync_error_at, format: :dashed -%>
+          </em>
+        <% else %>
+          <em>none</em>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td><%= t('activerecord.attributes.user.autologin_url') %>:</td>
+      <td colspan='999' id="td_autologin_url">
+        <% if @current_user.autologin_url %>
+          <%= link_to @current_user.full_autologin_url.to_s, target: '_blank' -%>
+        <% else %>
+          <em>none</em>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div id='sync-data'></div>
+
+<script>
+  $(document).ready(sync_status_user_functions(<%= Operation.datatable_columns.size %>));
+</script>

@@ -1,5 +1,5 @@
 module Wordpress
-  class Member < Struct.new(:member)
+  class Member < Struct.new(:user)
     # attribute: m.name
     # randomhex: SecureRandom.hex
     # profile: field_profile_name: { und: [ { value: m.name } ] }
@@ -37,8 +37,8 @@ module Wordpress
     end
 
     def create!
-      res = conn.get '/api/?' + query_string( { :email => self.member.email, :username => self.member.email, 
-        :firstname => self.member.first_name, :lastname => self.member.last_name, :action => 'add_user' })
+      res = conn.get '/api/?' + query_string( { :email => self.user.email, :username => self.user.email, 
+        :firstname => self.user.first_name, :lastname => self.user.last_name, :action => 'add_user' })
       update_member_api_id(res)
     end
 
@@ -51,24 +51,24 @@ module Wordpress
     end
 
     def new_record?
-      self.member.api_id.nil?
+      self.user.api_id.nil?
     end
 
     def reset_password!
-      conn.get '/api/?' + query_string({ :user_id => self.member.api_id, :email => self.member.email, :action => 'reset_password' })
+      conn.get '/api/?' + query_string({ :user_id => self.user.api_id, :email => self.user.email, :action => 'reset_password' })
     end
 
     def resend_welcome_email!
-      conn.get '/api/?' + query_string({ :user_id => self.member.api_id, :email => self.member.email, :action => 'resend_welcome_email' })
+      conn.get '/api/?' + query_string({ :user_id => self.user.api_id, :email => self.user.email, :action => 'resend_welcome_email' })
     end
 
   private
     def query_string(hash)
-      { :sac_username => self.member.club.api_username, :sac_password => self.member.club.api_password }.merge!(hash).collect {|key, value| "#{key}=#{value}"}.join('&')
+      { :sac_username => self.user.club.api_username, :sac_password => self.user.club.api_password }.merge!(hash).collect {|key, value| "#{key}=#{value}"}.join('&')
     end
 
     def conn
-      self.member.club.wordpress
+      self.user.club.wordpress
     end
 
     def update_member(res)
@@ -92,7 +92,7 @@ module Wordpress
           last_sync_error: res.body
         }
       end
-      ::Member.where(id: self.member.id).limit(1).update_all(data)
+      ::User.where(id: self.user.id).limit(1).update_all(data)
     end
 
 
@@ -108,7 +108,7 @@ module Wordpress
           last_sync_error: res.body
         }
       end
-      ::Member.where(id: self.member.id).limit(1).update_all(data)
+      ::User.where(id: self.user.id).limit(1).update_all(data)
     end
 
   end

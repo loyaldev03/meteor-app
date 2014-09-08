@@ -5,7 +5,7 @@ module Pardot
     logger.info " ** Initializing SAC Pardot integration"
 
     require 'sac_pardot/models/member_extensions'
-    Member.send :include, Pardot::MemberExtensions
+    User.send :include, Pardot::MemberExtensions
  
     require 'sac_pardot/models/prospect_extensions'
     Prospect.send :include, Pardot::ProspectExtensions
@@ -17,7 +17,7 @@ module Pardot
 
     logger.info "  * extending Prospect, Member and Club"
     Club.send :include, Pardot::ClubExtensions
-    MembersController.send :include, Pardot::MembersControllerExtensions
+    UsersController.send :include, Pardot::MembersControllerExtensions
 
     nil
   end

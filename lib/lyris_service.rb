@@ -14,12 +14,12 @@ class LyrisService
     action = user_exists?(communication.external_attributes[:mlid], communication.email) ? 'update' : 'add'
     send_request!(communication.external_attributes[:mlid],'record', action, true) do |body|
       body.DATA communication.email, :type => 'email'
-      body.DATA communication.member.first_name, :type => 'demographic', :id => 1
-      body.DATA communication.member.last_name, :type => 'demographic', :id => 2
+      body.DATA communication.user.first_name, :type => 'demographic', :id => 1
+      body.DATA communication.user.last_name, :type => 'demographic', :id => 2
       # Demographic data from ONMC . Do v5 have diff demographic IDs?
-      body.DATA communication.member.id, :type => 'demographic', :id => 41166
-      body.DATA communication.member.next_retry_bill_date, :type => 'demographic', :id => 47171
-      body.DATA communication.member.terms_of_membership.installment_amount, :type => 'demographic', :id => 48297
+      body.DATA communication.user.id, :type => 'demographic', :id => 41166
+      body.DATA communication.user.next_retry_bill_date, :type => 'demographic', :id => 47171
+      body.DATA communication.user.terms_of_membership.installment_amount, :type => 'demographic', :id => 48297
       body.DATA communication.external_attributes[:trigger_id], :type => 'extra', :id => 'trigger_id'
       body.DATA "yes", :type => 'extra', :id => 'trigger'
       # Rails.logger.debug YAML.dump(body)

@@ -1,0 +1,12 @@
+$('.pagination a').attr('data-remote', 'true');
+$('#states_td').attr('data-remote', 'true');
+
+
+if(update_select_only==true){
+	$('#states_td').html('<%=escape_javascript(render(:partial => "states" ))%>');
+}else{
+  <% if @solr_is_down %>
+    alert("<%= t('error_messages.search_user_is_out_of_service') %>");
+  <% end %>
+	$('#users').html('<%=escape_javascript(render(:partial => "search"))%>');
+}

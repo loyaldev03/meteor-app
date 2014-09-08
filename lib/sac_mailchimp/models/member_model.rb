@@ -1,5 +1,5 @@
 module SacMailchimp
-	class MemberModel < Struct.new(:member)
+	class MemberModel < Struct.new(:user)
 
     def save!
       update_member(new_record? ? create! : update!)
@@ -7,20 +7,20 @@ module SacMailchimp
 
     def new_record?
       # Find by subscriber key. We cant get the list of Lists to which this subscriber is subscribe it on. 
-      mailchimp_identification = self.member.marketing_client_id.nil? ? {email: self.member.email} : {euid: self.member.marketing_client_id}
+      mailchimp_identification = self.user.marketing_client_id.nil? ? {email: self.user.email} : {euid: self.user.marketing_client_id}
       res = Gibbon::API.lists.member_info({ id: mailchimp_list_id, emails: [mailchimp_identification] })
       @subscriber = res
       @subscriber["success_count"] == 0
     rescue Exception  => e
-      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
       raise e
     end
 
     def unsubscribe!
     	begin
-      	client.lists.unsubscribe({:id => mailchimp_list_id, :email => { :email => self.member.email }})
+      	client.lists.unsubscribe({:id => mailchimp_list_id, :email => { :email => self.user.email }})
     	rescue Exception => e
-	      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
+	      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
 	      raise e 
     	end
     end
@@ -32,9 +32,9 @@ module SacMailchimp
     def create!
 			options = {:double_optin => false}
       begin
-      	client.lists.subscribe( subscriber({:email => self.member.email}, options) )
+      	client.lists.subscribe( subscriber({:email => self.user.email}, options) )
       rescue Exception => e
-        Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
+        Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
         raise e
       end
     end
@@ -45,10 +45,10 @@ module SacMailchimp
         # We check if the subscriber is a prospect or not. In case it is a prospect we make reference 
         # to the leid we do not have saved. In case it is not prospect we use marketing_client we have.
         # TODO: if we have a marketing_client_id in prospect too we would be avoiding this step.
-        mailchimp_identification = self.member.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.member.marketing_client_id
+        mailchimp_identification = self.user.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.user.marketing_client_id
       	client.lists.subscribe( subscriber({:euid => mailchimp_identification}, options) )
     	rescue Exception => e
-	      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
+	      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
 	      raise e
     	end
     end
@@ -76,16 +76,16 @@ module SacMailchimp
         }
       end
       data = data.merge(need_sync_to_marketing_client: false)
-      ::Member.where(id: self.member.id).limit(1).update_all(data)
-      self.member.reload rescue self.member
+      ::User.where(id: self.user.id).limit(1).update_all(data)
+      self.user.reload rescue self.user
     end
 
     def subscriber(mailchimp_identification ,options={})
     	attributes = {}
     	fieldmap.each do |api_field, our_field| 
-        attributes.merge!(SacMailchimp.format_attribute(self.member, api_field, our_field))
+        attributes.merge!(SacMailchimp.format_attribute(self.user, api_field, our_field))
       end
-      membership = self.member.current_membership
+      membership = self.user.current_membership
       membership_fieldmap.each do |api_field, our_field| 
         attributes.merge!(SacMailchimp.format_attribute(membership, api_field, our_field))
       end
@@ -97,14 +97,14 @@ module SacMailchimp
       enrollment_fieldmap.each do |api_field, our_field| 
         attributes.merge!(SacMailchimp.format_attribute(enrollment_info, api_field, our_field))
       end
-      if Rails.env.production? and self.member.preferences and preferences_fieldmap
-        member_preferences = self.member.member_preferences
+      if Rails.env.production? and self.user.preferences and preferences_fieldmap
+        member_preferences = self.user.user_preferences
         preferences_fieldmap.each do |api_field, our_field|
-          attributes.merge!({ api_field => self.member.preferences[our_field].to_s })
+          attributes.merge!({ api_field => self.user.preferences[our_field].to_s })
         end
-      elsif Rails.env.prototype? and self.member.preferences
-        attributes.merge!({ "PREF1" => self.member.preferences["example_color"].to_s })
-        attributes.merge!({ "PREF2" => self.member.preferences["example_team"].to_s })
+      elsif Rails.env.prototype? and self.user.preferences
+        attributes.merge!({ "PREF1" => self.user.preferences["example_color"].to_s })
+        attributes.merge!({ "PREF2" => self.user.preferences["example_team"].to_s })
       end
 
 			{ id: mailchimp_list_id, :email => mailchimp_identification, :merge_vars => attributes }.merge!(options)
@@ -157,7 +157,7 @@ module SacMailchimp
     end
 
 		def preferences_fieldmap
-      case self.member.club_id
+      case self.user.club_id
         when 1
           {
             "PREF1" => "driver_1",
@@ -192,7 +192,7 @@ module SacMailchimp
     end
 
     def mailchimp_list_id
-    	@list_id ||= self.member.club.marketing_tool_attributes["mailchimp_list_id"]
+    	@list_id ||= self.user.club.marketing_tool_attributes["mailchimp_list_id"]
     end
 	end
 end

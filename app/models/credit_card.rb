@@ -1,11 +1,11 @@
 class CreditCard < ActiveRecord::Base
-  belongs_to :member
+  belongs_to :user
   has_many :transactions
 
   attr_accessible :active, :number, :expire_month, :expire_year, :blacklisted
 
   before_create :set_data_before_credit_card_number_disappear
-  before_destroy :confirm_presence_of_another_credit_card_related_to_member
+  before_destroy :confirm_presence_of_another_credit_card_related_to_user
   after_save :solr_index_asyn_call
 
   validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
@@ -14,7 +14,7 @@ class CreditCard < ActiveRecord::Base
   BLANK_CREDIT_CARD_TOKEN = 'a'
 
   def solr_index_asyn_call
-    self.member.asyn_solr_index if self.member and not (self.changed & ['last_digits', 'token', 'active']).empty? and self.active
+    self.user.asyn_solr_index if self.user and not (self.changed & ['last_digits', 'token', 'active']).empty? and self.active
   end
 
   def number=(x)
@@ -29,19 +29,19 @@ class CreditCard < ActiveRecord::Base
     @number
   end
 
-  def confirm_presence_of_another_credit_card_related_to_member
+  def confirm_presence_of_another_credit_card_related_to_user
     if self.active 
       errors[:active] << "Credit card is set as active. It cannot be destroyed."
       return false 
     end
 
-    if member.credit_cards.count == 1
+    if user.credit_cards.count == 1
       errors[:credit_card] << "The member should have at least one credit card."
       return false
     end
 
-    if member.is_chargeback?
-      errors[:member] << "The member was chargebacked. It cannot be destroyed."
+    if user.is_chargeback?
+      errors[:user] << "The member was chargebacked. It cannot be destroyed."
       return false
     end
   end
@@ -72,15 +72,15 @@ class CreditCard < ActiveRecord::Base
   end
 
   def can_be_blacklisted?
-    not self.member.lapsed? and not self.blacklisted 
+    not self.user.lapsed? and not self.blacklisted 
   end
 
   def can_be_activated?
-    not self.active and not self.member.lapsed? and not self.blacklisted and is_same_gateway_as_current_tom?
+    not self.active and not self.user.lapsed? and not self.blacklisted and is_same_gateway_as_current_tom?
   end
 
   def is_same_gateway_as_current_tom?
-    self.member.club.payment_gateway_configuration.gateway == self.gateway
+    self.user.club.payment_gateway_configuration.gateway == self.gateway
   end
 
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
@@ -100,23 +100,23 @@ class CreditCard < ActiveRecord::Base
 
   def set_as_active!
     if is_same_gateway_as_current_tom?
-      self.member.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
+      self.user.credit_cards.where([ ' id != ? ', self.id ]).update_all({ active: false })
       self.update_attribute :active , true
-      Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.member, Settings.operation_types.credit_card_activated)
+      Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.user, Settings.operation_types.credit_card_activated)
     else
       raise CreditCardDifferentGatewaysException.new(:message => "Different Gateway")
     end
   end
 
-  def get_token(pgc, pmember, allow_cc_blank = false)
-    pgc ||= member.terms_of_membership.payment_gateway_configuration
-    am = CreditCard.am_card(number, expire_month, expire_year, pmember.first_name || member.first_name, pmember.last_name || member.last_name)
+  def get_token(pgc, puser, allow_cc_blank = false)
+    pgc ||= user.terms_of_membership.payment_gateway_configuration
+    am = CreditCard.am_card(number, expire_month, expire_year, puser.first_name || user.first_name, puser.last_name || user.last_name)
     if am.valid?
       self.cc_type = am.brand
       begin              
         self.token = Transaction.store!(am, pgc)
       rescue Exception => e
-        Auditory.report_issue("CreditCard:GetToken", "Gateway response: " + e.to_s, { credit_card: self.inspect, member: pmember.inspect || self.member.inspect })
+        Auditory.report_issue("CreditCard:GetToken", "Gateway response: " + e.to_s, { credit_card: self.inspect, user: puser.inspect || self.user.inspect })
         logger.error e.inspect
         self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
       end
@@ -141,7 +141,7 @@ class CreditCard < ActiveRecord::Base
   # 6 Days Later if not successful = (+4) 3/2015
   # 6 Days Later if not successful = (+1) 3/2012
   def recycle_expired_rule(times)
-    if expired? or (member.recycled_times > 0 and member.has_been_sd_cc_expired?)
+    if expired? or (user.recycled_times > 0 and user.has_been_sd_cc_expired?)
       case times
       when 0
         new_year_exp=self.expire_year + 3
@@ -159,7 +159,7 @@ class CreditCard < ActiveRecord::Base
         new_year_exp=Time.zone.now.year
       end
       if new_year_exp != self.expire_year.to_i
-        Auditory.audit(nil, self, "Automatic Recycled Expired card from #{expire_month}/#{expire_year} to #{expire_month}/#{new_year_exp}", member, Settings.operation_types.automatic_recycle_credit_card)
+        Auditory.audit(nil, self, "Automatic Recycled Expired card from #{expire_month}/#{expire_year} to #{expire_month}/#{new_year_exp}", user, Settings.operation_types.automatic_recycle_credit_card)
         self.expire_year = new_year_exp
       end
     end
@@ -168,10 +168,10 @@ class CreditCard < ActiveRecord::Base
   def update_expire(year, month, current_agent = nil)
     if year.to_i == expire_year.to_i and month.to_i == expire_month.to_i
       { :code => Settings.error_codes.success, :message => "New expiration date its identically than the one we have in database." }
-    elsif Time.new(year, month, nil, nil, nil, nil, self.member.get_offset_related) >= Time.now.in_time_zone(self.member.get_club_timezone).beginning_of_month
+    elsif Time.new(year, month, nil, nil, nil, nil, self.user.get_offset_related) >= Time.now.in_time_zone(self.user.get_club_timezone).beginning_of_month
       message = "Changed credit card XXXX-XXXX-XXXX-#{last_digits} from #{expire_month}/#{expire_year} to #{month}/#{year}"
       update_attributes(:expire_month => month, :expire_year => year)
-      Auditory.audit(current_agent, self, message, self.member, Settings.operation_types.credit_card_updated)
+      Auditory.audit(current_agent, self, message, self.user, Settings.operation_types.credit_card_updated)
       { :code => Settings.error_codes.success, :message => message }
     else
       { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card') + " Expiration date could be wrong.", :errors => { :number => "New expiration date is expired." }}

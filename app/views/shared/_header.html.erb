@@ -18,9 +18,9 @@
             <% end %>
           <% else %>
             <% if @current_club.logo? %>
-              <%= link_to image_tag(@current_club.logo.url(:header)), members_path(@current_partner.prefix, @current_club.name) %>
+              <%= link_to image_tag(@current_club.logo.url(:header)), users_path(@current_partner.prefix, @current_club.name) %>
             <% else %>
-              <%= link_to @current_club.full_name, members_path(@current_partner.prefix, @current_club.name) %>
+              <%= link_to @current_club.full_name, users_path(@current_partner.prefix, @current_club.name) %>
             <% end %>
           <% end %>
 
@@ -40,8 +40,8 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @current_club.name %><b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <% if @current_agent.can? :read, Member, @current_club.id %>
-                    <li><%= link_to t('activerecord.model.members'), members_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% if @current_agent.can? :read, User, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.users'), users_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
                   <% if @current_agent.can? :read, Product, @current_club.id %>
                     <li><%= link_to t('activerecord.model.products'), products_path(@current_club.partner.prefix, @current_club.name) %></li>
@@ -79,9 +79,9 @@
             <% end %>
             <li><%= link_to "My Clubs", root_path, {id: "my_clubs"} %></li>
             <li>
-              <% selected = @current_club ? [ members_path(@current_partner.prefix, @current_club.name) ] : nil %>
+              <% selected = @current_club ? [ users_path(@current_partner.prefix, @current_club.name) ] : nil %>
               <%= select_tag "change_partner",
-                options_for_select((@current_agent.has_global_role? ? Club.includes(:partner).all : Club.includes(:partner).find(@current_agent.club_roles_without_api)).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", members_path(u.partner.prefix, u.name) ]}, 
+                options_for_select((@current_agent.has_global_role? ? Club.includes(:partner).all : Club.includes(:partner).find(@current_agent.club_roles_without_api)).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", users_path(u.partner.prefix, u.name) ]}, 
                   selected ), 
                 :prompt => 'Select Partner-Club',
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')", :style => "margin-top: 5px;" %>

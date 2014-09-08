@@ -8,7 +8,7 @@ module Pardot
     module ClassMethods
       def sync_members_to_pardot
         index = 0
-        base = Member.where("date(updated_at) >= ? ", Time.zone.now.yesterday.to_date).limit(2000)
+        base = User.where("date(updated_at) >= ? ", Time.zone.now.yesterday.to_date).limit(2000)
         Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_pardot, processing #{base.count} members"
         base.each do |member|
           tz = Time.zone.now

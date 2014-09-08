@@ -1,0 +1,64 @@
+<p> <h1> <%= t('search_results') %> </h1> </p> 
+<%= will_paginate @users if @users %>
+<table class="table table-bordered table-condensed" id="table_user_search_result">
+  <thead>
+  	<tr>
+      <th style="width: 110px;"><%= sortable "status", t('activerecord.attributes.user.status') %></th>
+      <th style="width: 125px;" NOWRAP id="th_user_id"> <%= sortable "id", t('activerecord.attributes.user.id') %> </th>
+      <% if @current_club.requires_external_id %>
+        <th> <%= t('activerecord.attributes.user.external_id') %> </th>
+      <% end %>
+      <th style="width: 170px;"> <%= sortable "full_name", t('activerecord.attributes.user.full_name') %></th>
+      <th style="width: 170px;"> <%= sortable "full_address", t('activerecord.attributes.user.full_address') %></th>
+      <th> <%= t('activerecord.attributes.user.user_classification_type') %> </th>
+      <th style="width: 20px;">View</th>
+      <th style="width: 20px;">Edit</th>
+      <th style="width: 80px;">&nbsp;</th>
+  	</tr>
+  </thead>
+  <tbody>
+    <% if @users %>
+      <% if @users.blank? %>
+        <tr> <td colspan="<%= @current_club.requires_external_id ? 9 : 8 %>"> <%= t('activerecord.attributes.user.search_user_not_found') %> </td> </tr>
+      <% else %>
+        <% @users.each do |user| %>
+        <tr> 
+          <td class="<%= user_status_class(user) %>"> 
+          <% if user.blacklisted? %>
+          <%= user.status %>
+          <%= t('activerecord.attributes.user.status_blacklisted') %>
+          <% else %>
+          <%= user.status %>
+          <% end %>
+          </td>
+          <td> <%= user.id %> </td>
+          <% if @current_club.requires_external_id %>
+            <td> <%= user.external_id if !user.external_id.nil? %> </td>
+          <% end %>
+          <td> <%= user.full_name %> </td>
+          <td> <%= user.full_address %> </td>
+          <td> <%= user.user_group_type.nil? ? t('activerecord.attributes.user.not_group_associated') : user.user_group_type.name %> </td>
+          <td><a href="<%= show_user_path(:user_prefix => user.id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
+          <td>
+            <% if can? :edit, User %>
+              <a href="<%= edit_user_path(:user_prefix => user.id) %>" class="btn btn-small"><i class="icon-pencil"></i> </a>
+            <% end %>
+          </td>
+          <td>
+            <% if can? :edit, User %> 
+              <%= user_action_drop_menu(user) %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %> 
+    <% end %>
+  <% end %>
+
+  </tbody>
+</table>
+
+<script type="text/javascript">
+  $('.dropdown-toggle').dropdown();
+  var new_position = $('#users').offset();
+  window.scrollTo(new_position.left,new_position.top);
+</script>

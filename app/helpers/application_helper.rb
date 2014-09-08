@@ -24,8 +24,8 @@ module ApplicationHelper
     css_class = (column == @sort_column ? ( @sort_direction == "asc" ? 'icon-arrow-down' : 'icon-arrow-up') : nil)
     direction = column == @sort_column && @sort_direction == "asc" ? "desc" : "asc"
     page = params[:page] || 1
-    member_search = params[:member] ? { :member => params[:member] } : { }
-    link_to title, {:sort => column, :direction => direction, :page => page}.merge(member_search), {:class => css_class}
+    user_search = params[:user] ? { :user => params[:user] } : { }
+    link_to title, {:sort => column, :direction => direction, :page => page}.merge(user_search), {:class => css_class}
   end 
 
   def dynamic_form_error_messages(object)

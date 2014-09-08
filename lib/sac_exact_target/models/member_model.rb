@@ -1,5 +1,5 @@
 module SacExactTarget
-  class MemberModel < Struct.new(:member)
+  class MemberModel < Struct.new(:user)
 
     def save!
       update_member(new_record? ? create! : update!)
@@ -11,7 +11,7 @@ module SacExactTarget
       @subscriber = res.Results.first
       @subscriber.nil?
     rescue Exception  => e
-      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.et_timeout_retrieve) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_retrieve) if e.to_s.include?("Timeout")
       raise e
     end
 
@@ -25,14 +25,14 @@ module SacExactTarget
 
     def send_email(customer_key)
       trigger_definition = ExactTargetSDK::TriggeredSendDefinition.new('CustomerKey' => customer_key)
-      s = ExactTargetSDK::Subscriber.new({ 'SubscriberKey' => subscriber_key, 'EmailAddress' => self.member.email })
+      s = ExactTargetSDK::Subscriber.new({ 'SubscriberKey' => subscriber_key, 'EmailAddress' => self.user.email })
       trigger_to_send = ExactTargetSDK::TriggeredSend.new(
         'TriggeredSendDefinition' => trigger_definition, 
         'Client' => client_id,
         'Subscribers' => [s] )
       client.Create(trigger_to_send)
     rescue Exception => e
-      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.et_timeout_trigger_create) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_trigger_create) if e.to_s.include?("Timeout")
       raise e
     end
 
@@ -48,24 +48,24 @@ module SacExactTarget
       ]
       s = ExactTargetSDK::Subscriber.new({
         'SubscriberKey' => subscriber_key, 'Status' => status,
-        'EmailAddress' => self.member.email, 'Client' => client_id, 'ObjectID' => true,
+        'EmailAddress' => self.user.email, 'Client' => client_id, 'ObjectID' => true,
         'Attributes' => attributes
       })
       client.Update(s)
     rescue Exception => e
-      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
       raise e
     end
 
     def create!
       options = { :subscribe_to_list => true }
       # Remove email from prospect list
-      SacExactTarget::ProspectModel.destroy_by_email! self.member.email, club_id
+      SacExactTarget::ProspectModel.destroy_by_email! self.user.email, club_id
       # Add customer under member list
       begin
         client.Create(subscriber(subscriber_key, options))
       rescue Exception => e
-        Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.et_timeout_create) if e.to_s.include?("Timeout")
+        Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_create) if e.to_s.include?("Timeout")
         raise e
       end
     end
@@ -76,7 +76,7 @@ module SacExactTarget
       options = { :subscribe_to_list => !@subscriber.attributes.select { |s| s[:name] == 'Club' and s[:value].nil? }.empty? }
       client.Update(subscriber(subscriber_key, options))
     rescue Exception => e
-      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
       raise e 
     end
 
@@ -103,15 +103,15 @@ module SacExactTarget
         }
       end
       data = data.merge(need_sync_to_marketing_client: false)
-      ::Member.where(id: self.member.id).limit(1).update_all(data)
-      self.member.reload rescue self.member
+      ::User.where(id: self.user.id).limit(1).update_all(data)
+      self.user.reload rescue self.user
     end
 
     def subscriber(subscriber_key, options ={})
       # TODO: marketing_tool_attributes['et_members_list'] must be an extended method from club 
-      attributes, list = [], [ ExactTargetSDK::List.new(ID: self.member.club.marketing_tool_attributes['et_members_list'], Status: 'Active', Action: 'create') ]
+      attributes, list = [], [ ExactTargetSDK::List.new(ID: self.user.club.marketing_tool_attributes['et_members_list'], Status: 'Active', Action: 'create') ]
       fieldmap.each do |api_field, our_field| 
-        attributes << SacExactTarget.format_attribute(self.member, api_field, our_field)
+        attributes << SacExactTarget.format_attribute(self.user, api_field, our_field)
       end
       membership = self.member.current_membership
       membership_fieldmap.each do |api_field, our_field| 
@@ -125,19 +125,19 @@ module SacExactTarget
       enrollment_fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(enrollment_info, api_field, our_field)
       end  
-      if Rails.env.production? and self.member.preferences and preferences_fieldmap
-        member_preferences = self.member.member_preferences
+      if Rails.env.production? and self.user.preferences and preferences_fieldmap
+        user_preferences = self.user.user_preferences
         preferences_fieldmap.each do |api_field, our_field|
-          attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.member.preferences[our_field].to_s)
+          attributes << ExactTargetSDK::Attributes.new(Name: api_field, Value: self.user.preferences[our_field].to_s)
         end
-      elsif Rails.env.prototype? and self.member.preferences
-        attributes << ExactTargetSDK::Attributes.new(Name: "pref_field_1", Value: self.member.preferences["example_color"].to_s)
-        attributes << ExactTargetSDK::Attributes.new(Name: "pref_field_2", Value: self.member.preferences["example_team"].to_s)
+      elsif Rails.env.prototype? and self.user.preferences
+        attributes << ExactTargetSDK::Attributes.new(Name: "pref_field_1", Value: self.user.preferences["example_color"].to_s)
+        attributes << ExactTargetSDK::Attributes.new(Name: "pref_field_2", Value: self.user.preferences["example_team"].to_s)
       end
       attributes << ExactTargetSDK::Attributes.new(Name: 'Club', Value: club_id)
       ExactTargetSDK::Subscriber.new({
         'SubscriberKey' => subscriber_key, 
-        'EmailAddress' => self.member.email, 'Client' => client_id, 'ObjectID' => true, 
+        'EmailAddress' => self.user.email, 'Client' => client_id, 'ObjectID' => true, 
         'Attributes' => attributes.compact }.
         merge(options[:subscribe_to_list] ? { 'Lists' => list } : {} )
       )        
@@ -193,7 +193,7 @@ module SacExactTarget
     end
 
     def preferences_fieldmap
-      case self.member.club_id
+      case self.user.club_id
         when 1
           {
             "pref_field_1" => "driver_1",
@@ -224,11 +224,11 @@ module SacExactTarget
     end
 
     def subscriber_key
-      Rails.env.production? ? self.member.id : "#{Rails.env}-#{self.member.id.to_s}"
+      Rails.env.production? ? self.user.id : "#{Rails.env}-#{self.user.id.to_s}"
     end
 
     def club_id
-      Rails.env.production? ? self.member.club_id.to_s : '9999'
+      Rails.env.production? ? self.user.club_id.to_s : '9999'
     end
 
     def client_id
@@ -236,7 +236,7 @@ module SacExactTarget
     end
     
     def business_unit_id
-      Rails.env.production? ? self.member.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
+      Rails.env.production? ? self.user.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
     end
   end
 end

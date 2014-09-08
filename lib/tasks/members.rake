@@ -39,7 +39,7 @@ namespace :members do
       Rails.logger.level = Logger::DEBUG
       ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
-      Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{Member.count} members"
+      Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{User.count} members"
       TasksHelpers.refresh_autologin
     rescue Exception => e
       Auditory.report_issue("Billing::Today", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
@@ -152,12 +152,12 @@ namespace :members do
     tall = Time.zone.now
 
     #club_id = 1 #WE HAVE TO SET THIS VAlUE.
-    members = Member.where("status != 'lapsed' and sync_status = 'synced' and club_id = ?",club_id)
+    members = User.where("status != 'lapsed' and sync_status = 'synced' and club_id = ?",club_id)
 
     members.find_in_batches(:batch_size=>40) do |group|
       tall = Time.zone.now
       group.each do |member|
-        api_m = member.api_member
+        api_m = member.api_user
         begin
           if api_m.save!(force: true)
             if member.last_sync_error_at

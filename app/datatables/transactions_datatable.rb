@@ -2,7 +2,7 @@ class TransactionsDatatable < Datatable
 
 private
   def total_records
-    @current_member.transactions.count
+    @current_user.transactions.count
   end
 
   def total_entries
@@ -20,7 +20,7 @@ private
         transaction.gateway + " " + transaction.response_transaction_id.to_s,
         transaction.last_digits,
         transaction.can_be_refunded? ? link_to(I18n.t('refund'),
-            @url_helpers.member_refund_path(@current_partner.prefix,@current_club.name,@current_member.id, :transaction_id => transaction.id), 
+            @url_helpers.user_refund_path(@current_partner.prefix,@current_club.name,@current_user.id, :transaction_id => transaction.id), 
             :class=>"btn btn-warning btn-mini", :id => 'refund' ,:disabled=>(!@current_agent.can? :refund, Transaction, @current_club.id)) : '',
       ]
     end
@@ -31,7 +31,7 @@ private
   end
 
   def fetch_transactions
-    transactions = Transaction.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member).includes(:member)
+    transactions = Transaction.order("#{sort_column} #{sort_direction}").where('user_id' => @current_user).includes(:user)
     transactions = transactions.page(page).per_page(per_page)
     if params[:sSearch].present?
       transactions = transactions.where("transaction_type like :search or response_result like :search", search: "%#{params[:sSearch]}%")

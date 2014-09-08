@@ -1,0 +1,11 @@
+<%= render :partial => "shared/user_information" %>
+<table class="table table-bordered" id="undeliverable_table">
+  <thead>
+  	<tr>
+      <th>
+				<%= render :partial => "set_undeliverable_form" %>
+      </th>
+  	</tr>
+  </thead>
+</table>
+<%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %> 

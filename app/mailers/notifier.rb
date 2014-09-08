@@ -37,31 +37,31 @@ class Notifier < ActionMailer::Base
     mail :to => to, :subject => "pillar to #{email}"
   end
 
-  def active_with_approval(emails,member)
-    @member = member
-    mail :to => emails, :subject => "Member activation needs approval"
+  def active_with_approval(emails,user)
+    @user = user
+    mail :to => emails, :subject => "User activation needs approval"
   end
 
-  def recover_with_approval(emails,member)
-    @member = member
-    mail :to => emails, :subject => "Member recovering needs approval"
+  def recover_with_approval(emails,user)
+    @user = user
+    mail :to => emails, :subject => "User recovering needs approval"
   end
 
-  def call_these_members(csv)
-    attachments["call_members_#{Date.today}.csv"] = { :mime_type => 'text/csv', :content => csv }
-    mail :to => Settings.call_these_members_recipients, 
-         :subject => "AUS answered CALL to these members #{Date.today}",
+  def call_these_users(csv)
+    attachments["call_users_#{Date.today}.csv"] = { :mime_type => 'text/csv', :content => csv }
+    mail :to => Settings.call_these_users_recipients, 
+         :subject => "AUS answered CALL to these users #{Date.today}",
          :bcc => 'platformadmins@xagax.com'
   end
 
-  def hard_decline(member)
-    @member = member
-    mail :to => member.email, :subject => "Membership cancellation [#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )}"
+  def hard_decline(user)
+    @user = user
+    mail :to => user.email, :subject => "Membership cancellation [#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )}"
   end
 
-  def soft_decline(member)
-    @member = member
-    mail :to => member.email, :subject => "Membership cancellation [#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )}"
+  def soft_decline(user)
+    @user = user
+    mail :to => user.email, :subject => "Membership cancellation [#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )}"
   end
 
   def product_list(product_xls_file)
@@ -89,9 +89,9 @@ class Notifier < ActionMailer::Base
     mail :to => agent.email, :subject => "Fulfillment file ##{fulfillment_file.id}"
   end
 
-  def hot_rod_magazine_cancellation(members_csv_file, quantity)
+  def hot_rod_magazine_cancellation(users_csv_file, quantity)
     @quantity = quantity
-    attachments["#{I18n.l(Time.zone.now, :format => :only_date)}_hotrod_magazine_cancellation.csv"] = { :mime_type => 'text/csv', :content => members_csv_file }
+    attachments["#{I18n.l(Time.zone.now, :format => :only_date)}_hotrod_magazine_cancellation.csv"] = { :mime_type => 'text/csv', :content => users_csv_file }
     mail :to => Settings.hot_rod_cancellation_emails, :subject => "#{I18n.l(Time.zone.now, :format => :default )} - HOT ROD magazine cancellation"
   end
 

@@ -1,0 +1,10 @@
+<h1> 
+  <% unless params[:controller].include?('terms_of_membership') %>
+    <%= params[:controller].humanize.singularize %>:
+  <% end %>
+  <%= @current_user.id %> - 
+  <%= @current_user.first_name %> <%= @current_user.last_name %> 
+	<% if @current_user.blacklisted? %>
+  &nbsp;<small style="color: red;">Blacklisted!!!</small>
+  <% end %>
+</h1>

@@ -1,9 +1,9 @@
 module Drupal
-  class Member < Struct.new(:member)
+  class Member < Struct.new(:user)
     OBSERVED_FIELDS = %w(first_name last_name gender address city email phone_country_code phone_area_code phone_local_number state zip country id type_of_phone_number birth_date type_of_phone_number club_cash_amount next_retry_bill_date).to_set.freeze
 
     def get
-      res = conn.get('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }).body unless self.new_record?
+      res = conn.get('/api/user/%{drupal_id}' % { drupal_id: self.user.api_id }).body unless self.new_record?
     rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
       Drupal.logger.info "  => #{$!.to_s}"
     ensure
@@ -13,11 +13,11 @@ module Drupal
     def update!(options = {})
       if options[:force] || sync_fields.present? # change tracking
         begin
-          res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.member.api_id }, fieldmap)
+          res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.user.api_id }, fieldmap)
         rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
           Drupal.logger.info "  => #{$!.to_s}"
         ensure
-          update_member(res)
+          update_user(res)
           res
         end
       end
@@ -25,7 +25,7 @@ module Drupal
 
     def create!(options = {})
       res = conn.post '/api/user', fieldmap
-      update_member(res)
+      update_user(res)
       if res and res.status == 200
         @token = Hashie::Mash.new(res.body['urllogin'])
         login_token
@@ -33,56 +33,56 @@ module Drupal
     end
 
     def save!(options = {})
-      if self.member.can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
+      if self.user.can_be_synced_to_remote? # Bug #23017 - skip sync if lapsed or applied.
         self.new_record? ? self.create!(options) : self.update!(options)
       end
     end
 
     def destroy!
-      res = conn.post('/api/user/%{drupal_id}/cancel' % { drupal_id: self.member.api_id }) unless self.member.new_record?
+      res = conn.post('/api/user/%{drupal_id}/cancel' % { drupal_id: self.user.api_id }) unless self.user.new_record?
     rescue Faraday::Error::ParsingError # Drupal sends invalid application/json
       Drupal.logger.info "  => #{$!.to_s}"
     ensure
-      update_member(res, true)
+      update_user(res, true)
       res
     end
 
     def new_record?
-      self.member.api_id.nil?
+      self.user.api_id.nil?
     end
 
     def login_token(options = {})
       if @token.nil? || options[:force]
-        @token = Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}' % { drupal_id: self.member.api_id }).body) unless self.new_record?
+        @token = Hashie::Mash.new(conn.get('/api/urllogin/%{drupal_id}' % { drupal_id: self.user.api_id }).body) unless self.new_record?
       end
       uri = @token && @token.url && URI.parse(@token.url)
-      self.member.update_column :autologin_url, uri.path if uri
+      self.user.update_column :autologin_url, uri.path if uri
       @token
     rescue Exception => e
-      Auditory.report_issue('Drupal:Member:login_token', e, { :member => self.member.inspect })
+      Auditory.report_issue('Drupal:Member:login_token', e, { :member => self.user.inspect })
       nil
     end
 
     def reset_password!
-      res = conn.post('/api/user/%{drupal_id}/password_reset' % { drupal_id: self.member.api_id })
+      res = conn.post('/api/user/%{drupal_id}/password_reset' % { drupal_id: self.user.api_id })
       res.success?
     end
 
     def resend_welcome_email!
-      res = conn.post('/api/user/%{drupal_id}/resend_welcome_email' % { drupal_id: self.member.api_id })
+      res = conn.post('/api/user/%{drupal_id}/resend_welcome_email' % { drupal_id: self.user.api_id })
       res.success?
     end
 
   private
     def sync_fields
-      OBSERVED_FIELDS.intersection(self.member.changed)
+      OBSERVED_FIELDS.intersection(self.user.changed)
     end
 
     def conn
-      self.member.club.drupal
+      self.user.club.drupal
     end
 
-    def update_member(res, destroy = false)
+    def update_user(res, destroy = false)
       if res
         data = if res.status == 200
           { 
@@ -99,13 +99,13 @@ module Drupal
             sync_status: "with_error"
           }
         end
-        ::Member.where(id: self.member.id).limit(1).update_all(data)
-        self.member.reload rescue self.member
+        ::User.where(id: self.user.id).limit(1).update_all(data)
+        self.user.reload rescue self.user
       end
     end
 
     def fieldmap
-      m = self.member
+      m = self.user
 
       role_list = {}
       m.current_membership.terms_of_membership.api_role.to_s.split(',').each do |role|

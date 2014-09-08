@@ -1,0 +1,10 @@
+
+<%= form_for @user, :html => { :class => 'form-horizontal', :id => 'new_user' } do |f| %>
+  <%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>
+
+
+<script>
+  $(document).ready(new_user_functions());
+  $(document).ready(function(){ $('#states_div').attr('data-remote', 'true'); })
+</script>

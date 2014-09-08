@@ -10,11 +10,11 @@ module SacMailchimp
     require 'sac_mailchimp/models/prospect_model'
     require 'sac_mailchimp/controllers/members_controller_extensions'
 
-    Member.send :include, SacMailchimp::MemberExtensions
+    User.send :include, SacMailchimp::MemberExtensions
     Prospect.send :include, SacMailchimp::ProspectExtensions
-    MembersController.send :include, SacMailchimp::MembersControllerExtensions
+    UsersController.send :include, SacMailchimp::MembersControllerExtensions
     
-    logger.info "  * extending Member and Prospect"
+    logger.info "  * extending User and Prospect"
 
     nil
   end

@@ -1,21 +1,21 @@
-<% if @current_member.has_link_to_api? %>
+<% if @current_user.has_link_to_api? %>
   <% large_button = ( use_large_button ? "btn-large-w" : "") %>
-  <% if @current_member.api_id.blank? %>
+  <% if @current_user.api_id.blank? %>
     <%= 
       link_to "#", 
         class: "btn #{large_button} btn-success disabled",
-        id: "login_remotely_as_member" do %>
+        id: "login_remotely_as_user" do %>
       <i class='icon-signin'></i>
-      <%= t('buttons.login_remotely_as_member') %>
+      <%= t('buttons.login_remotely_as_user') %>
     <% end %>
   <% else %>
     <%= 
-      link_to login_as_member_path, 
-        id: "login_remotely_as_member",
+      link_to login_as_user_path, 
+        id: "login_remotely_as_user",
         class: "btn #{large_button} btn-success", 
         target: '_blank' do %>
       <i class='icon-signin'></i>
-      <%= t('buttons.login_remotely_as_member') %>
+      <%= t('buttons.login_remotely_as_user') %>
     <% end %>
   <% end %>
 <% end %>

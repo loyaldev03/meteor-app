@@ -31,13 +31,13 @@ en:
   blacklisted: 'Blacklisted'
   search_results: 'Search results'
   are_you_sure: 'Are you sure?'
-  pgc_are_you_sure: "Are you really sure? You wont be able to change this Payment Gateway once there are enrolled members in the club."
-  pgc_are_you_sure_replace: "Are you really sure? This payment gateway will replace previous one and you wont be able to change it once there are enrolled members in the club."
+  pgc_are_you_sure: "Are you really sure? You wont be able to change this Payment Gateway once there are enrolled users in the club."
+  pgc_are_you_sure_replace: "Are you really sure? This payment gateway will replace previous one and you wont be able to change it once there are enrolled users in the club."
   initial_date: 'Initial date'
   end_date: 'End date'
   all_times: 'All times'
-  text_cancel_are_you_sure: 'This member will be canceled. Are you really sure?'
-  text_blacklist_are_you_sure: 'This member will be blacklisted. Are you really sure?'
+  text_cancel_are_you_sure: 'This user will be canceled. Are you really sure?'
+  text_blacklist_are_you_sure: 'This user will be blacklisted. Are you really sure?'
   loading: 'Loading'
   test_api_connection: 'Test API Connection'
   index: '#'
@@ -51,17 +51,17 @@ en:
   buttons:
     list_fulfillments_files: List Fulfillment Files
     update_fulfillment_status: 'Update status'
-    return_to_member_show: 'Return to member show'
+    return_to_user_show: 'Return to user show'
     add_club_cash_transaction: 'Save club cash transaction'
-    blacklist_member: 'Blacklist member'
-    cancel_member: 'Cancel member'
+    blacklist_user: 'Blacklist user'
+    cancel_user: 'Cancel user'
     change_bill_date: 'Change next bill date'
-    refund_member: 'Refund'
+    refund_user: 'Refund'
     full_save: 'Full save'
     save_te_sale: 'Save the sale'
     set_wrong_address: 'Set wrong address'
     set_wrong_phone_number: 'Set wrong phone number'
-    save_member_note: 'Save note'
+    save_user_note: 'Save note'
     save_operation_note: 'Save operation'
     save_credit_card: 'Save credit card'
     report: 'Report'
@@ -70,7 +70,7 @@ en:
     password_reset: 'Password reset'
     blacklist: 'Blacklist'
     cancel: 'Cancel'
-    login_remotely_as_member: 'Login remotely as member'
+    login_remotely_as_user: 'Login remotely as user'
     resend_welcome_email: 'Resend welcome email'
     sync_to_remote: 'Sync to remote'
     password_reset: 'Password reset'
@@ -103,17 +103,17 @@ en:
       index:
         title: Partners
   error_messages:
-    cant_recover_member: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}"
-    member_email_blacklisted: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}."
+    cant_recover_user: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}"
+    user_email_blacklisted: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}."
     credit_card_blank: "There was an error with your credit card information. Please verify your information and resubmit."
     invalid_credit_card: "There was an error with your credit card information. Please verify your information and resubmit."
     blacklisted: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}."
-    member_not_saved: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}."
+    user_not_saved: "There was a problem processing your enrollment. Please call member services at: %{cs_phone_number}."
     prorated_enroll_failure: "We cannot process your request. Please call member services at: %{cs_phone_number}."
-    member_set_wrong_address_error: "Could not set member's address as undeliverable. %{errors}"
-    member_already_set_wrong_address: "Member's address already set as wrong address."
-    member_set_as_blacklisted: "Operation cannot be done. Member is set as blacklisted."
-    member_data_invalid: "Member information is invalid."
+    user_set_wrong_address_error: "Could not set member's address as undeliverable. %{errors}"
+    user_already_set_wrong_address: "Member's address already set as wrong address."
+    user_set_as_blacklisted: "Operation cannot be done. Member is set as blacklisted."
+    user_data_invalid: "Member information is invalid."
     credit_card_in_use: "We're sorry but our system shows that the credit card you entered is already in use! Please try another card or call our members services at: %{cs_phone_number}."
     credit_card_blacklisted: "There was an error with your credit card information. Please call member services at: %{cs_phone_number}."
     expired_credit_card: "Credit card to activate is expired."
@@ -125,7 +125,7 @@ en:
     credit_card_blank_with_grace: "Payment gateway not found."
     duplicate_transaction: "Duplicated Transaction: %{response}"
     next_bill_date_blank: "Next bill date should not be blank."
-    member_already_active: "Membership already exists for this email address. Contact Member Services if you would like more information at: %{cs_phone_number}."
+    user_already_active: "Membership already exists for this email address. Contact Member Services if you would like more information at: %{cs_phone_number}."
     unrecoverable_error: "We cant process your join now. Contact Member Services if you would like more information at: %{cs_phone_number}"
     get_token_mes_error: "An error was encountered while processing your request."
     club_is_not_enable_for_new_enrollments: "We are not accepting new enrollments at this time. Please call member services at: %{cs_phone_number}"
@@ -146,7 +146,7 @@ en:
     payment_gateway_time_out: "Time out trying to connect with the payment gateway."
     transaction_gateway_differs_from_current: "Transaction does not have the same active gateway."
     credit_card_gateway_differs_from_current: "Credit card does not have the same active gateway."
-    search_member_is_out_of_service: "Members search is out of service. Please try again in a few minutes or contact the site admin if problem persist."
+    search_user_is_out_of_service: "Members search is out of service. Please try again in a few minutes or contact the site admin if problem persist."
     fulfillment_file_not_ready_wait: "There is already one fulfillment file being created within this club with that product set. Please, wait until this fulfillment file has finished and proceed to create this new one. Sorry for the inconvenience."
     pgc_cannot_be_created_club_has_members: "The club has members enrolled already. You cannot create a new payment gateway for this club."
     club_payment_gateway_configuration_not_created: 'Payment Gateway Configuration is not configured within the club <a href="%{link}">Add Payment Gateway</a>'
@@ -159,7 +159,7 @@ en:
             base:
               club_payment_gateway_configuration: 'Payment Gateway Configuration is not configured within the club'
     model:
-      members: 'Members'
+      users: 'Users'
       products: 'Products'
       fulfillments: 'Fulfillments'
       fulfillment_files: 'Fulfillment Files'
@@ -171,7 +171,7 @@ en:
       litle: Litle
       authorize_net: 'Authorize Net'
       first_data: 'First Data'
-    member: 'Member'
+    user: 'User'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
     credit_card: 'Credit card'
@@ -210,7 +210,7 @@ en:
           type_117: 'Membership: Soft Decline Limit Reach (No Strategy)' # membership_billing_without_decline_strategy_limit
           type_118: 'Billing: Manual Cash Transaction' # membership_manual_cash_billing
           type_119: 'Billing: Manual Check Transaction' # membership_manual_check_billing
-          type_125: 'Billing: Member Rebuttal Chargeback' # chargeback
+          type_125: 'Billing: User Rebuttal Chargeback' # chargeback
           type_203: 'Membership: Recovery' # recovery
           type_206: 'Membership: Requires Approval' # enrollment_needs_approval
         amount_available_to_refund: Max
@@ -233,7 +233,7 @@ en:
         role: 'Role'
       domain:
         url_help: 'Formats: http://xxxxx.xxx.xx or https://xxxxx.xxx.xx'
-      member:
+      user:
         marketing_client_id: ID
         marketing_client_last_synced_at: Last Success Sync
         marketing_client_synced_status: Status
@@ -241,7 +241,7 @@ en:
         marketing_client_last_sync_error_at: Sync Error Time
         cohort: Cohort
         api_id: 'Remote ID'
-        id: 'Member ID'
+        id: 'User ID'
         full_name: 'Full name'
         first_name: 'First name'
         last_name: 'Last name'
@@ -256,8 +256,8 @@ en:
         zip: 'Zip'
         gender: 'Gender'
         no_gender: 'No gender selected'
-        member_notes: 'Member Notes'
-        no_member_notes: 'There are no member notes to be shown.'
+        user_notes: 'User Notes'
+        no_user_notes: 'There are no user notes to be shown.'
         phone_country_code: Country
         phone_local_number: Number
         phone_area_code: Area
@@ -266,30 +266,30 @@ en:
         status: 'Status'
         email: 'Email'
         external_id: 'External ID'
-        member_since_date: 'Member since date'
+        member_since_date: 'User since date'
         join_date: 'Join date'
         club_cash_expire_date: 'Club cash expire date'
         next_retry_bill_date: 'Next bill date'
         created_by: 'Created by'
         cancel_date: 'Cancel date'
         recycled_times: 'Recycled times'
-        recycled_times_explanation: 'The number of recycle attempts in the current recycle process. If greater than 0, then the member is currently in a recycle stage. This number resets upon HD or successful charge.'
+        recycled_times_explanation: 'The number of recycle attempts in the current recycle process. If greater than 0, then the user is currently in a recycle stage. This number resets upon HD or successful charge.'
         quota: 'Quota'
         terms_of_membership_id: 'Terms of membership'
         date_of_primary_cc: 'Date Added of Primary CC'
         date_of_active_credit_card: 'Date Added of Active CC'
         last_successful_bill_date: 'Last successful bill date'
         recovery_times: 'Recovery times'
-        member_classification_type: 'Classification'
+        user_classification_type: 'Classification'
         not_group_associated: ' -- '
         not_have_birth_date_set: 'No birth date set.'
-        does_not_have_member_groups: 'It has no groups to be selected.'
+        does_not_have_user_groups: 'It has no groups to be selected.'
         zip_help: 'It supports zips with format xxxxx or xxxxx-xxxx. Only numbers.'
         set_unreachable: 'Set Unreachable'
         set_undeliverable: 'Set undeliverable'
         undeliverable: 'This address is undeliverable.'
         unreachable: 'This phone number is unreachable.'
-        search_member_not_found: 'No records were found.'
+        search_user_not_found: 'No records were found.'
         club_cash_amount: 'Club cash amount'
         add_club_cash_transaction: 'Add club cash'
         needs_approval: 'Needs approval'
@@ -302,7 +302,7 @@ en:
         billed_date_from: 'From:'
         billed_date_to: 'To:'
         manual_payment: 'Set to cash/check payments only'
-        manual_payment_help: 'Setting this flag will require Check/Cash payments transactions to remain active. Check/Cash payments should be made before the NBD or the member will be cancelled'
+        manual_payment_help: 'Setting this flag will require Check/Cash payments transactions to remain active. Check/Cash payments should be made before the NBD or the user will be cancelled'
         sync_status_priorities:
           synced: success
           unsynced: warning
@@ -311,7 +311,7 @@ en:
           synced: Synced
           unsynced: Not Synced
           error: Sync Error
-        is_lapsed: 'Member was canceled.'
+        is_lapsed: 'User was canceled.'
         billing_is_not_expected: 'Billing is not expected.'
       enrollment_info:
         kit_card_product_sku: KIT-CARD
@@ -330,7 +330,7 @@ en:
         id: 'ID'
         name: 'Name'
         description: 'Description'
-        members_count: 'Members count'
+        users_count: 'Users count'
         family_memberships_allowed: Family memberships allowed
         club_without_domains: 'There are no domains related to this club. In order to assign a drupal domain, you should first relate domains to this club. (Once the club is created, you can relate the domain from its edit/creation page).'
         marketing_tool_attributes:
@@ -402,7 +402,7 @@ en:
           plan_name: 'Subscription Plan Name'
           plan_name_help: 'The name the subscription plan will be identified by.'
           external_code: 'External Code (optional)'
-          external_code_help: 'A value to be used by an external system, usually a CMS. If you are using Drupal, this should be set as the role to be granted to the member in Drupal when enrolled with this subscription plan.'
+          external_code_help: 'A value to be used by an external system, usually a CMS. If you are using Drupal, this should be set as the role to be granted to the user in Drupal when enrolled with this subscription plan.'
           description: 'Description (optional)'
           description_help: "Short text describing for what the subscription plan will be used to."
           step_1_button_next: 'Define Membership Terms'
@@ -410,7 +410,7 @@ en:
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
           needs_enrollment_approval: 'Needs Enrollment Approval'
-          needs_enrollment_approval_help: 'If this option is selected, a member enrolled with this subscription plan will need to be approved by an agent before a membership is granted.'
+          needs_enrollment_approval_help: 'If this option is selected, a user enrolled with this subscription plan will need to be approved by an agent before a membership is granted.'
           initial_fee: 'Initial Fee'
           initial_fee_amount: 'Initial Fee Amount'
           trial_period: 'Trial Period'
@@ -424,10 +424,10 @@ en:
           recurring_amount_help: 'Amount of money to bill at each installment period as defined by you, once the trial period expires.'
           every: 'every'
           subscription_terms: 'Subscription Terms'
-          bill_until_cancelled: 'Bill until Member Cancelled'
+          bill_until_cancelled: 'Bill until User Cancelled'
           stop_billing_after: 'Stop billing after'
           keep_active_until_manually_cancelled: 'Keep provisional until manually cancel'
-          cancel_member_after: 'Cancel member after'
+          cancel_user_after: 'Cancel user after'
           step_2_button_next: 'Define Upgrades / Downgrades'
           step_2_edit_button_next: 'Edit Upgrades / Downgrades'
           club_cash_amount: 'Club Cash Amount'
@@ -438,7 +438,7 @@ en:
           skip_first_club_cash: 'Skip adding club cash on first membership billing'
           # Step 3
           step_3_instructions: 'Configure whether you want to automatically upgrade or downgrade the memberships through this plan. These steps are optional'
-          if_cannot_bill_member_then: 'If we cannot bill a member then'
+          if_cannot_bill_user_then: 'If we cannot bill a user then'
           cancel: 'Cancel'
           suspend_for: 'Suspend for'
           downgrade_to: 'Downgrade to'
@@ -449,7 +449,7 @@ en:
           step_3_button_next: 'Create Plan'
           step_3_edit_button_next: 'Update Plan'
           no_downgrade_upgrade_configuration: 'According to the configuration you selected on step 2, there is nothing to configure on this step.'
-          upgrade_help: "Upon successful billing we will check if the member should be upgraded or not. We will check if join date + upgrade period is older than date when it is billed, and If so, we will change member's subscriptions plan to the one especified."
+          upgrade_help: "Upon successful billing we will check if the user should be upgraded or not. We will check if join date + upgrade period is older than date when it is billed, and If so, we will change user's subscriptions plan to the one especified."
       email_template:
         title_new: 'New Communication'
         title_edit: 'Edit Communication'
@@ -518,8 +518,8 @@ en:
         created_at: 'Created at'
         sku: SKU
         package: Package
-        package_help: 'This value is part of the Packageid on the fulfillment file. e.g: set as package NCARFLAG and platform will add the member id. The packageid obtained will be NCARFLAG20243911111'
-        sku_help: 'Members get fulfills according to the list of SKUs stored while enrollment.'
+        package_help: 'This value is part of the Packageid on the fulfillment file. e.g: set as package NCARFLAG and platform will add the user id. The packageid obtained will be NCARFLAG20243911111'
+        sku_help: 'Users get fulfills according to the list of SKUs stored while enrollment.'
         is_visible: 'Is Visible?'
         is_visible_label: 'Will product be visible?'
         is_visible_help: 'This option makes a product invisible in the fulfillment file manager.'

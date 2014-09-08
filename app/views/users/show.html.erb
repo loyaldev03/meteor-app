@@ -1,0 +1,451 @@
+<div class="page-header">
+  <%= render :partial => "shared/user_information" %>
+</div>
+
+<div class="row">
+  
+  <div class="span4">
+    <table>
+      <tr>
+        <td><%= t('activerecord.attributes.user.user_id') %>:</td>
+        <td><input id="input_id" readonly="true" type="text" class="test_field" value="<%= @current_user.id %>" /></td>
+      </tr>
+      <tr>
+        <td><%= t('activerecord.attributes.user.first_name') %>:</td>
+        <td><input id="input_first_name" readonly="true" type="text" class="test_field" value="<%= @current_user.first_name %>" />
+        </td>
+      </tr>
+      <tr>
+        <td><%= t('activerecord.attributes.user.last_name') %>:</td>
+        <td><input id="input_last_name" readonly="true" type="text" class="test_field" value="<%= @current_user.last_name %>" />
+        </td>
+      </tr>
+      <tr>
+        <td><%= t('activerecord.attributes.user.gender') %>:</td>
+        <td>
+          <% unless @current_user.gender.blank? %>
+          <input id="input_gender" readonly="true" type="text" class="test_field" value="<%= @current_user.gender == 'F' ? 'Female' : 'Male' %>" />
+          <% else %>
+            <input id="input_gender" readonly="true" type="text" class="test_field" value="<%=t('activerecord.attributes.user.no_gender')%>"  />
+          <% end %>
+        </td>  
+      </tr>
+      <tr>
+        <td><%= t('activerecord.attributes.user.user_classification_type') %>:</td>
+        <td>
+          <input id="input_user_group_type" readonly="true" type="text" class="test_field" value="<%= @current_user.user_group_type.nil? ? t('activerecord.attributes.user.not_group_associated') : @current_user.user_group_type.name %>" />
+        </td>  
+      </tr>
+    </table>
+  </div>
+  
+  <div class="span8">
+    
+    <div class="row-fluid">
+      <div class="span4">
+        <%= link_to 'Edit', edit_user_path, :class => "btn btn-success btn-large-w", :id => 'edit', :disabled => (cannot? :api_update, User) %>
+      </div>
+      <div class="span4">
+        <% disable_save_sale = @current_user.can_change_tom? == false  %>
+        <%= link_to("Save the sale", (!disable_save_sale ? user_save_the_sale_path : "#"), :id => 'save_the_sale' ,:class => "btn btn-large-w #{(disable_save_sale ? "disabled" : "btn-info")}", :disabled => (cannot? :save_sale, User)) %>
+      </div>
+      <div class="span4">
+        <%= link_to "Blacklist", (@current_user.can_be_blacklisted? ? user_blacklist_path : "#"), :class => "btn btn-large-w #{(@current_user.can_be_blacklisted? ? "btn-danger" : "disabled")}", :disabled => (!@current_user.can_be_blacklisted? or cannot? :blacklist, User), :id => "blacklist_btn" %>
+      </div>
+    </div>
+
+    <div class="row-fluid" style="margin-top: 8px;">
+      <div class="span4">
+        <%= link_to "Add a note", new_user_note_path, :class => "btn btn-success btn-large-w", :id => "add_user_note" ,:disabled => (cannot? :add_user_note, UserNote) %>
+      </div>
+      <div class="span4">
+        <% disable_cancel = @current_user.can_be_canceled? == false %>
+        <%= link_to("Cancel", (!disable_cancel ? user_cancel_path : "#"), :class => "btn  btn-large-w #{(disable_cancel ? "disabled" : "btn-danger")}", :disabled => (cannot? :cancel, User or disable_cancel) , :id => 'cancel') %>
+      </div>
+      <div class="span4">
+        <%= link_to('Edit additional data', additional_data_path, :class => "btn btn-success btn-large-w", :id => 'edit_additional_attributes', :disabled => (cannot? :api_update, User)) if @current_user.additional_data_form and can? :update, UserAdditionalData %>
+      </div>
+    </div>  
+
+    <div class="row-fluid" style="margin-top: 8px;">
+      <div class="span4">
+        <% if @current_user.can_recover? and can? :recover, User %>
+          <%= link_to "Recover", user_recover_path, :class => "btn btn-success btn-large-w", :id => 'recovery' %>
+        <% else %>
+          <%= link_to "Recover", "#", :class => "btn btn-large-w", :disabled => true, :id => 'recovery' %>
+        <% end %>
+      </div>
+      <% disable_applied = @current_user.applied? == false  %>
+      <% unless disable_applied %>
+        <div class="span4">
+          <%= link_to "Approve", user_approve_path, :class => "btn btn-large-w btn-info", :confirm => t('are_you_sure'),:id => 'approve', :method => :post %>
+        </div>
+        <div class="span4">
+          <%= link_to "Reject", user_reject_path, :class => "btn btn-large-w btn-danger", :confirm => t('are_you_sure'),:id => 'reject', :method => :post %>
+        </div>
+      <% end %>
+    </div>  
+
+    <div class="row-fluid" style="margin-top: 8px;">
+      <div class="span4">
+        <%= render :partial => 'shared/resend_welcome_email_button', :locals => { use_large_button: true } %>
+      </div>
+      <div class="span4">
+        <%= render :partial => 'shared/reset_password_button', :locals => { use_large_button: true } %>
+      </div>
+      <div class="span4">
+        <%= render :partial => 'shared/login_remotely_button', :locals => { use_large_button: true } %>
+      </div>
+    </div>
+
+    <div class="row-fluid" style="margin-top: 8px;">
+      <div class="span4">
+        <% if @current_user.billing_enabled? and can? :no_recurrent_billing, User %>
+          <%= link_to I18n.t('buttons.no_recurrent_billing'), user_no_recurrent_billing_path, :class => "btn btn-large-w btn-info", :id => "no_recurrent_bill_btn" %>
+        <% else %>
+          <%= link_to I18n.t('buttons.no_recurrent_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled', :id => "no_recurrent_bill_btn" %>
+        <% end %>
+      </div>
+      <% if @current_user.is_billing_expected? %>
+        <div class="span4">
+          <% if @current_user.billing_enabled? and can? :manual_billing, User %>
+            <%= link_to I18n.t('buttons.manual_billing'), user_manual_billing_path, :class => "btn btn-large-w btn-info", :id => "manual_billing_btn" %>
+          <% else %>
+            <%= link_to I18n.t('buttons.manual_billing'), "#", :class => "btn btn-large-w btn-info", :disabled => 'disabled', :id => "manual_billing_btn" %>
+          <% end %>
+          <%= render :partial => "shared/help", :locals => { :title => t('buttons.manual_billing'), :content => t('buttons.manual_billing_help')} %>
+        </div>
+      <% end %>
+      <div class="span4">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<table id="table_demographic_information" class="table table-bordered table-condensed">
+  <thead>
+    <tr class="box_title"><th colspan="6"><h4>Demographic Information</h4></th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th style="width: 20%;">Address</th><th  style="width: 20%;">City</th><th>State</th><th>Country</th><th>Zip</th><th>Actions</th>
+    </tr>
+    <tr class="<%= (!@current_user.wrong_address.nil? ? "yellow" : "") %>">
+      <td NOWRAP><%= @current_user.address %></td>
+      <td><%= @current_user.city %></td>
+      <td><%= @current_user.state %></td>
+      <td><%= @current_user.country %></td>
+      <td><%= @current_user.zip %></td>
+      <td NOWRAP>
+        <% if @current_user.wrong_address.nil? %>
+          <%= link_to(user_set_undeliverable_path, :class => "btn btn-mini btn-danger", :id => "link_user_set_undeliverable", :disabled => (cannot? :set_undeliverable, User)) do %> 
+            <i class="icon-remove"></i> <%= t('activerecord.attributes.user.set_undeliverable') %>
+          <% end %>        
+        <% else %>
+          <%= t('activerecord.attributes.user.undeliverable') %>
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table id="table_contact_information" class="table table-bordered table-condensed">
+  <thead>
+    <tr class="box_title"><th colspan="4"><h4>Contact Information</h4></th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th><%= t('activerecord.attributes.user.phone_number') %></th><th><%= t('activerecord.attributes.user.type_of_phone_number') %></th><th>Email</th><th>Birth date</th>
+    </tr>
+    <tr class="<%= (!@current_user.wrong_phone_number.nil? ? "yellow" : "") %>">
+      <td nowrap="nowrap">
+        <%= @current_user.full_phone_number %>
+        <% if @current_user.wrong_phone_number.nil? %>
+          <%= link_to(user_set_unreachable_path, :class => "btn btn-mini btn-danger", :id => "link_user_set_unreachable", :disabled => (cannot? :set_unreachable, User)) do %> 
+            <i class="icon-remove"></i> <%= t('activerecord.attributes.user.set_unreachable') %>
+          <% end %>        
+        <% else %>
+          <%= @current_user.wrong_phone_number %>
+        <% end %>
+      </td>
+      <td> <%= @current_user.type_of_phone_number.capitalize unless @current_user.type_of_phone_number.nil? %> </td>
+
+      <td nowrap="nowrap"><a href="mailto:<%= @current_user.email %>"><%= @current_user.email %></a></td>
+      <td nowrap="nowrap"><%= @current_user.birth_date.nil? ? t('activerecord.attributes.user.not_have_birth_date_set') : @current_user.birth_date %></td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table id="table_active_credit_card" class="table table-bordered table-condensed">
+  <thead>
+    <tr class="box_title">
+      <th colspan="2"><h4>Active Credit Card</h4></th>
+      <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
+        <td style="border: none"></td>
+      <% end %>
+      <td style="border: none; text-align: right;" colspan="4">
+        <%= link_to(new_credit_card_path, :class => "btn btn-success", :disabled => (cannot? :create, CreditCard), :id => "add_credit_card") do %> 
+          <i class="icon-plus"></i> Add a credit card
+        <% end %>
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th> <%= t("activerecord.attributes.credit_card.last_digits") %> </th>
+      <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
+        <th> <%= t('activerecord.attributes.credit_card.token') %> </th>
+      <% end %>
+      <th><%= t("activerecord.attributes.credit_card.expire_date") %></th>
+      <th> <%= t('activerecord.attributes.credit_card.added_at') %> </th>
+      <th> <%= t('activerecord.attributes.credit_card.last_successful_bill_date') %> </th>
+    </tr>
+    <% if @active_credit_card %>
+      <tr class="<%= (@active_credit_card.expired? ? "card_expired" : "") %>">
+        <td>
+          <%= @active_credit_card.last_digits %>
+          (<%= @active_credit_card.cc_type.nil? ?  t('activerecord.attributes.credit_card.type_unknown') : @active_credit_card.cc_type %>)
+        </td>
+        <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
+          <td> <%= @active_credit_card.token %> </td>
+        <% end %>
+        <td><%= @active_credit_card.expire_month %> / <%= @active_credit_card.expire_year %></td>
+        <td id="td_mi_credit_cards_first_created_at"> <%= I18n.l @active_credit_card.created_at, :format => :only_date %></td>
+        <td id="td_mi_last_successful_bill_date"> <%= I18n.l @active_credit_card.last_successful_bill_date, :format => :only_date if !@active_credit_card.last_successful_bill_date.nil? %> </td>
+      <% end %>
+
+    </tr>
+  </tbody>
+</table>
+
+<%= render :partial => 'mkt_tool_sync_information' %>
+
+<table id="table_membership_information" class="table table-bordered table-condensed table-nohover">
+  <thead>
+    <tr class="box_title"><th colspan="2"><h4>Membership Information</h4></th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="width: 50%;">
+        <table class="hidden_table_border">
+          <tr>
+            <th>Status:</th>
+            <td id="td_mi_status"><span style="height: 20px; padding: 4px;" class="<%= user_status_class(@current_user) %>"><b><%= @current_user.status %></b></span></td>  
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.user.member_since_date') %>:</th>
+            <td id="td_mi_member_since_date"><%= I18n.l @current_user.member_since_date, :format => :only_date %></td>  
+          </tr>
+          <tr>
+            <th><%= t('menu.activerecord.term_of_membership') %>:</th>
+            <td id="td_mi_terms_of_membership_name">
+              <%= link_to(terms_of_membership_path(:id => @current_membership.terms_of_membership), :class => "btn btn-mini btn-small", :disabled => (cannot? :show, TermsOfMembership)) do %> 
+                <i class="icon-zoom-in"></i> <%= @current_membership.terms_of_membership.name %>
+              <% end %>
+            </td>  
+          </tr>
+          <tr>
+            <th> <%= t('activerecord.attributes.user.created_by') %>: </th>
+            <td id="td_mi_created_by"> <%= @current_membership.created_by.try(:username) %> </td>
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.user.recovery_times') %>:</th>
+            <td id="td_mi_reactivation_times"><%= @current_user.reactivation_times %></td>  
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.user.recycled_times') %>:</th>
+            <td id="td_mi_recycled_times">
+              <%= @current_user.recycled_times %>
+              <%= render :partial => "shared/help", :locals => { :title => t('activerecord.attributes.user.recycled_times'), :content => t('activerecord.attributes.user.recycled_times_explanation')} %> 
+            </td>  
+          </tr>
+          <% if @current_user.club.requires_external_id %>
+          <tr>
+            <th><%= t('activerecord.attributes.user.external_id') %>:</th>
+            <td id="td_mi_external_id"><%= @current_user.external_id %></td>  
+          </tr>
+          <% end %>
+        </table>
+      </td>
+      <td style="width: 50%;">
+        <table class="hidden_table_border">
+          <tr>
+            <th><%= t('activerecord.attributes.user.join_date') %>:</th>
+            <td id="td_mi_join_date"><%= I18n.l @current_membership.join_date, :format => :only_date %></td>
+          </tr>
+          <tr class="ligthgrey">
+            <th><%= t('activerecord.attributes.user.next_retry_bill_date') %>:</th>
+            <td id="td_mi_next_retry_bill_date">
+              <% if @current_user.is_billing_expected? %>
+                <%= I18n.l(@current_user.next_retry_bill_date, :format => :only_date) unless @current_user.next_retry_bill_date.nil? %>&nbsp;&nbsp;&nbsp;
+                <% if @current_user.can_change_next_bill_date? %>
+                  <%= link_to(user_change_next_bill_date_path, :class => "btn btn-mini btn-info", :id => "link_user_change_next_bill_date", :disabled => (cannot? :change_next_bill_date, User)) do %> 
+                    <i class="icon-pencil"></i> Change
+                  <% end %>
+                <% end %>
+              <% else %>
+                <%= t('activerecord.attributes.user.billing_is_not_expected') %>
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <th><%= t('activerecord.attributes.user.cancel_date') %>:</th>
+            <td id="td_mi_cancel_date"><%= I18n.l(@current_membership.cancel_date, :format => :only_date) unless @current_membership.cancel_date.nil? %></td>  
+          </tr>
+          <% if @current_club.allow_club_cash_transaction? %>
+            <tr class="ligthgrey">
+              <th><%= t('activerecord.attributes.user.club_cash_amount') %>:</th>
+              <td id="td_mi_club_cash_amount">
+                <%= @current_user.club_cash_amount %>&nbsp;&nbsp;&nbsp;
+                <% unless disable_save_sale %>
+                  <% if (not @current_agent.can? :add_club_cash, User, @current_club.id or not @current_user.can_add_club_cash?) %>
+                    <%= link_to('#', :class => "btn btn-mini btn-success", :id => "link_user_add_club_cash", :disabled => ("disable")) do %> 
+                    <i class="icon-plus"></i> <%= t('activerecord.attributes.user.add_club_cash_transaction') %>
+                    <% end %>
+                  <% else %>
+                    <%= link_to(user_add_club_cash_path, :class => "btn btn-mini btn-success", :id => "link_user_add_club_cash") do %> 
+                    <i class="icon-plus"></i> <%= t('activerecord.attributes.user.add_club_cash_transaction') %>      
+                    <% end %>  
+                  <% end %> 
+                <% end %>
+              </td>  
+            </tr>
+          <tr>
+            <th> <%= t('activerecord.attributes.user.club_cash_expire_date') %>: </th>
+            <td id="td_mi_club_cash_expire_date"> <%= I18n.l(@current_user.club_cash_expire_date, :format => :only_date) unless @current_user.club_cash_expire_date.nil?  %> </td>
+          </tr>
+          <% end %>
+        </table>        
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<table id="table_enrollment_info" class="table table-bordered table-condensed table-nohover">
+  <thead>
+    <tr class="box_title"><th><h4>Preferences</h4></th></tr>
+  </thead>
+  <tbody>
+    <% unless @current_user.preferences.nil? %>
+      <% @current_user.preferences.each do |key, value| %>
+        <tr><td> <%= key %>: <%= value %> </td></tr>
+      <% end %>
+    <% else %>
+      <tr><td> <%= t('activerecord.attributes.user.has_no_preferences_saved') %> </td></tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% unless @current_user.additional_data.nil? %>
+  <table id="table_additional_data" class="table table-bordered table-condensed table-nohover">
+    <thead>
+      <tr class="box_title"><th><h4>Additional Data</h4></th></tr>
+    </thead>
+    <tbody>
+      <% @current_user.additional_data.each do |key, value| %>
+        <tr><td> <%= key %>: <%= value %> </td></tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<ul class="nav nav-tabs">
+  
+  <% if @current_agent.can? :list, Transaction, @current_club.id %>
+    <li class="active"><a href="#transactions" data-toggle="tab" name="transactions">Transactions</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, UserNote, @current_club.id %>
+    <li><a href="#notes" data-toggle="tab" name="notes">Notes</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, Fulfillment, @current_club.id %>
+    <li><a href="#fulfillments" data-toggle="tab" name="fulfillments">Fulfillments</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, Communication, @current_club.id %>
+    <li><a href="#communication" data-toggle="tab" name="communications">Communications</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, Operation, @current_club.id %>
+    <li><a href="#operations" data-toggle="tab" name="operations">Operations</a></li>
+  <% end %>
+  <% if @current_agent.can? :list, CreditCard, @current_club.id %>
+    <li><a href="#credit_cards" data-toggle="tab" name="credit_cards">Credit Cards</a></li>
+  <% end %>
+  <% if @current_user.has_link_to_api? and can? :see_sync_status, User, @current_club.id %>
+    <li><a href="#sync_status" data-toggle="tab" name="sync_status">Sync Status</a></li>
+  <% end %>
+  <% if @current_club.is_not_drupal? and @current_agent.can? :list, ClubCashTransaction, @current_club.id%>
+    <% if @current_club.allow_club_cash_transaction? %>
+      <li><a href="#club_cash_transactions" data-toggle="tab" name="club_cash_transactions">Club Cash</a></li>
+    <% end %>  
+  <% end %>
+  <% if @current_agent.can? :list, Membership, @current_club.id %>
+    <li><a href="#memberships" data-toggle="tab" name="memberships">Memberships</a></li>
+  <% end %>
+</ul>
+
+<div class="tab-content">
+  <% if @current_agent.can? :list, Transaction, @current_club.id %>
+    <div class="tab-pane active" id="transactions">
+  	 <div class="tab_body_padding">
+  	  </div>
+  	</div>
+  <% end %>
+  <% if @current_agent.can? :list, UserNote, @current_club.id %>
+  	<div class="tab-pane" id="notes">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>	
+  <% end %>
+  <% if @current_agent.can? :list, Fulfillment, @current_club.id %>
+  	<div class="tab-pane" id="fulfillments">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div> 
+  <% end %>
+  <% if @current_agent.can? :list, Communication, @current_club.id %>
+  	<div class="tab-pane" id="communications">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>
+  <% end %>
+  <% if @current_agent.can? :list, Operation, @current_club.id %>
+  	<div class="tab-pane" id="operations">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>	
+  <% end %>
+  <% if @current_agent.can? :list, CreditCard, @current_club.id %>
+  	<div class="tab-pane" id="credit_cards">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>
+  <% end %>
+	<% if @current_user.has_link_to_api? and can? :see_sync_status, User, @current_club.id %>
+	  <div class="tab-pane" id="sync_status">
+	    <div class="tab_body_padding">
+        <%= render :partial => 'sync_status', :locals => { :user => @current_user} %>
+	    </div>
+	  </div>
+	<% end %>
+  <% if @current_club.is_not_drupal? and @current_agent.can? :list, ClubCashTransaction, @current_club.id%>
+	  <% if @current_club.allow_club_cash_transaction? %>
+	    <div class="tab-pane" id="club_cash_transactions">
+	      <div class="tab_body_padding">
+	      </div>
+	    </div>
+	  <% end %>
+	<% end %>
+  <% if @current_agent.can? :list, Membership, @current_club.id %>
+  	<div class="tab-pane" id="memberships">
+  	  <div class="tab_body_padding">
+  	  </div>
+  	</div>
+  <% end %>
+</div>
+
+<script>
+  var user_prefix = "<%= @current_user.id %>"
+  $(document).ready(show_user_functions());
+</script>
