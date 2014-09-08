@@ -102,7 +102,7 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_mandrill, :queue => :mandrill_email, priority: 15
 
-  def test_deliver_mandrill(template, member)
+  def self.test_deliver_mandrill(template, member)
     if member.mandrill_member
       result = member.mandrill_member.send_email(template.external_attributes[:template_name])
       sent_success = (result["status"]=="sent")
@@ -235,7 +235,7 @@ class Communication < ActiveRecord::Base
     result = if template.exact_target?
       Communication.test_deliver_exact_target(template, member)
     elsif template.mandrill?
-      Communication.test_deliver_mandrill(template, member)
+      Communication.test_deliver_mandrilself.l(template, member)
     elsif template.action_mailer?
       Communication.test_deliver_action_mailer(template, member)
     else
