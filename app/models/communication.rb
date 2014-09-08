@@ -141,31 +141,6 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_lyris, :queue => :lyris_email, priority: 15
 
-  def send_action_mailer!
-    case template_type.to_sym
-    when :cancellation
-      Notifier.cancellation(email).deliver!
-    when :rejection
-      Notifier.rejection(email).deliver!
-    when :prebill
-      Notifier.pre_bill(email).deliver!
-    when :manual_payment_prebill
-      Notifier.manual_payment_pre_bill(email).deliver!
-    when :refund
-      Notifier.refund(email).deliver!
-    when :birthday
-      Notifier.birthday(email).deliver!
-    when :pillar
-      Notifier.pillar(email).deliver!
-    when :hard_decline
-      Notifier.hard_decline(member).deliver!
-    when :soft_decline
-      Notifier.soft_decline(member).deliver!
-    else
-      nil
-    end
-  end
-
   def deliver_action_mailer
     case template_type.to_sym
     when :cancellation
@@ -244,6 +219,4 @@ class Communication < ActiveRecord::Base
     success = result[:sent_success] ? Settings.error_codes.success : Settings.error_codes.test_communication_error
     { code: success, message: result[:response] }
   end
-
-
 end
