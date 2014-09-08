@@ -20,7 +20,7 @@
           <td> <%= email_template.id %> </td>
           <td> <%= email_template.name %> </td>
           <td> <%= email_template.template_type %> </td>
-          <td> <%= link_to "send", "#", :class => "btn btn-mini", :id => "send", :name => email_template.id %> </td>
+          <td> <%= link_to "send", "#", :class => "btn btn-mini", :name => email_template.id %> </td>
           <td id= <%= "result_#{email_template.id}" %>> </td>
         </tr>
       <% end %>
