@@ -142,7 +142,7 @@ class Communication < ActiveRecord::Base
   handle_asynchronously :deliver_lyris, :queue => :lyris_email, priority: 15
 
   def deliver_action_mailer
-    case template_type.to_sym
+    response = case template_type.to_sym
     when :cancellation
       Notifier.cancellation(email).deliver!
     when :rejection
