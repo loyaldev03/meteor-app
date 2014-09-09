@@ -7,6 +7,7 @@
         <i class="icon-plus"></i> New Communication
       <% end %>
     <% end %>
+      <%= link_to("Test Communications", terms_of_membership_test_communications_path, :class => 'btn btn-primary btn_on_header_additional') %>
   </div>
 
   <table id="email_templates_table" class="table table-bordered table-condensed dataTable" data-source="<%= terms_of_membership_email_templates_url(format: "json") %>">

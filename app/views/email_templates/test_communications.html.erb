@@ -1,0 +1,37 @@
+<div class="control-group">
+  <%= form_tag(terms_of_membership_test_communications_path, :id => "test_communication") do %>
+    <%= label :member_id, "Member ID to send communications", :class => 'help-inline' %>: 
+    <%= text_field_tag "member_id", nil, :class => 'text_field input-medium required', :id => "member_id"%>
+  <% end %>
+</div>
+  <table id='communications_table' class="table table-bordered table-condensed tablesorter">
+    <thead>
+      <tr>
+        <th class="span1"> Template ID </th>
+        <th class="span2"> Template Name </th>
+        <th class="span1"> Template Type </th>
+        <th class="span1"> Action </th>
+        <th class="span4"> Result </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @email_templates.each do |email_template| %>
+        <tr>
+          <td> <%= email_template.id %> </td>
+          <td> <%= email_template.name %> </td>
+          <td> <%= email_template.template_type %> </td>
+          <td> <%= link_to "send", "#", :class => "btn btn-mini", :name => email_template.id %> </td>
+          <td id= <%= "result_#{email_template.id}" %>> </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")), terms_of_membership_email_templates_path, :class => 'btn' %>
+
+
+
+
+<script type="text/javascript">
+  $(document).ready( test_communications_functions() );
+</script>
