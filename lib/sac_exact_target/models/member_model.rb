@@ -113,7 +113,7 @@ module SacExactTarget
       fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(self.user, api_field, our_field)
       end
-      membership = self.member.current_membership
+      membership = self.user.current_membership
       membership_fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(membership, api_field, our_field)
       end
