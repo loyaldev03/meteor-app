@@ -1308,11 +1308,11 @@ function test_communications_functions() {
           url: "",
           data: { email_template_id:template_id, member_id:member_id },
           success: function(data){
-            $("#result_"+template_id).empty();
+            button.parent().next().empty();
             if (data.code == "000"){
-              $("#result_"+template_id).append("<div class='alert-info alert'>Successfully send</div>")
+              button.parent().next().append("<div class='alert-info alert'>Successfully send</div>");
             }else{
-              $("#result_"+template_id).append("<div class='error-info alert'>"+data.message+"</div>")
+              button.parent().next().append("<div class='error-info alert'>"+data.message+"</div>");
             };
             endAjaxLoader();
             button.removeAttr("disabled");
