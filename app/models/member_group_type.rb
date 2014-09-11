@@ -1,4 +1,4 @@
-class UserGroupType < Enumeration
+class MemberGroupType < Enumeration
   has_many :users
   belongs_to :club
 

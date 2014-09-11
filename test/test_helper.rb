@@ -49,13 +49,13 @@ class ActiveSupport::TestCase
   end
 
   def unstubs_solr_index
-    Member.any_instance.unstub(:solr_index)
-    Member.any_instance.unstub(:solr_index!)
+    User.any_instance.unstub(:solr_index)
+    User.any_instance.unstub(:solr_index!)
   end
 
   def stubs_solr_index
-    Member.any_instance.stubs(:solr_index).returns(true) 
-    Member.any_instance.stubs(:solr_index!).returns(true)
+    User.any_instance.stubs(:solr_index).returns(true) 
+    User.any_instance.stubs(:solr_index!).returns(true)
   end
 
   CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8", 
@@ -123,19 +123,19 @@ class ActiveSupport::TestCase
      ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:process).returns(answer)
   end
 
-  def create_active_member(tom, member_type = :active_member, enrollment_type = :enrollment_info, member_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
+  def create_active_user(tom, user_type = :active_user, enrollment_type = :enrollment_info, user_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
     if use_default_active_merchant_stub
       active_merchant_stubs 
       active_merchant_stubs_store
     end
-    membership = FactoryGirl.create("#{member_type}_membership".to_sym, { terms_of_membership: tom }.merge(membership_args))
-    active_member = FactoryGirl.create(member_type, { club: tom.club, current_membership: membership }.merge(member_args))
-    active_member.memberships << membership
-    active_member.save
-    ei = FactoryGirl.create(enrollment_type, :member_id => active_member.id) unless enrollment_type.nil?
+    membership = FactoryGirl.create("#{user_type}_membership".to_sym, { terms_of_membership: tom }.merge(membership_args))
+    active_user = FactoryGirl.create(user_type, { club: tom.club, current_membership: membership }.merge(user_args))
+    active_user.memberships << membership
+    active_user.save
+    ei = FactoryGirl.create(enrollment_type, :user_id => active_user.id) unless enrollment_type.nil?
     membership.enrollment_info = ei
-    active_member.reload
-    active_member
+    active_user.reload
+    active_user
   end  
 
   def excecute_like_server(club_timezone)
@@ -210,18 +210,18 @@ module ActionController
 
     def select_country_and_state(country = 'US')
       if country == 'US'
-        select('United States', :from => 'member[country]')
-        within('#states_td'){ select('Alabama', :from => 'member[state]') }
+        select('United States', :from => 'user[country]')
+        within('#states_td'){ select('Alabama', :from => 'user[state]') }
       else
-        select('Canada', :from => 'member[country]')
-        within('#states_td'){ select('Manitoba', :from => 'member[state]') }
+        select('Canada', :from => 'user[country]')
+        within('#states_td'){ select('Manitoba', :from => 'user[state]') }
       end
     end
 
-    def search_member(field_selector, value, validate_obj)
+    def search_user(field_selector, value, validate_obj)
       fill_in field_selector, :with => value unless value.nil?
       click_on 'Search'
-      within("#members") do
+      within("#users") do
         assert page.has_content?(validate_obj.status)
         assert page.has_content?("#{validate_obj.id}")
         assert page.has_content?(validate_obj.full_name)
@@ -233,7 +233,7 @@ module ActionController
       end
     end
         
-    def create_member_by_sloop(agent, member, credit_card, enrollment_info, terms_of_membership, validate = true, cc_blank = false)
+    def create_user_by_sloop(agent, user, credit_card, enrollment_info, terms_of_membership, validate = true, cc_blank = false)
       enrollment_info = FactoryGirl.build(:enrollment_info) if enrollment_info.nil?
 
       if cc_blank
@@ -252,22 +252,22 @@ module ActionController
       )
 
       active_merchant_stubs_store(credit_card_to_load.number)
-      post( api_members_url , { member: {:first_name => member.first_name, 
-                                :last_name => member.last_name,
-                                :address => member.address,
+      post( api_members_url , { member: {:first_name => user.first_name, 
+                                :last_name => user.last_name,
+                                :address => user.address,
                                 :gender => 'M',
-                                :city => member.city, 
-                                :zip => member.zip,
-                                :state => member.state,
-                                :email => member.email,
-                                :country => member.country,
-                                :type_of_phone_number => member.type_of_phone_number,
-                                :phone_country_code => member.phone_country_code,
-                                :phone_area_code => member.phone_area_code,
-                                :phone_local_number => member.phone_local_number,
+                                :city => user.city, 
+                                :zip => user.zip,
+                                :state => user.state,
+                                :email => user.email,
+                                :country => user.country,
+                                :type_of_phone_number => user.type_of_phone_number,
+                                :phone_country_code => user.phone_country_code,
+                                :phone_area_code => user.phone_area_code,
+                                :phone_local_number => user.phone_local_number,
                                 :enrollment_amount => enrollment_info.enrollment_amount,
                                 :terms_of_membership_id => terms_of_membership.id,
-                                :birth_date => member.birth_date,
+                                :birth_date => user.birth_date,
                                 :credit_card => {:number => credit_card_to_load.number,
                                                  :expire_month => credit_card_to_load.expire_month,
                                                  :expire_year => credit_card_to_load.expire_year },
@@ -307,26 +307,26 @@ module ActionController
       date
     end
 
-    def fill_in_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])
-      visit members_path( :partner_prefix => unsaved_member.club.partner.prefix, :club_prefix => unsaved_member.club.name )
-      click_link_or_button 'New Member'
+    def fill_in_user(unsaved_user, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])
+      visit users_path( :partner_prefix => unsaved_user.club.partner.prefix, :club_prefix => unsaved_user.club.name )
+      click_link_or_button 'New User'
 
       credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
 
-      type_of_phone_number = (unsaved_member[:type_of_phone_number].blank? ? '' : unsaved_member.type_of_phone_number.capitalize)
+      type_of_phone_number = (unsaved_user[:type_of_phone_number].blank? ? '' : unsaved_user.type_of_phone_number.capitalize)
       
       within("#table_demographic_information") do
-        fill_in 'member[first_name]', :with => unsaved_member.first_name
-        if unsaved_member.gender == "Male" or unsaved_member.gender == "M"
-          select("Male", :from => 'member[gender]')
-        elsif unsaved_member.gender == "Female" or unsaved_member.gender == "F"
-          select("Female", :from => 'member[gender]')
+        fill_in 'user[first_name]', :with => unsaved_user.first_name
+        if unsaved_user.gender == "Male" or unsaved_user.gender == "M"
+          select("Male", :from => 'user[gender]')
+        elsif unsaved_user.gender == "Female" or unsaved_user.gender == "F"
+          select("Female", :from => 'user[gender]')
         end
-        fill_in 'member[address]', :with => unsaved_member.address
-        select_country_and_state(unsaved_member.country) 
-        fill_in 'member[city]', :with => unsaved_member.city
-        fill_in 'member[last_name]', :with => unsaved_member.last_name
-        fill_in 'member[zip]', :with => unsaved_member.zip
+        fill_in 'user[address]', :with => unsaved_user.address
+        select_country_and_state(unsaved_user.country) 
+        fill_in 'user[city]', :with => unsaved_user.city
+        fill_in 'user[last_name]', :with => unsaved_user.last_name
+        fill_in 'user[zip]', :with => unsaved_user.zip
       end
 
       # page.execute_script("window.jQuery('#birt_date').next().click()")
@@ -339,24 +339,24 @@ module ActionController
       # end
 
       within("#table_contact_information")do
-        fill_in 'member[phone_country_code]', :with => unsaved_member.phone_country_code
-        fill_in 'member[phone_area_code]', :with => unsaved_member.phone_area_code
-        fill_in 'member[phone_local_number]', :with => unsaved_member.phone_local_number
-        select(type_of_phone_number, :from => 'member[type_of_phone_number]')
+        fill_in 'user[phone_country_code]', :with => unsaved_user.phone_country_code
+        fill_in 'user[phone_area_code]', :with => unsaved_user.phone_area_code
+        fill_in 'user[phone_local_number]', :with => unsaved_user.phone_local_number
+        select(type_of_phone_number, :from => 'user[type_of_phone_number]')
         # TODO: select(unsaved_member.type_of_phone_number.capitalize, :from => 'member[type_of_phone_number]') Do we need capitalize ???
-        fill_in 'member[email]', :with => unsaved_member.email 
+        fill_in 'user[email]', :with => unsaved_user.email 
       end
 
       if not tom_type.nil?
         within("#table_contact_information")do
-          select(tom_type, :from => 'member[terms_of_membership_id]') 
+          select(tom_type, :from => 'user[terms_of_membership_id]') 
         end     
       end 
 
       fill_in_credit_card_info(credit_card, cc_blank)
 
-      if unsaved_member.club.requires_external_id and not unsaved_member.external_id.nil?
-        fill_in 'member[external_id]', :with => unsaved_member.external_id
+      if unsaved_user.club.requires_external_id and not unsaved_user.external_id.nil?
+        fill_in 'user[external_id]', :with => unsaved_user.external_id
       end 
 
       product_skus.each do |product|
@@ -368,7 +368,7 @@ module ActionController
       end
 
       alert_ok_js
-      click_link_or_button 'Create Member'
+      click_link_or_button 'Create User'
     end
 
     def fill_in_credit_card_info(credit_card, cc_blank = false)
@@ -380,49 +380,48 @@ module ActionController
       else
         active_merchant_stubs_store(credit_card.number)
         within("#table_credit_card")do
-          fill_in 'member[credit_card][number]', :with => credit_card.number
-          select credit_card.expire_month.to_s, :from => 'member[credit_card][expire_month]'
-          select credit_card.expire_year.to_s, :from => 'member[credit_card][expire_year]'
+          fill_in 'user[credit_card][number]', :with => credit_card.number
+          select credit_card.expire_month.to_s, :from => 'user[credit_card][expire_month]'
+          select credit_card.expire_year.to_s, :from => 'user[credit_card][expire_year]'
         end
       end
     end
 
-    def create_member(unsaved_member, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])
-      fill_in_member(unsaved_member, credit_card, tom_type, cc_blank, product_skus)
-      
+    def create_user(unsaved_user, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])
+      fill_in_user(unsaved_user, credit_card, tom_type, cc_blank, product_skus)
       begin
-        wait_until{ assert find_field('input_first_name').value == unsaved_member.first_name }
+        wait_until{ assert find_field('input_first_name').value == unsaved_user.first_name }
       rescue
         Rails.logger.error "Error - "
         Rails.logger.error page.inspect
       end
-      Member.find_by_email(unsaved_member.email)
+      User.find_by_email(unsaved_user.email)
     end
 
     # Check Refund email -  It is send it by CS inmediate
-    def bill_member(member, do_refund = true, refund_amount = nil, update_next_bill_date_to_today = true)
+    def bill_user(user, do_refund = true, refund_amount = nil, update_next_bill_date_to_today = true)
       active_merchant_stubs
-      diff_between_next_bill_date_and_today = member.next_retry_bill_date - Time.zone.now
-      next_bill_date = member.next_retry_bill_date + member.terms_of_membership.installment_period.days
+      diff_between_next_bill_date_and_today = user.next_retry_bill_date - Time.zone.now
+      next_bill_date = user.next_retry_bill_date + user.terms_of_membership.installment_period.days
 
-      member.update_attribute(:next_retry_bill_date, Time.zone.now)
+      user.update_attribute(:next_retry_bill_date, Time.zone.now)
       Time.zone = "UTC"
-      member.reload
-      answer = member.bill_membership
-      Time.zone = member.club.time_zone
-      member.update_attribute(:next_retry_bill_date, member.next_retry_bill_date + diff_between_next_bill_date_and_today)
+      user.reload
+      answer = user.bill_membership
+      Time.zone = user.club.time_zone
+      user.update_attribute(:next_retry_bill_date, user.next_retry_bill_date + diff_between_next_bill_date_and_today)
 
       assert (answer[:code] == Settings.error_codes.success), answer[:message]
-      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix =>member.club.name, :member_prefix => member.id)  
+      visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix =>user.club.name, :user_prefix => user.id)  
 
       within("#table_membership_information")do
         find("#td_mi_next_retry_bill_date", :text => I18n.l(next_bill_date, :format => :only_date) )
-        assert page.has_content?(I18n.l member.active_credit_card.last_successful_bill_date, :format => :only_date )
+        assert page.has_content?(I18n.l user.active_credit_card.last_successful_bill_date, :format => :only_date )
       end
 
       within(".nav-tabs"){ click_on 'Operations' }
       within("#operations") do
-        assert page.has_content?("Member billed successfully $#{member.terms_of_membership.installment_amount}") 
+        assert page.has_content?("Member billed successfully $#{user.terms_of_membership.installment_amount}") 
       end
 
       within(".nav-tabs"){ click_on 'Transactions' }
@@ -432,7 +431,7 @@ module ActionController
           assert (page.has_content?("Sale : This transaction has been approved") or page.has_content?("Billing:  Membership Fee - This transaction has been approved")  ) 
         end
         # assert page.has_content?("Sale : This transaction has been approved")
-        assert page.has_content?(member.terms_of_membership.installment_amount.to_s)
+        assert page.has_content?(user.terms_of_membership.installment_amount.to_s)
       end
 
       within("#transactions_table") do
@@ -440,8 +439,8 @@ module ActionController
       end
       
       if do_refund
-        transaction = member.transactions.where("operation_type = 101").order(:created_at).last
-        visit member_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id, :transaction_id => transaction.id)
+        transaction = user.transactions.where("operation_type = 101").order(:created_at).last
+        visit user_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => user.id, :transaction_id => transaction.id)
 
         assert page.has_content?(transaction.amount_available_to_refund.to_s)
 
@@ -470,8 +469,8 @@ module ActionController
       end
     end
 
-    def add_credit_card(member,credit_card)
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id)
+    def add_credit_card(user,credit_card)
+      visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => user.id)
       click_on 'Add a credit card'
       active_merchant_stubs_store(credit_card.number)
 
@@ -482,11 +481,11 @@ module ActionController
       click_on 'Save credit card'
     end
 
-    def add_club_cash(member, amount, description, validate = true)
-      previous_amount = member.club_cash_amount
+    def add_club_cash(user, amount, description, validate = true)
+      previous_amount = user.club_cash_amount
       new_amount = previous_amount + amount
-      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
-      wait_until{ assert find_field('input_first_name').value == member.first_name  }
+      visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name, :user_prefix => user.id)
+      wait_until{ assert find_field('input_first_name').value == user.first_name  }
       within("#table_membership_information"){ click_on 'Add club cash' }
       find( "tr", :text => I18n.t('activerecord.attributes.club_cash_transaction.amount_help') )
       
@@ -505,11 +504,11 @@ module ActionController
       end
     end
 
-    def save_the_sale(member, new_terms_of_membership, validate = true)
+    def save_the_sale(user, new_terms_of_membership, validate = true)
       assert_difference('Fulfillment.count',0) do 
-        old_membership = member.current_membership
-        next_retry_bill_date_old = member.next_retry_bill_date
-        visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
+        old_membership = user.current_membership
+        next_retry_bill_date_old = user.next_retry_bill_date
+        visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name, :user_prefix => user.id)
 
         click_on 'Save the sale'    
         select(new_terms_of_membership.name, :from => 'terms_of_membership_id')
@@ -517,35 +516,35 @@ module ActionController
         click_on 'Save the sale'
         if validate
           assert page.has_content?("Save the sale succesfully applied")
-          member.reload
+          user.reload
           old_membership.reload
           assert_equal old_membership.status, "lapsed"
-          assert_equal next_retry_bill_date_old, member.next_retry_bill_date
-          assert_equal member.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
-          assert_equal member.status, member.current_membership.status
+          assert_equal next_retry_bill_date_old, user.next_retry_bill_date
+          assert_equal user.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
+          assert_equal user.status, user.current_membership.status
           within(".nav-tabs"){ click_on 'Operations' }
           within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
         end
       end
     end
 
-    def recover_member(member,new_tom, validate = true)
-      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
-      wait_until{ assert find_field('input_first_name').value == member.first_name }
+    def recover_user(user,new_tom, validate = true)
+      visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name, :user_prefix => user.id)
+      wait_until{ assert find_field('input_first_name').value == user.first_name }
       click_link_or_button "Recover"
       select(new_tom.name, :from => 'terms_of_membership_id')
       confirm_ok_js
       click_on "Recover"
       if validate
-        wait_until{ assert find_field('input_first_name').value == member.first_name }
+        wait_until{ assert find_field('input_first_name').value == user.first_name }
         within("#td_mi_reactivation_times")do
           wait_until{ assert page.has_content?("1")}
         end
       end
     end
 
-    def set_as_undeliverable_member(member, reason = 'Undeliverable', validate = true)
-      visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => member.id)
+    def set_as_undeliverable_user(user, reason = 'Undeliverable', validate = true)
+      visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => user.id)
       click_link_or_button "Set undeliverable"
       within("#undeliverable_table"){
         fill_in reason, :with => reason
@@ -554,15 +553,15 @@ module ActionController
       click_link_or_button 'Set wrong address'
 
       if validate
-        member.reload
+        user.reload
         within('.nav-tabs'){ click_on 'Operations' }
-        within("#operations"){ assert page.has_content?("Address #{member.full_address} is undeliverable. Reason: #{reason}")}
+        within("#operations"){ assert page.has_content?("Address #{user.full_address} is undeliverable. Reason: #{reason}")}
         
         within("#table_demographic_information")do
           assert page.has_css?('tr.yellow')
         end 
-        @saved_member.reload
-        assert_equal @saved_member.wrong_address, reason
+        @saved_user.reload
+        assert_equal @saved_user.wrong_address, reason
       end
     end
 
@@ -640,33 +639,33 @@ module ActionController
       end
     end
 
-    def validate_view_member_base(member, status='provisional')
-      visit show_member_path(:partner_prefix => member.club.partner.prefix, :club_prefix => member.club.name, :member_prefix => member.id)
-      wait_until{ assert find_field('input_first_name').value == member.first_name }
+    def validate_view_user_base(user, status='provisional')
+      visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name, :user_prefix => user.id)
+      wait_until{ assert find_field('input_first_name').value == user.first_name }
 
-      assert find_field('input_id').value == "#{member.id}"
-      assert find_field('input_first_name').value == member.first_name
-      assert find_field('input_last_name').value == member.last_name
-      assert find_field('input_gender').value == (member.gender == 'F' ? 'Female' : 'Male') unless member.gender.blank?
-      assert find_field('input_member_group_type').value == (member.member_group_type.nil? ? I18n.t('activerecord.attributes.member.not_group_associated') : member.member_group_type.name)
+      assert find_field('input_id').value == "#{user.id}"
+      assert find_field('input_first_name').value == user.first_name
+      assert find_field('input_last_name').value == user.last_name
+      assert find_field('input_gender').value == (user.gender == 'F' ? 'Female' : 'Male') unless user.gender.blank?
+      assert find_field('input_member_group_type').value == (user.member_group_type.nil? ? I18n.t('activerecord.attributes.user.not_group_associated') : user.member_group_type.name)
       
       within("#table_demographic_information") do
-        assert page.has_content?(member.address)
-        assert page.has_content?(member.city)
-        assert page.has_content?(member.state)
-        assert page.has_content?(member.country)
-        assert page.has_content?(member.zip)
-        assert page.has_selector?('#link_member_set_undeliverable')     
+        assert page.has_content?(user.address)
+        assert page.has_content?(user.city)
+        assert page.has_content?(user.state)
+        assert page.has_content?(user.country)
+        assert page.has_content?(user.zip)
+        assert page.has_selector?('#link_user_set_undeliverable')     
       end
 
       within("#table_contact_information") do
-        assert page.has_content?(member.full_phone_number)
-        assert page.has_content?(member.type_of_phone_number.capitalize)
-        assert page.has_content?("#{member.birth_date}")
-        assert page.has_selector?('#link_member_set_unreachable')     
+        assert page.has_content?(user.full_phone_number)
+        assert page.has_content?(user.type_of_phone_number.capitalize)
+        assert page.has_content?("#{user.birth_date}")
+        assert page.has_selector?('#link_user_set_unreachable')     
       end
 
-      active_credit_card = member.active_credit_card
+      active_credit_card = user.active_credit_card
       within("#table_active_credit_card") do
         wait_until{ assert page.has_content?("#{active_credit_card.last_digits}") }
         if active_credit_card.cc_type.nil?
@@ -682,42 +681,42 @@ module ActionController
         
         within("#td_mi_status") { assert page.has_content?(status) }
         
-        within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(member.member_since_date, :format => :only_date)) }
+        within("#td_mi_member_since_date") { assert page.has_content?(I18n.l(user.member_since_date, :format => :only_date)) }
         
-        assert page.has_content?(member.terms_of_membership.name)
+        assert page.has_content?(user.terms_of_membership.name)
         
-        within("#td_mi_reactivation_times") { assert page.has_content?("#{member.reactivation_times}") }
+        within("#td_mi_reactivation_times") { assert page.has_content?("#{user.reactivation_times}") }
         
-        assert page.has_content?(member.current_membership.created_by.username)
+        assert page.has_content?(user.current_membership.created_by.username)
 
-        within("#td_mi_reactivation_times") { assert page.has_content?("#{member.reactivation_times}") }
+        within("#td_mi_reactivation_times") { assert page.has_content?("#{user.reactivation_times}") }
         
-        within("#td_mi_recycled_times") { assert page.has_content?("#{member.recycled_times}") }
+        within("#td_mi_recycled_times") { assert page.has_content?("#{user.recycled_times}") }
         
         assert page.has_no_selector?("#td_mi_external_id")
         
-        within("#td_mi_join_date") { assert page.has_content?(I18n.l(member.join_date, :format => :only_date)) }
+        within("#td_mi_join_date") { assert page.has_content?(I18n.l(user.join_date, :format => :only_date)) }
 
-        within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(member.next_retry_bill_date, :format => :only_date)) } unless ['applied', 'lapsed'].include? member.status 
+        within("#td_mi_next_retry_bill_date") { assert page.has_content?(I18n.l(user.next_retry_bill_date, :format => :only_date)) } unless ['applied', 'lapsed'].include? user.status 
 
-        assert page.has_selector?("#link_member_change_next_bill_date") unless ['applied', 'lapsed'].include? member.status 
+        assert page.has_selector?("#link_user_change_next_bill_date") unless ['applied', 'lapsed'].include? user.status 
 
-        within("#td_mi_club_cash_amount") { assert page.has_content?("#{member.club_cash_amount.to_f}") }
+        within("#td_mi_club_cash_amount") { assert page.has_content?("#{user.club_cash_amount.to_f}") }
 
-        assert page.has_selector?("#link_member_add_club_cash") if member.status == 'provisional' or member.status == 'active'
+        assert page.has_selector?("#link_user_add_club_cash") if user.status == 'provisional' or user.status == 'active'
 
       end  
-      if not member.current_membership.enrollment_info.nil?
-        if not member.current_membership.enrollment_info.product_sku.blank? and not member.status == 'applied'
+      if not user.current_membership.enrollment_info.nil?
+        if not user.current_membership.enrollment_info.product_sku.blank? and not user.status == 'applied'
           within(".nav-tabs"){ click_on 'Fulfillments' }
           within("#fulfillments") do
-            member.enrollment_infos.first.product_sku.to_s.split(',') do |product|
+            user.enrollment_infos.first.product_sku.to_s.split(',') do |product|
               assert page.has_content?(product)
             end
           end
         end
       end
-      membership = member.current_membership
+      membership = user.current_membership
 
       within(".nav-tabs"){ click_on 'Memberships' }
       within("#memberships_table")do

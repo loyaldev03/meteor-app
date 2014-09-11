@@ -147,7 +147,7 @@ class Club < ActiveRecord::Base
   end
 
   def resync_users_and_prospects
-    subscribers_count = self.users_count.to_i
+    subscribers_count = self.members_count.to_i
     if subscribers_count > Settings.maximum_number_of_subscribers_to_automatically_resync
       Auditory.report_club_changed_marketing_client(self, subscribers_count)
     end

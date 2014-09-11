@@ -8,7 +8,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     @agent = FactoryGirl.create(:agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @member = FactoryGirl.build(:member)
+    @user = FactoryGirl.build(:user)
     @credit_card = FactoryGirl.build(:credit_card)
     @tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
   end
@@ -94,7 +94,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     end
   end
 
-	test 'Do not allow enter member communication duplicate where it is not Pillar type - Logged by General Admin' do
+	test 'Do not allow enter user communication duplicate where it is not Pillar type - Logged by General Admin' do
 		comm = EmailTemplate.where(:terms_of_membership_id => @tom.id, :template_type => 'birthday').first
 		sign_in(@admin_agent)
     assert_difference("EmailTemplate.count",0) do
@@ -109,7 +109,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   # CLUBS ROLES
   ##################################################### 
 
-  test 'Do not allow to see members communications from another TOM where I do not have permissions' do
+  test 'Do not allow to see users communications from another TOM where I do not have permissions' do
     @club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test2')
     @club_admin = FactoryGirl.create(:agent)
@@ -128,7 +128,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'Do not allow enter member communication duplicate - Logged by Admin_by_club' do
+  test 'Do not allow enter user communication duplicate - Logged by Admin_by_club' do
     comm = EmailTemplate.where(:terms_of_membership_id => @tom.id, :template_type => 'birthday').first
     @agent = FactoryGirl.create(:agent)
     club_role = ClubRole.new :club_id => @club.id

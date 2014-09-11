@@ -5,14 +5,14 @@ FactoryGirl.define do
     # are not used. Consequence: visible_id is not auto increment.
     # sequence(:visible_id) {|n| n }
 
-  factory :member do
+  factory :user do
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "member#{n}@test.no" }
+    sequence(:email) {|n| "user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
@@ -25,14 +25,14 @@ FactoryGirl.define do
     club_cash_amount 0
   end
 
-  factory :member_with_api, class: Member do
+  factory :user_with_api, class: User do
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "member_with_api#{n}@test.no" }
+    sequence(:email) {|n| "user_with_api#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
@@ -45,14 +45,14 @@ FactoryGirl.define do
     #association :club, factory: :club_with_api
   end
 
-  factory :member_with_cc, class: Member do
+  factory :user_with_cc, class: User do
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
     address { Faker::Address.street_address  }
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "member_with_cc#{n}@test.no" }
+    sequence(:email) {|n| "user_with_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
@@ -67,7 +67,7 @@ FactoryGirl.define do
   end
 
 
-  factory :active_member, class: Member do
+  factory :active_user, class: User do
     status "active"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -75,7 +75,7 @@ FactoryGirl.define do
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "member_active#{n}@test.no" }
+    sequence(:email) {|n| "user_active#{n}@test.no" }
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -90,7 +90,7 @@ FactoryGirl.define do
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
-  factory :active_member_with_external_id, class: Member do
+  factory :active_user_with_external_id, class: User do
     status "active"
     first_name { Faker::Name.first_name  }
     last_name { Faker::Name.last_name }
@@ -98,7 +98,7 @@ FactoryGirl.define do
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "active_member_with_external_id#{n}@test.no" }
+    sequence(:email) {|n| "active_user_with_external_id#{n}@test.no" }
     phone_country_code 123
     phone_area_code 123
     phone_local_number 1234
@@ -114,7 +114,7 @@ FactoryGirl.define do
     external_id 123456789
   end
 
-  factory :active_member_without_cc, class: Member do
+  factory :active_user_without_cc, class: User do
     gender "M"
     status "active"
     first_name { Faker::Name.first_name  }
@@ -123,7 +123,7 @@ FactoryGirl.define do
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "active_member_without_cc#{n}@test.no" }
+    sequence(:email) {|n| "active_user_without_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
@@ -135,7 +135,7 @@ FactoryGirl.define do
     club_cash_amount 0
   end
 
-  factory :lapsed_member, class: Member do
+  factory :lapsed_user, class: User do
     gender "M"
     status "lapsed"
     first_name { Faker::Name.first_name  }
@@ -144,7 +144,7 @@ FactoryGirl.define do
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "lapsed_member#{n}@test.no" }
+    sequence(:email) {|n| "lapsed_user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
@@ -158,7 +158,7 @@ FactoryGirl.define do
   end
 
 
-  factory :provisional_member_with_cc, class: Member do
+  factory :provisional_user_with_cc, class: User do
     gender "M"
     status "provisional"
     first_name { Faker::Name.first_name  }
@@ -167,7 +167,7 @@ FactoryGirl.define do
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "provisional_member_with_cc#{n}@test.no" }
+    sequence(:email) {|n| "provisional_user_with_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
@@ -180,7 +180,7 @@ FactoryGirl.define do
     credit_cards {|ccs| [ccs.association(:credit_card)]}
   end
 
-  factory :provisional_member, class: Member do
+  factory :provisional_user, class: User do
     gender "M"
     status "provisional"
     first_name { Faker::Name.first_name  }
@@ -189,7 +189,7 @@ FactoryGirl.define do
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "provisional_member#{n}@test.no" }
+    sequence(:email) {|n| "provisional_user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123
@@ -201,7 +201,7 @@ FactoryGirl.define do
     bill_date { DateTime.now }
   end
 
-  factory :applied_member, class: Member do
+  factory :applied_user, class: User do
     gender "M"
     status "applied"
     first_name { Faker::Name.first_name  }
@@ -210,7 +210,7 @@ FactoryGirl.define do
     city { Faker::Address.city }
     zip { Faker::Address.zip }
     state "AL"
-    sequence(:email) {|n| "applied_member#{n}@test.no" }
+    sequence(:email) {|n| "applied_user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code 123
     phone_area_code 123

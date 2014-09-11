@@ -16,7 +16,7 @@ class PaymentGatewayConfigurationsController < ApplicationController
 		@payment_gateway_configuration = PaymentGatewayConfiguration.new(params[:payment_gateway_configuration])
 		@payment_gateway_configuration.club_id = @current_club.id
 		success = false
-		if @current_club.users_count.to_i == 0 and @current_club.users.count == 0
+		if @current_club.members_count.to_i == 0 and @current_club.users.count == 0
 			PaymentGatewayConfiguration.transaction do 
 				begin
 					if @payment_gateway_configuration.valid?

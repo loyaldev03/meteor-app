@@ -246,20 +246,20 @@ class Admin::AgentsControllerTest < ActionController::TestCase
 
 ## Testing abilities related to views ## 
 
-  test "Admin and supervisor should see the enroll button on member#index." do
+  test "Admin and supervisor should see the enroll button on user#index." do
   	[@admin_user,@supervisor_user].each do |agent|
 	  	sign_in agent
-	  	assert agent.can?(:enroll, Member), "#{agent.roles} cant see member's enroll button on member#index."
+	  	assert agent.can?(:enroll, User), "#{agent.roles} cant see user's enroll button on user#index."
     end
   end
 
-  test "Representative and Api users should not see the enroll button on member#index." do
+  test "Representative and Api users should not see the enroll button on user#index." do
   	sign_in @representative_user
     ability = Ability.new(@api_user)
-    assert ability.cannot?(:enroll, Member), "#{@api_user.roles} can see member's enroll button on member#index."
+    assert ability.cannot?(:enroll, User), "#{@api_user.roles} can see user's enroll button on user#index."
 
     ability = Ability.new(@representative_user)
-    assert ability.can?(:enroll, Member), "#{@representative_user.roles} can see member's enroll button on member#index."
+    assert ability.can?(:enroll, User), "#{@representative_user.roles} can see user's enroll button on user#index."
   end
 
   #####################################################

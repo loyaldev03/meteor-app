@@ -190,7 +190,7 @@ class Api::MembersController < ApplicationController
     response = user.update_credit_card_from_drupal(params[:member][:credit_card], @current_agent)
 
     if response[:code] == Settings.error_codes.success
-      user.update_member_data_by_params(params[:member])
+      user.update_user_data_by_params(params[:member])
       changed_attributes = user.changed
       if user.save
         message = "Member updated successfully"

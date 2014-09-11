@@ -78,8 +78,8 @@ module Pardot
         next_bill_date: m.bill_date
       }
 
-      unless m.user_group_type_id.nil?
-        map.merge!({ member_group_type: m.user_group_type.name })
+      unless m.member_group_type_id.nil?
+        map.merge!({ member_group_type: m.member_group_type.name })
       end
 
       unless options.empty?

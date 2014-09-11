@@ -37,7 +37,7 @@
           <% end %>
           <td> <%= user.full_name %> </td>
           <td> <%= user.full_address %> </td>
-          <td> <%= user.user_group_type.nil? ? t('activerecord.attributes.user.not_group_associated') : user.user_group_type.name %> </td>
+          <td> <%= user.member_group_type.nil? ? t('activerecord.attributes.user.not_group_associated') : user.member_group_type.name %> </td>
           <td><a href="<%= show_user_path(:user_prefix => user.id) %>" class="btn btn-small"><i class="icon-zoom-in"></i> </a></td>
           <td>
             <% if can? :edit, User %>

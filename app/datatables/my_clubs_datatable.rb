@@ -19,7 +19,7 @@ private
         club.id,
         club.name, 
         club.description,
-        club.users_count,
+        club.members_count,
         (link_to(I18n.t('activerecord.model.users'), @url_helpers.users_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'users') if @current_agent.can? :read, User, club.id).to_s+
         (link_to(I18n.t('activerecord.model.products'), @url_helpers.products_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'products') if @current_agent.can? :read, Product, club.id).to_s+
         (link_to(I18n.t('activerecord.model.fulfillments'), @url_helpers.fulfillments_index_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'fulfillments') if @current_agent.can? :read, Fulfillment, club.id).to_s+

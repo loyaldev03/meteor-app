@@ -375,7 +375,7 @@ function retrieve_information(){
       referral_path: $("#user_referral_path").val(),
       ip_address: $("#user_ip_address").val(),
       campaign_description: $("#user_campaign_description").val(),
-      user_group_type_id: $("#user_user_group_type_id").val()
+      member_group_type_id: $("#user_member_group_type_id").val()
     }
   }
   if( $("#user_credit_card_number").length > 0 ){

@@ -33,7 +33,7 @@
       <tr>
         <td><%= t('activerecord.attributes.user.user_classification_type') %>:</td>
         <td>
-          <input id="input_user_group_type" readonly="true" type="text" class="test_field" value="<%= @current_user.user_group_type.nil? ? t('activerecord.attributes.user.not_group_associated') : @current_user.user_group_type.name %>" />
+          <input id="input_member_group_type" readonly="true" type="text" class="test_field" value="<%= @current_user.member_group_type.nil? ? t('activerecord.attributes.user.not_group_associated') : @current_user.member_group_type.name %>" />
         </td>  
       </tr>
     </table>

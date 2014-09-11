@@ -31,7 +31,7 @@ namespace :billing do
   end
 end
 
-namespace :members do
+namespace :users do
   desc "Refresh autologin_url for ALL members"
   task :Members => :environment do
     begin

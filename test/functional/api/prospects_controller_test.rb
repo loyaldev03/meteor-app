@@ -12,21 +12,21 @@ class Api::ProspectsControllerTest < ActionController::TestCase
   end
 
   def do_post
-    post( :create, { prospect: {:first_name => @member.first_name, 
-                                :last_name => @member.last_name,
-                                :address => @member.address,
+    post( :create, { prospect: {:first_name => @user.first_name, 
+                                :last_name => @user.last_name,
+                                :address => @user.address,
                                 :gender => 'M',
-                                :city => @member.city, 
-                                :zip => @member.zip,
-                                :state => @member.state,
-                                :email => @member.email,
-                                :country => @member.country,
-                                :type_of_phone_number => @member.type_of_phone_number,
-                                :phone_country_code => @member.phone_country_code,
-                                :phone_area_code => @member.phone_area_code,
-                                :phone_local_number => @member.phone_local_number,
+                                :city => @user.city, 
+                                :zip => @user.zip,
+                                :state => @user.state,
+                                :email => @user.email,
+                                :country => @user.country,
+                                :type_of_phone_number => @user.type_of_phone_number,
+                                :phone_country_code => @user.phone_country_code,
+                                :phone_area_code => @user.phone_area_code,
+                                :phone_local_number => @user.phone_local_number,
                                 :terms_of_membership_id => @terms_of_membership.id,
-                                :birth_date => @member.birth_date,
+                                :birth_date => @user.birth_date,
                                 :product_description => @enrollment_info.product_description,
                                 :marketing_code => @enrollment_info.marketing_code,
                                 :campaign_medium => @enrollment_info.campaign_medium,
@@ -37,7 +37,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
                                 :ip_address => @enrollment_info.ip_address,
                                 :referral_host => @enrollment_info.referral_host,
                                 :referral_path => @enrollment_info.referral_path,
-                                :user_id => @enrollment_info.user_id,
+                                :visitor_id => @enrollment_info.visitor_id,
                                 :landing_url => @enrollment_info.landing_url,
                                 :preferences => @enrollment_info.preferences,
                                 :cookie_set => @enrollment_info.cookie_set,
@@ -49,7 +49,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
 
   test "admin should create a prospect" do
   	sign_in @admin_user
-  	@member = FactoryGirl.build :member_with_api
+  	@user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
   	assert_difference('Prospect.count') do
@@ -61,7 +61,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
 
   test "api user should create a prospect" do
   	sign_in @api_user
-  	@member = FactoryGirl.build :member_with_api
+  	@user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
   	assert_difference('Prospect.count') do
@@ -74,7 +74,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
 
   test "supervisor should not create a prospect" do
   	sign_in @supervisor_user
-  	@member = FactoryGirl.build :member_with_api
+  	@user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
   	assert_difference('Prospect.count',0) do
@@ -85,7 +85,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
 
   test "representative should not create a prospect" do
   	sign_in @representative_user
-  	@member = FactoryGirl.build :member_with_api
+  	@user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
   	assert_difference('Prospect.count',0) do
@@ -96,14 +96,14 @@ class Api::ProspectsControllerTest < ActionController::TestCase
 
   test "try to create a prospect without sending params" do
     sign_in @admin_user
-    @member = FactoryGirl.build :member_with_api
+    @user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
     post( :create, {:format => :json})
     assert @response.body.include? "There are some params missing. Please check them."
     assert_response :success
 
-    post( :create, {:first_name => @member.first_name, :format => :json})
+    post( :create, {:first_name => @user.first_name, :format => :json})
     assert @response.body.include? "There are some params missing. Please check them."
     assert_response :success
   end

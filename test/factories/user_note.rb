@@ -1,6 +1,6 @@
 FactoryGirl.define do
 
-  factory :member_note do
+  factory :user_note do
   	description 'This note'
   end
 

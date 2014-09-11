@@ -8,7 +8,7 @@ namespace :clubs do
     tall = Time.zone.now
     begin
       Club.all.each do |club|
-        club.update_attribute(:users_count, club.users.count + 0)
+        club.update_attribute(:members_count, club.users.count + 0)
       end
     rescue Exception => e
       Auditory.report_issue("Clubs::count_users_in_clubs", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})

@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   extend Extensions::User::CountrySpecificValidations
 #  extend Extensions::Member::DateSpecificValidations
   belongs_to :club
-  belongs_to :user_group_type
+  belongs_to :member_group_type
   has_many :user_notes
   has_many :credit_cards
   has_many :transactions, :order => "created_at ASC"
@@ -29,7 +29,7 @@ class User < ActiveRecord::Base
   attr_accessible :address, :bill_date, :city, :country, :description, 
       :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
       :last_name, :next_retry_bill_date, 
-      :bill_date, :state, :zip, :user_group_type_id, :blacklisted, :wrong_address,
+      :bill_date, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
       :wrong_phone_number, :credit_cards_attributes, :birth_date,
       :gender, :type_of_phone_number, :preferences, :current_join_date
 
@@ -231,7 +231,7 @@ class User < ActiveRecord::Base
     membership.save
   end
 
-  def set_member_as_rejected
+  def set_user_as_rejected
     decrement!(:reactivation_times, 1) if reactivation_times > 0 # we increment when it gets applied. If we reject the member we have to get back
     self.current_membership.update_attribute(:cancel_date, Time.zone.now)
   end
@@ -808,7 +808,7 @@ class User < ActiveRecord::Base
     
     begin
       enrollment_info = EnrollmentInfo.new :terms_of_membership_id => tom.id
-      enrollment_info.update_enrollment_info_by_hash member_params
+      enrollment_info.update_enrollment_info_by_hash user_params
       self.enrollment_infos << enrollment_info
       self.memberships << new_membership
       self.current_membership = new_membership
@@ -1080,7 +1080,7 @@ class User < ActiveRecord::Base
     [ :first_name, :last_name, :address, :state, :city, :country, :zip,
       :email, :birth_date, :gender,
       :phone_country_code, :phone_area_code, :phone_local_number, 
-      :user_group_type_id, :preferences, :external_id, :manual_payment ].each do |key|
+      :member_group_type_id, :preferences, :external_id, :manual_payment ].each do |key|
           self.send("#{key}=", params[key]) if params.include? key
     end
     self.type_of_phone_number = params[:type_of_phone_number].to_s.downcase if params.include? :type_of_phone_number
@@ -1425,7 +1425,7 @@ class User < ActiveRecord::Base
     end
 
     def cancellation
-      self.cancel_member_at_remote_domain
+      self.cancel_user_at_remote_domain
       if (Time.zone.now.to_date - join_date.to_date).to_i <= Settings.days_to_wait_to_cancel_fulfillments
         fulfillments.where_cancellable.each do |fulfillment| 
           fulfillment.update_status(nil, 'canceled', "Member canceled")
@@ -1445,6 +1445,7 @@ class User < ActiveRecord::Base
 
     def set_decline_strategy(trans)
       # soft / hard decline
+
       tom = terms_of_membership
       decline = DeclineStrategy.find_by_gateway_and_response_code_and_credit_card_type(trans.gateway.downcase, 
                   trans.response_code, trans.cc_type) || 
@@ -1493,7 +1494,7 @@ class User < ActiveRecord::Base
       Auditory.audit(nil, trans, message, self, operation_type )
       if cancel_member
         if tom.downgradable?
-          downgrade_member
+          downgrade_user
         else
           self.cancel! Time.zone.now.in_time_zone(get_club_timezone), "HD cancellation"
           set_as_canceled!

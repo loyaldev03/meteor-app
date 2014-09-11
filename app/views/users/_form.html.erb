@@ -10,10 +10,10 @@
    <tr class="control-group"> 
       <td colspan="4">
       <%= t('activerecord.attributes.user.user_classification_type') %>:
-      <% if !@user_group_types.nil? %>
-        <%= f.select :user_group_type_id, 
-                    options_from_collection_for_select(@user_group_types, "id","name", 
-                    {:selected => @user.user_group_type_id }), :include_blank => '' %>
+      <% if !@member_group_types.nil? %>
+        <%= f.select :member_group_type_id, 
+                    options_from_collection_for_select(@member_group_types, "id","name", 
+                    {:selected => @user.member_group_type_id }), :include_blank => '' %>
       <% else %>
         <%= t('activerecord.attributes.user.does_not_have_user_groups')  %>
       <% end %>

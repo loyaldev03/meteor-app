@@ -95,7 +95,7 @@ class UsersController < ApplicationController
 
   def edit  
     @user = @current_user
-    @user_group_types = UserGroupType.find_all_by_club_id(@current_club)
+    @member_group_types = MemberGroupType.find_all_by_club_id(@current_club)
     @country = Carmen::Country.coded(@user.country)
     @months = 1..12
     @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
@@ -166,7 +166,7 @@ class UsersController < ApplicationController
   end
 
   def cancel
-    @user_cancel_reason = UserCancelReason.all
+    @user_cancel_reason = MemberCancelReason.all
     if request.post?
       begin
         response = @current_user.cancel! params[:cancel_date], params[:reason], current_agent
@@ -184,7 +184,7 @@ class UsersController < ApplicationController
   end
 
   def blacklist
-    @blacklist_reasons = UserBlacklistReason.all
+    @blacklist_reasons = MemberBlacklistReason.all
     if request.post? 
       response = @current_user.blacklist(@current_agent, params[:reason])
       if response[:code] == Settings.error_codes.success
@@ -252,7 +252,7 @@ class UsersController < ApplicationController
   def reject
     if @current_user.can_be_rejected?
       @current_user.set_as_canceled!
-      message = "User was rejected and now its lapsed."
+      message = "Member was rejected and now its lapsed."
       Auditory.audit(@current_agent, @current_user, message, @current_user, Settings.operation_types.user_rejected)
       flash[:notice] = message
     else

@@ -17,8 +17,6 @@ class ChangeMemberToUser < ActiveRecord::Migration
     rename_column :operations, :member_id, :user_id
     rename_column :transactions, :member_id, :user_id
     rename_column :prospects, :user_id, :visitor_id
-    rename_column :clubs, :members_count, :users_count
-    rename_column :users, :member_group_type_id, :user_group_type_id
   end
 
   def down
@@ -39,7 +37,5 @@ class ChangeMemberToUser < ActiveRecord::Migration
     rename_column :operations, :user_id, :member_id
     rename_column :transactions, :user_id, :member_id
     rename_column :prospects, :visitor_id, :user_id
-    rename_column :clubs, :users_count, :members_count
-    rename_column :members, :user_group_type_id, :member_group_type_id
   end
 end
