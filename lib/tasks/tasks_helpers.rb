@@ -87,7 +87,7 @@ module TasksHelpers
 
   # Method used from rake task and also from tests!
   def self.cancel_all_member_up_today
-    base =  User.includes(:current_membership).where("date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
+    base = User.includes(:current_membership).where("date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
     base_for_manual_payment = User.includes(:current_membership).where("manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", Time.zone.now.to_date, 'lapsed')
    
     [base, base_for_manual_payment].each do |list|
@@ -130,7 +130,7 @@ module TasksHelpers
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
-    base = User.where('last_sync_error like "There is no user with ID%"')
+    base =  User.where('last_sync_error like "There is no user with ID%"')
     base2 = User.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users with error sync related to wrong api_id, processing #{base.count+base2.count} users"
     tz = Time.zone.now
@@ -150,7 +150,7 @@ module TasksHelpers
             unless api_m.nil?
               if api_m.save!(force: true)
                 unless user.last_sync_error_at
-                  Auditory.audit(nil, user, "User synchronized by batch script", user, Settings.operation_types.user_drupal_account_synced_batch)
+                  Auditory.audit(nil, user, "Member synchronized by batch script", user, Settings.operation_types.user_drupal_account_synced_batch)
                 end
               end
             end
@@ -174,7 +174,7 @@ module TasksHelpers
         unless api_m.nil?
           if api_m.save!(force: true)
             unless user.last_sync_error_at
-              Auditory.audit(nil, user, "User synchronized by batch script", user, Settings.operation_types.user_drupal_account_synced_batch)
+              Auditory.audit(nil, user, "Member synchronized by batch script", user, Settings.operation_types.user_drupal_account_synced_batch)
             end
           end
         end

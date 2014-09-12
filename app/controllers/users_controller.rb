@@ -313,7 +313,7 @@ class UsersController < ApplicationController
       if @current_user.last_sync_error_at
         message = "Synchronization failed: #{@current_user.last_sync_error ? @current_user.last_sync_error.html_safe : ''}"
       else
-        message = "User synchronized"
+        message = "Member synchronized"
       end
       Auditory.audit(@current_agent, @current_user, message, @current_user, Settings.operation_types.user_manually_synced_to_drupal)
       redirect_to show_user_path, notice: message    
