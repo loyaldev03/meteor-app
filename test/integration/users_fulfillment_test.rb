@@ -363,9 +363,8 @@ test "Enroll a user with recurrent product and it on the list" do
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
-      require "ruby-debug" ; debugger
-      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_no_selector?('#resend')
@@ -427,8 +426,8 @@ test "Enroll a user with recurrent product and it on the list" do
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
-      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process')
@@ -477,8 +476,8 @@ test "Enroll a user with recurrent product and it on the list" do
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
-      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('sent') 
@@ -522,8 +521,8 @@ test "Enroll a user with recurrent product and it on the list" do
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
-      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process') 
@@ -561,8 +560,8 @@ test "Enroll a user with recurrent product and it on the list" do
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
-      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process') 
@@ -578,7 +577,7 @@ test "Enroll a user with recurrent product and it on the list" do
       click_on("Fulfillments")
     end
     within("#fulfillments")do
-      assert page.has_content?(I18n.l @saved_user.join_date, :format => :long)
+      assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
       assert page.has_content?(@product.sku)
       assert page.has_content?('sent')
     end
@@ -606,8 +605,8 @@ test "Enroll a user with recurrent product and it on the list" do
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
-      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process') 
@@ -627,7 +626,7 @@ test "Enroll a user with recurrent product and it on the list" do
       click_on("Fulfillments")
     end
     within("#fulfillments")do
-      assert page.has_content?(I18n.l @saved_user.join_date, :format => :long)
+      assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
       assert page.has_content?('KIT-CARD')
       assert page.has_content?('bad_address')
     end
@@ -658,8 +657,8 @@ test "Enroll a user with recurrent product and it on the list" do
 #     within("#report_results")do
 #       assert page.has_content?("#{fulfillment.user.id}")
 #       assert page.has_content?(fulfillment.user.full_name)
-#       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-#       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+#       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+#       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
 #       assert page.has_content?(fulfillment.product_sku)
 #       assert page.has_content?(fulfillment.tracking_code)
 #       assert page.has_content?('out_of_stock') 
@@ -692,8 +691,8 @@ test "Enroll a user with recurrent product and it on the list" do
 #     within("#report_results")do
 #       assert page.has_content?("#{fulfillment.user.id}")
 #       assert page.has_content?(fulfillment.user.full_name)
-#       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-#       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+#       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+#       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
 #       assert page.has_content?(fulfillment.product_sku)
 #       assert page.has_content?(fulfillment.tracking_code)
 #       assert page.has_content?('out_of_stock') 
@@ -722,8 +721,8 @@ test "Enroll a user with recurrent product and it on the list" do
 #     within("#report_results")do
 #       assert page.has_content?("#{fulfillment.user.id}")
 #       assert page.has_content?(fulfillment.user.full_name)
-#       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-#       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+#       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+#       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
 #       assert page.has_content?(fulfillment.product_sku)
 #       assert page.has_content?(fulfillment.tracking_code)
 #       assert page.has_content?('out_of_stock') 
@@ -769,8 +768,8 @@ test "Enroll a user with recurrent product and it on the list" do
 #     within("#report_results")do
 #       assert page.has_content?("#{fulfillment.user.id}")
 #       assert page.has_content?(fulfillment.user.full_name)
-#       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :long)))
-#       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :long)))
+#       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+#       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
 #       assert page.has_content?(fulfillment.product_sku)
 #       assert page.has_content?(fulfillment.tracking_code)
 #       assert page.has_content?('out_of_stock') 
@@ -785,7 +784,7 @@ test "Enroll a user with recurrent product and it on the list" do
 #       click_on("Fulfillments")
 #     end
 #     within("#fulfillments")do
-#       assert page.has_content?(I18n.l @saved_user.join_date, :format => :long)
+#       assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
 #       assert page.has_content?('KIT-CARD')
 #       assert page.has_content?('not_processed')
 #     end
@@ -817,8 +816,8 @@ test "Enroll a user with recurrent product and it on the list" do
 #       click_on("Fulfillments")
 #     end
 #     within("#fulfillments")do
-#       assert page.has_content?(I18n.l @saved_user.join_date + 1.year, :format => :long)
-#       assert page.has_content?(I18n.l @saved_user.join_date + 2.year, :format => :long)
+#       assert page.has_content?(I18n.l @saved_user.join_date + 1.year, :format => :only_date)
+#       assert page.has_content?(I18n.l @saved_user.join_date + 2.year, :format => :only_date)
 #       assert page.has_content?(fulfillment.product_sku)
 #       assert page.has_content?('out_of_stock')
 #       assert page.has_content?('sent')
@@ -826,8 +825,8 @@ test "Enroll a user with recurrent product and it on the list" do
 #     fulfillment.reload
 #     fulfillment_new = Fulfillment.last
 #     assert_equal(fulfillment_new.product_sku, fulfillment.product_sku)
-#     assert_equal((I18n.l fulfillment_new.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long))
-#     assert_equal((I18n.l fulfillment_new.renewable_at, :format => :long), (I18n.l fulfillment_new.assigned_at + 1.year, :format => :long))
+#     assert_equal((I18n.l fulfillment_new.assigned_at, :format => :only_date), (I18n.l Time.zone.now, :format => :only_date))
+#     assert_equal((I18n.l fulfillment_new.renewable_at, :format => :only_date), (I18n.l fulfillment_new.assigned_at + 1.year, :format => :only_date))
 #     assert_equal(fulfillment_new.status, 'out_of_stock')
 #     assert_equal(fulfillment_new.renewed, false)
 #     assert_equal(fulfillment.renewed, true)
@@ -855,16 +854,16 @@ test "Enroll a user with recurrent product and it on the list" do
 #       click_on("Fulfillments")
 #     end
 #     within("#fulfillments")do
-#       assert page.has_content?(I18n.l @saved_user.join_date + 1.year, :format => :long)
-#       assert page.has_content?(I18n.l @saved_user.join_date + 2.year, :format => :long)
+#       assert page.has_content?(I18n.l @saved_user.join_date + 1.year, :format => :only_date)
+#       assert page.has_content?(I18n.l @saved_user.join_date + 2.year, :format => :only_date)
 #       assert page.has_content?('KIT-CARD')
 #       assert page.has_content?('bad_address')
 #     end
 #     fulfillment.reload
 #     fulfillment_new = Fulfillment.last
 #     assert_equal(fulfillment_new.product_sku, fulfillment.product_sku)
-#     assert_equal((I18n.l fulfillment_new.assigned_at, :format => :long), (I18n.l Time.zone.now, :format => :long))
-#     assert_equal((I18n.l fulfillment_new.renewable_at, :format => :long), (I18n.l fulfillment_new.assigned_at + 1.year, :format => :long))
+#     assert_equal((I18n.l fulfillment_new.assigned_at, :format => :only_date), (I18n.l Time.zone.now, :format => :only_date))
+#     assert_equal((I18n.l fulfillment_new.renewable_at, :format => :only_date), (I18n.l fulfillment_new.assigned_at + 1.year, :format => :only_date))
 #     assert_equal(fulfillment_new.status, 'bad_address')
 #     assert_equal(fulfillment_new.renewed, false)
 #     assert_equal(fulfillment.renewed, true)
