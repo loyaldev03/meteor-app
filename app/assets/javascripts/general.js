@@ -1289,7 +1289,7 @@ function email_templates_table_index_functions(column_count) {
 }
 
 function test_communications_functions() {
-  $('form').submit(function(event){ event.preventDefault() });
+  $('#test_communication').submit(function(event){ event.preventDefault() });
   $("#communications_table a").live("click", function(event){
     if($("#test_communication").valid()){
       event.preventDefault();
