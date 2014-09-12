@@ -114,16 +114,20 @@ class EmailTemplatesController < ApplicationController
     if request.post? 
       begin
         template = EmailTemplate.find_by_id (params[:email_template_id]) 
-        my_authorize! :test_communications, EmailTemplate, template.terms_of_membership.club_id
-        member = Member.find_by_id params[:member_id]
-        response = if template.nil? or member.nil?
-          { code: Settings.error_codes.not_found, message: "Member or Template not found."}
-        elsif member.club_id != template.terms_of_membership.club_id
-          { code: Settings.error_codes.wrong_data, message: "Member does not belong to same club as the Template."}
-        elsif params[:terms_of_membership_id].to_i != template.terms_of_membership_id
-          { code: Settings.error_codes.wrong_data, message: "Terms of membership does not belong to this Subscription Plan." }
-        else 
-          Communication.test_deliver!(template, member)
+        if template.nil?
+          response = { code: Settings.error_codes.not_found, message: "Template not found."}
+        else
+	        my_authorize! :test_communications, EmailTemplate, template.terms_of_membership.club_id
+	        member = Member.find_by_id params[:member_id]
+	        response = if member.nil?
+	          { code: Settings.error_codes.not_found, message: "Member not found."}
+	        elsif member.club_id != template.terms_of_membership.club_id
+	          { code: Settings.error_codes.wrong_data, message: "Member does not belong to same club as the Template."}
+	        elsif params[:terms_of_membership_id].to_i != template.terms_of_membership_id
+	          { code: Settings.error_codes.wrong_data, message: "Terms of membership does not belong to this Subscription Plan." }
+	        else
+	          Communication.test_deliver!(template, member)
+	        end
         end
         render json: response
       rescue CanCan::AccessDenied => e
