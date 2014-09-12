@@ -5,7 +5,7 @@ class EnrollmentInfo < ActiveRecord::Base
 
   serialize :preferences, JSON
 
-  attr_accessible :visitor_id, :prospect_id, :enrollment_amount, :product_sku, :product_description, :mega_channel,
+  attr_accessible :user_id, :prospect_id, :enrollment_amount, :product_sku, :product_description, :mega_channel,
                   :marketing_code, :fulfillment_code, :ip_address, :user_agent, :referral_host,
                   :referral_parameters, :referral_path, :visitor_id, :landing_url, :terms_of_membership_id,
                   :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,

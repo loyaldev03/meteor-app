@@ -273,7 +273,7 @@ class UsersClubCashTest < ActionController::IntegrationTest
     click_link_or_button('Edit')
     select('VIP', :from => 'user[member_group_type_id]')
     alert_ok_js
-    click_link_or_button('Update user')
+    click_link_or_button('Update User')
     assert find_field('input_first_name').value == @saved_user.first_name
     @saved_user.reload
     @saved_user.current_membership.update_attribute :join_date, Time.zone.now-12.months

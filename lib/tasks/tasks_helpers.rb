@@ -283,7 +283,7 @@ module TasksHelpers
         users.each do |user|
           begin
             tz = Time.zone.now
-            Rails.logger.info " *** Processing user #{user.id}"
+            Rails.logger.info " *** Processing member #{user.id}"
             csv << [ '', '', '', user.email, user.email, '', '', '', user.first_name, user.last_name, '', '',
                   user.address, '', user.city, user.state, user.zip, user.country, '', '', '', '', '-8',
                   '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'cancel', '', '', '' ]
@@ -310,7 +310,7 @@ module TasksHelpers
       group.each do |fulfillment| 
         begin
           index = index+1
-          Rails.logger.info "  *[#{index}] processing user ##{fulfillment.user_id} fulfillment ##{fulfillment.id}"
+          Rails.logger.info "  *[#{index}] processing member ##{fulfillment.user_id} fulfillment ##{fulfillment.id}"
           fulfillment.renew!
         rescue Exception => e
           Auditory.report_issue("User::Fulfillment", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :fulfillment => fulfillment.inspect })

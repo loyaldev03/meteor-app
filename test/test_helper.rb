@@ -235,7 +235,6 @@ module ActionController
         
     def create_user_by_sloop(agent, user, credit_card, enrollment_info, terms_of_membership, validate = true, cc_blank = false)
       enrollment_info = FactoryGirl.build(:enrollment_info) if enrollment_info.nil?
-
       if cc_blank
         credit_card_to_load = FactoryGirl.build(:blank_credit_card)
       elsif credit_card.nil?
