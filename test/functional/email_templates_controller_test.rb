@@ -88,11 +88,11 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Admin agents should send testing communications' do
     sign_in @admin_agent
-    @saved_member = create_active_member(@tom, :active_member, nil, {}, { :created_by => @admin_user })
+    @saved_user = create_active_user(@tom, :active_user, nil, {}, { :created_by => @admin_user })
     @communication = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
     assert_difference("Communication.count",0) do
       assert_difference("Operation.count",0) do
-        post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id, :member_id => @saved_member.id
+        post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id, :user_id => @saved_user.id
       end
     end
     assert_response :success
@@ -120,15 +120,15 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'Admin agents should not send testing communications to members from other club' do
+  test 'Admin agents should not send testing communications to users from other club' do
     sign_in @admin_agent
-    @saved_member = create_active_member(@tom, :active_member, nil, {}, { :created_by => @admin_user })
+    @saved_user = create_active_user(@tom, :active_user, nil, {}, { :created_by => @admin_user })
     @communication = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
     @club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test2')
-    @saved_member2 = create_active_member(@tom2, :active_member, nil, {}, { :created_by => @admin_user })
+    @saved_user2 = create_active_user(@tom2, :active_user, nil, {}, { :created_by => @admin_user })
     
-    post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id, :member_id => @saved_member2.id
+    post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id, :user_id => @saved_user2.id
     assert_response :success
     assert @response.body.include? "Member does not belong to same club as the Template."
   end
