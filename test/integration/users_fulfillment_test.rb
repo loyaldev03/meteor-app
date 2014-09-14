@@ -77,164 +77,100 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-  # test "cancel user and check if in_process fulfillments were updated to canceled" do
-  #   setup_user
-  #   @fulfillment.set_as_in_process
+  test "cancel user and check if in_process fulfillments were updated to canceled" do
+    setup_user
+    @fulfillment.set_as_in_process
 
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?('in_process')
-  #   end
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?('in_process')
+    end
 
-  #   @saved_user.set_as_canceled!
+    @saved_user.set_as_canceled!
 
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?('canceled')
-  #   end
-  #   @fulfillment.reload
-  #   assert_equal @fulfillment.status, 'canceled'
-  # end
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?('canceled')
+    end
+    @fulfillment.reload
+    assert_equal @fulfillment.status, 'canceled'
+  end
 
-  # test "cancel user and check if out_of_stock fulfillments were updated to canceled" do
-  #   setup_user
-  #   @fulfillment.set_as_out_of_stock
+  test "cancel user and check if out_of_stock fulfillments were updated to canceled" do
+    setup_user
+    @fulfillment.set_as_out_of_stock
     
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?('out_of_stock')
-  #   end
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?('out_of_stock')
+    end
 
-  #   @saved_user.set_as_canceled!
+    @saved_user.set_as_canceled!
 
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?('canceled')
-  #   end
-  #   @fulfillment.reload
-  #   assert_equal @fulfillment.status, 'canceled'
-  # end
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?('canceled')
+    end
+    @fulfillment.reload
+    assert_equal @fulfillment.status, 'canceled'
+  end
 
-  # test "cancel user and check if bad_address fulfillments were updated to canceled" do
-  #   setup_user
-  #   @fulfillment.set_as_in_process
-  #   @fulfillment.set_as_bad_address
+  test "cancel user and check if bad_address fulfillments were updated to canceled" do
+    setup_user
+    @fulfillment.set_as_in_process
+    @fulfillment.set_as_bad_address
     
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?('bad_address')
-  #   end
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?('bad_address')
+    end
 
-  #   @saved_user.set_as_canceled!
+    @saved_user.set_as_canceled!
 
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?('canceled')
-  #   end
-  #   @fulfillment.reload
-  #   assert_equal @fulfillment.status, 'canceled'
-  # end 
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?('canceled')
+    end
+    @fulfillment.reload
+    assert_equal @fulfillment.status, 'canceled'
+  end 
 
-  # test "display default initial and end dates on fulfillments index" do
-  #   setup_user
-  #   visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  test "display default initial and end dates on fulfillments index" do
+    setup_user
+    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
 
-  #   within("#fulfillments_table") do
-  #     assert find_field('initial_date').value == "#{Date.today-1.week}"
-  #     assert find_field('end_date').value == "#{Date.today}"
-  #   end
-  # end
+    within("#fulfillments_table") do
+      assert find_field('initial_date').value == "#{Date.today-1.week}"
+      assert find_field('end_date').value == "#{Date.today}"
+    end
+  end
 
-  # test "enroll a user with product not available but it on the list at CS and recurrent false" do
-  #   setup_user(false)
-  #   @product = FactoryGirl.create(:product_without_recurrent, :club_id => @club.id)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
-
-  #   assert_difference('Product.find(@product.id).stock',-1) do
-  #     create_user_throught_sloop(enrollment_info)
-  #   end
-  #   @saved_user = User.find_by_email(@user.email)
-
-  #   fulfillment = Fulfillment.last
-  #   assert_equal(fulfillment.user_id, @saved_user.id)
-  #   assert_equal(fulfillment.product_sku, @product.sku)
-  #   assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
-  #   assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
-  #   assert_equal(fulfillment.renewable_at, nil)
-  #   assert_equal(fulfillment.status, 'not_processed')
-    
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   assert find_field('input_first_name').value == @saved_user.first_name
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
-  #     assert page.has_content?(@product.sku)
-  #     assert page.has_content?('not_processed')  
-  #     assert page.has_no_selector?('Resend')
-  #     assert page.has_no_selector?('Mark as sent')
-  #     assert page.has_no_selector?('Set as wrong address')
-  #   end
-  # end
-
-  # test "enroll a user with product not available but it on the list at CS and recurrent true" do
-  #   setup_user(false)
-  #   @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
-
-  #   assert_difference('Product.find(@product.id).stock',-1) do
-  #     create_user_throught_sloop(enrollment_info)
-  #   end
-  #   @saved_user = User.find_by_email(@user.email)
-
-  #   fulfillment = Fulfillment.last
-  #   assert_equal(fulfillment.product_sku, @product.sku)
-  #   assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
-  #   assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
-  #   assert_equal(fulfillment.renewable_at, fulfillment.assigned_at + 1.year)
-  #   assert_equal(fulfillment.status, 'not_processed')
-    
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   assert find_field('input_first_name').value == @saved_user.first_name
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
-  #     assert page.has_content?(I18n.l fulfillment.renewable_at, :format => :only_date)
-  #     assert page.has_content?(@product.sku)
-  #     assert page.has_content?('not_processed') 
-  #     assert page.has_no_selector?('Resend')
-  #     assert page.has_no_selector?('Mark as sent')
-  #     assert page.has_no_selector?('Set as wrong address')
-  #   end
-  # end
-
-  test "enroll a user with product out of stock and recurrent" do
+  test "enroll a user with product not available but it on the list at CS and recurrent false" do
     setup_user(false)
-    @product = FactoryGirl.create(:product_without_stock_and_recurrent, :club_id => @club.id)
+    @product = FactoryGirl.create(:product_without_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
-    create_user_throught_sloop(enrollment_info)
+    assert_difference('Product.find(@product.id).stock',-1) do
+      create_user_throught_sloop(enrollment_info)
+    end
     @saved_user = User.find_by_email(@user.email)
 
     fulfillment = Fulfillment.last
@@ -242,8 +178,40 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(fulfillment.product_sku, @product.sku)
     assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
     assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
+    assert_equal(fulfillment.renewable_at, nil)
+    assert_equal(fulfillment.status, 'not_processed')
+    
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    assert find_field('input_first_name').value == @saved_user.first_name
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
+      assert page.has_content?(@product.sku)
+      assert page.has_content?('not_processed')  
+      assert page.has_no_selector?('Resend')
+      assert page.has_no_selector?('Mark as sent')
+      assert page.has_no_selector?('Set as wrong address')
+    end
+  end
+
+  test "enroll a user with product not available but it on the list at CS and recurrent true" do
+    setup_user(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+
+    assert_difference('Product.find(@product.id).stock',-1) do
+      create_user_throught_sloop(enrollment_info)
+    end
+    @saved_user = User.find_by_email(@user.email)
+
+    fulfillment = Fulfillment.last
+    assert_equal(fulfillment.product_sku, @product.sku)
+    assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
+    assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
     assert_equal(fulfillment.renewable_at, fulfillment.assigned_at + 1.year)
-    assert_equal(fulfillment.status, 'out_of_stock')
+    assert_equal(fulfillment.status, 'not_processed')
     
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -254,11 +222,20 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
       assert page.has_content?(I18n.l fulfillment.renewable_at, :format => :only_date)
       assert page.has_content?(@product.sku)
-      assert page.has_content?('out_of_stock')  
+      assert page.has_content?('not_processed') 
       assert page.has_no_selector?('Resend')
       assert page.has_no_selector?('Mark as sent')
       assert page.has_no_selector?('Set as wrong address')
     end
+  end
+
+  test "enroll a user with product out of stock and recurrent" do
+    setup_user(false)
+    @product = FactoryGirl.create(:product_without_stock_and_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+
+    create_user_throught_sloop(enrollment_info)
+    assert_nil User.find_by_email(@user.email)
   end
 
   test "enroll a user with product out of stock and not recurrent" do
@@ -267,7 +244,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
-    asset_nil User.find_by_email(@user.email)
+    assert_nil User.find_by_email(@user.email)
   end
 
   test "enroll a user with product not in the list" do
@@ -275,75 +252,75 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'product not in the list')
 
     create_user_throught_sloop(enrollment_info)
-    asset_nil User.find_by_email(@user.email)
+    assert_nil User.find_by_email(@user.email)
   end
 
-  # test "enroll a user with blank product_sku" do
-  #   setup_user(false)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => '')
-  #   assert_difference('Fulfillment.count',0){
-  #     create_user_throught_sloop(enrollment_info)
-  #   }
-  #   @saved_user = User.find_by_email(@user.email)
+  test "enroll a user with blank product_sku" do
+    setup_user(false)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => '')
+    assert_difference('Fulfillment.count',0){
+      create_user_throught_sloop(enrollment_info)
+    }
+    @saved_user = User.find_by_email(@user.email)
 
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   assert find_field('input_first_name').value == @saved_user.first_name
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?('No fulfillments were found.')
-  #   end
-  # end
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    assert find_field('input_first_name').value == @saved_user.first_name
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?('No fulfillments were found.')
+    end
+  end
 
-  # test "Enroll a user with recurrent product and it on the list" do
-  #   setup_user(false)
-  #   @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
-  #   create_user_throught_sloop(enrollment_info)
-  #   @saved_user = User.find_by_email(@user.email)
+  test "Enroll a user with recurrent product and it on the list" do
+    setup_user(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    create_user_throught_sloop(enrollment_info)
+    @saved_user = User.find_by_email(@user.email)
 
-  #   fulfillment = Fulfillment.last
+    fulfillment = Fulfillment.last
 
-  #   click_link_or_button("My Clubs")
-  #   within("#my_clubs_table"){click_link_or_button("Fulfillments")}
-  #   page.has_content?("Fulfillments")
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    page.has_content?("Fulfillments")
 
-  #   within("#fulfillments_table")do
-  #     check('all_times')
-  #     select('not_processed', :from => 'status')
-  #     choose('radio_product_type_SLOOPS')
-  #   end
-  #   click_link_or_button('Report')
+    within("#fulfillments_table")do
+      check('all_times')
+      select('not_processed', :from => 'status')
+      choose('radio_product_type_SLOOPS')
+    end
+    click_link_or_button('Report')
 
-  #   within("#report_results")do
-  #     assert page.has_content?("#{fulfillment.user.id}")
-  #     assert page.has_content?(fulfillment.user.full_name)
-  #     assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-  #     assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
-  #     assert page.has_content?(fulfillment.product_sku)
-  #     assert page.has_content?(fulfillment.tracking_code)
-  #     assert page.has_no_selector?('#resend')
-  #   end
-  #   stock = @product.stock
-  #   @product.reload
-  #   assert_equal(@product.stock,stock-1)
-  # end
+    within("#report_results")do
+      assert page.has_content?("#{fulfillment.user.id}")
+      assert page.has_content?(fulfillment.user.full_name)
+      assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
+      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
+      assert page.has_content?(fulfillment.product_sku)
+      assert page.has_content?(fulfillment.tracking_code)
+      assert page.has_no_selector?('#resend')
+    end
+    stock = @product.stock
+    @product.reload
+    assert_equal(@product.stock,stock-1)
+  end
 
-  # test "display default data on fulfillments index" do
-  #   setup_user(false)
+  test "display default data on fulfillments index" do
+    setup_user(false)
 
-  #   click_link_or_button("My Clubs")
-  #   within("#my_clubs_table"){click_link_or_button("Fulfillments")}
-  #   page.has_content?("Fulfillments")
+    click_link_or_button("My Clubs")
+    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    page.has_content?("Fulfillments")
 
-  #   within("#fulfillments_table")do
-  #     assert find_field('initial_date').value == "#{Date.today-1.week}"
-  #     assert find_field('end_date').value == "#{Date.today}"
-  #     assert page.find_field('status').value == 'not_processed'
-  #     assert page.find_field('all_times')   
-  #   end
-  # end
+    within("#fulfillments_table")do
+      assert find_field('initial_date').value == "#{Date.today-1.week}"
+      assert find_field('end_date').value == "#{Date.today}"
+      assert page.find_field('status').value == 'not_processed'
+      assert page.find_field('all_times')   
+    end
+  end
 
   test "fulfillment record at in_process + check stock" do
     setup_user(false)
@@ -1295,7 +1272,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
 
-    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillment.club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id])
     fulfillment = fulfillments.first
     
@@ -1680,7 +1657,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_user.first_name
 
     click_link_or_button 'Edit'
-    select('VIP', :from => 'user_user_group_type_id')
+    select('VIP', :from => 'user_member_group_type_id')
     alert_ok_js
     click_link_or_button 'Update User'
 
@@ -1732,7 +1709,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_difference("User.count",0)do
       create_user_throught_sloop(enrollment_info)
     end
-    assert_equal @response.body, '{"message":"You are trying to move a user to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders","code":"'+Settings.error_codes.product_out_of_stock+'"}'
+    assert_equal @response.body, '{"message":"You are trying to move a member to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders","code":"'+Settings.error_codes.product_out_of_stock+'"}'
   end
 
   #Search fulfillment at "Not Processed" status from Initial Date to End Date

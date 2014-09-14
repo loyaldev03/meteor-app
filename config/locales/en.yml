@@ -438,7 +438,7 @@ en:
           skip_first_club_cash: 'Skip adding club cash on first membership billing'
           # Step 3
           step_3_instructions: 'Configure whether you want to automatically upgrade or downgrade the memberships through this plan. These steps are optional'
-          if_cannot_bill_user_then: 'If we cannot bill a user then'
+          if_cannot_bill_user_then: 'If we cannot bill an user then'
           cancel: 'Cancel'
           suspend_for: 'Suspend for'
           downgrade_to: 'Downgrade to'
