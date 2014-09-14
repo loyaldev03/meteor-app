@@ -1300,14 +1300,14 @@ function test_communications_functions() {
       });
       if(is_processing == false){
         button = $(this)
-        member_id = $("#member_id").val();
+        user_id = $("#user_id").val();
         template_id = button.attr('name');
         button.attr('disabled', 'disabled');
         startAjaxLoader();
         $.ajax({
           type: "POST",
           url: "",
-          data: { email_template_id:template_id, member_id:member_id },
+          data: { email_template_id:template_id, user_id:user_id },
           success: function(data){
             button.parent().next().empty();
             if (data.code == "000"){

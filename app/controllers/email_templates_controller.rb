@@ -118,22 +118,22 @@ class EmailTemplatesController < ApplicationController
           response = { code: Settings.error_codes.not_found, message: "Template not found."}
         else
 	        my_authorize! :test_communications, EmailTemplate, template.terms_of_membership.club_id
-	        member = Member.find_by_id params[:member_id]
-	        response = if member.nil?
+	        user = Member.find_by_id params[:user_id]
+	        response = if user.nil?
 	          { code: Settings.error_codes.not_found, message: "Member not found."}
-	        elsif member.club_id != template.terms_of_membership.club_id
+	        elsif user.club_id != template.terms_of_membership.club_id
 	          { code: Settings.error_codes.wrong_data, message: "Member does not belong to same club as the Template."}
 	        elsif params[:terms_of_membership_id].to_i != template.terms_of_membership_id
 	          { code: Settings.error_codes.wrong_data, message: "Terms of membership does not belong to this Subscription Plan." }
 	        else
-	          Communication.test_deliver!(template, member)
+	          Communication.test_deliver!(template, user)
 	        end
         end
         render json: response
       rescue CanCan::AccessDenied => e
         raise e
       rescue Exception => e
-        Auditory.report_issue("EmailTemplate::test_communication", e, { :member => member.inspect, :template => template.inspect })
+        Auditory.report_issue("EmailTemplate::test_communication", e, { :user => user.inspect, :template => template.inspect })
         render json: { code: Settings.error_codes.unrecoverable_error, message: e.to_s}
       end
     else

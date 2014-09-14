@@ -65,10 +65,10 @@ class Communication < ActiveRecord::Base
   end  
   handle_asynchronously :deliver_exact_target, :queue => :exact_target_email, priority: 15
 
-  def self.test_deliver_exact_target(template, member)
-    if member.exact_target_member
-      member.exact_target_member.save! unless member.marketing_client_synced_status == 'synced'
-      result = member.exact_target_member.send_email(template.external_attributes[:customer_key])
+  def self.test_deliver_exact_target(template, user)
+    if user.exact_target_member
+      user.exact_target_member.save! unless user.marketing_client_synced_status == 'synced'
+      result = user.exact_target_member.send_email(template.external_attributes[:customer_key])
       sent_success = (result.OverallStatus == "OK")
       { sent_success: sent_success, response: (sent_success ? I18n.t('error_messages.testing_communication_send') : result.inspect) }
     else
@@ -76,7 +76,7 @@ class Communication < ActiveRecord::Base
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { :member => member.inspect, :template => template.inspect })
+    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { :user => user.inspect, :template => template.inspect })
     { sent_success: false, response: e.to_s }
   end
 
@@ -102,9 +102,9 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_mandrill, :queue => :mandrill_email, priority: 15
 
-  def self.test_deliver_mandrill(template, member)
-    if member.mandrill_member
-      result = member.mandrill_member.send_email(template.external_attributes[:template_name])
+  def self.test_deliver_mandrill(template, user)
+    if user.mandrill_member
+      result = user.mandrill_member.send_email(template.external_attributes[:template_name])
       sent_success = (result["status"]=="sent")
       { sent_success: sent_success, response: (sent_success ? I18n.t('error_messages.testing_communication_send') : result) }
     else
@@ -112,7 +112,7 @@ class Communication < ActiveRecord::Base
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { :member => member.inspect, :template => template.inspect })
+    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { :user => user.inspect, :template => template.inspect })
     { sent_success: false, response: e.to_s }
   end
 
@@ -176,27 +176,27 @@ class Communication < ActiveRecord::Base
   end
   handle_asynchronously :deliver_action_mailer, :queue => :email_queue, priority: 15
 
-  def self.test_deliver_action_mailer(template, member)
+  def self.test_deliver_action_mailer(template, user)
     success = true
     case template.template_type.to_sym
     when :cancellation
-      Notifier.cancellation(member.email).deliver!
+      Notifier.cancellation(user.email).deliver!
     when :rejection
-      Notifier.rejection(member.email).deliver!
+      Notifier.rejection(user.email).deliver!
     when :prebill
-      Notifier.pre_bill(member.email).deliver!
+      Notifier.pre_bill(user.email).deliver!
     when :manual_payment_prebill
-      Notifier.manual_payment_pre_bill(member.email).deliver!
+      Notifier.manual_payment_pre_bill(user.email).deliver!
     when :refund
-      Notifier.refund(member.email).deliver!
+      Notifier.refund(user.email).deliver!
     when :birthday
-      Notifier.birthday(member.email).deliver!
+      Notifier.birthday(user.email).deliver!
     when :pillar
-      Notifier.pillar(member.email).deliver!
+      Notifier.pillar(user.email).deliver!
     when :hard_decline
-      Notifier.hard_decline(member).deliver!
+      Notifier.hard_decline(user).deliver!
     when :soft_decline
-      Notifier.soft_decline(member).deliver!
+      Notifier.soft_decline(user).deliver!
     else
       success = false 
     end
@@ -206,15 +206,15 @@ class Communication < ActiveRecord::Base
     { sent_success: false, response: e.to_s }
   end
 
-  def self.test_deliver!(template, member)
+  def self.test_deliver!(template, user)
     result = if template.exact_target?
-      Communication.test_deliver_exact_target(template, member)
+      Communication.test_deliver_exact_target(template, user)
     elsif template.mandrill?
-      Communication.test_deliver_mandrill(template, member)
+      Communication.test_deliver_mandrill(template, user)
     elsif template.action_mailer?
-      Communication.test_deliver_action_mailer(template, member)
+      Communication.test_deliver_action_mailer(template, user)
     else
-      { sent_success: false, response: "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{member.terms_of_membership_id}" }
+      { sent_success: false, response: "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{user.terms_of_membership_id}" }
     end
     success = result[:sent_success] ? Settings.error_codes.success : Settings.error_codes.test_communication_error
     { code: success, message: result[:response] }
