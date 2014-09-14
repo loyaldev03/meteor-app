@@ -1287,3 +1287,39 @@ function email_templates_table_index_functions(column_count) {
     "sAjaxSource": $('#email_templates_table').data('source')
   });
 }
+
+function test_communications_functions() {
+  $('#test_communication').submit(function(event){ event.preventDefault() });
+  $("#communications_table a").live("click", function(event){
+    if($("#test_communication").valid()){
+      event.preventDefault();
+      is_processing = false;
+      $("#communications_table a").each( function(){
+        if($(this).attr('disabled') == 'disabled')
+          is_processing = true;
+      });
+      if(is_processing == false){
+        button = $(this)
+        member_id = $("#member_id").val();
+        template_id = button.attr('name');
+        button.attr('disabled', 'disabled');
+        startAjaxLoader();
+        $.ajax({
+          type: "POST",
+          url: "",
+          data: { email_template_id:template_id, member_id:member_id },
+          success: function(data){
+            button.parent().next().empty();
+            if (data.code == "000"){
+              button.parent().next().append("<div class='alert-info alert'>Successfully send</div>");
+            }else{
+              button.parent().next().append("<div class='error-info alert'>"+data.message+"</div>");
+            };
+            endAjaxLoader();
+            button.removeAttr("disabled");
+          },
+        })
+      }
+    }
+  });
+}

@@ -16,56 +16,77 @@ LOGFILE="/tmp/cron_rake.log"
 
 echo "`date` env variable => `env`"
 
+echo "`date` rake members:cancel"
 cd /var/www/$2/current && rake users:cancel  >> $LOGFILE 2>&1
+echo "`date` rake members:process_sync"
 cd /var/www/$2/current && rake users:process_sync  >> $LOGFILE 2>&1
 
 if [ "$1" == "production" ]; then
+  echo "`date` rake mes:chargeback_report"
   cd /var/www/$2/current && rake mes:chargeback_report  >> $LOGFILE 2>&1 
+  echo "`date` rake mes:account_updater_process_answers"
   cd /var/www/$2/current && rake mes:account_updater_process_answers  >> $LOGFILE 2>&1
+  echo "`date` rake mes:account_updater_send_file_to_process"
   cd /var/www/$2/current && rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 
 fi
 
 # nowadys we will run billing once per day 
+echo "`date` rake billing:for_today"
 cd /var/www/$2/current && rake billing:for_today  >> $LOGFILE 2>&1
 
+echo "`date` rake members:process_fulfillments"
 cd /var/www/$2/current && rake users:process_fulfillments  >> $LOGFILE 2>&1 &
+echo "`date` rake members:process_email_sync_error"
 cd /var/www/$2/current && rake users:process_email_sync_error  >> $LOGFILE 2>&1 &
 
+WAIT_PIDS=`jobs -l | awk '{print $2}'`
+wait $WAIT_PIDS
+
+echo "`date` rake products:send_product_list_email"
+cd /var/www/$2/current && rake products:send_product_list_email  >> $LOGFILE 2>&1 &
+echo "`date` rake mkt_tools:sync_members_to_exact_target"
 cd /var/www/$2/current && rake mkt_tools:sync_members_to_exact_target  >> $LOGFILE 2>&1 &
+echo "`date` rake mkt_tools:sync_members_to_mailchimp"
 cd /var/www/$2/current && rake mkt_tools:sync_members_to_mailchimp  >> $LOGFILE 2>&1 &
 
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS
 
-cd /var/www/$2/current && rake mkt_tools:sync_prospects_to_exact_target  >> $LOGFILE 2>&1 &
-cd /var/www/$2/current && rake mkt_tools:sync_prospects_to_mailchimp  >> $LOGFILE 2>&1 &
-cd /var/www/$2/current && rake products:send_product_list_email  >> $LOGFILE 2>&1 &
-
-WAIT_PIDS=`jobs -l | awk '{print $2}'`
-wait $WAIT_PIDS
-
+echo "`date` rake billing:send_prebill"
 cd /var/www/$2/current && rake billing:send_prebill  >> $LOGFILE 2>&1 &
+echo "`date` rake users:send_happy_birthday"
 cd /var/www/$2/current && rake users:send_happy_birthday  >> $LOGFILE 2>&1 &
+echo "`date` rake users:send_pillar_emails "
 cd /var/www/$2/current && rake users:send_pillar_emails  >> $LOGFILE 2>&1 &
-cd /var/www/$2/current && rake products:send_product_list_email  >> $LOGFILE 2>&1 &
+echo "`date` rake users:process_club_cash"
 # club cash should be processed before billing. Because if we reset club cash and then we bill, new CC should not be resetted
 cd /var/www/$2/current && rake users:process_club_cash  >> $LOGFILE 2>&1 &
-
-
 
 # after this script we should do the BK and reports
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS
 
 # count members for each  club
+echo "`date` rake clubs:count_members_in_clubs"
 cd /var/www/$2/current && rake clubs:count_members_in_clubs >> $LOGFILE 2>&1
 
 DATE=`date +"%u"` # 1 monday
 if [ "$1" == "production" ]; then
   if [ "$DATE" == "1" ]; then
+    echo "`date` rake fulfillments:send_print_magazine_hot_rod_file"
     cd /var/www/$2/current && rake fulfillments:send_print_magazine_hot_rod_file >> $LOGFILE 2>&1 
+    echo "`date` rake users:send_magazine_cancellation_email"
     cd /var/www/$2/current && rake users:send_magazine_cancellation_email >> $LOGFILE 2>&1 
-    # cd /var/www/$2/current && rake fulfillments:generate_nfla_report >> $LOGFILE 2>&1 
   fi
+  echo "`date` running remote script distribute_production_data.sh"
   ssh deploy@50.116.28.74 -p 30003 '/home/deploy/sac-platform-reporting/current/scripts/distribute_production_data.sh >> /home/deploy/sac-platform-reporting/current/log/nightly.log 2>&1'
 fi
+
+echo "`date` rake mkt_tools:sync_prospects_to_exact_target"
+cd /var/www/$2/current && rake mkt_tools:sync_prospects_to_exact_target  >> $LOGFILE 2>&1 &
+echo "`date` rake mkt_tools:sync_prospects_to_mailchimp"
+cd /var/www/$2/current && rake mkt_tools:sync_prospects_to_mailchimp  >> $LOGFILE 2>&1 &
+
+WAIT_PIDS=`jobs -l | awk '{print $2}'`
+wait $WAIT_PIDS
+

@@ -484,4 +484,18 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content? email_template.name
     assert_equal @club.marketing_tool_client, email_template.client
   end
+
+  ############################################################
+  ## COMMUNICATION TEST
+  ############################################################
+
+  test "Do not send any communication if you do not enter a Member ID" do
+    sign_in_as(@admin_agent)
+    visit terms_of_membership_test_communications_path partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id
+    alert_ok_js
+    within("#communications_table") do
+      first(:link, 'send').click
+    end
+    assert page.has_no_content? I18n.t('error_messages.testing_communication_send')
+  end
 end
