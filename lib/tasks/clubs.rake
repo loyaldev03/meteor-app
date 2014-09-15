@@ -1,5 +1,5 @@
 namespace :clubs do
-  desc "Count members in clubs"
+  desc "Count users in clubs"
   # This task should be run every X hours. 
   task :count_members_in_clubs => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/count_members_in_clubs.log")
@@ -8,7 +8,7 @@ namespace :clubs do
     tall = Time.zone.now
     begin
       Club.all.each do |club|
-        club.update_attribute(:members_count, club.members.count + 0)
+        club.update_attribute(:members_count, club.users.count + 0)
       end
     rescue Exception => e
       Auditory.report_issue("Clubs::count_members_in_clubs", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})

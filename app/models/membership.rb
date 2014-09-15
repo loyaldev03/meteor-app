@@ -1,6 +1,6 @@
 class Membership < ActiveRecord::Base
   belongs_to :terms_of_membership
-  belongs_to :member
+  belongs_to :user
   belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
   has_one :enrollment_info
   has_many :transactions

@@ -11,7 +11,7 @@ module SacExactTarget
           options = { :subscribe_to_list => true }
           client.Create(subscriber(subscriber_key, options))
         rescue Exception => e
-          Auditory.audit(nil, self.prospect, e, Member.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.et_timeout_create) if e.to_s.include?("Timeout")
+          Auditory.audit(nil, self.prospect, e, User.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.et_timeout_create) if e.to_s.include?("Timeout")
           raise e
         end
       elsif SacExactTarget::ProspectModel.email_belongs_to_prospect?(subscriber.subscriber_key)
@@ -19,7 +19,7 @@ module SacExactTarget
           options = { :subscribe_to_list => false }
           client.Update(subscriber(subscriber.subscriber_key, options))
         rescue Exception => e
-          Auditory.audit(nil, self.prospect, e, Member.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
+          Auditory.audit(nil, self.prospect, e, User.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
           raise e
         end
       end
@@ -42,7 +42,7 @@ module SacExactTarget
       res = client.Delete(subscriber)
       SacExactTarget::report_error("SacExactTarget:Prospect:destroy", res) if res.OverallStatus != "OK"
     rescue Exception => e 
-      Auditory.audit(nil, self.prospect, e, Member.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.et_timeout_destroy) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self.prospect, e, User.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.et_timeout_destroy) if e.to_s.include?("Timeout")
       raise e
     end
 
@@ -53,7 +53,7 @@ module SacExactTarget
         result.attributes.select {|d| d == { :name => "Club", :value => club_id } }.empty? ? nil : result
       end.flatten.compact
     rescue Exception => e
-      Auditory.audit(nil, nil, e, Member.find_by_email_and_club_id(email,club_id), Settings.operation_types.et_timeout_find) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, nil, e, User.find_by_email_and_club_id(email,club_id), Settings.operation_types.et_timeout_find) if e.to_s.include?("Timeout")
       raise e
     end
 

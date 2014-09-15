@@ -1,0 +1,22 @@
+<%= render :partial => "shared/user_information" %>
+
+<%= form_tag(user_manual_billing_path) do %>
+	<table class="table table-bordered">
+		<tr>
+			<td>
+				<%= label :amount, I18n.t('activerecord.attributes.transaction.amount')+I18n.t('activerecord.attributes.transaction.amount_help', :minimun_amount => number_to_currency(@tom.installment_amount)), :class => 'help-inline' %>
+				<%= text_field_tag :amount %>
+			</td>
+			<td>
+				<%= label :payment_type, I18n.t('activerecord.attributes.transaction.payment_type'), :class => 'help-inline' %>
+				<%= select_tag :payment_type, options_for_select([['Cash', 'cash'], ['Check', 'check']]),:include_blank => '' %>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">
+		        <%= submit_tag t('buttons.manual_billing'), :class => 'btn btn-primary' %>
+		        <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %> 
+			</th>
+		</tr>
+	</table>
+<% end %>

@@ -1,23 +1,23 @@
-module SacMandrill
-  class MemberModel < Struct.new(:member)
+  module SacMandrill
+  class MemberModel < Struct.new(:user)
 
     def send_email(template_name)
-      message = {"to" => [{ "email" => self.member.email }]}
+      message = {"to" => [{ "email" => self.user.email }]}
       message.merge!({ "global_merge_vars" => subscriber_variables })
       template_content = {}
       result = client.messages.send_template template_name, template_content, message
       result.first
     rescue Exception => e
-      Auditory.audit(nil, self.member, e, self.member, Settings.operation_types.mandrill_timeout_trigger_create) if e.to_s.include?("Timeout")
+      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mandrill_timeout_trigger_create) if e.to_s.include?("Timeout")
       raise e
     end
 
     def subscriber_variables
       attributes = []
       fieldmap.each do |api_field, our_field| 
-        attributes << SacMandrill.format_attribute(self.member, api_field, our_field)
+        attributes << SacMandrill.format_attribute(self.user, api_field, our_field)
       end
-      membership = self.member.current_membership
+      membership = self.user.current_membership
       membership_fieldmap.each do |api_field, our_field| 
         attributes << SacMandrill.format_attribute(membership, api_field, our_field)
       end
@@ -30,13 +30,13 @@ module SacMandrill
         attributes << SacMandrill.format_attribute(enrollment_info, api_field, our_field)
       end
       if Rails.env.production? and self.member.preferences and preferences_fieldmap
-        member_preferences = self.member.member_preferences
+        member_preferences = self.user.user_preferences
         preferences_fieldmap.each do |api_field, our_field|
-          attributes << {"name" => api_field, "content" => self.member.preferences[our_field].to_s}
+          attributes << {"name" => api_field, "content" => self.user.preferences[our_field].to_s}
         end
-      elsif Rails.env.prototype? and self.member.preferences
-        attributes << {"name" => "PREF1", "content" => self.member.preferences["example_color"].to_s}
-        attributes << {"name" => "PREF1", "content" => self.member.preferences["example_team"].to_s}
+      elsif Rails.env.prototype? and self.user.preferences
+        attributes << {"name" => "PREF1", "content" => self.user.preferences["example_color"].to_s}
+        attributes << {"name" => "PREF1", "content" => self.user.preferences["example_team"].to_s}
       end
       attributes
     end
@@ -88,7 +88,7 @@ module SacMandrill
     end
 
     def preferences_fieldmap
-      case self.member.club_id
+      case self.user.club_id
         when 1
           {
             "PREF1" => "driver_1",
@@ -119,7 +119,7 @@ module SacMandrill
     end
 
     def client
-      @mandrill ||= Mandrill::API.new self.member.club.marketing_tool_attributes["mandrill_api_key"]
+      @mandrill ||= Mandrill::API.new self.user.club.marketing_tool_attributes["mandrill_api_key"]
     end
   end
 end

@@ -1,0 +1,21 @@
+<%= render :partial => "shared/user_information" %>
+
+<%= form_for(user_set_unreachable_path) do %>
+  <table class="table table-bordered" id="unreachable_table">
+    <thead>
+    <tr>
+      <th>
+        <%= label :reason, t('reason'), :class => 'help-inline' %> 
+        <%= select_tag "reason", options_for_select([Settings.wrong_phone_number.unreachable,                                     Settings.wrong_phone_number.wrong_phone_number]) %>
+      </th>
+    </tr>
+    <tr>
+    <th> 
+      <%= submit_tag t('buttons.set_wrong_phone_number'), :class => 'btn btn-primary', 
+                               :confirm => t('are_you_sure') %>
+      <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %> 
+    </th>
+    </tr>
+    </thead>
+  </table>
+<% end %>

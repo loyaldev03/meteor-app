@@ -52,7 +52,7 @@ class Product < ActiveRecord::Base
         sheet.add_row header
         club.products.each do |product|
           row = [ product.name, product.sku ]
-          status_list.each {|status| row << Fulfillment.joins(:member).where([ "fulfillments.product_sku = ? AND fulfillments.status = ? AND members.club_id = ?", 
+          status_list.each {|status| row << Fulfillment.joins(:user).where([ "fulfillments.product_sku = ? AND fulfillments.status = ? AND users.club_id = ?", 
                                                 product.sku, status.to_s, club.id ]).count }
           sheet.add_row row
         end

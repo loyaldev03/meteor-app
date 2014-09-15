@@ -7,17 +7,17 @@ class FulfillmentsController < ApplicationController
       @status = params[:status]
       if params[:all_times] == '1'
         if params[:product_type] == Settings.others_product
-          @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and fulfillments.club_id = ?', params[:status], @current_club.id).type_others.not_renewed
+          @fulfillments = Fulfillment.includes(:user).joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ?', params[:status], @current_club.id).type_others.not_renewed
         else
-          @fulfillments = Fulfillment.includes(:member).joins(:member).where('fulfillments.status = ? and fulfillments.club_id = ? and product_sku = ? ', params[:status], @current_club.id, params[:product_type]).not_renewed
+          @fulfillments = Fulfillment.includes(:user).joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ? and product_sku = ? ', params[:status], @current_club.id, params[:product_type]).not_renewed
         end
         @product_type = params[:product_type]
       else
         if params[:product_type] == Settings.others_product
-          @fulfillments = Fulfillment.includes(:member).joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? ', 
+          @fulfillments = Fulfillment.includes(:user).joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? ', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id]).type_others.not_renewed
         else
-          @fulfillments = Fulfillment.includes(:member).joins(:member).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? AND product_sku = ? ', 
+          @fulfillments = Fulfillment.includes(:user).joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? AND product_sku = ? ', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id, params[:product_type]]).not_renewed
         end
       end  
@@ -29,7 +29,7 @@ class FulfillmentsController < ApplicationController
     my_authorize! :report, Fulfillment, @current_club.id
     respond_to do |format|
       format.html
-      format.json { render json: FulfillmentFilesDatatable.new(view_context,@current_partner,@current_club,@current_member,@current_agent)}
+      format.json { render json: FulfillmentFilesDatatable.new(view_context,@current_partner,@current_club,@current_user,@current_agent)}
     end
   end
 
@@ -54,7 +54,7 @@ class FulfillmentsController < ApplicationController
   def list_for_file
     @file = FulfillmentFile.find(params[:fulfillment_file_id])
     my_authorize! :report, Fulfillment, @file.club_id
-    @fulfillments = @file.fulfillments.includes(:member)
+    @fulfillments = @file.fulfillments.includes(:user)
     render :index
   end
 
@@ -107,7 +107,7 @@ class FulfillmentsController < ApplicationController
     fulfillment_file = FulfillmentFile.find(params[:fulfillment_file_id])
     fulfillment_file.send_email_with_file(params[:only_in_progress])
 
-    flash[:notice] = "We are generating the Fulfillment File requested, and it will be delivered to your configured email as soon as it is ready. Have in mind this could take up to 15 minutes depending on the amount of members and fulfillments involved."
+    flash[:notice] = "We are generating the Fulfillment File requested, and it will be delivered to your configured email as soon as it is ready. Have in mind this could take up to 15 minutes depending on the amount of users and fulfillments involved."
 
     redirect_to list_fulfillment_files_path
   end

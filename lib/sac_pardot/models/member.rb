@@ -1,9 +1,9 @@
 module Pardot
-  class Member < Struct.new(:member)
+  class Member < Struct.new(:user)
     def save!(options = {})
-      unless self.member.email.include?('@noemail.com') # do not sync @noemail.com
+      unless self.user.email.include?('@noemail.com') # do not sync @noemail.com
         begin
-          res = conn.prospects.upsert_by_email(CGI.escape(self.member.email), fieldmap(options))
+          res = conn.prospects.upsert_by_email(CGI.escape(self.user.email), fieldmap(options))
           Pardot.logger.debug "Pardot answer: " + res.inspect
         rescue Exception => e
           res = $!.to_s
@@ -16,7 +16,7 @@ module Pardot
     end
 
     def new_record?
-      self.member.marketing_client_id.nil?
+      self.user.marketing_client_id.nil?
     end
 
   private
@@ -24,7 +24,7 @@ module Pardot
     # will raise a Pardot::ResponseError if login fails
     # will raise a Pardot::NetError if the http call fails
     def conn
-      c = self.member.club.pardot
+      c = self.user.club.pardot
       c.authenticate
       c
     end
@@ -45,12 +45,12 @@ module Pardot
           marketing_client_last_sync_error_at: Time.zone.now
         }
       end
-      ::Member.where(id: self.member.id).limit(1).update_all(data)
-      self.member.reload rescue self.member
+      ::User.where(id: self.user.id).limit(1).update_all(data)
+      self.user.reload rescue self.user
     end
 
     def fieldmap(options)
-      m = self.member
+      m = self.user
       cm = m.current_membership
       map = {
         first_name: m.first_name,

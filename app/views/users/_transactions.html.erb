@@ -1,0 +1,20 @@
+
+<table id="transactions_table" class="table table-bordered table-condensed dataTable" data-source="<%= transactions_url(format: "json") %>">
+  <thead>
+    <tr>
+      <th id="th_date"> <%= t('activerecord.attributes.transaction.date') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.description') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.amount') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.refundable') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.gw_trans') %> </th>
+      <th> <%= t('activerecord.attributes.transaction.cc_related') %> </th>
+      <th> <%= t('actions') %> </th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script>
+  $(document).ready(transactions_user_functions(<% Transaction.datatable_columns.size %>));
+</script>

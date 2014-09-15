@@ -13,11 +13,11 @@ module SacExactTarget
 
 
     Club.send :include, SacExactTarget::ClubExtensions
-    Member.send :include, SacExactTarget::MemberExtensions
+    User.send :include, SacExactTarget::MemberExtensions
     Prospect.send :include, SacExactTarget::ProspectExtensions
-    MembersController.send :include, SacExactTarget::MembersControllerExtensions
+    UsersController.send :include, SacExactTarget::MembersControllerExtensions
 
-    logger.info "  * extending Member and Club"
+    logger.info "  * extending User and Club"
 
     nil
   end

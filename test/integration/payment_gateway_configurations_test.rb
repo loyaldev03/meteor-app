@@ -86,9 +86,9 @@ class PaymentGatewayConfigurationTest < ActionController::IntegrationTest
     assert page.has_no_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="mes"]'
   end
 
-  test "Do not allow to edit a PGC if it has members - Login by General Admin" do
+  test "Do not allow to edit a PGC if it has users - Login by General Admin" do
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @member = FactoryGirl.create(:member, :club_id => @club.id)
+    @user = FactoryGirl.create(:user, :club_id => @club.id)
     visit club_path(@partner.prefix, @club.id)
 
     click_link_or_button "Payment Gateway Configuration"

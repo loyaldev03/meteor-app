@@ -22,7 +22,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     end
   end
 
-  test 'Show all member communications - Logged by General Admin' do
+  test 'Show all user communications - Logged by General Admin' do
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test2')
@@ -39,7 +39,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_no_content? communication.name
   end
 
-  test 'Add member communications - Logged by General Admin' do
+  test 'Add user communications - Logged by General Admin' do
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
@@ -75,7 +75,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     end
   end
 
-  test 'Show one member communication - Logged by General Admin' do
+  test 'Show one user communication - Logged by General Admin' do
     communication_name = 'Comm Name'
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -94,7 +94,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content?('General Information')
   end
 
-  test 'Allow to create more than one member communication with Pillar type - Logged by General Admin' do
+  test 'Allow to create more than one user communication with Pillar type - Logged by General Admin' do
     old_comm = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'pillar')
     old_comm.save
     sign_in_as(@admin_agent)
@@ -112,7 +112,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content?('was successfully created')
   end
 
-  test 'Edit member communications - Logged by General Admin' do
+  test 'Edit user communications - Logged by General Admin' do
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
@@ -144,21 +144,21 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     click_link_or_button 'Create Email template'
     assert page.has_content?('was successfully created')
 
-    @saved_member = create_active_member(@tom, :active_member)
+    @saved_user = create_active_user(@tom, :active_user)
 
     assert_difference("Communication.count",1) do
-      @saved_member.set_as_canceled!
+      @saved_user.set_as_canceled!
     end
-    communication = @saved_member.communications.find_by_template_type "cancellation"
+    communication = @saved_user.communications.find_by_template_type "cancellation"
     assert_not_nil communication
-    visit show_member_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :member_prefix => @saved_member.id)
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within(".nav-tabs"){ click_on("Communications") }
     within("#communications") do
       assert page.has_content? communication.template_name
     end
   end
 
-  test 'CS send a member communication - Logged by General Admin' do
+  test 'CS send an user communication - Logged by General Admin' do
     sign_in_as(@admin_agent)
     @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
     @club_tom.save
@@ -172,7 +172,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     create_email_template_and_send_communication({email_template_name: 'Comm Name New', template_name: "cancellation2"}, {"email_template[template_type]" => "Cancellation"}, [])
   end
   
-  test "Show and create members comms only for marketing client configured - Login by General Admin" do
+  test "Show and create users comms only for marketing client configured - Login by General Admin" do
     @club.update_attributes :marketing_tool_client => 'exact_target'
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -217,7 +217,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert_equal @club.marketing_tool_client, email_template.client
   end
 
-  test 'Edit member communications - Logged by Admin_by_club' do
+  test 'Edit user communications - Logged by Admin_by_club' do
     @agent = FactoryGirl.create(:agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
@@ -241,7 +241,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content?('was successfully updated')
   end
 
-  test 'Destroy member communications - Logged by Admin_by_club' do
+  test 'Destroy user communications - Logged by Admin_by_club' do
     @agent = FactoryGirl.create(:agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
@@ -265,7 +265,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content? first_email_template.name
   end
 
-  test 'Destroy member communications - Logged by General Admin' do
+  test 'Destroy user communications - Logged by General Admin' do
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
@@ -284,7 +284,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content? first_email_template.name
   end
 
-  test "Show all member communications - Logged by Admin_by_club" do
+  test "Show all user communications - Logged by Admin_by_club" do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
@@ -334,7 +334,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     end
   end
 
-  test 'Add member communications - Logged by Admin_by_club' do
+  test 'Add user communications - Logged by Admin_by_club' do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
@@ -359,7 +359,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content?('was successfully created')
   end
 
-  test 'Show one member communication - Logged by Admin_by_club' do
+  test 'Show one user communication - Logged by Admin_by_club' do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
@@ -387,7 +387,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content?('General Information')
   end
 
-  test 'Do not allow enter member communication duplicate - Logged by Admin_by_club' do
+  test 'Do not allow enter user communication duplicate - Logged by Admin_by_club' do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
@@ -412,7 +412,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     end
   end
 
-  test 'CS send a member communication - Logged by Admin_by_club' do
+  test 'CS send an user communication - Logged by Admin_by_club' do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
@@ -433,7 +433,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     create_email_template_and_send_communication({email_template_name: 'Comm Name New', template_name: "cancellation2"}, {"email_template[template_type]" => "Cancellation"}, [])
   end
 
-  test "Show and create members comms only for marketing client configured - Login by Admin_by_club" do
+  test "Show and create users comms only for marketing client configured - Login by Admin_by_club" do
     @club.update_attributes :marketing_tool_client => 'exact_target'
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id

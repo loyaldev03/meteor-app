@@ -2,7 +2,7 @@ class MembershipsDatatable < Datatable
 
 private
   def total_records
-    @current_member.memberships.count
+    @current_user.memberships.count
   end
 
   def total_entries
@@ -25,7 +25,7 @@ private
   end
 
   def fetch_memberships
-    memberships = Membership.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
+    memberships = Membership.order("#{sort_column} #{sort_direction}").where('user_id' => @current_user)
     memberships.page(page).per_page(per_page)
   end
 

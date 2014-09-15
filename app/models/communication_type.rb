@@ -1,5 +1,5 @@
 class CommunicationType < Enumeration
-  has_many :member_notes
+  has_many :user_notes
 
   def to_s
     name

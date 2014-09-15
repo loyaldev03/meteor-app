@@ -1,13 +1,13 @@
 class EnrollmentInfo < ActiveRecord::Base
-  belongs_to :member
+  belongs_to :user
   belongs_to :membership
   belongs_to :prospect
 
   serialize :preferences, JSON
 
-  attr_accessible :member_id, :prospect_id, :enrollment_amount, :product_sku, :product_description, :mega_channel,
+  attr_accessible :user_id, :prospect_id, :enrollment_amount, :product_sku, :product_description, :mega_channel,
                   :marketing_code, :fulfillment_code, :ip_address, :user_agent, :referral_host,
-                  :referral_parameters, :referral_path, :user_id, :landing_url, :terms_of_membership_id,
+                  :referral_parameters, :referral_path, :visitor_id, :landing_url, :terms_of_membership_id,
                   :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,
                   :campaign_medium_version, :joint
 
@@ -17,7 +17,7 @@ class EnrollmentInfo < ActiveRecord::Base
   CS_CAMPAIGN_MEDIUM = 'phone'
   CS_CAMPAIGN_DESCRIPTION = 'CS Join'
 
-  # Method to update every enrollment_info field with the hash of information we recieve when enrolling a member.
+  # Method to update every enrollment_info field with the hash of information we recieve when enrolling a user.
   #
   def update_enrollment_info_by_hash(params)
     unless params.nil?
@@ -31,7 +31,7 @@ class EnrollmentInfo < ActiveRecord::Base
       self.referral_host = params[:referral_host]
       self.referral_parameters = params[:referral_parameters]
       self.referral_path = params[:referral_path]
-      self.user_id = params[:user_id]
+      self.visitor_id = params[:user_id]
       self.landing_url = params[:landing_url].downcase if params[:landing_url]
       self.preferences = params[:preferences]
       self.cookie_value = params[:cookie_value]

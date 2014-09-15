@@ -16,7 +16,7 @@ class PaymentGatewayConfigurationsController < ApplicationController
 		@payment_gateway_configuration = PaymentGatewayConfiguration.new(params[:payment_gateway_configuration])
 		@payment_gateway_configuration.club_id = @current_club.id
 		success = false
-		if @current_club.members_count.to_i == 0 and @current_club.members.count == 0
+		if @current_club.members_count.to_i == 0 and @current_club.users.count == 0
 			PaymentGatewayConfiguration.transaction do 
 				begin
 					if @payment_gateway_configuration.valid?
@@ -28,7 +28,7 @@ class PaymentGatewayConfigurationsController < ApplicationController
 				end
 			end
 		else
-			flash.now[:error] = I18n.t("error_messages.pgc_cannot_be_created_club_has_members")
+			flash.now[:error] = I18n.t("error_messages.pgc_cannot_be_created_club_has_users")
 		end
 
 		if success 
