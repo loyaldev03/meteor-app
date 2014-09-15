@@ -132,19 +132,19 @@ class UsersBillTest < ActionController::IntegrationTest
     end
   end
 
-  test "create a user billing enroll > 0" do
+  test "create an user billing enroll > 0" do
     active_merchant_stubs
     setup_user
     bill_user(@saved_user, false)
   end 
 
-  test "create a user billing enroll > 0 + refund" do
+  test "create an user billing enroll > 0 + refund" do
     active_merchant_stubs
     setup_user
     bill_user(@saved_user, true)
   end 
 
-  test "create a user billing enroll = 0 provisional_days = 0 installment amount > 0" do
+  test "create an user billing enroll = 0 provisional_days = 0 installment amount > 0" do
     active_merchant_stubs
     setup_user(0)
     EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
@@ -439,7 +439,7 @@ class UsersBillTest < ActionController::IntegrationTest
     within("#communications"){ assert page.has_content?("cancellation") }
   end
 
-  test "Try billing a user with credit card ok, and within a club that allows billing." do
+  test "Try billing an user with credit card ok, and within a club that allows billing." do
     setup_user
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)      
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
@@ -460,7 +460,7 @@ class UsersBillTest < ActionController::IntegrationTest
     end
   end
 
-  test "Try billing a user without providing the amount and/or description" do
+  test "Try billing an user without providing the amount and/or description" do
     setup_user
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
@@ -475,7 +475,7 @@ class UsersBillTest < ActionController::IntegrationTest
     assert page.has_content?("Amount, description and type cannot be blank.")
   end
 
-  test "Try billing a user without providing the amount and/or description." do
+  test "Try billing an user without providing the amount and/or description." do
     setup_user
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
@@ -485,7 +485,7 @@ class UsersBillTest < ActionController::IntegrationTest
     assert page.has_content?("Amount must be greater than 0.")
   end
 
-  test "Try billing a user within a club that do not allow billing." do
+  test "Try billing an user within a club that do not allow billing." do
     setup_user
     @saved_user.club.update_attribute( :billing_enable, false)
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
@@ -494,7 +494,7 @@ class UsersBillTest < ActionController::IntegrationTest
     assert page.has_selector?('#blacklist_btn')
   end
 
-  test "Try billing a user with blank credit card." do
+  test "Try billing an user with blank credit card." do
     setup_user(nil,false)
     unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)      
     @saved_user = create_user(unsaved_user,nil,nil, true)

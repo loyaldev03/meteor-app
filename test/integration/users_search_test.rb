@@ -349,7 +349,7 @@ class UsersSearchTest < ActionController::IntegrationTest
   #   end
   # end
 
-  # test "search a user with next bill date in past" do
+  # test "search an user with next bill date in past" do
   #   setup_search
   #   page.execute_script("window.jQuery('#user_next_retry_bill_date').next().click()")
   #   assert page.evaluate_script("window.jQuery('.ui-datepicker-prev').is('.ui-state-disabled')")
@@ -840,7 +840,7 @@ class UsersSearchTest < ActionController::IntegrationTest
     assert page.has_content? "Member cancellation scheduled to #{I18n.l(@saved_user.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}"
   end
 
-  # See a user is blacklisted in the search results
+  # See an user is blacklisted in the search results
   # test "should show status with 'Blisted' on search results, when user is blacklisted." do
   #   setup_user
   #   cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)

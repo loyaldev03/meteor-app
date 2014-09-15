@@ -47,7 +47,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:1})
 		click_link_or_button 'Define Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 	  choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -65,7 +65,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:0, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:1})
 		click_link_or_button 'Define Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 	  choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -83,7 +83,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:0, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:1})
 		click_link_or_button 'Define Upgrades / Downgrades'
 
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -100,7 +100,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:0, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:1},{trial_period_lasting_time_span:"Month(s)"})
 		click_link_or_button 'Define Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -118,7 +118,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:0, trial_period_amount:100, trial_period_lasting:5, installment_amount:0, installment_amount_days:1},{trial_period_lasting_time_span:"Day(s)"})
 		click_link_or_button 'Define Upgrades / Downgrades'
 
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -136,7 +136,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:0, trial_period_amount:100, trial_period_lasting:5, installment_amount:0, installment_amount_days:1},{trial_period_lasting_time_span:"Month(s)"})
 		click_link_or_button 'Define Upgrades / Downgrades'
 
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -154,7 +154,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:0, trial_period_amount:0, trial_period_lasting:0, installment_amount:10, installment_amount_days:1},{installment_amount_days_time_span:"Month(s)"})
 		click_link_or_button 'Define Upgrades / Downgrades'
 
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -172,14 +172,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:0, trial_period_amount:0, trial_period_lasting:0, installment_amount:10, installment_amount_days:12},{installment_amount_days_time_span:"Month(s)"})
 		click_link_or_button 'Define Upgrades / Downgrades'
 
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
-	# Create a user with TOM before created
+	# Create an user with TOM before created
 	test "Create a TOM with 'no payment is expected' selected - with Trial Period and Initial Club cash" do
 		sign_in_as(@admin_agent)
 		tom_name = 'TOM with No payment expected'
@@ -212,7 +212,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     assert_nil saved_user.next_retry_bill_date
 	end
 
-	#Create a user with TOM before created
+	#Create an user with TOM before created
 	test "Create a TOM with 'no payment is expected' selected - with Trial Period and NOT Initial Club Cash" do
 		sign_in_as(@admin_agent)
 		tom_name = 'TOM with No payment expected'
@@ -245,7 +245,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     assert_nil saved_user.next_retry_bill_date
 	end
 
-	# Create a user with TOM before created
+	# Create an user with TOM before created
 	test "Create a TOM with 'no payment is expected' selected - without Trial Period and Initial Club Cash" do
 		sign_in_as(@admin_agent)
 		tom_name = 'TOM with No payment expected'
@@ -278,7 +278,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
     assert_nil saved_user.next_retry_bill_date
 	end
 
-	# Create a user with TOM before created
+	# Create an user with TOM before created
 	test "Create a TOM with 'no payment is expected' selected - without Trial Period and without Initial Club Cash" do
 		sign_in_as(@admin_agent)
 		tom_name = 'TOM with No payment expected'
@@ -321,7 +321,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# # 	fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,subscription_terms_stop_billing_after:0},{subscription_terms_stop_billing_after_time_span:"Month(s)"},["subscription_terms_stop_cancel_after"])
 	# # 	click_link_or_button 'Define Upgrades / Downgrades'
 
-	# # 	find("label", :text => "If we cannot bill a user then")
+	# # 	find("label", :text => "If we cannot bill an user then")
 	# # 	choose('if_cannot_bill_user_cancel')
 	# # 	click_link_or_button 'Create Plan'
 	# # 	assert page.has_content?('was created succesfully') # TOM was created
@@ -338,14 +338,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# # 	fill_in_step_2({initial_fee_amount:0, trial_period_amount:1, trial_period_lasting:0, installment_amount:1, installment_amount_days:1,subscription_terms_stop_billing_after:0},{subscription_terms_stop_billing_after_time_span:"Day(s)"},["subscription_terms_stop_cancel_after"])
 	# # 	click_link_or_button 'Define Upgrades / Downgrades'
 
-	# # 	find("label", :text => "If we cannot bill a user then")
+	# # 	find("label", :text => "If we cannot bill an user then")
 	# # 	choose('if_cannot_bill_user_cancel')
 	# # 	click_link_or_button 'Create Plan'
 	# # 	assert page.has_content?('was created succesfully') # TOM was created
 	# # 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	# # end
 
-	test "Create a user at TOM created by Subscription Plan" do
+	test "Create an user at TOM created by Subscription Plan" do
 		sign_in_as(@admin_agent)
 		# First, create the TOM
 		tom_name = 'TOM To Create the User'
@@ -357,7 +357,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:1})
 		click_link_or_button 'Define Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 	  choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 		assert page.has_content?('was created succesfully') # TOM was created
@@ -379,7 +379,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:10, installment_amount_days:1},{installment_amount_days_time_span:"Month(s)"})
 	# 	click_link_or_button 'Define Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a user then")
+	# 	find("label", :text => "If we cannot bill an user then")
 	# 	choose('if_cannot_bill_user_suspend')
 	# 	fill_in 'if_cannot_bill_user_suspend_for', :with => '30'
 	# 	select('Day(s)', :from => 'if_cannot_bill_user_suspend_for_time_span')
@@ -398,7 +398,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:10, installment_amount_days:1},{installment_amount_days_time_span:"Month(s)"})
 	# 	click_link_or_button 'Define Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a user then")
+	# 	find("label", :text => "If we cannot bill an user then")
 	# 	choose('if_cannot_bill_user_suspend')
 	# 	fill_in 'if_cannot_bill_user_suspend_for', :with => '1'
 	# 	select('Month(s)', :from => 'if_cannot_bill_user_suspend_for_time_span')
@@ -419,7 +419,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:10, installment_amount_days:1},{installment_amount_days_time_span:"Month(s)"})
 		click_link_or_button 'Define Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_downgrade_to')
 		select(tom_to_downgrade.name, :from => 'downgrade_to_tom')
 		click_link_or_button 'Create Plan'
@@ -427,7 +427,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	end
 
-	test "Create a new TOM with club cash and enroll a user with it" do
+	test "Create a new TOM with club cash and enroll an user with it" do
 		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name with club cash'
 		initial_amount_of_club_cash = 80
@@ -456,7 +456,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		within("#td_mi_club_cash_amount") { assert page.has_content?(initial_amount_of_club_cash) }
 	end
 
-	test "Create a user with TOM upgrate to = 1" do
+	test "Create an user with TOM upgrate to = 1" do
 		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name with upgrade'
 		tom_to_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Upgraded TOM')
@@ -506,7 +506,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:1},{},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -530,7 +530,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:0, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:1},{},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -554,7 +554,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:0, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Day(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -578,7 +578,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:0, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
@@ -603,7 +603,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Day(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -627,7 +627,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:1},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -651,7 +651,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:6},{trial_period_lasting_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -675,7 +675,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:10, installment_amount:10, installment_amount_days:24},{trial_period_lasting_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -721,7 +721,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:24},{subscription_terms_stop_billing_after_time_span:"Month(s)",installment_amount_days_time_span:"Month(s)"},["is_payment_expected_yes","subscription_terms_stop_cancel_after"])
 	# 	click_link_or_button 'Edit Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a user then")
+	# 	find("label", :text => "If we cannot bill an user then")
 	# 	choose('if_cannot_bill_user_cancel')
 	# 	click_link_or_button 'Update Plan'
 	# 	assert page.has_content?('was updated succesfully') # TOM was created
@@ -744,14 +744,14 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30, installment_amount:10, installment_amount_days:24, subscription_terms_stop_billing_after:10},{installment_amount_days_time_span:"Month(s)",subscription_terms_stop_billing_after_time_span:"Day(s)"},["is_payment_expected_yes","subscription_terms_stop_cancel_after"])
 	# 	click_link_or_button 'Edit Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a user then")
+	# 	find("label", :text => "If we cannot bill an user then")
 	# 	choose('if_cannot_bill_user_cancel')
 	# 	click_link_or_button 'Update Plan'
 	# 	assert page.has_content?('was updated succesfully') # TOM was created
 	# 	assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 	# end
 
-	# test "Create a user at TOM updated by Subscription Plan  - No membership associated" do
+	# test "Create an user at TOM updated by Subscription Plan  - No membership associated" do
 	# 	# First, create the TOM and update it
 	# 	tom_name = 'TOM Name'
 	# 	tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
@@ -771,7 +771,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
 	# 	click_link_or_button 'Edit Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a user then")
+	# 	find("label", :text => "If we cannot bill an user then")
 	# 	choose('if_cannot_bill_user_suspend')
 	# 	fill_in 'if_cannot_bill_user_suspend_for', :with => '10'
 	# 	select('Day(s)', :from => 'if_cannot_bill_user_suspend_for_time_span')
@@ -802,7 +802,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
 	# 	click_link_or_button 'Edit Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a user then")
+	# 	find("label", :text => "If we cannot bill an user then")
 	# 	choose('if_cannot_bill_user_suspend')
 	# 	fill_in 'if_cannot_bill_user_suspend_for', :with => '10'
 	# 	select('Day(s)', :from => 'if_cannot_bill_user_suspend_for_time_span')
@@ -830,7 +830,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
 	# 	click_link_or_button 'Edit Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a user then")
+	# 	find("label", :text => "If we cannot bill an user then")
 	# 	choose('if_cannot_bill_user_suspend')
 	# 	fill_in 'if_cannot_bill_user_suspend_for', :with => '10'
 	# 	select('Month(s)', :from => 'if_cannot_bill_user_suspend_for_time_span')
@@ -859,7 +859,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	# 	               ["is_payment_expected_yes", "subscription_terms_stop_cancel_after"])
 	# 	click_link_or_button 'Edit Upgrades / Downgrades'
 		
-	# 	find("label", :text => "If we cannot bill a user then")
+	# 	find("label", :text => "If we cannot bill an user then")
 	# 	choose('if_cannot_bill_user_downgrade_to')
 	# 	select(tom_to_downgrade.name, :from => 'downgrade_to_tom')
 	# 	click_link_or_button 'Update Plan'
@@ -887,7 +887,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 					   ["is_payment_expected_yes", "subscription_terms_until_cancelled"])
 		click_link_or_button 'Edit Upgrades / Downgrades'
 		
-		find("label", :text => "If we cannot bill a user then")
+		find("label", :text => "If we cannot bill an user then")
 		choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Update Plan'
 		assert page.has_content?('was updated succesfully') # TOM was created
@@ -1144,7 +1144,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		assert page.has_content?("was successfully destroyed.")
 	end
 
-	test "Create a user a TOM that Requires Approval" do
+	test "Create an user a TOM that Requires Approval" do
 		sign_in_as(@admin_agent)
 		the_tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => 'TOM that Requires Approval')
 		unsaved_user =  FactoryGirl.build(:active_user, :club_id => the_tom.club_id)

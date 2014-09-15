@@ -35,7 +35,7 @@ class UsersCancelTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-  test "Downgrade a user when credit card is blank - Same club" do
+  test "Downgrade an user when credit card is blank - Same club" do
     setup_user(false)
     credit_card = FactoryGirl.build(:blank_credit_card)
     @unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
@@ -90,7 +90,7 @@ class UsersCancelTest < ActionController::IntegrationTest
   ##   end
   ## end
 
-  test "Downgrade a user when soft recycled is limit - Same club" do
+  test "Downgrade an user when soft recycled is limit - Same club" do
     setup_user false
     @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership_with_gateway.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => @terms_of_membership_with_gateway_to_downgrade.id, :installment_amount => 0.54)
@@ -175,7 +175,7 @@ class UsersCancelTest < ActionController::IntegrationTest
     assert assert find_field('input_first_name').value == @saved_user.first_name
   end
 
-  test "Rejecting a user should set cancel_date" do
+  test "Rejecting an user should set cancel_date" do
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)

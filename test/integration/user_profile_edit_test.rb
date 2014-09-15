@@ -629,7 +629,7 @@ class UserProfileEditTest < ActionController::IntegrationTest
     end
   end
 
-  test "Update a user with CC blacklisted inside the same Club" do
+  test "Update an user with CC blacklisted inside the same Club" do
     setup_user false, true
     @saved_user.active_credit_card.update_attribute :blacklisted, true 
 

@@ -161,7 +161,7 @@ class UserBlacklistTest < ActionController::IntegrationTest
     @saved_user2 = fill_in_user(unsaved_user2, bl_credit_card, @terms_of_membership_with_gateway2.name, false)
   end
 
-  test "Blacklist a user with status Lapsed" do
+  test "Blacklist an user with status Lapsed" do
     setup_user
     @saved_user.set_as_canceled
     @saved_user.reload
@@ -170,20 +170,20 @@ class UserBlacklistTest < ActionController::IntegrationTest
     validate_blacklisted_user(@saved_user)
   end
 
-  test "Blacklist a user with status Active" do
+  test "Blacklist an user with status Active" do
     setup_user
     blacklist_user(@saved_user,@member_blacklist_reason.name)
     validate_blacklisted_user(@saved_user)
   end
 
-  test "Blacklist a user with status Provisional" do
+  test "Blacklist an user with status Provisional" do
     setup_user(false)
     @saved_user = create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc, nil, {}, { :created_by => @admin_agent })
     blacklist_user(@saved_user,@member_blacklist_reason.name)
     validate_blacklisted_user(@saved_user)
   end
 
-  test "Blacklist a user with status Applied" do
+  test "Blacklist an user with status Applied" do
     setup_user(false)
     @saved_user = create_active_user(@terms_of_membership_with_gateway, :applied_user, nil, {}, { :created_by => @admin_agent })
     blacklist_user(@saved_user,@member_blacklist_reason.name)

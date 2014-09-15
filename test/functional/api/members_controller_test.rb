@@ -1108,7 +1108,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
   end
 
-  # Update a user with different CC 
+  # Update an user with different CC 
   # Update same CC with spaces 
   test "Update a profile with CC with white spaces" do
     sign_in @admin_user
@@ -1553,7 +1553,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert !(@response.body.include? last.id.to_s)
   end
   
-  # StatzHub - Add an Api method to cancel a user
+  # StatzHub - Add an Api method to cancel an user
   # Cancel date using a Curl call
   test "Admin should cancel user" do
     sign_in @admin_user

@@ -163,7 +163,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "enroll a user with product not available but it on the list at CS and recurrent false" do
+  test "enroll an user with product not available but it on the list at CS and recurrent false" do
     setup_user(false)
     @product = FactoryGirl.create(:product_without_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
@@ -196,7 +196,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "enroll a user with product not available but it on the list at CS and recurrent true" do
+  test "enroll an user with product not available but it on the list at CS and recurrent true" do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
@@ -229,7 +229,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "enroll a user with product out of stock and recurrent" do
+  test "enroll an user with product out of stock and recurrent" do
     setup_user(false)
     @product = FactoryGirl.create(:product_without_stock_and_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
@@ -238,7 +238,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_nil User.find_by_email(@user.email)
   end
 
-  test "enroll a user with product out of stock and not recurrent" do
+  test "enroll an user with product out of stock and not recurrent" do
     setup_user(false)
     @product = FactoryGirl.create(:product_without_stock_and_not_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
@@ -247,7 +247,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_nil User.find_by_email(@user.email)
   end
 
-  test "enroll a user with product not in the list" do
+  test "enroll an user with product not in the list" do
     setup_user(false)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'product not in the list')
 
@@ -255,7 +255,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     assert_nil User.find_by_email(@user.email)
   end
 
-  test "enroll a user with blank product_sku" do
+  test "enroll an user with blank product_sku" do
     setup_user(false)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => '')
     assert_difference('Fulfillment.count',0){
@@ -273,7 +273,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "Enroll a user with recurrent product and it on the list" do
+  test "Enroll an user with recurrent product and it on the list" do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
@@ -2652,7 +2652,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     within('#fulfillments'){ assert page.has_no_selector?("#update_fulfillment_status")}
   end
 
-  test "Mark a user as 'wrong address' - Admin Role - not_processed status" do
+  test "Mark an user as 'wrong address' - Admin Role - not_processed status" do
     setup_user(true)
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
@@ -2668,7 +2668,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     end
   end 
 
-  test "Mark a user as 'wrong address' - In Process status" do
+  test "Mark an user as 'wrong address' - In Process status" do
     setup_user(true)
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_in_process
@@ -2685,7 +2685,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     end
   end
 
-  test "Mark a user as 'wrong address' - Out of stock status" do
+  test "Mark an user as 'wrong address' - Out of stock status" do
     setup_user(true)
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_out_of_stock
@@ -2702,7 +2702,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     end
   end
 
-  test "Mark a user as 'wrong address' - Returned status" do
+  test "Mark an user as 'wrong address' - Returned status" do
     setup_user(true)
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_returned

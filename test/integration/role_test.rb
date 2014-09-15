@@ -158,7 +158,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "Admin role - Recover a user" do
+  test "Admin role - Recover an user" do
     setup_admin
     setup_user
     @saved_user.set_as_canceled!
@@ -232,7 +232,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "Mark a user as 'wrong address' - Supervisor Role" do
+  test "Mark an user as 'wrong address' - Supervisor Role" do
     setup_supervisor
     setup_user(@agent)
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD')}
@@ -249,7 +249,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  test "Supervisor role - Recover a user" do
+  test "Supervisor role - Recover an user" do
     setup_supervisor
     setup_user
     @saved_user.set_as_canceled!
@@ -300,7 +300,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end
 
-  #Do not allow Mark a user as "wrong address" - Representative Role
+  #Do not allow Mark an user as "wrong address" - Representative Role
   test "Profile Representative - Delete Credit Card" do
     setup_representative
     setup_user
@@ -355,7 +355,7 @@ class RolesTest < ActionController::IntegrationTest
     page.has_content?("Credit card #{credit_card.last_digits} added and activated.")
   end
 
-  test "Representative role - Recover a user" do
+  test "Representative role - Recover an user" do
     setup_representative
     setup_user
     @saved_user.set_as_canceled!
@@ -441,7 +441,7 @@ class RolesTest < ActionController::IntegrationTest
     end
   end 
 
-test "Agency role - Recover a user" do
+test "Agency role - Recover an user" do
     setup_agency
     setup_user
     @saved_user.set_as_canceled!
@@ -503,7 +503,7 @@ test "Agency role - Recover a user" do
     bill_user(@saved_user, true)
   end
 
-  test "fulfillment_managment role - Recover a user" do
+  test "fulfillment_managment role - Recover an user" do
     setup_fulfillment_managment
     setup_user
     @new_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'new_tome')

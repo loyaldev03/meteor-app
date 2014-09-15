@@ -13,7 +13,7 @@ class UserTest < ActiveSupport::TestCase
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
   end
 
-  test "Should create a user" do
+  test "Should create an user" do
     user = FactoryGirl.build(:user)
     assert !user.save, user.errors.inspect
     user.club = @terms_of_membership_with_gateway.club
@@ -24,22 +24,22 @@ class UserTest < ActiveSupport::TestCase
     Delayed::Worker.delay_jobs = false
   end
 
-  test "Should not create a user without first name" do
+  test "Should not create an user without first name" do
     user = FactoryGirl.build(:user, :first_name => nil)
     assert !user.save
   end
 
-  test "Should not create a user without last name" do
+  test "Should not create an user without last name" do
     user = FactoryGirl.build(:user, :last_name => nil)
     assert !user.save
   end
 
-  test "Should create a user without gender" do
+  test "Should create an user without gender" do
     user = FactoryGirl.build(:user, :gender => nil)
     assert !user.save
   end
 
-  test "Should create a user without type_of_phone_number" do
+  test "Should create an user without type_of_phone_number" do
     user = FactoryGirl.build(:user, :type_of_phone_number => nil)
     assert !user.save
   end
@@ -132,7 +132,7 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  # When enrolling/recovering a user should send approval email as DJ
+  # When enrolling/recovering an user should send approval email as DJ
   test "Lapsed user can be recovered unless it needs approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     user = create_active_user(@tom_approval, :lapsed_user)
@@ -164,7 +164,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
 
-  test "Should not let create a user with a wrong format zip" do
+  test "Should not let create an user with a wrong format zip" do
     ['12345-1234', '12345'].each {|zip| zip
       user = FactoryGirl.build(:user, zip: zip, club: @terms_of_membership_with_gateway.club)
       assert user.save, "User cant be save #{user.errors.inspect}"
@@ -382,7 +382,7 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "Add club cash - more than maximum value on a user related to drupal" do
+  test "Add club cash - more than maximum value on an user related to drupal" do
     agent = FactoryGirl.create(:confirmed_admin_agent)
     club = FactoryGirl.create(:club_with_api)
     user = FactoryGirl.create(:user_with_api, :club_id => @club.id)

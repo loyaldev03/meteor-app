@@ -160,7 +160,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-  #Create a user selecting only a kit-card
+  #Create an user selecting only a kit-card
   test "create user" do
   	setup_user(false)
 
@@ -189,7 +189,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content? I18n.t('error_messages.club_is_not_enable_for_new_enrollments', :cs_phone_number => @club.cs_phone_number)
   end
 
-  test "Join a user with auth.net PGC" do
+  test "Join an user with auth.net PGC" do
     setup_user(false)
     @club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
     Time.zone = @club.time_zone
@@ -199,7 +199,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     created_user = create_user(unsaved_user, nil, nil, false)
   end
 
-  test "Create a user with CC blank" do
+  test "Create an user with CC blank" do
     setup_user(false)
 
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
@@ -657,7 +657,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table"){ assert page.has_content?('user was updated successfully last - 1000') }
   end
 
-  test "create a user with an expired credit card (if actual month is not january)" do
+  test "create an user with an expired credit card (if actual month is not january)" do
     setup_user(false)
     unless(Time.zone.now.month == 1)
       unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
@@ -811,7 +811,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     validate_view_user_base(@saved_user)
   end
 
-  test "Create a user without Telephone Type" do
+  test "Create an user without Telephone Type" do
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :type_of_phone_number => '', :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -825,7 +825,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "Enroll a user with user approval TOM" do
+  test "Enroll an user with user approval TOM" do
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     
@@ -847,7 +847,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     within("#operations_table") { assert page.has_content?("Member enrolled pending approval successfully $0.0 on TOM(#{@terms_of_membership_with_approval.id}) -#{@terms_of_membership_with_approval.name}-") }
   end
 
-  test "Enroll a user should create membership" do
+  test "Enroll an user should create membership" do
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     
@@ -1095,7 +1095,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
   end
 
-  test "Create a user and update a user with letters at Credit Card" do
+  test "Create an user and update an user with letters at Credit Card" do
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -1160,7 +1160,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     assert page.has_content?('There was an error with your credit card information. Please verify your information and resubmit. {:number=>["is required"]}')
   end
 
-  # # Remove/Add Club Cash on a user with lifetime TOM
+  # # Remove/Add Club Cash on an user with lifetime TOM
   test "Create a new user in the CS using the Lifetime TOM" do
     setup_user(false)
     @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, :club_id => @club.id)
@@ -1171,7 +1171,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     add_club_cash(@saved_user, 10, "Generic description",true)
   end
 
-  test "Do not enroll a user with wrong payment gateway" do
+  test "Do not enroll an user with wrong payment gateway" do
     setup_user(false)
     @club.payment_gateway_configurations.first.update_attribute(:gateway,'fail')
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
@@ -1183,7 +1183,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "Create a user selecting only a product" do
+  test "Create an user selecting only a product" do
     setup_user(false)
     product = FactoryGirl.create(:product, :club_id => @club.id,)
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
@@ -1201,7 +1201,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     assert_equal created_user.fulfillments.last.product_sku, product.sku
   end
 
-  test "Create a user without selecting any " do
+  test "Create an user without selecting any " do
     setup_user(false)
     product = FactoryGirl.create(:product, :club_id => @club.id, :name => 'PRODUCT_RANDOM')
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
@@ -1216,7 +1216,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     assert_equal(Fulfillment.count, 0)
   end
 
-  test "Create a user selecting kit-card and product" do
+  test "Create an user selecting kit-card and product" do
     setup_user(false)
     product = FactoryGirl.create(:product, :club_id => @club.id)
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)

@@ -105,7 +105,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
   
-  test "Recover a user using CS which was enrolled with a product sku that does not have stock" do
+  test "Recover an user using CS which was enrolled with a product sku that does not have stock" do
     setup_user(true, true)
     prods = Product.find_all_by_sku @saved_user.enrollment_infos.first.product_sku.split(',')
     prods.each do |p| 
@@ -116,7 +116,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     recover_user(@saved_user,@terms_of_membership_with_gateway)
   end
 
-  test "recovery a user with provisional TOM" do
+  test "recovery an user with provisional TOM" do
     setup_user
     recover_user(@saved_user,@new_terms_of_membership_with_gateway)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -125,7 +125,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     validate_user_recovery(@saved_user, @new_terms_of_membership_with_gateway)
   end
 
-  test "recovery a user 3 times" do
+  test "recovery an user 3 times" do
     setup_user
     3.times do
       if @saved_user.current_membership.terms_of_membership.name == "another_tom"
@@ -145,7 +145,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     end
   end
 
-  test "Recover a user by Monthly membership" do
+  test "Recover an user by Monthly membership" do
     setup_user
     @new_terms_of_membership_with_gateway.installment_type = "1.month"
     @new_terms_of_membership_with_gateway.save
@@ -157,7 +157,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     validate_user_recovery(@saved_user,@new_terms_of_membership_with_gateway)
   end 
 
-  test "Recover a user by Annual Usership" do
+  test "Recover an user by Annual Usership" do
     setup_user
     @terms_of_membership_with_gateway.update_attribute(:installment_type, "1.year")
     recover_user(@saved_user, @terms_of_membership_with_gateway)
@@ -167,7 +167,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     validate_user_recovery(@saved_user, @terms_of_membership_with_gateway)
   end
 
-  test "Recovery a user with Paid TOM" do
+  test "Recovery an user with Paid TOM" do
     setup_user
     actual_tom = @saved_user.current_membership
 
@@ -187,7 +187,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
   end
 
-  test "Recover a user with CC blacklisted" do
+  test "Recover an user with CC blacklisted" do
     setup_user
     @saved_user.active_credit_card.update_attribute(:blacklisted, true )
     assert_equal @saved_user.active_credit_card.blacklisted, true
@@ -251,7 +251,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     validate_view_user_base(@saved_user)
   end
 
-  test "Recover a user with CC expired year after (actualYear-3 years)" do
+  test "Recover an user with CC expired year after (actualYear-3 years)" do
     setup_user
     three_years_before = (Time.zone.now-3.year).year
     @saved_user.active_credit_card.update_attribute(:expire_year, three_years_before )
@@ -276,7 +276,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     end
   end
 
-  test "Recover a user with CC expired year less than (actualYear-3 years)" do
+  test "Recover an user with CC expired year less than (actualYear-3 years)" do
     setup_user
     three_years_before = (Time.zone.now-4.year).year
     @saved_user.active_credit_card.update_attribute(:expire_year, three_years_before )

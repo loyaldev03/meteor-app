@@ -59,7 +59,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   end
 
   # Create a TOM with upgrate to >1
-  test "Create a user with TOM upgrate to >1" do
+  test "Create an user with TOM upgrate to >1" do
     active_merchant_stubs
     @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
@@ -96,7 +96,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   end
 
   #Create a TOM with upgrate to = 1
-  test "Create a user with TOM upgrate to = 1" do
+  test "Create an user with TOM upgrate to = 1" do
     active_merchant_stubs
     @terms_of_membership_with_upgrade = FactoryGirl.build(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
@@ -105,7 +105,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     user = enroll_user(@terms_of_membership_with_upgrade)
   end
 
-  test "Create a user with Manual Payment with TOM upgrate to >1" do
+  test "Create an user with Manual Payment with TOM upgrate to >1" do
     active_merchant_stubs
     @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 

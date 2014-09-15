@@ -158,7 +158,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     end
   end
 
-  test 'CS send a user communication - Logged by General Admin' do
+  test 'CS send an user communication - Logged by General Admin' do
     sign_in_as(@admin_agent)
     @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
     @club_tom.save
@@ -412,7 +412,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     end
   end
 
-  test 'CS send a user communication - Logged by Admin_by_club' do
+  test 'CS send an user communication - Logged by Admin_by_club' do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id

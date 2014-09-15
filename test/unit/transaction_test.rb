@@ -316,7 +316,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "Chargeback a user" do 
+  test "Chargeback an user" do 
     active_merchant_stubs_store
     active_user = create_active_user(@terms_of_membership)
     nbd = active_user.bill_date
@@ -709,7 +709,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "Should event bill a user, and also refund it." do
+  test "Should event bill an user, and also refund it." do
     user = enroll_user(@terms_of_membership, 0, false)
     amount = 200
     assert_difference("Transaction.count") do
@@ -806,8 +806,8 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal trans.response_result, I18n.t('error_messages.airbrake_error_message')
   end
 
-  # Try billing a user's membership when he was previously SD for credit_card_expired before last billing for MeS
-  test "Try billing a user's membership when he was previously SD for credit_card_expired for MeS" do 
+  # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for MeS
+  test "Try billing an user's membership when he was previously SD for credit_card_expired for MeS" do 
     active_user = create_active_user(@terms_of_membership)
     active_merchant_stubs(@sd_mes_expired_strategy.response_code, "decline stubbed", false)
     active_user.bill_membership
@@ -838,7 +838,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "Try billing a user's membership when he was previously SD for credit_card_expired on different membership for MeS" do 
+  test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for MeS" do 
     active_user = create_active_user(@terms_of_membership)
     active_merchant_stubs(@sd_mes_expired_strategy, "decline stubbed", false)
     active_user.bill_membership
@@ -860,8 +860,8 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  # Try billing a user's membership when he was previously SD for credit_card_expired before last billing for Litle
-  test "Try billing a user's membership when he was previously SD for credit_card_expired for Litle" do 
+  # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Litle
+  test "Try billing an user's membership when he was previously SD for credit_card_expired for Litle" do 
     @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
     @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
     @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)    
@@ -898,7 +898,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "Try billing a user's membership when he was previously SD for credit_card_expired on different membership for Litle" do 
+  test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for Litle" do 
     @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
     @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
     @litle_terms_of_membership_the_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id, :name =>"second_one")
@@ -928,7 +928,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "Create and bill a user with installment period = X days or months at TOM" do 
+  test "Create and bill an user with installment period = X days or months at TOM" do 
     active_merchant_stubs
 
     @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
@@ -975,7 +975,7 @@ class TransactionTest < ActiveSupport::TestCase
   ############################################################################
 
 
-  test "Create a user with initial_club_cash_amount and club_cash_installment_amount like 0 and skip_first_club_cash set as false" do
+  test "Create an user with initial_club_cash_amount and club_cash_installment_amount like 0 and skip_first_club_cash set as false" do
     @terms_of_membership.update_attribute :skip_first_club_cash, false
     @terms_of_membership.update_attribute :club_cash_installment_amount, 0
     @terms_of_membership.update_attribute :initial_club_cash_amount, 0
@@ -1009,7 +1009,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.club_cash_amount, 0
   end
 
-  test "Create a user with initial_club_cash_amount and club_cash_installment_amount like 0 and skip_first_club_cash set as true" do
+  test "Create an user with initial_club_cash_amount and club_cash_installment_amount like 0 and skip_first_club_cash set as true" do
     @terms_of_membership.update_attribute :skip_first_club_cash, true
     @terms_of_membership.update_attribute :club_cash_installment_amount, 0
     @terms_of_membership.update_attribute :initial_club_cash_amount, 0
@@ -1043,7 +1043,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.club_cash_amount, 0
   end
 
-  test "Create a user with initial_club_cash_amount = X, club_cash_installment_amount = 0 and skip_first_club_cash set = false" do
+  test "Create an user with initial_club_cash_amount = X, club_cash_installment_amount = 0 and skip_first_club_cash set = false" do
     @terms_of_membership.update_attribute :skip_first_club_cash, false
     @terms_of_membership.update_attribute :club_cash_installment_amount, 0
     @terms_of_membership.update_attribute :initial_club_cash_amount, 100
@@ -1077,7 +1077,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.club_cash_amount, 100  
   end
 
-  test "Create a user with initial_club_cash_amount = X, club_cash_installment_amount = 0 and skip_first_club_cash set = true" do
+  test "Create an user with initial_club_cash_amount = X, club_cash_installment_amount = 0 and skip_first_club_cash set = true" do
     @terms_of_membership.update_attribute :skip_first_club_cash, true
     @terms_of_membership.update_attribute :club_cash_installment_amount, 0
     @terms_of_membership.update_attribute :initial_club_cash_amount, 100
@@ -1111,7 +1111,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.club_cash_amount, 100
   end
 
-  test "Create a user with initial_club_cash_amount = X, club_cash_installment_amount = X and skip_first_club_cash set = false" do
+  test "Create an user with initial_club_cash_amount = X, club_cash_installment_amount = X and skip_first_club_cash set = false" do
     @terms_of_membership.update_attribute :skip_first_club_cash, true
     @terms_of_membership.update_attribute :club_cash_installment_amount, 50
     @terms_of_membership.update_attribute :initial_club_cash_amount, 100
@@ -1145,7 +1145,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.club_cash_amount, 150
   end
 
-  test "Create a user with initial_club_cash_amount = X, club_cash_installment_amount = X and skip_first_club_cash set = true" do
+  test "Create an user with initial_club_cash_amount = X, club_cash_installment_amount = X and skip_first_club_cash set = true" do
     @terms_of_membership.update_attribute :skip_first_club_cash, true
     @terms_of_membership.update_attribute :club_cash_installment_amount, 50
     @terms_of_membership.update_attribute :initial_club_cash_amount, 100
@@ -1179,7 +1179,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.club_cash_amount, 150  
   end
 
-  test "Create a user with initial_club_cash_amount = 0, club_cash_installment_amount = X and skip_first_club_cash set = false" do
+  test "Create an user with initial_club_cash_amount = 0, club_cash_installment_amount = X and skip_first_club_cash set = false" do
     @terms_of_membership.update_attribute :skip_first_club_cash, false
     @terms_of_membership.update_attribute :club_cash_installment_amount, 50
     @terms_of_membership.update_attribute :initial_club_cash_amount, 0
@@ -1213,7 +1213,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.club_cash_amount, 100
   end
 
-  test "Create a user with initial_club_cash_amount = 0, club_cash_installment_amount = X and skip_first_club_cash set = true" do
+  test "Create an user with initial_club_cash_amount = 0, club_cash_installment_amount = X and skip_first_club_cash set = true" do
     @terms_of_membership.update_attribute :skip_first_club_cash, true
     @terms_of_membership.update_attribute :club_cash_installment_amount, 50
     @terms_of_membership.update_attribute :initial_club_cash_amount, 0
@@ -1331,8 +1331,8 @@ class TransactionTest < ActiveSupport::TestCase
   #   end
   # end
 
-  # Try billing a user's membership when he was previously SD for credit_card_expired before last billing for Auth.net
-  test "Try billing a user's membership when he was previously SD for credit_card_expired for Auth.net" do 
+  # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Auth.net
+  test "Try billing an user's membership when he was previously SD for credit_card_expired for Auth.net" do 
     @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
     @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
     @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net, :token => "tzNduuh2DRQT7FXUILDl3Q==")
@@ -1366,7 +1366,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "Try billing a user's membership when he was previously SD for credit_card_expired on different membership for Auth.net" do 
+  test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for Auth.net" do 
     @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
     @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
     @authorize_net_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id, :name =>"second_one")
@@ -1454,8 +1454,8 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  # Try billing a user's membership when he was previously SD for credit_card_expired before last billing for FirstData
-  test "Try billing a user's membership when he was previously SD for credit_card_expired for FirstDate" do 
+  # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for FirstData
+  test "Try billing an user's membership when he was previously SD for credit_card_expired for FirstDate" do 
     club_with_first_data
     active_user = enroll_user(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
     # active_merchant_stubs_first_data(@sd_first_data_expired_strategy.response_code, "decline stubbed", false)
@@ -1489,7 +1489,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-  test "Try billing a user's membership when he was previously SD for credit_card_expired on different membership for FirstData" do 
+  test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for FirstData" do 
     club_with_first_data
     @first_data_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @first_data_club.id, :name =>"second_one")
     active_user = enroll_user(@first_data_terms_of_membership, 100, false, @credit_card_first_data)

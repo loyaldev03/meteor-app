@@ -378,7 +378,7 @@ class UsersSyncronizeTest < ActionController::IntegrationTest
     within("#span_api_id"){ assert page.has_content?("none") }
   end
 
-  test "Create a user with Synced Status" do
+  test "Create an user with Synced Status" do
     setup_environment
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -396,7 +396,7 @@ class UsersSyncronizeTest < ActionController::IntegrationTest
     within(".nav-tabs"){ page.has_selector?("#sync_status") }
   end
 
-  test "Create a user with Not Synced status" do
+  test "Create an user with Not Synced status" do
     setup_environment
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -415,7 +415,7 @@ class UsersSyncronizeTest < ActionController::IntegrationTest
     within("#span_mi_sync_status"){ page.has_content?('Not Synced') }
   end
 
-  test "Create a user with Sync Error status" do
+  test "Create an user with Sync Error status" do
     setup_environment
     User.any_instance.stubs(:last_sync_error).returns("Error on users#sync: #{$!}")
 
@@ -512,7 +512,7 @@ class UsersSyncronizeTest < ActionController::IntegrationTest
     within("#sync_status"){ assert page.has_no_selector?("edit_api_id") }
   end
 
-  test "Remove drupal account when Cancel a user" do
+  test "Remove drupal account when Cancel an user" do
     setup_environment
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
