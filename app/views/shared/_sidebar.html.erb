@@ -2,11 +2,11 @@
   <div class="span3">
     <div class="well sidebar-nav">
       <h3>Sidebar</h3>
-      <% if @current_member %>
+      <% if @current_user %>
         <ul class="nav nav-list">
-          <li class="nav-header">Member</li>
-          <li><%= link_to "Member Dashboard", show_member_path(@current_partner.prefix, @current_club.name, @current_member.id) if can?(:show, Member, @current_club.id) %></li>
-          <li><%= link_to "Club Dashboard", members_path(@current_partner.prefix, @current_club.name) if can?(:list, Member, @current_club.id) %></li>
+          <li class="nav-header">User</li>
+          <li><%= link_to "User Dashboard", show_user_path(@current_partner.prefix, @current_club.name, @current_user.id) if can?(:show, User, @current_club.id) %></li>
+          <li><%= link_to "Club Dashboard", users_path(@current_partner.prefix, @current_club.name) if can?(:list, User, @current_club.id) %></li>
         </ul>
       <% elsif @current_partner %>
         <ul class="nav nav-list">

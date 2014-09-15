@@ -20,9 +20,9 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
 
   test "admin should not add club cash transaction if domain is drupal" do
     sign_in @admin_user
-    @saved_member = create_active_member(@terms_of_membership_with_gateway, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent }) 
     assert_difference('ClubCashTransaction.count', 0) do
-      result = post(:create, { :member_id => @saved_member.id, 
+      result = post(:create, { :member_id => @saved_user.id, 
                                 club_cash_transaction: {
                                   :amount => 100, 
                                   :description => "adding club cash"
@@ -34,11 +34,11 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
 
   test "admin should add club cash transaction" do
     sign_in @admin_user
-    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @saved_user = create_active_user(@wordpress_terms_of_membership, :active_user, nil, {}, { :created_by => @admin_agent }) 
     @club.update_attribute :api_type, ''
 
     assert_difference('ClubCashTransaction.count') do
-      result = post(:create, { :member_id => @saved_member.id, 
+      result = post(:create, { :member_id => @saved_user.id, 
                                 club_cash_transaction: {
                                     :amount => 100, 
                                   :description => "adding club cash"
@@ -49,10 +49,10 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
 
   test "representative should not add club cash transaction" do
     sign_in @representative_user
-    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @saved_user = create_active_user(@wordpress_terms_of_membership, :active_user, nil, {}, { :created_by => @admin_agent }) 
 
     assert_difference('ClubCashTransaction.count',0) do
-      result = post(:create, { :member_id => @saved_member.id, 
+      result = post(:create, { :member_id => @saved_user.id, 
                                 club_cash_transaction: {
                                   :amount => 100, 
                                   :description => "adding club cash"
@@ -63,11 +63,11 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
 
   test "supervisor should add club cash transaction" do
     sign_in @supervisor_user
-    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @saved_user = create_active_user(@wordpress_terms_of_membership, :active_user, nil, {}, { :created_by => @admin_agent }) 
     @club.update_attribute :api_type, ''
 
     assert_difference('ClubCashTransaction.count') do
-      result = post(:create, { :member_id => @saved_member.id, 
+      result = post(:create, { :member_id => @saved_user.id, 
                                 club_cash_transaction: {
                                   :amount => 100, 
                                   :description => "adding club cash"
@@ -78,10 +78,10 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
 
   test "agency should not add club cash transaction" do
     sign_in @agency_user
-    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
+    @saved_user = create_active_user(@wordpress_terms_of_membership, :active_user, nil, {}, { :created_by => @admin_agent }) 
 
     assert_difference('ClubCashTransaction.count',0) do
-      result = post(:create, { :member_id => @saved_member.id, 
+      result = post(:create, { :member_id => @saved_user.id, 
                                 club_cash_transaction: {
                                   :amount => 100, 
                                   :description => "adding club cash"
@@ -93,8 +93,8 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
   test "Should not let add club cash when club does not allow to" do
     sign_in @admin_user
     @club.update_attribute :club_cash_enable, false
-    @saved_member = create_active_member(@wordpress_terms_of_membership, :active_member, nil, {}, { :created_by => @admin_agent }) 
-    post(:create, { :member_id => @saved_member.id, 
+    @saved_user = create_active_user(@wordpress_terms_of_membership, :active_user, nil, {}, { :created_by => @admin_agent }) 
+    post(:create, { :member_id => @saved_user.id, 
                               club_cash_transaction: {
                                 :amount => 100, 
                                 :description => "adding club cash"

@@ -114,14 +114,14 @@ class TermsOfMembershipsController < ApplicationController
       @tom.initial_club_cash_amount = post_data[:terms_of_membership][:initial_club_cash_amount]
       @tom.skip_first_club_cash = post_data[:terms_of_membership][:skip_first_club_cash]
       # Step 3
-      case post_data[:if_cannot_bill_member]
+      case post_data[:if_cannot_bill_user]
       when 'cancel'
         @tom.if_cannot_bill = 'cancel'
         @tom.downgrade_tom_id = nil
         @tom.suspension_period = nil
       when 'suspend'
         @tom.if_cannot_bill = 'suspend'
-        @tom.suspension_period = post_data[:if_cannot_bill_member_suspend_for_time_span] == 'months' ? months_to_days(post_data[:if_cannot_bill_member_suspend_for].to_i) : post_data[:if_cannot_bill_member_suspend_for].to_i
+        @tom.suspension_period = post_data[:if_cannot_bill_user_suspend_for_time_span] == 'months' ? months_to_days(post_data[:if_cannot_bill_user_suspend_for].to_i) : post_data[:if_cannot_bill_user_suspend_for].to_i
         @tom.downgrade_tom_id = nil
       when 'downgrade_to'
         @tom.if_cannot_bill = 'downgrade_tom'

@@ -1,13 +1,13 @@
-<p>Member <%= @member.full_name %> needs to be approved.</p>
+<p>User <%= @user.full_name %> needs to be approved.</p>
     
-<p> The following member has enrolled:
-<p> <b> First name: </b>  <%= @member.first_name %> </p>
-<p> <b> Last name: </b> <%= @member.last_name %> </p>
-<p> <b> Address: </b> <%= @member.full_address %> </p>
-<p> <b> Club: </b> <%= @member.club_id %> - <%= @member.club.name %> </p> 
-<p> <b> Terms of membership: </b> <%= @member.terms_of_membership_id %> - <%= @member.terms_of_membership.name %> </p>
+<p> The following User has enrolled:
+<p> <b> First name: </b>  <%= @user.first_name %> </p>
+<p> <b> Last name: </b> <%= @user.last_name %> </p>
+<p> <b> Address: </b> <%= @user.full_address %> </p>
+<p> <b> Club: </b> <%= @user.club_id %> - <%= @user.club.name %> </p> 
+<p> <b> Terms of membership: </b> <%= @user.terms_of_membership_id %> - <%= @user.terms_of_membership.name %> </p>
 
-<p> In order to accept or reject this member, please follow this link <%= link_to 'Link to member show page', show_member_url(@member.club.partner.prefix, @member.club.name , @member.id) %> .</p>.
+<p> In order to accept or reject this user, please follow this link <%= link_to 'Link to user show page', show_user_url(@user.club.partner.prefix, @user.club.name , @user.id) %> .</p>.
 
 <p>Regards.</p>
 

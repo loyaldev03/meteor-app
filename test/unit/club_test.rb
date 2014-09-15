@@ -28,7 +28,7 @@ class ClubTest < ActiveSupport::TestCase
     end
   end
 
-  test "Update Marketing client in a club with more members than the treshold configured to sync with marketing client" do
+  test "Update Marketing client in a club with more users than the treshold configured to sync with marketing client" do
     @club.members_count = Settings.maximum_number_of_subscribers_to_automatically_resync + 1
     @club.save
 

@@ -49,7 +49,7 @@ module MesAccountUpdater
       0.upto(quantity) do |i|
         request_file_by_id answer["rspfId_#{i}"], "#{gateway.club_id}-rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
       end
-      send_email_with_call_members
+      send_email_with_call_users
     end
   end
 
@@ -60,13 +60,13 @@ module MesAccountUpdater
   end
 
   private
-    def self.send_email_with_call_members
+    def self.send_email_with_call_users
       ccs = CreditCard.where([" aus_status = 'CALL' AND date(aus_answered_at) = ? ", Time.zone.now.to_date ])
       if ccs.size > 0
         csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"
-        csv += ccs.collect {|cc| [ cc.member_id, cc.member.first_name, cc.member.last_name, cc.member.email, cc.member.full_phone_number,
-            cc.member.status, cc.member.next_retry_bill_date ].join(',') }.join("\n")
-        Notifier.call_these_members(csv).deliver
+        csv += ccs.collect {|cc| [ cc.user_id, cc.user.first_name, cc.user.last_name, cc.user.email, cc.user.full_phone_number,
+            cc.user.status, cc.user.next_retry_bill_date ].join(',') }.join("\n")
+        Notifier.call_these_users(csv).deliver
       end
     end
 
@@ -97,10 +97,10 @@ module MesAccountUpdater
 
       count = 0
       # members with expired credit card and active
-      members = Member.billable.where([ 'date(bill_date) = ? AND club_id = ?', 
+      users = User.billable.where([ 'date(bill_date) = ? AND club_id = ?', 
                     (Time.zone.now+7.days).to_date, gateway.club_id ])
-      members.each do |member|
-        cc = member.active_credit_card
+      users.each do |user|
+        cc = user.active_credit_card
         account_type = case cc.cc_type
         when 'visa'
           'VISA'
@@ -194,18 +194,18 @@ module MesAccountUpdater
                 new_credit_card = CreditCard.new(number: new_account_number, expire_year: new_expire_year, expire_month: new_expire_month)
                 new_credit_card.token = old_account_token
                 new_credit_card.cc_type = new_account_type_am
-                answer = cc.member.add_new_credit_card(new_credit_card)
+                answer = cc.user.add_new_credit_card(new_credit_card)
                 unless answer[:code] == Settings.error_codes.success
                   Auditory.report_issue("MES::aus_update_process", response_code, { :credit_card => cc.inspect, :answer => answer, :line => line })
                 end
               when 'NEWEXP'
-                Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.member, Settings.operation_types.aus_recycle_credit_card)
+                Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.user, Settings.operation_types.aus_recycle_credit_card)
                 cc.update_attributes :expire_year => new_expire_year, :expire_month => new_expire_month
               when 'CLOSED', 'CALL'
-                member = cc.member
-                unless member.lapsed?
-                  member.cancel! Time.zone.now, "Automatic cancellation. AUS answered account #{response_code} wont be able to bill"
-                  member.set_as_canceled!
+                user = cc.user
+                unless user.lapsed?
+                  user.cancel! Time.zone.now, "Automatic cancellation. AUS answered account #{response_code} wont be able to bill"
+                  user.set_as_canceled!
                 end
               else
                 Rails.logger.info "CreditCard id ##{discretionary_data} with response #{response_code} ask for an action. #{line}"
@@ -234,19 +234,19 @@ module MesAccountUpdater
         }
         next if MesAccountUpdater::CHARGEBACKS_TO_NOT_PROCESS.include?(args[:reason])
         transaction_chargebacked = Transaction.find_by_payment_gateway_configuration_id_and_response_transaction_id gateway.id, args[:trident_transaction_id]
-        member = Member.find_by_id_and_club_id(args[:client_reference_number], gateway.club_id)
+        user = User.find_by_id_and_club_id(args[:client_reference_number], gateway.club_id)
         begin
           if transaction_chargebacked.nil?
-            raise "Chargeback ##{args[:control_number]} could not be processed. member or transaction_chargebacked are null! #{line}"
-          elsif member.nil?
-            transaction_chargebacked.member.chargeback! transaction_chargebacked, args
-          elsif transaction_chargebacked.member_id == member.id
-            member.chargeback! transaction_chargebacked, args
+            raise "Chargeback ##{args[:control_number]} could not be processed. user or transaction_chargebacked are null! #{line}"
+          elsif user.nil?
+            transaction_chargebacked.user.chargeback! transaction_chargebacked, args
+          elsif transaction_chargebacked.user_id == user.id
+            user.chargeback! transaction_chargebacked, args
           else
-            raise "Chargeback ##{args[:control_number]} could not be processed. member and transaction_chargebacked are different! #{line}"
+            raise "Chargeback ##{args[:control_number]} could not be processed. user and transaction_chargebacked are different! #{line}"
           end
         rescue 
-          Auditory.report_issue("MES::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :member => member.inspect, :line => line, :transaction_chargebacked_id => transaction_chargebacked.id.to_s })
+          Auditory.report_issue("MES::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :user => user.inspect, :line => line, :transaction_chargebacked_id => transaction_chargebacked.id.to_s })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end

@@ -1,0 +1,37 @@
+<%= render :partial => "shared/user_information" %>
+
+<div id="error_explanation">
+  <h2> Errors </h2>
+  <ul>
+  </ul>
+</div>
+<br>
+
+<%= form_tag(user_add_club_cash_path) do %> 
+  <table class="table table-condensed table-bordered">
+    <tr> 
+      <td>
+	      <%= label :amount, t('activerecord.attributes.club_cash_transaction.amount'), :class=>"help-inline" %>
+	      <%= text_field :club_cash_transaction, :amount, 
+            :value => (params[:club_cash_transaction][:amount] if params[:club_cash_transaction]) %>
+        </br>
+        <p class="help-inline"> <%= t('activerecord.attributes.club_cash_transaction.amount_help') %> </p>
+      </td>      
+    </tr>
+    <tr> 
+      <td> 
+	    <%= label :description, t('activerecord.attributes.club_cash_transaction.description') %>
+	    <%= text_area :club_cash_transaction, :description, :style => 'width: 99%; height: 200px' %>
+      </td>
+    </tr>
+    <tr>
+    	<td> <%= submit_tag t('buttons.add_club_cash_transaction'), :class => 'btn btn-primary', :id => "submit_button" %> 
+    	     <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn', :id => 'cancel_button' %> </td>
+    </tr>
+  </table>
+<% end %>
+
+<script>
+  var id = "<%= @current_user.id %>"; 
+  $(document).ready(club_cash_functions())
+</script>

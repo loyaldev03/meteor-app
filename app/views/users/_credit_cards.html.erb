@@ -1,0 +1,54 @@
+
+<table class="table table-bordered table-condensed">
+  <thead>
+    <tr>
+      <th> <%= t('activerecord.attributes.credit_card.last_digits') %> </th>
+      <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
+        <th> <%= t('activerecord.attributes.credit_card.token') %> </th>
+      <% end %>
+      <th> <%= t('activerecord.attributes.credit_card.expire_date') %> </th>
+      <th> <%= t('activerecord.attributes.credit_card.added_at') %> </th>
+      <th> <%= t('activerecord.attributes.credit_card.last_successful_bill_date') %> </th>
+      <th> <%= t('actions') %> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% credit_cards.each do |cc| %>
+    <!-- Improve css with fnCreatedCell (see the gem was updated.)-->
+    <tr <% if cc.blacklisted %> 
+          class="blacklisted" 
+        <% elsif cc.active %>
+          class = "ligthgreen"
+        <% else %>
+          class="<%= cycle("odd","even") %>" 
+        <% end %>
+        >
+      <td> <%= cc.last_digits %> </td>
+      <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
+        <td> <%= cc.token %> </td>
+      <% end %>
+      <td> <%= cc.expire_month %> / <%= cc.expire_year %> </td>
+      <td> <%= I18n.l cc.created_at, :format => :only_date %> </td>
+      <td> <%= I18n.l cc.last_successful_bill_date, :format => :dashed if !cc.last_successful_bill_date.nil? %> </td>
+      <td>
+        <% if cc.blacklisted %>
+          <%= t('activerecord.attributes.credit_card.blacklisted') %>
+        <% end %>
+        <%= t('activerecord.attributes.credit_card.active') if cc.active %>
+        <% if cc.can_be_activated? %>
+          <%= form_for @cc, :as => :credit_card, :url => credit_card_activate_path(:credit_card_id => cc.id) do |f| %>
+            <%= submit_tag 'Activate', :name => 'activate', :class=> "btn btn-warning confirm", :id => "activate_credit_card_button" ,:disabled => (cannot? :activate, CreditCard, @current_club.id) %>
+          <% end %>
+        <% end %>
+        <% if @current_user.lapsed? and not @current_user.blacklisted and not cc.active and not @current_user.is_chargeback? and can? :destroy, CreditCard %>
+          <%= link_to(I18n.t(:destroy), credit_card_path(@current_partner.prefix, @current_club.name, @current_user.id, cc.id), :method => :delete, :id => "destroy",
+                        :confirm => I18n.t("are_you_sure"),
+                        :class => 'btn btn-mini btn-danger') %>
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
+  <% end %>
+</table>
+
+

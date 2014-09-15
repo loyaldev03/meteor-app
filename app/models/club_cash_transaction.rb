@@ -1,5 +1,5 @@
 class ClubCashTransaction < ActiveRecord::Base
-  belongs_to :member
+  belongs_to :user
 
   attr_accessible :amount, :description
 
@@ -9,9 +9,9 @@ class ClubCashTransaction < ActiveRecord::Base
     self.errors.collect {|attr, message| "#{attr}: #{message}" }.join(delimiter)
   end
 
-  def errors_merged(member)
+  def errors_merged(user)
     errors = self.errors.to_hash
-    errors.merge!(member: member.errors.to_hash) unless member.errors.empty?
+    errors.merge!(user: user.errors.to_hash) unless user.errors.empty?
     errors
   end
 

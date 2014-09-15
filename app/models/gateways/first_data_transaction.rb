@@ -1,8 +1,8 @@
 class FirstDataTransaction < Transaction
 
-  def member=(member)
-    super(member)
-    self.invoice_number = member.id
+  def user=(user)
+    super(user)
+    self.invoice_number = user.id
   end
 
   def self.store!(am_credit_card, pgc)

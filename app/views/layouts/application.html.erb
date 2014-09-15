@@ -25,7 +25,7 @@
       <%= render :partial => "shared/footer"%>
     </div> <!-- /container -->
 
-    <% if Rails.env.production? and params[:controller].include?('members') and ['index', 'show'].include?(params[:action]) and  params[:club_prefix] == 'Nascar' %>
+    <% if Rails.env.production? and params[:controller].include?('users') and ['index', 'show'].include?(params[:action]) and  params[:club_prefix] == 'Nascar' %>
       <script type="text/javascript">
         setTimeout(function(){var a=document.createElement("script");
         var b=document.getElementsByTagName("script")[0];

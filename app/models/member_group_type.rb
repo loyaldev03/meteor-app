@@ -1,5 +1,5 @@
 class MemberGroupType < Enumeration
-  has_many :members
+  has_many :users
   belongs_to :club
 
   def to_s

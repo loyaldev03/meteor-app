@@ -1,0 +1,24 @@
+<%= render :partial => "shared/user_information" %>
+
+ <%= form_for @user_note, :as => :user_note, :url => user_notes_path(:id => @user_notes) do |f|%>
+  <table class="table table-bordered" id="user_notes_table">    
+    <tr>
+      <td> 
+        <%= f.select :communication_type_id, options_from_collection_for_select(@communication_types, "id", "name") %>
+        <%= f.select :disposition_type_id, options_from_collection_for_select(@disposition_types, "id", "name") %> 
+      </td>
+    </tr>
+    <tr>
+      <td> <%= f.text_area :description, :style => 'width: 99%; height: 200px', :class => 'required' %> </td>
+    </tr>
+    <tr> 
+      <td> <%= submit_tag t('buttons.save_user_note'), :class => 'btn btn-primary' %>
+           <%= link_to t('buttons.cancel'), :back, :class => 'btn' %> 
+      </td> 
+    </tr>
+  </table>
+ <% end %>
+ 
+<script type="text/javascript">
+  $(document).ready( user_note_functions() );
+</script>

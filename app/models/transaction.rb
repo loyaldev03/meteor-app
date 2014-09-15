@@ -1,5 +1,5 @@
 class Transaction < ActiveRecord::Base
-  belongs_to :member
+  belongs_to :user
   belongs_to :membership
   belongs_to :payment_gateway_configuration
   belongs_to :decline_strategy
@@ -26,17 +26,17 @@ class Transaction < ActiveRecord::Base
     ['created_at']
   end
 
-  def member=(member)
-    self.member_id = member.id
-    self.first_name = member.first_name
-    self.last_name = member.last_name
-    self.phone_number = member.full_phone_number
-    self.email = member.email
-    self.address = member.address
-    self.city = member.city
-    self.state = member.state
-    self.country = member.country
-    self.zip = member.zip
+  def user=(user)
+    self.user_id = user.id
+    self.first_name = user.first_name
+    self.last_name = user.last_name
+    self.phone_number = user.full_phone_number
+    self.email = user.email
+    self.address = user.address
+    self.city = user.city
+    self.state = user.state
+    self.country = user.country
+    self.zip = user.zip
   end
 
   def credit_card=(credit_card)
@@ -62,13 +62,13 @@ class Transaction < ActiveRecord::Base
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
   end
 
-  def prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, operation_type_to_set = nil)
-    self.member = member
+  def prepare(user, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, operation_type_to_set = nil)
+    self.user = user
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
-    self.membership_id = membership.nil? ? member.current_membership_id : membership.id 
-    self.terms_of_membership_id = terms_of_membership_id || member.terms_of_membership.id
+    self.membership_id = membership.nil? ? user.current_membership_id : membership.id 
+    self.terms_of_membership_id = terms_of_membership_id || user.terms_of_membership.id
     self.operation_type = operation_type_to_set
     self.save
     @options = {
@@ -85,27 +85,27 @@ class Transaction < ActiveRecord::Base
     }    
   end
 
-  def prepare_no_recurrent(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, type)
+  def prepare_no_recurrent(user, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, type)
     operation_type = type=="one-time" ? Settings.operation_types.no_recurrent_billing : Settings.operation_types.no_reccurent_billing_donation
-    prepare(member, credit_card, amount, payment_gateway_configuration, terms_of_membership_id, membership, operation_type)
+    prepare(user, credit_card, amount, payment_gateway_configuration, terms_of_membership_id, membership, operation_type)
   end
 
-  def prepare_for_manual(member, amount, operation_type_to_set)
-    self.terms_of_membership_id = member.terms_of_membership.id
-    self.member = member
+  def prepare_for_manual(user, amount, operation_type_to_set)
+    self.terms_of_membership_id = user.terms_of_membership.id
+    self.user = user
     self.amount = amount
-    self.membership_id = member.current_membership_id 
+    self.membership_id = user.current_membership_id 
     self.operation_type = operation_type_to_set
     self.gateway = :manual
     self.save    
   end
 
   def can_be_refunded?
-    [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !member.blacklisted? and self.success? and has_same_pgc_as_current?
+    [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !user.blacklisted? and self.success? and has_same_pgc_as_current?
   end
 
   def has_same_pgc_as_current?
-    gateway == member.club.payment_gateway_configurations.first.gateway
+    gateway == user.club.payment_gateway_configurations.first.gateway
   end
 
   def process
@@ -197,17 +197,17 @@ class Transaction < ActiveRecord::Base
           return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
         end
         trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
-        trans.prepare(sale_transaction.member, sale_transaction.credit_card, -amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, operation_type_to_set)
+        trans.prepare(sale_transaction.user, sale_transaction.credit_card, -amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, operation_type_to_set)
         trans.fill_transaction_type_for_credit(sale_transaction)
         answer = trans.process
         if trans.success?
           sale_transaction.refunded_amount = sale_transaction.refunded_amount + amount if update_refunded_amount
           sale_transaction.save
-          Auditory.audit(agent, trans, "Refund success $#{amount} on transaction #{sale_transaction.id}", sale_transaction.member, Settings.operation_types.credit)
-          Communication.deliver!(:refund, sale_transaction.member)
-          sale_transaction.member.update_attribute :need_sync_to_marketing_client, true
+          Auditory.audit(agent, trans, "Refund success $#{amount} on transaction #{sale_transaction.id}", sale_transaction.user, Settings.operation_types.credit)
+          Communication.deliver!(:refund, sale_transaction.user)
+          sale_transaction.user.update_attribute :need_sync_to_marketing_client, true
         else
-          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.member, Settings.operation_types.credit_error)
+          Auditory.audit(agent, trans, "Refund $#{amount} error: #{answer[:message]}", sale_transaction.user, Settings.operation_types.credit_error)
           trans.update_attribute :operation_type, Settings.operation_types.credit_error
         end
         answer
@@ -215,10 +215,10 @@ class Transaction < ActiveRecord::Base
     end
   end
 
-  def self.generate_balance_transaction(agent, member, amount, membership, transaction_to_refund = nil)
+  def self.generate_balance_transaction(agent, user, amount, membership, transaction_to_refund = nil)
     trans = Transaction.obtain_transaction_by_gateway!(membership.terms_of_membership.payment_gateway_configuration.gateway)
     trans.transaction_type = "balance"
-    trans.prepare(member, member.active_credit_card, amount, membership.terms_of_membership.payment_gateway_configuration, membership.terms_of_membership.id, membership, Settings.operation_types.membership_balance_transfer)
+    trans.prepare(user, user.active_credit_card, amount, membership.terms_of_membership.payment_gateway_configuration, membership.terms_of_membership.id, membership, Settings.operation_types.membership_balance_transfer)
     trans.process
     transaction_to_refund.update_attribute :refunded_amount, amount.abs if transaction_to_refund
   end
@@ -261,7 +261,7 @@ class Transaction < ActiveRecord::Base
       save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
       response = save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Credit", e, {:member => self.member.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
+      Auditory.report_issue("Transaction::Credit", e, {:user => self.user.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
       response
     end
 
@@ -279,7 +279,7 @@ class Transaction < ActiveRecord::Base
       save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
       response = save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Refund", e, {:member => self.member.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
+      Auditory.report_issue("Transaction::Refund", e, {:user => self.user.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
       response
     end    
 

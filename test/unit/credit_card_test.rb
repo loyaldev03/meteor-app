@@ -11,10 +11,10 @@ class CreditCardTest < ActiveSupport::TestCase
   
   def check_offset 
     terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    member = create_active_member(terms_of_membership, :provisional_member_with_cc)
-    credit_card = member.active_credit_card
+    user = create_active_user(terms_of_membership, :provisional_user_with_cc)
+    credit_card = user.active_credit_card
     # # testing internal logic
-    assert_equal Time.now.in_time_zone(@club.time_zone).formatted_offset, credit_card.member.get_offset_related
+    assert_equal Time.now.in_time_zone(@club.time_zone).formatted_offset, credit_card.user.get_offset_related
   end
   
 	test "CC dates validation within club with negative offset" do

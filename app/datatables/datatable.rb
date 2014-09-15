@@ -1,11 +1,11 @@
 class Datatable
   delegate :params, :h, :link_to, :number_to_currency, to: :@view
   
-  def initialize(view,current_partner=nil,current_club =nil, current_member=nil, current_agent=nil)
+  def initialize(view,current_partner=nil,current_club =nil, current_user=nil, current_agent=nil)
     @view = view
     @current_partner = current_partner
     @current_club = current_club
-    @current_member = current_member
+    @current_user = current_user
     @current_agent = current_agent
     @url_helpers = Rails.application.routes.url_helpers
   end

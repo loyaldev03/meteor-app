@@ -1,6 +1,6 @@
-<% if @current_member.has_link_to_api? %>
+<% if @current_user.has_link_to_api? %>
   <% large_button = ( use_large_button ? "btn-large-w" : "") %>
-  <% if @current_member.api_id.blank? %>
+  <% if @current_user.api_id.blank? %>
     <%= 
       link_to "#", 
         class: "btn btn-info #{large_button} disabled",
@@ -11,7 +11,7 @@
     <% end %>      
   <% else %>
     <%= 
-      link_to member_resend_welcome_path(@current_partner.prefix, @current_club.name, @current_member.id), 
+      link_to user_resend_welcome_path(@current_partner.prefix, @current_club.name, @current_user.id), 
         method: :post, 
         class: "btn #{large_button} btn-info",
         id: "resend_welcome_email", 

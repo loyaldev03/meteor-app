@@ -1,8 +1,8 @@
 module Drupal
-  class UserPoints < Struct.new(:member)
+  class UserPoints < Struct.new(:user)
 
     def get
-      res = conn.get('/api/userpoints/%{drupal_id}' % { drupal_id: self.member.api_id }).body
+      res = conn.get('/api/userpoints/%{drupal_id}' % { drupal_id: self.user.api_id }).body
     rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
       Drupal.logger.info "  => #{$!.to_s}"
     ensure
@@ -11,15 +11,15 @@ module Drupal
 
     def create!(options = {})
       res = conn.post '/api/userpoints/add', fieldmap(options)
-      update_member(res)
+      update_user(res)
     end
 
   private
     def conn
-      self.member.club.drupal
+      self.user.club.drupal
     end
 
-    def update_member(res)
+    def update_user(res)
       if res
         data = if res.status == 200
           { 
@@ -36,14 +36,14 @@ module Drupal
             sync_status: "with_error"
           }
         end
-        ::Member.where(id: self.member.id).limit(1).update_all(data)
-        self.member.reload rescue self.member
+        ::User.where(id: self.user.id).limit(1).update_all(data)
+        self.user.reload rescue self.user
       end
     end
 
     def fieldmap(options)
       {
-        uid: member.api_id,
+        uid: user.api_id,
         points: options[:amount].to_f*100,
         operation: "Add",
         description: options[:description],

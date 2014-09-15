@@ -2,7 +2,7 @@ class ClubCashTransactionsDatatable < Datatable
 
 private
   def total_records
-    @current_member.club_cash_transactions.count
+    @current_user.club_cash_transactions.count
   end
 
   def total_entries
@@ -25,7 +25,7 @@ private
   end
 
   def fetch_club_cash_transactions
-    club_cash_transactions = ClubCashTransaction.order("#{sort_column} #{sort_direction}").where('member_id' => @current_member)
+    club_cash_transactions = ClubCashTransaction.order("#{sort_column} #{sort_direction}").where('user_id' => @current_user)
     club_cash_transactions = club_cash_transactions.page(page).per_page(per_page)
     if params[:sSearch].present?
       club_cash_transactions = club_cash_transactions.where("amount like :search or description like :search", search: "%#{params[:sSearch]}%")

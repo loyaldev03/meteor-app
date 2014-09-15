@@ -5,7 +5,7 @@ class Club < ActiveRecord::Base
   belongs_to :partner
   has_many :domains
   has_many :terms_of_memberships
-  has_many :members
+  has_many :users
   has_many :fulfillments
   has_many :prospects
   has_many :payment_gateway_configurations
@@ -146,15 +146,15 @@ class Club < ActiveRecord::Base
     not pgc.nil? and pgc.authorize_net?
   end
 
-  def resync_members_and_prospects
+  def resync_users_and_prospects
     subscribers_count = self.members_count.to_i
     if subscribers_count > Settings.maximum_number_of_subscribers_to_automatically_resync
       Auditory.report_club_changed_marketing_client(self, subscribers_count)
     end
-    self.members.update_all(:need_sync_to_marketing_client => 1, :marketing_client_synced_status => "not_sinced", :marketing_client_last_synced_at => nil, :marketing_client_last_sync_error => nil, :marketing_client_last_sync_error_at => nil, :marketing_client_id => nil)
+    self.users.update_all(:need_sync_to_marketing_client => 1, :marketing_client_synced_status => "not_sinced", :marketing_client_last_synced_at => nil, :marketing_client_last_sync_error => nil, :marketing_client_last_sync_error_at => nil, :marketing_client_id => nil)
     self.prospects.update_all(:need_sync_to_marketing_client => 1)
   end
-  handle_asynchronously :resync_members_and_prospects, :queue => :generic_queue
+  handle_asynchronously :resync_users_and_prospects, :queue => :generic_queue
 
   private
     def add_default_member_groups
@@ -205,7 +205,7 @@ class Club < ActiveRecord::Base
     def resync_with_merketing_tool_process
       if self.changes.include? :marketing_tool_client
         unless ['action_mailer', ''].include?(self.changes[:marketing_tool_client].last)
-          resync_members_and_prospects 
+          resync_users_and_prospects 
         end
       end
     end

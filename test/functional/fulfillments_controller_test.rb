@@ -14,13 +14,13 @@ class FulfillmentsControllerTest < ActionController::TestCase
   end
 
   def update_status_on_fulfillment_where_i_do_not_manage(profile)
-      # setup member from other club
+      # setup user from other club
     @other_club = FactoryGirl.create(:simple_club_with_gateway)
     @terms_of_membership_with_gateway_other_club = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @other_club.id)
-    @other_club_saved_member = create_active_member(@terms_of_membership_with_gateway_other_club, :active_member, nil, {}, { :created_by => @admin_user })
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @other_club_saved_member.id, :product_sku => 'KIT-CARD', :club_id => @other_club.id)}
+    @other_club_saved_user = create_active_user(@terms_of_membership_with_gateway_other_club, :active_user, nil, {}, { :created_by => @admin_user })
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @other_club_saved_user.id, :product_sku => 'KIT-CARD', :club_id => @other_club.id)}
 
-    # setup my member and login as club role fulfillment manager
+    # setup my user and login as club role fulfillment manager
     @my_club = FactoryGirl.create(:simple_club_with_gateway)
     @terms_of_membership_with_gateway_my_club = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @my_club.id)
 
@@ -30,27 +30,27 @@ class FulfillmentsControllerTest < ActionController::TestCase
     club_role.agent_id = @agent_club_role.id
     club_role.save    
 
-    @my_club_saved_member = create_active_member(@terms_of_membership_with_gateway_my_club, :active_member, nil, {}, { :created_by => @agent_club_role })
-    3.times{FactoryGirl.create(:fulfillment, :member_id => @my_club_saved_member.id, :product_sku => 'KIT-CARD', :club_id => @my_club.id)}
+    @my_club_saved_user = create_active_user(@terms_of_membership_with_gateway_my_club, :active_user, nil, {}, { :created_by => @agent_club_role })
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @my_club_saved_user.id, :product_sku => 'KIT-CARD', :club_id => @my_club.id)}
 
     sign_in @agent_club_role
 
-    assert_equal @other_club_saved_member.fulfillments.where(status: 'not_processed').count, 3
-    assert_equal @my_club_saved_member.fulfillments.where(status: 'not_processed').count, 3
+    assert_equal @other_club_saved_user.fulfillments.where(status: 'not_processed').count, 3
+    assert_equal @my_club_saved_user.fulfillments.where(status: 'not_processed').count, 3
 
     # try to change status on other club fulfillment
-    other_fulfillment = @other_club_saved_member.fulfillments.first
+    other_fulfillment = @other_club_saved_user.fulfillments.first
     response = put :update_status, partner_prefix: @my_club.partner.prefix, club_prefix: @my_club.name, new_status: 'out_of_stock', reason: 'test', file: nil, id: other_fulfillment.id
     assert response.body.include?("\"code\":\"414\""), "Response code invalid"
     assert_response :success
 
     other_fulfillment.reload
     assert_equal other_fulfillment.status, 'not_processed'
-    assert_equal 0, @other_club_saved_member.fulfillments.where(status: 'out_of_stock').count
+    assert_equal 0, @other_club_saved_user.fulfillments.where(status: 'out_of_stock').count
 
 
     # try to change status on my club fulfillment
-    my_fulfillment = @my_club_saved_member.fulfillments.first
+    my_fulfillment = @my_club_saved_user.fulfillments.first
     response = put :update_status, partner_prefix: @my_club.partner.prefix, club_prefix: @my_club.name, new_status: 'out_of_stock', reason: 'test2', id: my_fulfillment.id
 
     assert response.body.include?("\"code\":\"000\""), "Response code invalid"
@@ -58,7 +58,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
 
     my_fulfillment.reload
     assert_equal my_fulfillment.status, 'out_of_stock'
-    assert_equal 1, @my_club_saved_member.fulfillments.where(status: 'out_of_stock').count
+    assert_equal 1, @my_club_saved_user.fulfillments.where(status: 'out_of_stock').count
   end
 
   def create_xls_file_with_club_role(role)
@@ -71,18 +71,18 @@ class FulfillmentsControllerTest < ActionController::TestCase
 
     second_club = FactoryGirl.create(:simple_club_with_gateway)
     second_product = FactoryGirl.create(:product, :club_id => second_club.id)
-    first_member = FactoryGirl.create(:member, :club_id => @club.id)
-    second_member = FactoryGirl.create(:member, :club_id => second_club.id)
+    first_user = FactoryGirl.create(:user, :club_id => @club.id)
+    second_user = FactoryGirl.create(:user, :club_id => second_club.id)
 
     first_fulfillment = Fulfillment.new
     first_fulfillment.product_sku = @product.sku
     first_fulfillment.club_id = @club.id
-    first_fulfillment.member_id = first_member.id
+    first_fulfillment.user_id = first_user.id
     first_fulfillment.save
     second_fulfillment = Fulfillment.new
     second_fulfillment.product_sku = second_product.sku
     second_fulfillment.club_id = second_club.id
-    second_fulfillment.member_id = second_member.id
+    second_fulfillment.user_id = second_user.id
     second_fulfillment.save
 
     get :generate_xls, initial_date: I18n.l(Time.zone.now, :format=>:only_date),
@@ -190,18 +190,18 @@ class FulfillmentsControllerTest < ActionController::TestCase
       @agent.club_roles.first.update_attribute :role, role
       second_club = FactoryGirl.create(:simple_club_with_gateway)
       second_product = FactoryGirl.create(:product, :club_id => second_club.id)
-      first_member = FactoryGirl.create(:member, :club_id => @club.id)
-      second_member = FactoryGirl.create(:member, :club_id => second_club.id)
+      first_user = FactoryGirl.create(:user, :club_id => @club.id)
+      second_user = FactoryGirl.create(:user, :club_id => second_club.id)
 
       first_fulfillment = Fulfillment.new
       first_fulfillment.product_sku = @product.sku
       first_fulfillment.club_id = @club.id
-      first_fulfillment.member_id = first_member.id
+      first_fulfillment.user_id = first_user.id
       first_fulfillment.save
       second_fulfillment = Fulfillment.new
       second_fulfillment.product_sku = second_product.sku
       second_fulfillment.club_id = second_club.id
-      second_fulfillment.member_id = second_member.id
+      second_fulfillment.user_id = second_user.id
       second_fulfillment.save
 
       get :generate_xls, initial_date: I18n.l(Time.zone.now, :format=>:only_date),

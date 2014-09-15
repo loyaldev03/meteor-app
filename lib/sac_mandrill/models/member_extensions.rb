@@ -14,7 +14,7 @@ module SacMandrill
           SacMandrill::MemberModel.new self
         end
       else
-        Auditory.report_issue("Member:mandrill_member", 'Mandrill not configured correctly', { :club => self.club.inspect, :member => self.member })
+        Auditory.report_issue("Member:mandrill_member", 'Mandrill not configured correctly', { :club => self.club.inspect, :member => self.user })
         false
       end
     end

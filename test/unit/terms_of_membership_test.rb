@@ -7,18 +7,18 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     @current_agent = FactoryGirl.create(:agent)
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @member = FactoryGirl.build(:member)
+    @user = FactoryGirl.build(:user)
     @credit_card = FactoryGirl.build(:credit_card)
   end
 
-  def enroll_member(tom, amount=23, cc_blank=false, cc_card = nil)
+  def enroll_user(tom, amount=23, cc_blank=false, cc_card = nil)
     credit_card = cc_card.nil? ? @credit_card : cc_card
-    answer = Member.enroll(tom, @current_agent, amount, 
-      { first_name: @member.first_name,
-        last_name: @member.last_name, address: @member.address, city: @member.city, gender: 'M',
-        zip: @member.zip, state: @member.state, email: @member.email, type_of_phone_number: @member.type_of_phone_number,
-        phone_country_code: @member.phone_country_code, phone_area_code: @member.phone_area_code,
-        type_of_phone_number: 'Home', phone_local_number: @member.phone_local_number, country: 'US', 
+    answer = User.enroll(tom, @current_agent, amount, 
+      { first_name: @user.first_name,
+        last_name: @user.last_name, address: @user.address, city: @user.city, gender: 'M',
+        zip: @user.zip, state: @user.state, email: @user.email, type_of_phone_number: @user.type_of_phone_number,
+        phone_country_code: @user.phone_country_code, phone_area_code: @user.phone_area_code,
+        type_of_phone_number: 'Home', phone_local_number: @user.phone_local_number, country: 'US', 
         product_sku: Settings.kit_card_product }, 
       { number: credit_card.number, 
         expire_year: credit_card.expire_year, expire_month: credit_card.expire_month },
@@ -26,10 +26,10 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
 
     assert (answer[:code] == Settings.error_codes.success), answer[:message]+answer.inspect
 
-    member = Member.find(answer[:member_id])
-    assert_not_nil member
-    assert_equal member.status, 'provisional'
-    member
+    user = User.find(answer[:member_id])
+    assert_not_nil user
+    assert_equal user.status, 'provisional'
+    user
   end
 
   test "Should not allow to save toms with same name within same club" do
@@ -59,85 +59,85 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   end
 
   # Create a TOM with upgrate to >1
-  test "Create a member with TOM upgrate to >1" do
+  test "Create an user with TOM upgrate to >1" do
     active_merchant_stubs
     @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 65, :provisional_days => 30, :installment_period => 30 )
 
-    member = enroll_member(@terms_of_membership_with_upgrade)
-    nbd = member.next_retry_bill_date
-    next_month = Time.zone.now.to_date + member.terms_of_membership.installment_period.days
+    user = enroll_user(@terms_of_membership_with_upgrade)
+    nbd = user.next_retry_bill_date
+    next_month = Time.zone.now.to_date + user.terms_of_membership.installment_period.days
     #first billing, it should not upgrade 
-    Timecop.travel(member.next_retry_bill_date) do
+    Timecop.travel(user.next_retry_bill_date) do
       assert_difference("Operation.count", 3) do
         TasksHelpers.bill_all_members_up_today
       end      
-      member.reload
-      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
+      user.reload
+      assert_equal user.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
     end
     #Second billing, it should not upgrade 
-    Timecop.travel(member.next_retry_bill_date) do
+    Timecop.travel(user.next_retry_bill_date) do
       assert_difference("Operation.count", 3) do
         TasksHelpers.bill_all_members_up_today
       end
-      member.reload
-      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
+      user.reload
+      assert_equal user.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
     end
     #Third billing, it should upgrade 
-    Timecop.travel(member.next_retry_bill_date) do
+    Timecop.travel(user.next_retry_bill_date) do
       assert_difference("Operation.count", 4) do
         TasksHelpers.bill_all_members_up_today
       end
-      member.reload
-      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership.id
-      assert_not_nil member.operations.where(operation_type: Settings.operation_types.tom_upgrade).first
+      user.reload
+      assert_equal user.current_membership.terms_of_membership_id, @terms_of_membership.id
+      assert_not_nil user.operations.where(operation_type: Settings.operation_types.tom_upgrade).first
     end
   end
 
   #Create a TOM with upgrate to = 1
-  test "Create a member with TOM upgrate to = 1" do
+  test "Create an user with TOM upgrate to = 1" do
     active_merchant_stubs
     @terms_of_membership_with_upgrade = FactoryGirl.build(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 1, :provisional_days => 30, :installment_period => 30 )
     assert @terms_of_membership_with_upgrade.save
-    member = enroll_member(@terms_of_membership_with_upgrade)
+    user = enroll_user(@terms_of_membership_with_upgrade)
   end
 
-  test "Create a member with Manual Payment with TOM upgrate to >1" do
+  test "Create an user with Manual Payment with TOM upgrate to >1" do
     active_merchant_stubs
     @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 65, :provisional_days => 30, :installment_period => 30 )
 
-    member = enroll_member(@terms_of_membership_with_upgrade)
-    member.update_attribute :manual_payment, true
+    user = enroll_user(@terms_of_membership_with_upgrade)
+    user.update_attribute :manual_payment, true
 
     #first billing, it should not upgrade  
-    Timecop.travel(member.next_retry_bill_date) do
+    Timecop.travel(user.next_retry_bill_date) do
       assert_difference("Operation.count", 3) do
-        member.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
+        user.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
       end      
-      member.reload
-      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
+      user.reload
+      assert_equal user.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
     end
     #Second billing, it should not upgrade 
-    Timecop.travel(member.next_retry_bill_date) do
+    Timecop.travel(user.next_retry_bill_date) do
       assert_difference("Operation.count", 3) do
-        member.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
+        user.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
       end
-      member.reload
-      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
+      user.reload
+      assert_equal user.current_membership.terms_of_membership_id, @terms_of_membership_with_upgrade.id
     end
     #Third billing, it should upgrade 
-    Timecop.travel(member.next_retry_bill_date) do
+    Timecop.travel(user.next_retry_bill_date) do
       assert_difference("Operation.count", 4) do
-        member.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
+        user.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
       end
-      member.reload
-      assert_equal member.current_membership.terms_of_membership_id, @terms_of_membership.id
-      assert_not_nil member.operations.where(operation_type: Settings.operation_types.tom_upgrade).first
+      user.reload
+      assert_equal user.current_membership.terms_of_membership_id, @terms_of_membership.id
+      assert_not_nil user.operations.where(operation_type: Settings.operation_types.tom_upgrade).first
     end
   end
 end

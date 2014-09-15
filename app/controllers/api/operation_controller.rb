@@ -28,7 +28,7 @@ class Api::OperationController < ApplicationController
   # @example_response_description Example response to valid request.
   #
 	def create
-  	member = Member.find(params[:member_id])
+  	user = User.find(params[:member_id])
     
     o = Operation.new( 
       :operation_date => params[:operation_date], 
@@ -37,7 +37,7 @@ class Api::OperationController < ApplicationController
       :operation_type => params[:operation_type]
     )
     o.created_by_id = @current_agent.id
-    o.member = member
+    o.user = user
 
     o.save!
     render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }

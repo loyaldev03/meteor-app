@@ -26,11 +26,11 @@
           <%= @current_club.name %>
         <% end %>
       </li>      
-      <% if params[:controller] == 'members' and params[:action] == 'index' %>
+      <% if params[:controller] == 'users' and params[:action] == 'index' %>
         <%= delimiter %><li class="active">Search</li>
       <% end %>
-      <% if params[:controller] == 'members' and params[:action] == 'new' %>
-        <%= delimiter %><li class="active">New member</li>
+      <% if params[:controller] == 'users' and params[:action] == 'new' %>
+        <%= delimiter %><li class="active">New user</li>
       <% end %>
       <% if params[:controller] == 'fulfillments' %>
         <%= delimiter %><li class="active">Fulfillments</li>
@@ -57,13 +57,13 @@
       <% end %>
     <% end %>
 
-    <% if @current_member %>
+    <% if @current_user %>
       <%= delimiter %>
-      <li><a href="<%= members_path %>">Members</a></li>
+      <li><a href="<%= users_path %>">User</a></li>
       <%= delimiter %>
-      <li><a href="<%= show_member_path %>">Member</a></li>
+      <li><a href="<%= show_user_path %>">User</a></li>
       <%= delimiter %>
-      <% if params[:controller].include?('member_notes') %>
+      <% if params[:controller].include?('user_notes') %>
         <li class="active">Notes</li>
       <% elsif params[:controller].include?('credit_cards') %>
         <li class="active">Credit card</li>

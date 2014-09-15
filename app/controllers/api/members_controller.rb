@@ -99,8 +99,8 @@ class Api::MembersController < ApplicationController
   #
   def create
     tom = TermsOfMembership.find(params[:member][:terms_of_membership_id])  
-    my_authorize! :api_enroll, Member, tom.club_id
-    render json: Member.enroll(
+    my_authorize! :api_enroll, User, tom.club_id
+    render json: User.enroll(
       tom, 
       current_agent, 
       params[:member][:enrollment_amount], 
@@ -112,7 +112,7 @@ class Api::MembersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
-    Auditory.report_issue("API::Member::create", e, { :params => params.inspect })
+    Auditory.report_issue("API::User::create", e, { :params => params.inspect })
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
@@ -177,36 +177,36 @@ class Api::MembersController < ApplicationController
   def update
     response = {}
     batch_update = params[:setter] && params[:setter][:batch_update] && params[:setter][:batch_update].to_s.to_bool
-    member = Member.find(params[:id])
+    user = User.find(params[:id])
 
-    my_authorize! :api_update, Member, member.club_id
-    member.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync].to_s.to_bool
-    member.api_id = params[:member][:api_id] if params[:member][:api_id].present? and batch_update
-    member.wrong_phone_number = nil if params[:setter][:wrong_phone_number].to_s.to_bool unless params[:setter].nil?
-    member.wrong_phone_number = nil if (member.phone_country_code != params[:member][:phone_country_code].to_i || 
-                                                          member.phone_area_code != params[:member][:phone_area_code].to_i ||
-                                                          member.phone_local_number != params[:member][:phone_local_number].to_i)
+    my_authorize! :api_update, User, user.club_id
+    user.skip_api_sync! if params[:setter] && params[:setter][:skip_api_sync] && params[:setter][:skip_api_sync].to_s.to_bool
+    user.api_id = params[:member][:api_id] if params[:member][:api_id].present? and batch_update
+    user.wrong_phone_number = nil if params[:setter][:wrong_phone_number].to_s.to_bool unless params[:setter].nil?
+    user.wrong_phone_number = nil if (user.phone_country_code != params[:member][:phone_country_code].to_i || 
+                                                          user.phone_area_code != params[:member][:phone_area_code].to_i ||
+                                                          user.phone_local_number != params[:member][:phone_local_number].to_i)
 
-    response = member.update_credit_card_from_drupal(params[:member][:credit_card], @current_agent)
+    response = user.update_credit_card_from_drupal(params[:member][:credit_card], @current_agent)
 
     if response[:code] == Settings.error_codes.success
-      member.update_member_data_by_params(params[:member])
-      changed_attributes = member.changed
-      if member.save
+      user.update_user_data_by_params(params[:member])
+      changed_attributes = user.changed
+      if user.save
         message = "Member updated successfully"
         notes = 'Modified: ' + changed_attributes.join(', ')
         unless batch_update
-          Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_updated, Time.zone.now, notes)
+          Auditory.audit(current_agent, user, message, user, Settings.operation_types.profile_updated, Time.zone.now, notes)
         end
-        response = { :message => message, :code => Settings.error_codes.success, :member_id => member.id}
+        response = { :message => message, :code => Settings.error_codes.success, :user_id => user.id}
       else
-        message = "Member could not be updated, #{member.error_to_s}"
+        message = "Member could not be updated, #{user.error_to_s}"
         if batch_update
           logger.error "Remote batch update message: #{message}"
         else
-          Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_update_error)
+          Auditory.audit(current_agent, user, message, user, Settings.operation_types.profile_update_error)
         end
-        response = { :message => I18n.t('error_messages.member_data_invalid'), :code => Settings.error_codes.member_data_invalid, :errors => member.errors }
+        response = { :message => I18n.t('error_messages.user_data_invalid'), :code => Settings.error_codes.user_data_invalid, :errors => user.errors }
       end
     end
     render json: response
@@ -278,36 +278,36 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request
   #
   def show
-    member = Member.find(params[:id])
-    my_authorize! :api_profile, Member, member.club_id
-    club = member.club
-    membership = member.current_membership
-    credit_card = member.active_credit_card
+    user = User.find(params[:id])
+    my_authorize! :api_profile, User, user.club_id
+    club = user.club
+    membership = user.current_membership
+    credit_card = user.active_credit_card
     response = {
       code: Settings.error_codes.success,
       member: {
-        first_name: member.first_name, 
-        last_name: member.last_name, 
-        email: member.email,
-        address: member.address, 
-        city: member.city, 
-        state: member.state, 
-        zip: member.zip,
-        birth_date: member.birth_date,
-        phone_country_code: member.phone_country_code, 
-        phone_area_code: member.phone_area_code,
-        phone_local_number: member.phone_local_number, 
-        type_of_phone_number: member.type_of_phone_number,
-        gender: member.gender,
-        bill_date: member.next_retry_bill_date.nil? ? '' : member.next_retry_bill_date.to_datetime.change(:offset => member.get_offset_related).to_s,
-        wrong_address: member.wrong_address,
-        wrong_phone_number: member.wrong_phone_number,
-        member_since_date: member.member_since_date.to_datetime.change(:offset => member.get_offset_related).to_s,
-        reactivation_times: member.reactivation_times,
-        external_id: member.external_id,
-        blacklisted: member.blacklisted,
-        member_group_type: ( member.member_group_type.nil? ? nil : member.member_group_type.name ),
-        preferences: member.preferences
+        first_name: user.first_name, 
+        last_name: user.last_name, 
+        email: user.email,
+        address: user.address, 
+        city: user.city, 
+        state: user.state, 
+        zip: user.zip,
+        birth_date: user.birth_date,
+        phone_country_code: user.phone_country_code, 
+        phone_area_code: user.phone_area_code,
+        phone_local_number: user.phone_local_number, 
+        type_of_phone_number: user.type_of_phone_number,
+        gender: user.gender,
+        bill_date: user.next_retry_bill_date.nil? ? '' : user.next_retry_bill_date.to_datetime.change(:offset => user.get_offset_related).to_s,
+        wrong_address: user.wrong_address,
+        wrong_phone_number: user.wrong_phone_number,
+        member_since_date: user.member_since_date.to_datetime.change(:offset => user.get_offset_related).to_s,
+        reactivation_times: user.reactivation_times,
+        external_id: user.external_id,
+        blacklisted: user.blacklisted,
+        member_group_type: ( user.member_group_type.nil? ? nil : user.member_group_type.name ),
+        preferences: user.preferences
         },
       credit_card: {
         last_4_digits: credit_card.last_digits,
@@ -316,11 +316,11 @@ class Api::MembersController < ApplicationController
       },
       current_membership:{
         status: membership.status,
-        join_date: membership.join_date.to_datetime.change(:offset => member.get_offset_related).to_s,
-        cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => member.get_offset_related).to_s
+        join_date: membership.join_date.to_datetime.change(:offset => user.get_offset_related).to_s,
+        cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => user.get_offset_related).to_s
       }
     }
-    response.merge!( external_id: member.external_id ) if member.club.requires_external_id
+    response.merge!( external_id: user.external_id ) if user.club.requires_external_id
     render json: response
   rescue ActiveRecord::RecordNotFound
     render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
@@ -348,20 +348,20 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request.
   #
   def club_cash
-    member = Member.find(params[:id])
-    my_authorize! :api_update_club_cash, Member, member.club_id
-    response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => member.id }
+    user = User.find(params[:id])
+    my_authorize! :api_update_club_cash, User, user.club_id
+    response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => user.id }
     if params[:amount].blank?
       response = { :message => "Check amount value, please. Amount cannot be blank or null.", :code => Settings.error_codes.wrong_data }
-    elsif not member.club.allow_club_cash_transaction?
+    elsif not user.club.allow_club_cash_transaction?
       response = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
-    elsif not member.club.is_not_drupal?
-      member.skip_api_sync!
-      member.club_cash_amount = params[:amount]
-      member.club_cash_expire_date = params[:expire_date]
-      member.save(:validate => false)
+    elsif not user.club.is_not_drupal?
+      user.skip_api_sync!
+      user.club_cash_amount = params[:amount]
+      user.club_cash_expire_date = params[:expire_date]
+      user.save(:validate => false)
       message = "Member updated successfully"
-      Auditory.audit(current_agent, member, message, member, Settings.operation_types.profile_updated)
+      Auditory.audit(current_agent, user, message, user, Settings.operation_types.profile_updated)
       response = { :message => message, :code => Settings.error_codes.success }
     end
     render json: response
@@ -391,9 +391,9 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request.
   #
   def next_bill_date
-    member = Member.find params[:id]
-    my_authorize! :api_change_next_bill_date, Member, member.club_id
-    render json: member.change_next_bill_date(params[:next_bill_date], @current_agent)
+    user = User.find params[:id]
+    my_authorize! :api_change_next_bill_date, User, user.club_id
+    render json: user.change_next_bill_date(params[:next_bill_date], @current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   end 
@@ -421,14 +421,14 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request.
   #
   def find_all_by_updated
-    my_authorize! :api_find_all_by_updated, Member, params[:club_id]
+    my_authorize! :api_find_all_by_updated, User, params[:club_id]
     if params[:start_date].blank? or params[:end_date].blank?
       answer = { :message => "Make sure to send both start and end dates, please. There seems to be at least one as null or blank", :code => Settings.error_codes.wrong_data }
     elsif params[:start_date].to_datetime > params[:end_date].to_datetime
       answer = { :message => "Check both start and end date, please. Start date is greater than end date.", :code => Settings.error_codes.wrong_data }
     else
-      members_list = ( Member.where :updated_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime), :club_id => params[:club_id] ).collect &:id
-      answer = { :list => members_list, :code => Settings.error_codes.success }
+      users_list = ( User.where :updated_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime), :club_id => params[:club_id] ).collect &:id
+      answer = { :list => users_list, :code => Settings.error_codes.success }
     end
     render json: answer
   rescue ArgumentError => e
@@ -458,14 +458,14 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request.
   #
   def find_all_by_created
-    my_authorize! :api_find_all_by_updated, Member, params[:club_id]
+    my_authorize! :api_find_all_by_updated, User, params[:club_id]
     if params[:start_date].blank? or params[:end_date].blank?
       answer = { :message => "Make sure to send both start and end dates, please. There seems to be at least one as null or blank", :code => Settings.error_codes.wrong_data }
     elsif params[:start_date].to_datetime > params[:end_date].to_datetime
       answer = { :message => "Check both start and end date, please. Start date is greater than end date.", :code => Settings.error_codes.wrong_data }
     else
-      members_list = ( Member.where :created_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime), :club_id => params[:club_id] ).collect &:id
-      answer = { :list => members_list, :code => Settings.error_codes.success }
+      users_list = ( User.where :created_at =>(params[:start_date].to_datetime)..(params[:end_date].to_datetime), :club_id => params[:club_id] ).collect &:id
+      answer = { :list => users_list, :code => Settings.error_codes.success }
     end
     render json: answer
   rescue ArgumentError => e
@@ -494,9 +494,9 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request.
   #
   def cancel
-    member = Member.find params[:id]
-    my_authorize! :api_cancel, Member, member.club_id
-    render json: member.cancel!(params[:cancel_date], params[:reason], @current_agent)
+    user = User.find params[:id]
+    my_authorize! :api_cancel, User, user.club_id
+    render json: user.cancel!(params[:cancel_date], params[:reason], @current_agent)
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   rescue ArgumentError => e
@@ -534,13 +534,13 @@ class Api::MembersController < ApplicationController
   #
   def change_terms_of_membership
     tom = TermsOfMembership.find(params[:terms_of_membership_id])
-    member = Member.find(params[:id])
+    user = User.find(params[:id])
     my_authorize! :api_change, TermsOfMembership, tom.club_id
-    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.save_the_sale_through_api, @current_agent)
+    render json: user.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.save_the_sale_through_api, @current_agent)
   rescue ActiveRecord::RecordNotFound => e 
     if e.to_s.include? "TermsOfMembership"
       message = "Terms of membership not found"
-    elsif e.to_s.include? "Member"
+    elsif e.to_s.include? "User"
       message = "Member not found"
     end
     render json: { :message => message, :code => Settings.error_codes.not_found }
@@ -588,11 +588,11 @@ class Api::MembersController < ApplicationController
     new_tom = TermsOfMembership.find(params[:terms_of_membership_id])
     my_authorize! :api_change, TermsOfMembership, new_tom.club_id
 
-    member = Member.find(:first, :conditions => ["club_id = ? AND ( id = ? OR email = ? )", new_tom.club_id, params[:id_or_email], params[:id_or_email]])
-    raise ActiveRecord::RecordNotFound if member.nil?
+    user = User.find(:first, :conditions => ["club_id = ? AND ( id = ? OR email = ? )", new_tom.club_id, params[:id_or_email], params[:id_or_email]])
+    raise ActiveRecord::RecordNotFound if user.nil?
     prorated = params[:prorated].nil? ? true : params[:prorated].to_s.to_bool
 
-    render json: member.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{member.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card])
+    render json: user.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card])
   rescue ActiveRecord::RecordNotFound => e
     message = (e.to_s.include? "TermsOfMembership") ? "Terms of membership not found" : "Member not found"
     render json: { :message => message, :code => Settings.error_codes.not_found }
@@ -626,13 +626,13 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request.
   #
   def sale
-    member = Member.find(params[:id])
-    my_authorize! :api_sale, Member, member.club_id
-    render json: member.no_recurrent_billing(params[:amount], params[:description], params[:type])
+    user = User.find(params[:id])
+    my_authorize! :api_sale, User, user.club_id
+    render json: user.no_recurrent_billing(params[:amount], params[:description], params[:type])
   rescue ActiveRecord::RecordNotFound => e
     if e.to_s.include? "TermsOfMembership"
       message = "Terms of membership not found"
-    elsif e.to_s.include? "Member"
+    elsif e.to_s.include? "User"
       message = "Member not found"
     end
     render json: { :message => message, :code => Settings.error_codes.not_found }
@@ -665,17 +665,17 @@ class Api::MembersController < ApplicationController
   def get_banner_by_email
     club = @current_agent.clubs.first
     if club
-      my_authorize! :api_get_banner_by_email, Member, club.id
+      my_authorize! :api_get_banner_by_email, User, club.id
       if params[:email].blank?
         answer = { :message => "Email address is blank.", :landing_url => club.non_member_landing_url, 
                    :banner_url => club.non_member_banner_url ,:code => Settings.error_codes.success }
       else 
-        member = Member.new email: params[:email]
-        if EmailValidator.new(member).validate(member).nil?
-          member = Member.find_by_club_id_and_email(club.id, params[:email])
-          if member
+        user = User.new email: params[:email]
+        if EmailValidator.new(user).validate(user).nil?
+          user = User.find_by_club_id_and_email(club.id, params[:email])
+          if user
             answer = { :message => "Email address belongs to an already created member.", :landing_url => club.member_landing_url, 
-                     :banner_url => club.member_banner_url, :member_id => member.id, :code => Settings.error_codes.success }
+                     :banner_url => club.member_banner_url, :member_id => user.id, :code => Settings.error_codes.success }
           else
             answer = { :message => "Email address does not belongs to an already created member.", :landing_url => club.non_member_landing_url, 
                      :banner_url => club.non_member_banner_url, :code => Settings.error_codes.success }

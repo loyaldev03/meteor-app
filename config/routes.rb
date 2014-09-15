@@ -47,9 +47,9 @@ SacPlatform::Application.routes.draw do
     match 'clubs/:client/marketing_tool_attributes' => 'clubs#marketing_tool_attributes', :via => :get
 
     scope '/club/:club_prefix' do
-      match '/members/new' => 'members#new', as: 'new_member'
-      match '/members' => 'members#index', as: 'members', :via => [:get, :post]
-      match '/members/search_result' => 'members#search_result', as: 'members_search_result', :via => [:get]
+      match '/users/new' => 'users#new', as: 'new_user'
+      match '/users' => 'users#index', as: 'users', :via => [:get, :post]
+      match '/users/search_result' => 'users#search_result', as: 'users_search_result', :via => [:get]
       
       resources :terms_of_memberships, :path => 'subscription_plans' do
         get :resumed_information
@@ -59,55 +59,55 @@ SacPlatform::Application.routes.draw do
       end
       resources :payment_gateway_configurations, :except => [:index, :destroy]
       
-      scope '/member/:member_prefix' do
-        match '/edit' => 'members#edit', as: 'edit_member', :via => [:get]
+      scope '/user/:user_prefix' do
+        match '/edit' => 'users#edit', as: 'edit_user', :via => [:get]
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]
         resources :operations, :only => [:show, :update]
-        resources :member_notes, :only => [ :new, :create ]
+        resources :user_notes, :only => [ :new, :create ]
         resources :transactions, :only => [ :index ]
         resources :memberships, :only => [ :index ]
         resources :club_cash_transactions, :only => [:index]
         resources :credit_cards, :only => [ :new, :create, :destroy ] do
           post :activate
         end
-        get 'additional_data' => 'members#additional_data'
-        post 'additional_data' => 'members#additional_data'
-        match '/recover' => 'members#recover', as: 'member_recover', :via => [:get, :post]
-        match '/refund/:transaction_id' => 'members#refund', as: 'member_refund', :via => [:get, :post]
-        match '/full_save' => 'members#full_save', as: 'member_full_save', :via => [:get]
-        match '/save_the_sale' => 'members#save_the_sale', as: 'member_save_the_sale', :via => [:get, :post]
-        match '/cancel' => 'members#cancel', as: 'member_cancel', :via => [:get, :post]
-        match '/blacklist' => 'members#blacklist', as: 'member_blacklist', :via => [:get, :post]
-        match '/change_next_bill_date' => 'members#change_next_bill_date', as: 'member_change_next_bill_date', :via => [:get, :post]
-        match '/set_undeliverable' => 'members#set_undeliverable', as: 'member_set_undeliverable', :via => [:get, :post]
-        match '/set_unreachable' => 'members#set_unreachable', as: 'member_set_unreachable', :via => [:get, :post]
-        match '/resend_fulfillment' => 'members#resend_fulfillment', as: 'member_resend_fulfillment', :via => [:post]
-        match '/add_club_cash' => 'members#add_club_cash', as: 'member_add_club_cash'
-        match '/approve' => 'members#approve', as: 'member_approve', :via => [:post]
-        match '/reject' => 'members#reject', as: 'member_reject', :via => [:post]  
-        match '/no_recurrent_billing' => 'members#no_recurrent_billing', as: 'member_no_recurrent_billing', :via => [:get, :post]  
-        match '/manual_billing' => 'members#manual_billing', as: 'member_manual_billing', :via => [:get, :post]
-        match '/' => 'members#show', as: 'show_member', :via => [:get, :post]
+        get 'additional_data' => 'users#additional_data'
+        post 'additional_data' => 'users#additional_data'
+        match '/recover' => 'users#recover', as: 'user_recover', :via => [:get, :post]
+        match '/refund/:transaction_id' => 'users#refund', as: 'user_refund', :via => [:get, :post]
+        match '/full_save' => 'users#full_save', as: 'user_full_save', :via => [:get]
+        match '/save_the_sale' => 'users#save_the_sale', as: 'user_save_the_sale', :via => [:get, :post]
+        match '/cancel' => 'users#cancel', as: 'user_cancel', :via => [:get, :post]
+        match '/blacklist' => 'users#blacklist', as: 'user_blacklist', :via => [:get, :post]
+        match '/change_next_bill_date' => 'users#change_next_bill_date', as: 'user_change_next_bill_date', :via => [:get, :post]
+        match '/set_undeliverable' => 'users#set_undeliverable', as: 'user_set_undeliverable', :via => [:get, :post]
+        match '/set_unreachable' => 'users#set_unreachable', as: 'user_set_unreachable', :via => [:get, :post]
+        match '/resend_fulfillment' => 'users#resend_fulfillment', as: 'user_resend_fulfillment', :via => [:post]
+        match '/add_club_cash' => 'users#add_club_cash', as: 'user_add_club_cash'
+        match '/approve' => 'users#approve', as: 'user_approve', :via => [:post]
+        match '/reject' => 'users#reject', as: 'user_reject', :via => [:post]  
+        match '/no_recurrent_billing' => 'users#no_recurrent_billing', as: 'user_no_recurrent_billing', :via => [:get, :post]  
+        match '/manual_billing' => 'users#manual_billing', as: 'user_manual_billing', :via => [:get, :post]
+        match '/' => 'users#show', as: 'show_user', :via => [:get, :post]
 
-        post '/sync' => 'members#sync', as: 'member_sync'
-        put  '/sync' => 'members#update_sync', as: 'member_update_sync'
-        get  '/sync' => 'members#sync_data', as: 'member_sync_data'
-        post '/pardot_sync' => 'members#pardot_sync', as: 'member_pardot_sync'
-        post '/exact_target_sync' => 'members#exact_target_sync', as: 'member_exact_target_sync'
-        post '/mailchimp_sync' => 'members#mailchimp_sync', as: 'member_mailchimp_sync'
-        post '/reset_password' => 'members#reset_password', as: 'member_reset_password'
-        post '/resend_welcome' => 'members#resend_welcome', as: 'member_resend_welcome'
-        get  '/login_as_member' => 'members#login_as_member', as: 'login_as_member'
+        post '/sync' => 'users#sync', as: 'user_sync'
+        put  '/sync' => 'users#update_sync', as: 'user_update_sync'
+        get  '/sync' => 'users#sync_data', as: 'user_sync_data'
+        post '/pardot_sync' => 'users#pardot_sync', as: 'user_pardot_sync'
+        post '/exact_target_sync' => 'users#exact_target_sync', as: 'user_exact_target_sync'
+        post '/mailchimp_sync' => 'users#mailchimp_sync', as: 'user_mailchimp_sync'
+        post '/reset_password' => 'users#reset_password', as: 'user_reset_password'
+        post '/resend_welcome' => 'users#resend_welcome', as: 'user_resend_welcome'
+        get  '/login_as_user' => 'users#login_as_user', as: 'login_as_user'
 
-        get  '/transactions_content' => 'members#transactions_content', as: 'transactions_content'
-        get  '/notes_content' => 'members#notes_content', as: 'notes_content'
-        get  '/fulfillments_content' => 'members#fulfillments_content', as: 'fulfillments_content'
-        get  '/communications_content' => 'members#communications_content', as: 'communications_content'
-        get  '/operations_content' => 'members#operations_content', as: 'operations_content'
-        get  '/credit_cards_content' => 'members#credit_cards_content', as: 'credit_cards_content'
-        get  '/club_cash_transactions_content' => 'members#club_cash_transactions_content', as: 'club_cash_transactions_content'
-        get  '/sync_status_content' => 'members#sync_status_content', as: 'sync_status_content'
-        get  '/memberships_content' => 'members#memberships_content', as: 'memberships_content'
+        get  '/transactions_content' => 'users#transactions_content', as: 'transactions_content'
+        get  '/notes_content' => 'users#notes_content', as: 'notes_content'
+        get  '/fulfillments_content' => 'users#fulfillments_content', as: 'fulfillments_content'
+        get  '/communications_content' => 'users#communications_content', as: 'communications_content'
+        get  '/operations_content' => 'users#operations_content', as: 'operations_content'
+        get  '/credit_cards_content' => 'users#credit_cards_content', as: 'credit_cards_content'
+        get  '/club_cash_transactions_content' => 'users#club_cash_transactions_content', as: 'club_cash_transactions_content'
+        get  '/sync_status_content' => 'users#sync_status_content', as: 'sync_status_content'
+        get  '/memberships_content' => 'users#memberships_content', as: 'memberships_content'
       end
 
       resources :products

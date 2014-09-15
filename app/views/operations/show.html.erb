@@ -1,4 +1,4 @@
-<%= render :partial => "shared/member_information" %>
+<%= render :partial => "shared/user_information" %>
 <%= form_for @operation, :as => :operation, :url => operation_path(:id => @operation) do |f|%>
 <table class="table table-bordered">
 	<tr>
@@ -16,7 +16,7 @@
 	<tr>
 		<td colspan="2">
 			<%= f.submit t('buttons.save_operation_note'), :class => 'btn btn-primary' %>
-			<%= link_to t('buttons.cancel'), show_member_path, :class => 'btn' %>
+			<%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %>
 		</td>
 	</tr>
 </table>

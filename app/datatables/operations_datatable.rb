@@ -18,7 +18,7 @@ private
         #I couldnt make it work in another way. TODO: fix operation#show url.
         operation.description.to_s.truncate(150) + note_icon(operation),
         operation.created_by.username,
-        link_to("<i class='icon-zoom-in'>".html_safe, ((!@current_agent.can? :edit, Operation, @current_club.id) ? '#' : @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_member.id,:id => operation.id)), :class => "btn btn-small", :disabled=>(!@current_agent.can? :edit, Operation, @current_club.id)),
+        link_to("<i class='icon-zoom-in'>".html_safe, ((!@current_agent.can? :edit, Operation, @current_club.id) ? '#' : @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_user.id,:id => operation.id)), :class => "btn btn-small", :disabled=>(!@current_agent.can? :edit, Operation, @current_club.id)),
       ]
     end
   end
@@ -28,7 +28,7 @@ private
   end
 
   def fetch_operations
-    operations = @current_member.operations.order("#{sort_column} #{sort_direction}").is_visible
+    operations = @current_user.operations.order("#{sort_column} #{sort_direction}").is_visible
     
     if params[:sSearch].present?
       if params[:sSearch] == 'billing'

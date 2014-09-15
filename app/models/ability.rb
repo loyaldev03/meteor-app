@@ -11,8 +11,8 @@ class Ability
     cannot :manage, CreditCard
     cannot :manage, Domain
     cannot :manage, Fulfillment
-    cannot :manage, Member
-    cannot :manage, MemberNote
+    cannot :manage, User
+    cannot :manage, UserNote
     cannot :manage, Membership
     cannot :manage, Operation
     cannot :manage, Partner
@@ -22,19 +22,19 @@ class Ability
     cannot :manage, Transaction
     cannot :manage, PaymentGatewayConfiguration
     cannot :manage_club_cash_api, ClubCashTransaction
-    cannot :see_sync_status, Member
+    cannot :see_sync_status, User
     cannot :see_cc_token, CreditCard
-    cannot :api_enroll, Member
-    cannot :api_update, Member
-    cannot :api_profile, Member
-    cannot :api_update_club_cash, Member
-    cannot :api_change_next_bill_date, Member
-    cannot :api_cancel, Member
-    cannot :api_find_all_by_updated, Member
-    cannot :api_find_all_by_created, Member
+    cannot :api_enroll, User
+    cannot :api_update, User
+    cannot :api_profile, User
+    cannot :api_update_club_cash, User
+    cannot :api_change_next_bill_date, User
+    cannot :api_cancel, User
+    cannot :api_find_all_by_updated, User
+    cannot :api_find_all_by_created, User
     cannot :api_change, TermsOfMembership
-    cannot :api_sale, Member
-    cannot :api_get_banner_by_email, Member
+    cannot :api_sale, User
+    cannot :api_get_banner_by_email, User
     cannot :manage_product_api, Product
     cannot :manage_prospects_api, Prospect
     cannot :manage_token_api, Agent
@@ -42,7 +42,7 @@ class Ability
     cannot :manage, DelayedJob
     cannot :manage, DispositionType
     cannot :see_nice, Transaction
-    cannot :manage, MemberAdditionalData
+    cannot :manage, UserAdditionalData
     cannot :manage, EmailTemplate
 
 
@@ -50,7 +50,7 @@ class Ability
 
     case role
     when 'admin' then
-      can :manage, Member
+      can :manage, User
       can :manage, Membership
       can :manage, CreditCard
       can :manage, Agent
@@ -60,7 +60,7 @@ class Ability
       can :manage, Product
       can :manage, Fulfillment
       can :manage, Operation
-      can :manage, MemberNote
+      can :manage, UserNote
       can :manage, TermsOfMembership
       can :manage, Transaction
       can :manage, PaymentGatewayConfiguration
@@ -68,44 +68,44 @@ class Ability
       can :manage, ClubCashTransaction
       can :manage, DelayedJob
       can :manage, DispositionType
-      can :manage, MemberAdditionalData
+      can :manage, UserAdditionalData
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
       can :manage_operations_api, Operation
-      can :api_enroll, Member
-      can :api_update, Member
-      can :api_profile, Member
-      can :api_update_club_cash, Member
-      can :api_change_next_bill_date, Member
-      can :api_cancel, Member
-      can :api_find_all_by_updated, Member
-      can :api_find_all_by_created, Member
-      can :api_get_banner_by_email, Member
+      can :api_enroll, User
+      can :api_update, User
+      can :api_profile, User
+      can :api_update_club_cash, User
+      can :api_change_next_bill_date, User
+      can :api_cancel, User
+      can :api_find_all_by_updated, User
+      can :api_find_all_by_created, User
+      can :api_get_banner_by_email, User
       can :manage_product_api, Product
       can :api_change, TermsOfMembership
-      can :api_sale, Member
+      can :api_sale, User
       can :list, Communication
       can :manage, EmailTemplate
     when 'representative' then
-      can :manage, Member
-      cannot :api_profile, Member
-      cannot :set_undeliverable, Member
-      cannot :see_sync_status, Member
-      cannot :api_update_club_cash, Member
-      cannot :api_change_next_bill_date, Member
-      cannot :api_cancel, Member
-      cannot :api_find_all_by_updated, Member
-      cannot :api_find_all_by_created, Member
-      cannot :api_get_banner_by_email, Member
-      cannot :no_recurrent_billing, Member
-      cannot :api_sale, Member
+      can :manage, User
+      cannot :api_profile, User
+      cannot :set_undeliverable, User
+      cannot :see_sync_status, User
+      cannot :api_update_club_cash, User
+      cannot :api_change_next_bill_date, User
+      cannot :api_cancel, User
+      cannot :api_find_all_by_updated, User
+      cannot :api_find_all_by_created, User
+      cannot :api_get_banner_by_email, User
+      cannot :no_recurrent_billing, User
+      cannot :api_sale, User
       can :manage, Operation
       can :manage, CreditCard
       cannot :destroy, CreditCard
       cannot :see_cc_token, CreditCard
-      can :manage, MemberNote
-      can :manage, MemberAdditionalData
+      can :manage, UserNote
+      can :manage, UserAdditionalData
       can :see_nice, Transaction
       can :show, TermsOfMembership
       can :show, EmailTemplate
@@ -116,22 +116,22 @@ class Ability
       can :list, Communication
       can :list, Fulfillment
     when 'supervisor' then
-      can :manage, Member
-      cannot :api_profile, Member
-      cannot :see_sync_status, Member
-      cannot :api_update_club_cash, Member
-      cannot :api_change_next_bill_date, Member
-      cannot :api_cancel, Member
-      cannot :api_find_all_by_updated, Member
-      cannot :api_find_all_by_created, Member
-      cannot :api_get_banner_by_email, Member
-      cannot :api_sale, Member
+      can :manage, User
+      cannot :api_profile, User
+      cannot :see_sync_status, User
+      cannot :api_update_club_cash, User
+      cannot :api_change_next_bill_date, User
+      cannot :api_cancel, User
+      cannot :api_find_all_by_updated, User
+      cannot :api_find_all_by_created, User
+      cannot :api_get_banner_by_email, User
+      cannot :api_sale, User
       can :manage, Operation
-      can :manage, MemberNote
+      can :manage, UserNote
       can :manage, CreditCard
       can :manage, Transaction
       can :manage, ClubCashTransaction
-      can :manage, MemberAdditionalData
+      can :manage, UserAdditionalData
       can :show, TermsOfMembership
       can :show, EmailTemplate
       can :see_nice, Transaction
@@ -139,30 +139,30 @@ class Ability
       can :list, Communication
       can :list, Fulfillment
     when 'api' then
-      can :api_enroll, Member
-      can :api_update, Member
-      can :api_profile, Member
-      can :api_update_club_cash, Member
-      can :api_change_next_bill_date, Member
-      can :api_cancel, Member
-      can :api_find_all_by_updated, Member
-      can :api_find_all_by_created, Member
+      can :api_enroll, User
+      can :api_update, User
+      can :api_profile, User
+      can :api_update_club_cash, User
+      can :api_change_next_bill_date, User
+      can :api_cancel, User
+      can :api_find_all_by_updated, User
+      can :api_find_all_by_created, User
       can :manage_product_api, Product
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent
       can :manage_operations_api, Operation
       can :api_change, TermsOfMembership
-      can :api_sale, Member
-      can :api_get_banner_by_email, Member
+      can :api_sale, User
+      can :api_get_banner_by_email, User
     # Agency role: Team de acquisicion 
     when 'agency' then
       can :manage, Product
       can :read, Fulfillment
       can :list, Fulfillment
       can :report, Fulfillment
-      can :read, Member
-      can :search_result, Member    
+      can :read, User
+      can :search_result, User    
       can :show, Operation
       can :show, TermsOfMembership
       can :show, EmailTemplate
@@ -171,27 +171,27 @@ class Ability
       can :list, Transaction
       can :list, ClubCashTransaction
       can :list, CreditCard
-      can :list, MemberNote
+      can :list, UserNote
       can :list, Communication
     # Fulfillment Managment role: Team de Fulfillment
     when 'fulfillment_managment' then
-      can :manage, Member
-      cannot :api_profile, Member
-      cannot :see_sync_status, Member
-      cannot :api_update_club_cash, Member
-      cannot :api_change_next_bill_date, Member
-      cannot :api_find_all_by_updated, Member
-      cannot :api_find_all_by_created, Member
-      cannot :no_recurrent_billing, Member
-      cannot :api_get_banner_by_email, Member
-      cannot :manual_billing, Member
-      cannot :api_sale, Member
+      can :manage, User
+      cannot :api_profile, User
+      cannot :see_sync_status, User
+      cannot :api_update_club_cash, User
+      cannot :api_change_next_bill_date, User
+      cannot :api_find_all_by_updated, User
+      cannot :api_find_all_by_created, User
+      cannot :no_recurrent_billing, User
+      cannot :api_get_banner_by_email, User
+      cannot :manual_billing, User
+      cannot :api_sale, User
       can :manage, Operation
       can :manage, CreditCard
       cannot :destroy, CreditCard
       cannot :see_cc_token, CreditCard
       can :manage, Product
-      can :manage, MemberNote
+      can :manage, UserNote
       can :manage, Fulfillment
       can :show, TermsOfMembership
       can :show, EmailTemplate

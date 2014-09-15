@@ -26,8 +26,8 @@ namespace :fulfillments do
       fulfillment_file.product = "KIT-CARD"
       fulfillment_file.save!
 
-      fulfillments = Fulfillment.includes(:member).where( 
-        ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
+      fulfillments = Fulfillment.includes(:user).where( 
+        ["users.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
           AND ? and fulfillments.status = 'not_processed' 
           AND fulfillments.product_sku like 'KIT-CARD'", fulfillment_file.club_id, 
           fulfillment_file.initial_date, fulfillment_file.end_date ])
@@ -42,7 +42,7 @@ namespace :fulfillments do
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
             Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
-            member = fulfillment.member
+            member = fulfillment.user
             membership = member.current_membership
             row = [ member.first_name, member.last_name, member.id, 
                     membership.terms_of_membership.name, member.address, 
@@ -53,7 +53,7 @@ namespace :fulfillments do
                   ]
             sheet.add_row row 
             fulfillment_file.fulfillments << fulfillment
-            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.member_id}"
+            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.user_id}"
           end
         end
       end
@@ -106,8 +106,8 @@ namespace :fulfillments do
       fulfillment_file.end_date = Time.zone.now
       fulfillment_file.product = "SLOOPS"
 
-      fulfillments = Fulfillment.includes(:member).where( 
-        ["members.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
+      fulfillments = Fulfillment.includes(:user).where( 
+        ["users.club_id = ? AND fulfillments.assigned_at BETWEEN ? 
           AND ? and fulfillments.status = 'not_processed' 
           AND fulfillments.product_sku != 'KIT-CARD'", fulfillment_file.club_id, 
           fulfillment_file.initial_date, fulfillment_file.end_date ])
@@ -119,8 +119,8 @@ namespace :fulfillments do
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
-            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"       
-            member = fulfillment.member
+            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.user_id}"       
+            member = fulfillment.user
             membership = member.current_membership
             tom = TermsOfMembership.find(membership.terms_of_membership_id)            
             csv << [member.first_name, member.last_name, fulfillment.product_sku, member.address, 
@@ -129,7 +129,7 @@ namespace :fulfillments do
                     member.full_phone_number, member.email,
                     tom.id, tom.name, tom.description]
             fulfillment_file.fulfillments << fulfillment
-            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.member_id}"
+            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.user_id}"
           end
         end
       end
@@ -193,8 +193,8 @@ namespace :fulfillments do
 
       package = Axlsx::Package.new
 
-      fulfillments = Fulfillment.includes(:member => :memberships).where( 
-          ["members.club_id = ? 
+      fulfillments = Fulfillment.includes(:user => :memberships).where( 
+          ["users.club_id = ? 
             AND memberships.status != 'lapsed' 
             AND fulfillments.assigned_at BETWEEN ? AND ? 
             AND fulfillments.status = 'not_processed' 
@@ -221,8 +221,8 @@ namespace :fulfillments do
                           'Product Name', 'Product SKU' ]
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
-            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
-            member = fulfillment.member
+            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.user_id}"
+            member = fulfillment.user
             membership = member.current_membership
             if membership.terms_of_membership_id == tom.id 
               row = [ member.id.to_s, 
@@ -238,7 +238,7 @@ namespace :fulfillments do
               sheet.add_row row 
               fulfillment_file.fulfillments << fulfillment
             end
-            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.member_id}"
+            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.user_id}"
           end
         end
       end
@@ -331,11 +331,11 @@ namespace :fulfillments do
     file_info = ""
 
     # NEW JOIN and REINSTATEMENT
-    fulfillments = Fulfillment.joins(:member).readonly(false).where(["members.club_id = ? AND product_sku = ?
-      AND fulfillments.status = 'not_processed'", fulfillment_file.club_id, fulfillment_file.product]).group("members.id") 
+    fulfillments = Fulfillment.joins(:user).readonly(false).where(["users.club_id = ? AND product_sku = ?
+      AND fulfillments.status = 'not_processed'", fulfillment_file.club_id, fulfillment_file.product]).group("users.id") 
     fulfillments.each do |fulfillment| 
       begin
-        member = fulfillment.member
+        member = fulfillment.user
         membership_billing_transaction = member.transactions.where(["operation_type = 101 AND 
           membership_id = ? AND created_at BETWEEN ? AND ?", 
           member.current_membership_id, fulfillment_file.initial_date, fulfillment_file.end_date]).last
@@ -352,7 +352,7 @@ namespace :fulfillments do
       end
     end
     # RENEWAL
-    fulfillments = Fulfillment.joins(:member).readonly(false).where(["members.club_id = ? AND fulfillments.renewable_at BETWEEN ? and ?",
+    fulfillments = Fulfillment.joins(:user).readonly(false).where(["users.club_id = ? AND fulfillments.renewable_at BETWEEN ? and ?",
      fulfillment_file.club_id, fulfillment_file.initial_date, fulfillment_file.end_date])
     fulfillments.each do |fulfillment|
       begin
@@ -360,7 +360,7 @@ namespace :fulfillments do
           if fulfillment.renewed
             file_info << process_fulfillment(fulfillment, fulfillment_file, "2")
           else
-            fulfillment.update_attribute :renewable_at, fulfillment.member.next_retry_bill_date+1.day
+            fulfillment.update_attribute :renewable_at, fulfillment.user.next_retry_bill_date+1.day
           end
         end
       rescue Exception => e
@@ -374,7 +374,7 @@ namespace :fulfillments do
       fulfillment_file.end_date]).group("memberships.id") 
     memberships.each do |membership| 
       begin
-        member = membership.member 
+        member = membership.user 
         if member.lapsed?
           fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent' and created_at >= ?", fulfillment_file.product, member.join_date).last
           if fulfillment
@@ -387,9 +387,9 @@ namespace :fulfillments do
       end
     end
     # CHANGED ADDRESS 
-    members = Member.joins(:operations).where(["members.club_id = ? AND operations.operation_type = ? AND 
+    members = User.joins(:operations).where(["users.club_id = ? AND operations.operation_type = ? AND 
       operations.created_at BETWEEN ? and ?", fulfillment_file.club_id, Settings.operation_types.profile_updated,
-      fulfillment_file.initial_date, fulfillment_file.end_date]).group("members.id")
+      fulfillment_file.initial_date, fulfillment_file.end_date]).group("users.id")
     members.each do |member|
       begin
         fulfillment = member.fulfillments.where("product_sku = ? and status = 'sent'", fulfillment_file.product).last
@@ -431,7 +431,7 @@ namespace :fulfillments do
     tz = Time.zone.now
     Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
     line = ""
-    @member = fulfillment.member
+    @member = fulfillment.user
     @membership = @member.current_membership
     line << record_type # RECORD TYPE
     line << (record_type=="4" ? "2" : "1") # RECORD CODE
@@ -514,7 +514,7 @@ namespace :fulfillments do
     line << "P".rjust(1, '0')  # MARKETING 20
     line << "\n".rjust(1, '0')
     fulfillment_file.fulfillments << fulfillment
-    Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.member_id}"
+    Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process #{fulfillment.id} for member #{fulfillment.user_id}"
     line
   end
 

@@ -144,18 +144,18 @@
 <% # Third step %>
 <div class="step" id="third">
   <div class="control-group"><%= wizard_steps_indicator(3) %></div>
-  <div class="control-group" id="if_cannot_bill_member_options">
-    <%= label_tag 'if_cannot_bill_member', t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_member_then'), :class => 'control-label' %>
+  <div class="control-group" id="if_cannot_bill_user_options">
+    <%= label_tag 'if_cannot_bill_user', t('activerecord.attributes.terms_of_membership.wizard.if_cannot_bill_user_then'), :class => 'control-label' %>
     <div class="controls">
-      <%= radio_button_tag 'if_cannot_bill_member', 'cancel', ((@tom.if_cannot_bill == 'cancel' unless !@tom.if_cannot_bill) or true), :class => 'required' %>&nbsp;
+      <%= radio_button_tag 'if_cannot_bill_user', 'cancel', ((@tom.if_cannot_bill == 'cancel' unless !@tom.if_cannot_bill) or true), :class => 'required' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.cancel') %>
       <br /><br />
-<!--       <%= radio_button_tag 'if_cannot_bill_member', 'suspend', @tom.if_cannot_bill == 'suspend' %>&nbsp;
+<!--       <%= radio_button_tag 'if_cannot_bill_user', 'suspend', @tom.if_cannot_bill == 'suspend' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.suspend_for') %>
-      <%= text_field_tag 'if_cannot_bill_member_suspend_for', @tom.suspension_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
-      <%= select_for_date_span("if_cannot_bill_member_suspend_for_time_span") %>
+      <%= text_field_tag 'if_cannot_bill_user_suspend_for', @tom.suspension_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
+      <%= select_for_date_span("if_cannot_bill_user_suspend_for_time_span") %>
       <br /><br />
- -->      <%= radio_button_tag 'if_cannot_bill_member', 'downgrade_to', @tom.if_cannot_bill == 'downgrade_tom' %>&nbsp;
+ -->      <%= radio_button_tag 'if_cannot_bill_user', 'downgrade_to', @tom.if_cannot_bill == 'downgrade_tom' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.downgrade_to') %>
       <%= select_for_toms('downgrade_to_tom', @tom.downgrade_tom_id, @tom) %>
       <%= render :partial => "shared/help", :locals => { 
@@ -224,26 +224,26 @@
   // Third Step
 
   function cancel_radio_logic(){
-    $('#if_cannot_bill_member_suspend_for').removeAttr('required');
+    $('#if_cannot_bill_user_suspend_for').removeAttr('required');
     $('#downgrade_to_tom').removeAttr('required');
-    $('#if_cannot_bill_member_suspend_for').prop('disabled', true);
-    $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', true);
+    $('#if_cannot_bill_user_suspend_for').prop('disabled', true);
+    $('#if_cannot_bill_user_suspend_for_time_span').prop('disabled', true);
     $('#downgrade_to_tom').prop('disabled', true);
   }
 
   function suspend_radio_logic(){
-    $('#if_cannot_bill_member_suspend_for').prop('required', true);
+    $('#if_cannot_bill_user_suspend_for').prop('required', true);
     $('#downgrade_to_tom').removeAttr('required');
-    $('#if_cannot_bill_member_suspend_for').prop('disabled', false);
-    $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', false);
+    $('#if_cannot_bill_user_suspend_for').prop('disabled', false);
+    $('#if_cannot_bill_user_suspend_for_time_span').prop('disabled', false);
     $('#downgrade_to_tom').prop('disabled', true);   
   }
 
   function downgrade_radio_logic(){    
-    $('#if_cannot_bill_member_suspend_for').removeAttr('required');
+    $('#if_cannot_bill_user_suspend_for').removeAttr('required');
     $('#downgrade_to_tom').prop('required', true);
-    $('#if_cannot_bill_member_suspend_for').prop('disabled', true);
-    $('#if_cannot_bill_member_suspend_for_time_span').prop('disabled', true);
+    $('#if_cannot_bill_user_suspend_for').prop('disabled', true);
+    $('#if_cannot_bill_user_suspend_for_time_span').prop('disabled', true);
     $('#downgrade_to_tom').prop('disabled', false);  
   }
 
@@ -277,15 +277,15 @@
     $('#club_cash_installment_amount').removeAttr('required');
   }
 
-  $('#if_cannot_bill_member_cancel').click(function() {
+  $('#if_cannot_bill_user_cancel').click(function() {
     cancel_radio_logic();
   });
 
-  $('#if_cannot_bill_member_suspend').click(function() {
+  $('#if_cannot_bill_user_suspend').click(function() {
     suspend_radio_logic();
   });
 
-  $('#if_cannot_bill_member_downgrade_to').click(function() {
+  $('#if_cannot_bill_user_downgrade_to').click(function() {
     downgrade_radio_logic();
   });
 
@@ -306,7 +306,7 @@
     }
     else if (window.atTheEndOfTheTrial == 'no payment') {
       radio1Text = '<%= t('activerecord.attributes.terms_of_membership.wizard.keep_active_until_manually_cancelled') %>';
-      radio2Text = '<%= t('activerecord.attributes.terms_of_membership.wizard.cancel_member_after') %>';
+      radio2Text = '<%= t('activerecord.attributes.terms_of_membership.wizard.cancel_user_after') %>';
     }
     $('#label_for_until_cancelled').html(radio1Text);
     $('#label_for_stop_billing_after').html(radio2Text);
@@ -371,22 +371,22 @@
           break;
         case "third":
           if ($('#is_payment_expected_yes').is(':checked')) {
-            $('#if_cannot_bill_member_options').show();
+            $('#if_cannot_bill_user_options').show();
             $('#upgrade_options').show();
             $('#no_configuration_message').hide('fast');
           } else {
-            $('#if_cannot_bill_member_options').hide('fast');
+            $('#if_cannot_bill_user_options').hide('fast');
             $('#upgrade_options').hide('fast');
             $('#no_configuration_message').show();
           }
           
-          if( $("#if_cannot_bill_member_cancel").is(":checked") ){ 
+          if( $("#if_cannot_bill_user_cancel").is(":checked") ){ 
             cancel_radio_logic(); 
           }
-          else if( $("#if_cannot_bill_member_suspend").is(":checked") ){ 
+          else if( $("#if_cannot_bill_user_suspend").is(":checked") ){ 
             suspend_radio_logic(); 
           }
-          else if( $("#if_cannot_bill_member_downgrade_to").is(":checked") ){ 
+          else if( $("#if_cannot_bill_user_downgrade_to").is(":checked") ){ 
             downgrade_radio_logic();
           }
 

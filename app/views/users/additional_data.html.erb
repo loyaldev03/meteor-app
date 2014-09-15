@@ -1,0 +1,18 @@
+<%= form_tag do %>
+  <%= dynamic_form_error_messages(@form).html_safe  %>
+  <fieldset>
+    <legend>Additional data</legend>
+    <% @form.fields.each do |field_name, object| %>
+      <div class="control-group">
+        <%= @form[field_name].label_tag.to_s.html_safe %>
+        <div class="controls">
+          <%= @form[field_name].to_s.html_safe %>
+        </div>
+      </div>
+    <% end %>
+    <br>
+    <button type="submit" class="btn btn-success">Save</button>
+    <%= link_to t('buttons.return_to_user_show'), show_user_path, :class => 'btn' %> 
+  </fieldset>
+<% end %>
+
