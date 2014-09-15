@@ -475,6 +475,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		find_button("Create Plan")
 	  choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
+	  sleep 2
 		assert page.has_content?('was created succesfully') # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 
