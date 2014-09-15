@@ -17,9 +17,9 @@ ActiveRecord::Base.configurations["phoenix"] = {
 ###################################################
 ##### CLASES ######################################
 
-class Member < ActiveRecord::Base
+class User < ActiveRecord::Base
   establish_connection "phoenix" 
-  self.table_name = "members" 
+  self.table_name = "users" 
   self.primary_key = 'id'
 end
 
@@ -43,9 +43,9 @@ class EnrollmentInfo < ActiveRecord::Base
   self.table_name = "enrollment_infos" 
 end
 
-class MemberNote < ActiveRecord::Base
+class UserNote < ActiveRecord::Base
   establish_connection "phoenix" 
-  self.table_name = "member_notes" 
+  self.table_name = "user_notes" 
 end
 
 class CreditCard < ActiveRecord::Base
@@ -68,102 +68,102 @@ class Communication < ActiveRecord::Base
   self.table_name = "communications"
 end
 
-class MemberPreference < ActiveRecord::Base
+class UserPreference < ActiveRecord::Base
   establish_connection "phoenix" 
-  self.table_name = "member_preferences"
+  self.table_name = "user_preferences"
 end
 
 ###################################################
 ##### METHODS #####################################
 
-def delete_operations(member)
+def delete_operations(user)
   tz = Time.now.utc
-  Operation.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member's operations."
+  Operation.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user's operations."
 end
 
-def delete_member_notes(member)
+def delete_user_notes(user)
   tz = Time.now.utc
-  MemberNote.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member notes."
+  UserNote.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user notes."
 end
 
-def delete_member_preferences(member)
+def delete_user_preferences(user)
   tz = Time.now.utc
-  MemberPreference.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member preferences."
+  UserPreference.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user preferences."
 end
 
-def delete_credit_cards(member)
+def delete_credit_cards(user)
   tz = Time.now.utc
-  CreditCard.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member's credit cards."
+  CreditCard.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user's credit cards."
 end
 
-def delete_transactions(member)
+def delete_transactions(user)
   tz = Time.now.utc
-  Transaction.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member's transactions."
+  Transaction.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user's transactions."
 end
 
-def delete_fulfillments(member)
+def delete_fulfillments(user)
   tz = Time.now.utc
-  Fulfillment.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member fulfillments."
+  Fulfillment.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user fulfillments."
 end
 
-def delete_communications(member)
+def delete_communications(user)
   tz = Time.now.utc
-  Communication.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member communications."
+  Communication.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user communications."
 end
 
-def delete_club_cash_transactions(member)
+def delete_club_cash_transactions(user)
   tz = Time.now.utc
-  ClubCashTransaction.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member's club cash transactions."
+  ClubCashTransaction.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user's club cash transactions."
 end
 
-def delete_memberships(member)
+def delete_memberships(user)
   tz = Time.now.utc
-  Membership.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member memberships."
+  Membership.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user memberships."
 end
 
-def delete_enrollment_infos(member)
+def delete_enrollment_infos(user)
   tz = Time.now.utc
-  EnrollmentInfo.delete_all(["member_id = ?", member.id])
-  @log.info "    ... took #{Time.now.utc - tz} to delete member enrollment infos."
+  EnrollmentInfo.delete_all(["user_id = ?", user.id])
+  @log.info "    ... took #{Time.now.utc - tz} to delete user enrollment infos."
 end
 
-def delete_member(member)
+def delete_user(user)
   tz = Time.now.utc
-  member.delete
-  @log.info "    ... took #{Time.now.utc - tz} to delete member information."
+  user.delete
+  @log.info "    ... took #{Time.now.utc - tz} to delete user information."
 end
 
-def delete_functions(member)
-  delete_operations(member)
-  delete_member_notes(member)
-  delete_member_preferences(member)
-  delete_enrollment_infos(member)
-  delete_credit_cards(member)
-  delete_memberships(member)
-  delete_transactions(member)
-  delete_fulfillments(member)
-  delete_club_cash_transactions(member)
-  delete_communications(member)
-  delete_member(member)
+def delete_functions(user)
+  delete_operations(user)
+  delete_user_notes(user)
+  delete_user_preferences(user)
+  delete_enrollment_infos(user)
+  delete_credit_cards(user)
+  delete_memberships(user)
+  delete_transactions(user)
+  delete_fulfillments(user)
+  delete_club_cash_transactions(user)
+  delete_communications(user)
+  delete_user(user)
 end
 
 def init(id)
   start_time = Time.now.utc 
-  member =  Member.find(id)
-  @log.info "Deleting member #{member.first_name} record."
-  delete_functions(member)
-  @log.info "    ... took #{Time.now.utc - start_time} to delete member's history."
+  user =  User.find(id)
+  @log.info "Deleting user #{user.first_name} record."
+  delete_functions(user)
+  @log.info "    ... took #{Time.now.utc - start_time} to delete user's history."
 end
 
-member_id = ARGV[0]
-init(member_id)
+user_id = ARGV[0]
+init(user_id)
 
