@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class MembersFulfillmentTest < ActionController::IntegrationTest
+class UsersFulfillmentTest < ActionController::IntegrationTest
 
   ############################################################
   # SETUP
@@ -1320,7 +1320,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
 
-    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id])
     fulfillment = fulfillments.first
     
@@ -1545,7 +1545,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
     end
-    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id]).type_others
 
     csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
@@ -1593,7 +1593,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
-    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id]).type_others
 
     csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
@@ -1638,7 +1638,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_selector?("#mark_as_sent")
     end
 
-    fulfillments = Fulfillment.joins(:user).where('fulfillments.status = ? and club_id = ?', 'in_process', @club.id).type_others
+    fulfillments = Fulfillment.joins(:user).where('fulfillments.status = ? and fulfullments.club_id = ?', 'in_process', @club.id).type_others
     csv_string = Fulfillment.generateCSV(fulfillments, true, true) 
     assert_equal(csv_string, "PackageId,Costcenter,Companyname,Address,City,State,Zip,Endorsement,Packagetype,Divconf,Bill Transportation,Weight,UPS Service\n#{fulfillment.tracking_code},#{fulfillment.product_sku},#{@saved_user.full_name},#{@saved_user.address},#{@saved_user.city},#{@saved_user.state},#{@saved_user.zip},Return Service Requested,Irregulars,Y,Shipper,,MID\n")
   end
@@ -1669,7 +1669,7 @@ class MembersFulfillmentTest < ActionController::IntegrationTest
     end
 
     click_link_or_button 'Report'
-    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND club_id = ?', 
+    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 
             'in_process', Date.today, Date.today, @club.id]).type_card
     csv_string = Fulfillment.generateCSV(fulfillments, true, false) 
     assert_equal(csv_string, "Member Number,Member First Name,Member Last Name,Member Since Date,Member Expiration Date,ADDRESS,CITY,STATE,ZIP,Product,Charter Member Status\n#{@saved_user.id},#{@saved_user.first_name},#{@saved_user.last_name},#{(I18n.l @saved_user.user_since_date, :format => :only_date_short)},#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)},#{@saved_user.address},#{@saved_user.city},#{@saved_user.state},#{@saved_user.zip},#{product.sku},C\n")    
