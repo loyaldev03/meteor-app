@@ -411,7 +411,7 @@ en:
           # Step 2
           step_2_instructions: '<STEP_2_INSTRUCTIONS_HERE>'
           needs_enrollment_approval: 'Needs Enrollment Approval'
-          needs_enrollment_approval_help: 'If this option is selected, a user enrolled with this subscription plan will need to be approved by an agent before a membership is granted.'
+          needs_enrollment_approval_help: 'If this option is selected, an user enrolled with this subscription plan will need to be approved by an agent before a membership is granted.'
           initial_fee: 'Initial Fee'
           initial_fee_amount: 'Initial Fee Amount'
           trial_period: 'Trial Period'
