@@ -17,7 +17,7 @@ class Api::ProductsController < ApplicationController
   # @response_field [String] message Shows the method errors.
   # 
   # @example_request
-  #   curl -v -k -X POST -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD" https://dev.stoneacrehq.com:3000/api/v1/products/get_stock
+  #   curl -v -k -X POST -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD" https://dev.affinitystop.com:3000/api/v1/products/get_stock
   # @example_request_description Example of valid request. 
   #
   # @example_response
@@ -54,7 +54,7 @@ class Api::ProductsController < ApplicationController
   # @response_field [String] message Shows the method errors.
   # 
   # @example_request
-  #   curl -v -k -X POST -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD,AnoterOne,carflag" https://dev.stoneacrehq.com:3000/api/v1/products/get_list_of_stock
+  #   curl -v -k -X POST -d "api_key=zmemqz1Yi6v6aEm5fLjt&club_id=2&sku=KIT-CARD,AnoterOne,carflag" https://dev.affinitystop.com:3000/api/v1/products/get_list_of_stock
   # @example_request_description Example of valid request. 
   #
   # @example_response

@@ -64,7 +64,7 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @example_request
-  #   curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\",\"marketing_code\":\"marketing code\",\"fulfillment_code\":\"1\",\"ip_address\":\"192.168.1.1\",\"user_agent\":\"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537...\"},\"api_key\":\"o6ESwPCNtsMkJnDLzvpC\"}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members
+  #   curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\",\"marketing_code\":\"marketing code\",\"fulfillment_code\":\"1\",\"ip_address\":\"192.168.1.1\",\"user_agent\":\"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537...\"},\"api_key\":\"o6ESwPCNtsMkJnDLzvpC\"}" -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
   # @example_request_description Requesting enroll of a valid member, with params in json format.
   #
   # @example_response 
@@ -72,7 +72,7 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request
   #
   # @example_request
-  #   curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"\",\"last_name\":\"\", \"address\":\"\",\"city\":\"\",\"state\":\"\",\"gender\":\"\",\"zip\":\"\",\"phone_country_code\":\"\",\"phone_area_code\":\"\",\"phone_local_number\":\"\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"product_sku\":\"KIT-CARD\",\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\",\"marketing_code\":\"marketing code\",\"fulfillment_code\":\"1\",\"ip_address\":\"192.168.1.1\",\"user_agent\":\"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537...\"},\"api_key\":\"DyqgeuHrxmb9QA8gsU22\"}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members
+  #   curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"\",\"last_name\":\"\", \"address\":\"\",\"city\":\"\",\"state\":\"\",\"gender\":\"\",\"zip\":\"\",\"phone_country_code\":\"\",\"phone_area_code\":\"\",\"phone_local_number\":\"\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"product_sku\":\"KIT-CARD\",\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\",\"marketing_code\":\"marketing code\",\"fulfillment_code\":\"1\",\"ip_address\":\"192.168.1.1\",\"user_agent\":\"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537...\"},\"api_key\":\"DyqgeuHrxmb9QA8gsU22\"}" -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
   # @example_request_description Requesting enroll sending some params as blank
   #
   # @example_response 
@@ -159,7 +159,7 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @example_request 
-  #   curl -v -k -X PUT --data-ascii "{\"member\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}},\"api_key\":\"o6ESwPCNtsMkJnDLzvpC\"}" -H "Content-Type: application/json" https://dev.stoneacrehq.com:3000/api/v1/members/1
+  #   curl -v -k -X PUT --data-ascii "{\"member\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}},\"api_key\":\"o6ESwPCNtsMkJnDLzvpC\"}" -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members/1
   # @example_request_description Requesting member update with valid params and in json format.
   #
   # @example_response 
@@ -270,7 +270,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] code Code related to the method result.
   # 
   # @example_request
-  #   curl -v -k -X POST -d "api_key=DyqgeuHrxmb9QA8gsU22" https://dev.stoneacrehq.com:3000/api/v1/members/1/profile
+  #   curl -v -k -X POST -d "api_key=DyqgeuHrxmb9QA8gsU22" https://dev.affinitystop.com:3000/api/v1/members/1/profile
   # @example_request_description Example of valid request.
   #
   # @example_response
@@ -340,7 +340,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] code Code related to the method result.
   #
   # @example_request
-  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&amount=102&expiration_date=2013-02-02" https://dev.stoneacrehq.com:3000/api/v1/members/1/club_cash
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&amount=102&expiration_date=2013-02-02" https://dev.affinitystop.com:3000/api/v1/members/1/club_cash
   # @example_request_description Example of valid request.
   #
   # @example_response
@@ -383,7 +383,7 @@ class Api::MembersController < ApplicationController
   # @response_field [Hash] errors A hash with member and next_bill_date errors. 
   # 
   # @example_request
-  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&next_bill_date=2013-05-21" https://dev.stoneacrehq.com:3000/api/v1/members/1/next_bill_date
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&next_bill_date=2013-05-21" https://dev.affinitystop.com:3000/api/v1/members/1/next_bill_date
   # @example_request_description Example of valid request. 
   #
   # @example_response
@@ -413,7 +413,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] code Code related to the method result.
   # 
   # @example_request
-  #   curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.stoneacrehq.com:3000/api/v1/members/find_all_by_updated/2/2013-03-20/2013-03-22
+  #   curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.affinitystop.com:3000/api/v1/members/find_all_by_updated/2/2013-03-20/2013-03-22
   # @example_request_description Example of valid request. 
   #
   # @example_response
@@ -450,7 +450,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] code Code related to the method result.
   # 
   # @example_request
-  #   curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.stoneacrehq.com:3000/api/v1/members/find_all_by_created/2/2013-03-20/2013-03-22
+  #   curl -v -k -X POST -d "api_key=G6qq3KzWQVi9zgfFVXud" https://dev.affinitystop.com:3000/api/v1/members/find_all_by_created/2/2013-03-20/2013-03-22
   # @example_request_description Example of valid request. 
   #
   # @example_response
@@ -486,7 +486,7 @@ class Api::MembersController < ApplicationController
   # @response_field [Integer] code Code related to the method result.
   # 
   # @example_request
-  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&cancel_date=2013-05-21&reason=Did not know I have enrolled" https://dev.stoneacrehq.com:3000/api/v1/members/3/cancel
+  #   curl -v -k -X PUT -d "api_key=G6qq3KzWQVi9zgfFVXud&cancel_date=2013-05-21&reason=Did not know I have enrolled" https://dev.affinitystop.com:3000/api/v1/members/3/cancel
   # @example_request_description Example of valid request. 
   #
   # @example_response
@@ -618,7 +618,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] code Code related to the method result.
   #
   # @example_request
-  #   curl -v -k -X POST -d "api_key=YUiVENNdFbNpRiYFd83Q&amount=10&description=paid related to product&type=one-time" https://dev.stoneacrehq.com:3000/api/v1/members/3/sale
+  #   curl -v -k -X POST -d "api_key=YUiVENNdFbNpRiYFd83Q&amount=10&description=paid related to product&type=one-time" https://dev.affinitystop.com:3000/api/v1/members/3/sale
   # @example_request_description Example of valid request. 
   #
   # @example_response
@@ -655,7 +655,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] code Code related to the method result.
   #
   # @example_request
-  #   curl -v -k -X POST -d "api_key=5yzCzGvsVCSYkycjaKjS&email=email@domain.com" https://dev.stoneacrehq.com:3000/api/v1/members/get_banner_by_email
+  #   curl -v -k -X POST -d "api_key=5yzCzGvsVCSYkycjaKjS&email=email@domain.com" https://dev.affinitystop.com:3000/api/v1/members/get_banner_by_email
   # @example_request_description Example of valid request. 
   #
   # @example_response
