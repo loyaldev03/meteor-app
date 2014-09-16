@@ -32,7 +32,7 @@ class Api::OperationController < ApplicationController
     
     o = Operation.new( 
       :operation_date => params[:operation_date], 
-      :resource => member, 
+      :resource => user, 
       :description => params[:description], 
       :operation_type => params[:operation_type]
     )
