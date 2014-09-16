@@ -44,7 +44,7 @@ module TasksHelpers
 
   def self.send_pillar_emails 
     base = Membership.joins(:user).joins(:terms_of_membership).joins(:terms_of_membership => :club).joins(:terms_of_membership => :email_templates).
-           where("email_templates.template_type = 'pillar' AND email_templates.client = clubs.marketing_tool_client AND date(join_date) = DATE_SUB(?, INTERVAL email_templates.days_after_join_date DAY) AND users.status IN ('active','provisional')", Time.zone.now.to_date).
+           where("email_templates.template_type = 'pillar' AND email_templates.client = clubs.marketing_tool_client AND date(join_date) = DATE_SUB(?, INTERVAL email_templates.days_after_join_date DAY) AND members.status IN ('active','provisional') and billing_enable = true", Time.zone.now.to_date).
            select("memberships.user_id, email_templates.id")
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
     base.to_enum.with_index.each do |res,index|
@@ -209,8 +209,7 @@ module TasksHelpers
 
   def self.send_happy_birthday
     today = Time.zone.now.to_date
-    base = User.billable.where(" birth_date IS NOT NULL and DAYOFMONTH(birth_date) = ? and MONTH(birth_date) = ? ", 
-      today.day, today.month)
+    base = User.billable.joins(:club).where(" birth_date IS NOT NULL and DAYOFMONTH(birth_date) = ? and MONTH(birth_date) = ? and billing_enable = true", today.day, today.month)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:send_happy_birthday rake task, processing #{base.count} users"
     base.find_in_batches do |group|
       group.to_enum.with_index.each do |user,index| 

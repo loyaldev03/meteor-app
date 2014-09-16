@@ -7,7 +7,7 @@ class Communication < ActiveRecord::Base
     if user.email.include?("@noemail.com")
       message = "The email contains '@noemail.com' which is an empty email. The email won't be sent."
       Auditory.audit(nil, nil, message, user, Settings.operation_types.no_email_error)
-    else
+    elsif member.club.billing_enable
       if template_type.class == EmailTemplate
         template = template_type
       else
