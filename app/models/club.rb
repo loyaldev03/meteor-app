@@ -92,21 +92,19 @@ class Club < ActiveRecord::Base
   end
 
   def exact_target_sync?
-    success = (self.marketing_tool_attributes and 
-    [ 
-      self.marketing_tool_attributes['et_business_unit'], 
-      self.marketing_tool_attributes['et_prospect_list'], 
-      self.marketing_tool_attributes['et_members_list'],
-      self.marketing_tool_attributes['et_username'],
-      self.marketing_tool_attributes['et_password'],
-      self.marketing_tool_attributes['et_endpoint']
-    ].none?(&:blank?))
-    if not Rails.env.production? and success 
-    [
-      self.marketing_tool_attributes['club_id_for_test']
-    ].none?(&:blank?)
-    else
-      success
+    if self.marketing_tool_attributes
+      attributes = [ 
+        self.marketing_tool_attributes['et_business_unit'], 
+        self.marketing_tool_attributes['et_prospect_list'], 
+        self.marketing_tool_attributes['et_members_list'],
+        self.marketing_tool_attributes['et_username'],
+        self.marketing_tool_attributes['et_password'],
+        self.marketing_tool_attributes['et_endpoint']
+      ]
+      attributes << self.marketing_tool_attributes['club_id_for_test'] unless Rails.env.production?
+      attributes.none?(&:blank?)
+    else 
+      false
     end
   end
 
