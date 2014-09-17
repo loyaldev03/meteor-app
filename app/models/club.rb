@@ -103,7 +103,6 @@ class Club < ActiveRecord::Base
     ].none?(&:blank?))
     if success and not Rails.env.production?
     [
-      self.marketing_tool_attributes['business_unit_for_test'],
       self.marketing_tool_attributes['club_id_for_test']
     ].none?(&:blank?)
     else

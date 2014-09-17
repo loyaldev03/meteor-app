@@ -348,8 +348,6 @@ en:
             et_prospect_list_help: 'Exact Target prospect list id.'
             et_endpoint: 'Exact Target endpoint'
             et_endpoint_help: 'Exact Target endpoint '
-            business_unit_for_test: 'Business Unit for test'
-            business_unit_for_test_help: 'BussinessUnit id used only in prototype and staging evironments.'
             club_id_for_test: 'Club id for test'
             club_id_for_test_help: 'Club id used for members that belongs to prototype and staging envrionmnets.'
           mailchimp_mandrill:

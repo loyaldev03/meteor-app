@@ -60,16 +60,6 @@
 
 <% unless Rails.env.production? %>
   <div class="control-group">
-    <%= label_tag :business_unit_for_test, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.business_unit_for_test'), :class => 'control-label' %>
-    <div class="controls" id="div_marketing_tool_attributes_business_unit_for_test">
-      <%= text_field_tag 'marketing_tool_attributes[business_unit_for_test]', (@club.marketing_tool_attributes["business_unit_for_test"] if @club.marketing_tool_attributes)  %>
-      <%= render :partial => "shared/help", :locals => { 
-          :title => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.business_unit_for_test'), 
-          :content => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.business_unit_for_test_help') } %>
-    </div>
-  </div>
-
-  <div class="control-group">
     <%= label_tag :club_id_for_test, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.club_id_for_test'), :class => 'control-label' %>
     <div class="controls" id="div_marketing_tool_attributes_club_id_for_test">
       <%= text_field_tag 'marketing_tool_attributes[club_id_for_test]', (@club.marketing_tool_attributes["club_id_for_test"] if @club.marketing_tool_attributes)  %>

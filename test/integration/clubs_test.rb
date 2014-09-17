@@ -13,14 +13,13 @@ class ClubTest < ActionController::IntegrationTest
   # TESTS
   ###########################################################
 
-  def configure_exact_target(et_username, et_password, et_business_unit, et_prospect_list, et_members_list, business_unit_for_test, club_id_for_test, et_endpoint)
+  def configure_exact_target(et_username, et_password, et_business_unit, et_prospect_list, et_members_list, club_id_for_test, et_endpoint)
     select 'Exact Target', :from => 'club[marketing_tool_client]'
     fill_in 'marketing_tool_attributes[et_username]', with: et_username
     fill_in 'marketing_tool_attributes[et_password]', with: et_password
     fill_in 'marketing_tool_attributes[et_business_unit]', with: et_business_unit
     fill_in 'marketing_tool_attributes[et_prospect_list]', with: et_prospect_list
     fill_in 'marketing_tool_attributes[et_members_list]', with: et_members_list
-    fill_in 'marketing_tool_attributes[business_unit_for_test]', with: business_unit_for_test
     fill_in 'marketing_tool_attributes[club_id_for_test]', with: club_id_for_test
     fill_in 'marketing_tool_attributes[et_endpoint]', with: et_endpoint
   end
@@ -193,7 +192,7 @@ class ClubTest < ActionController::IntegrationTest
     fill_in 'club[description]', :with => unsaved_club.description
     fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
 
-    configure_exact_target("et_username_test","et_password_test","et_business_unit_test", "et_prospect_list_test", "et_members_list_test", "business_unit_for_test", "club_id_for_test", "et_endpoint")
+    configure_exact_target("et_username_test","et_password_test","et_business_unit_test", "et_prospect_list_test", "et_members_list_test", "club_id_for_test", "et_endpoint")
 
     assert_difference('Club.count', 1) do
       click_link_or_button 'Create Club'
@@ -211,7 +210,7 @@ class ClubTest < ActionController::IntegrationTest
     assert club.exact_target_client?
     click_link_or_button('Edit')
 
-    configure_exact_target("et_username_test_new","et_password_test_new","et_business_unit_test_new", "et_prospect_list_test_new", "et_members_list_test_new", "business_unit_for_test_new", "club_id_for_test_new", "et_endpoint_new")
+    configure_exact_target("et_username_test_new","et_password_test_new","et_business_unit_test_new", "et_prospect_list_test_new", "et_members_list_test_new", "club_id_for_test_new", "et_endpoint_new")
     click_link_or_button 'Update Club'
 
     assert page.has_content? "et_username_test_new"
@@ -219,7 +218,6 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content? "et_business_unit_test_new"
     assert page.has_content? "et_prospect_list_test_new"
     assert page.has_content? "et_members_list_test_new"
-    assert page.has_content? "business_unit_for_test_new"
     assert page.has_content? "club_id_for_test_new"
     assert page.has_content? "et_endpoint_new"    
   end
@@ -258,7 +256,7 @@ class ClubTest < ActionController::IntegrationTest
     fill_in 'club[description]', :with => unsaved_club.description
     fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
 
-    configure_exact_target("et_username_test","et_password_test","et_business_unit_test", "et_prospect_list_test", "et_members_list_test", "business_unit_for_test", "club_id_for_test", "et_endpoint")
+    configure_exact_target("et_username_test","et_password_test","et_business_unit_test", "et_prospect_list_test", "et_members_list_test", "club_id_for_test", "et_endpoint")
 
     assert_difference('Club.count', 1) do
       click_link_or_button 'Create Club'
@@ -269,7 +267,6 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content? "et_business_unit_test"
     assert page.has_content? "et_prospect_list_test"
     assert page.has_content? "et_members_list_test"
-    assert page.has_content? "business_unit_for_test"
     assert page.has_content? "club_id_for_test"
     assert page.has_content? "et_endpoint"
 
@@ -283,7 +280,7 @@ class ClubTest < ActionController::IntegrationTest
     club_role.save
 
     click_link_or_button('Edit')
-    configure_exact_target("et_username_test_new","et_password_test_new","et_business_unit_test_new", "et_prospect_list_test_new", "et_members_list_test_new", "business_unit_for_test_new", "club_id_for_test_new", "et_endpoint_new")
+    configure_exact_target("et_username_test_new","et_password_test_new","et_business_unit_test_new", "et_prospect_list_test_new", "et_members_list_test_new", "club_id_for_test_new", "et_endpoint_new")
     click_link_or_button 'Update Club'
 
     assert page.has_content? "et_username_test_new"
@@ -291,7 +288,6 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content? "et_business_unit_test_new"
     assert page.has_content? "et_prospect_list_test_new"
     assert page.has_content? "et_members_list_test_new"
-    assert page.has_content? "business_unit_for_test_new"
     assert page.has_content? "club_id_for_test_new"
     assert page.has_content? "et_endpoint_new"
 
