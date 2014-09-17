@@ -48,6 +48,16 @@
   </div>
 </div>
 
+<div class="control-group">
+  <%= label_tag :et_endpoint, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_endpoint'), :class => 'control-label' %>
+  <div class="controls" id="div_marketing_tool_attributes_club_id_for_test">
+    <%= text_field_tag 'marketing_tool_attributes[et_endpoint]', (@club.marketing_tool_attributes["et_endpoint"] if @club.marketing_tool_attributes)  %>
+    <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_endpoint'),
+        :content => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_endpoint_help') } %>
+  </div>
+</div>
+
 <% unless Rails.env.production? %>
   <div class="control-group">
     <%= label_tag :business_unit_for_test, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.business_unit_for_test'), :class => 'control-label' %>
@@ -69,16 +79,6 @@
     </div>
   </div>
 <% end %>
-
-<div class="control-group">
-  <%= label_tag :et_endpoint, t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_endpoint'), :class => 'control-label' %>
-  <div class="controls" id="div_marketing_tool_attributes_club_id_for_test">
-    <%= text_field_tag 'marketing_tool_attributes[et_endpoint]', (@club.marketing_tool_attributes["et_endpoint"] if @club.marketing_tool_attributes)  %>
-    <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_endpoint'),
-        :content => t('activerecord.attributes.club.marketing_tool_attributes.exact_target.et_endpoint_help') } %>
-  </div>
-</div>
 
 <script>
   $('document').ready($('.help').popover({offset: 10}));

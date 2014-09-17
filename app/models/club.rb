@@ -92,14 +92,23 @@ class Club < ActiveRecord::Base
   end
 
   def exact_target_sync?
-    self.marketing_tool_attributes and 
+    success = (self.marketing_tool_attributes and 
     [ 
       self.marketing_tool_attributes['et_business_unit'], 
       self.marketing_tool_attributes['et_prospect_list'], 
       self.marketing_tool_attributes['et_members_list'],
       self.marketing_tool_attributes['et_username'],
-      self.marketing_tool_attributes['et_password']
+      self.marketing_tool_attributes['et_password'],
+      self.marketing_tool_attributes['et_endpoint']
+    ].none?(&:blank?))
+    if success and not Rails.env.production?
+    [
+      self.marketing_tool_attributes['business_unit_for_test'],
+      self.marketing_tool_attributes['club_id_for_test']
     ].none?(&:blank?)
+    else
+      success
+    end
   end
 
   def mailchimp_sync?
