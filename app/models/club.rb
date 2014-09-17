@@ -101,7 +101,7 @@ class Club < ActiveRecord::Base
       self.marketing_tool_attributes['et_password'],
       self.marketing_tool_attributes['et_endpoint']
     ].none?(&:blank?))
-    if success and not Rails.env.production?
+    if not Rails.env.production? and success 
     [
       self.marketing_tool_attributes['club_id_for_test']
     ].none?(&:blank?)
