@@ -203,8 +203,8 @@ class ClubTest < ActionController::IntegrationTest
     assert page.has_content? "et_business_unit_test"
     assert page.has_content? "et_prospect_list_test"
     assert page.has_content? "et_members_list_test"
-    assert page.has_content? "et_members_list_test"
-    assert page.has_content? "et_members_list_test"
+    assert page.has_content? "club_id_for_test"
+    assert page.has_content? "et_endpoint"
 
     club = Club.last
     assert club.exact_target_client?
