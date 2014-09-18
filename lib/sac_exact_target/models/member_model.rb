@@ -228,7 +228,7 @@ module SacExactTarget
     end
 
     def club_id
-      Rails.env.production? ? self.user.club_id.to_s : '9999'
+      Rails.env.production? ? self.user.club_id.to_s : self.user.club.marketing_tool_attributes['club_id_for_test']
     end
 
     def client_id
@@ -236,7 +236,7 @@ module SacExactTarget
     end
     
     def business_unit_id
-      Rails.env.production? ? self.user.club.marketing_tool_attributes['et_business_unit'] : Settings.exact_target.business_unit_for_test
+      self.user.club.marketing_tool_attributes['et_business_unit']
     end
   end
 end

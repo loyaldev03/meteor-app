@@ -73,7 +73,7 @@ module SacExactTarget
         if not self.club.exact_target_client?
           false
         elsif club.exact_target_sync?
-          SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"])
+          SacExactTarget.config_integration(self.club.marketing_tool_attributes["et_username"], self.club.marketing_tool_attributes["et_password"], self.club.marketing_tool_attributes["et_endpoint"])
           @exact_target_member ||= if !self.exact_target_sync?
             false
           else
