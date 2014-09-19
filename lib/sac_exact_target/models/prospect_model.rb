@@ -178,7 +178,7 @@ module SacExactTarget
       end
 
       def club_id
-        Rails.env.production? ? @club.id.to_s : '9999'
+        Rails.env.production? ? @club_id.to_s : self.user.club.marketing_tool_attributes['club_id_for_test']
       end
 
       def business_unit_id
