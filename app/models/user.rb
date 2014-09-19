@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_user_at_remote_domain
-    api_user.destroy! unless api_user.nil? || api_id.nil?
+    api_user.destroy! unless api_user.nil? || api_id.nil? || not club.billing_enable
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
