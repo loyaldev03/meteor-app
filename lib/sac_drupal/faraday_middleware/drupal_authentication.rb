@@ -75,7 +75,7 @@ module Drupal
           nil
         end
       rescue Exception => e
-        Auditory.report_issue("FaradayMiddleware::DrupalAuthentication::GenerateToken", e.to_s, { drupal_response: res.to_s })
+        Auditory.report_issue("FaradayMiddleware::DrupalAuthentication::GenerateToken", e.to_s, { drupal_response: res.to_s, url: @options[:url] })
       end
 
       def cookie_age
