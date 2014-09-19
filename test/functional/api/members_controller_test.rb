@@ -2268,7 +2268,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
 
-
   test "Upgrade/Downgrade a User Basic membership level by prorate logic - Provisional User - NewProvisionalDays > OldProvisionalDays" do
     prepare_upgrade_downgrade_toms false
 
@@ -2283,16 +2282,15 @@ class Api::MembersControllerTest < ActionController::TestCase
     @saved_user.reload
     assert @saved_user.provisional?
     assert_not_nil @saved_user.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
-    nbd_should_have_set = nbd.to_datetime.change(:offset => @saved_user.get_offset_related).utc - days_in_provisional.days
-  
-    assert_equal @saved_user.next_retry_bill_date.to_date, nbd_should_have_set.to_date, "Expecting #{@saved_user.next_retry_bill_date.to_date} but was #{nbd_should_have_set.to_date}. Dates: #{@saved_user.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}"
+    nbd_should_have_set = nbd - days_in_provisional.days
+    assert_equal @saved_user.next_retry_bill_date.in_time_zone(@saved_user.club.time_zone).to_date, nbd_should_have_set.to_date, "Expecting #{@saved_user.next_retry_bill_date.to_date} but was #{nbd_should_have_set.to_date}. Dates: #{@saved_user.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}"
   end
-  
+
   test "Upgrade a User Basic membership level by prorate logic - Provisional User - NewProvisionalDays > OldProvisionalDays" do
     prepare_upgrade_downgrade_toms false
 
     days_in_provisional = @saved_user.terms_of_membership.installment_period/2
-    middle_of_provisional_days = Time.zone.now + days_in_provisional.days
+    middle_of_provisional_days = Time.zone.now.in_time_zone(@saved_user.club.time_zone) + days_in_provisional.days
     nbd = middle_of_provisional_days + @tom_yearly.provisional_days.days
     Timecop.travel(middle_of_provisional_days) do
       generate_post_update_terms_of_membership(@saved_user.id, @tom_yearly.id)
@@ -2300,9 +2298,10 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     @saved_user.reload
     assert_not_nil @saved_user.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
-    assert_equal @saved_user.next_retry_bill_date.to_date, (nbd.in_time_zone(@saved_user.club.time_zone).utc.to_date - days_in_provisional.days).to_date
+    nbd_should_have_set = nbd - days_in_provisional.days
+    assert_equal @saved_user.next_retry_bill_date.in_time_zone(@saved_user.club.time_zone).to_date, nbd_should_have_set.to_date
   end
-  
+    
   test "Upgrade/Downgrade User with Basic membership level by prorate logic (NewProvisionalDays > OldProvisionalDays)- Softdecline User (Provisional status)" do
     prepare_upgrade_downgrade_toms false
     previous_membership = @saved_user.current_membership
@@ -2315,7 +2314,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     active_merchant_stubs
 
-    rand_date = @saved_user.bill_date + rand(1..6).days
+    rand_date = @saved_user.bill_date.in_time_zone(@saved_user.club.time_zone) + rand(1..6).days
     days_in_provisional = (rand_date.to_date - @saved_user.join_date.to_date).to_i
     nbd = rand_date + @tom_yearly.provisional_days.days
     Timecop.travel(rand_date) do
@@ -2326,7 +2325,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_equal @saved_user.terms_of_membership.id, @tom_yearly.id
     assert_not_nil @saved_user.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
-    nbd_should_have_set = nbd.to_datetime.change(:offset => @saved_user.get_offset_related) - days_in_provisional.days
-    assert_equal @saved_user.next_retry_bill_date.to_datetime.change(:offset => @saved_user.get_offset_related).utc.to_date, nbd_should_have_set.utc.to_date, "Dates: #{@saved_user.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
+    nbd_should_have_set = nbd - days_in_provisional.days
+    assert_equal @saved_user.next_retry_bill_date.in_time_zone(@saved_user.club.time_zone).to_date, nbd_should_have_set.to_date, "Dates: #{@saved_user.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
   end
 end
