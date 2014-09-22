@@ -222,7 +222,7 @@ module MesAccountUpdater
       lines = body.split("\n")
       lines.each do |line|
         columns = line.split(',')
-        next if columns[0].include?('Merchant Id') or columns[12].blank?
+        next if columns[0].include?('Merchant Id')
         columns.each { |x| x.gsub!('"', '') }
         args = { :control_number => columns[2], :incomming_date => columns[3],
           :reference_number => columns[5].gsub("'", ''), :transaction_date => columns[6], :transaction_amount => columns[7],
@@ -232,7 +232,7 @@ module MesAccountUpdater
           :reason => columns[14], :first_time => columns[15],
           :reason_code => columns[16], :cb_ref_number => columns[17]
         }
-        next if MesAccountUpdater::CHARGEBACKS_TO_NOT_PROCESS.include?(args[:reason])
+        next if MesAccountUpdater::CHARGEBACKS_TO_NOT_PROCESS.include?(args[:reason]) or args[:adjudication_date].blank?
         transaction_chargebacked = Transaction.find_by_payment_gateway_configuration_id_and_response_transaction_id gateway.id, args[:trident_transaction_id]
         user = User.find_by_id_and_club_id(args[:client_reference_number], gateway.club_id)
         begin
