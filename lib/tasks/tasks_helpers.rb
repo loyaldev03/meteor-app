@@ -44,7 +44,7 @@ module TasksHelpers
 
   def self.send_pillar_emails 
     base = Membership.joins(:user).joins(:terms_of_membership).joins(:terms_of_membership => :club).joins(:terms_of_membership => :email_templates).
-           where("email_templates.template_type = 'pillar' AND email_templates.client = clubs.marketing_tool_client AND date(join_date) = DATE_SUB(?, INTERVAL email_templates.days_after_join_date DAY) AND members.status IN ('active','provisional') and billing_enable = true", Time.zone.now.to_date).
+           where("email_templates.template_type = 'pillar' AND email_templates.client = clubs.marketing_tool_client AND date(join_date) = DATE_SUB(?, INTERVAL email_templates.days_after_join_date DAY) AND users.status IN ('active','provisional') and billing_enable = true", Time.zone.now.to_date).
            select("memberships.user_id, email_templates.id")
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
     base.to_enum.with_index.each do |res,index|

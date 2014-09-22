@@ -481,14 +481,14 @@ class UserTest < ActiveSupport::TestCase
     end   
   end
 
-  test "If member's club does not have billing enable we should not send any communication." do
-    saved_member = create_active_member(@terms_of_membership_with_gateway)
-    saved_member.club.update_attribute :billing_enable, false
-    saved_member.reload
+  test "If user's club does not have billing enable we should not send any communication." do
+    saved_user = create_active_user(@terms_of_membership_with_gateway)
+    saved_user.club.update_attribute :billing_enable, false
+    saved_user.reload
     EmailTemplate::TEMPLATE_TYPES.each do |type|
       assert_difference('Operation.count', 0) do
         assert_difference('Communication.count', 0) do
-          Communication.deliver!(type, saved_member)
+          Communication.deliver!(type, saved_user)
         end
       end
     end
