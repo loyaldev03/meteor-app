@@ -111,7 +111,7 @@ module TasksHelpers
   end
 
   def self.process_sync 
-    base = User.where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )')
+    base = User.where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )').with_billing_enable
     tz = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users lapsed and api_id not null, processing #{base.count} users"
     base.find_in_batches do |group|
@@ -130,8 +130,8 @@ module TasksHelpers
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
-    base =  User.where('last_sync_error like "There is no user with ID%"')
-    base2 = User.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"')
+    base =  User.where('last_sync_error like "There is no user with ID%"').with_billing_enable
+    base2 = User.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"').with_billing_enable
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users with error sync related to wrong api_id, processing #{base.count+base2.count} users"
     tz = Time.zone.now
     index = 0
@@ -164,7 +164,7 @@ module TasksHelpers
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
-    base = User.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").limit(2000)
+    base = User.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").with_billing_enable.limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users not_synced or with_error, processing #{base.count} users"
     tz = Time.zone.now
     base.to_enum.with_index.each do |user,index|
