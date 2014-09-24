@@ -124,6 +124,7 @@ class ClubsController < ApplicationController
           end
         end
       end
+      marketing_tool_attributes.each{|attribute,value| marketing_tool_attributes.delete(attribute) if value.blank?}
       @club.marketing_tool_attributes = marketing_tool_attributes
     end
 end
