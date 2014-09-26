@@ -11,6 +11,9 @@ module SacMailchimp
       res = Gibbon::API.lists.member_info({ id: mailchimp_list_id, emails: [mailchimp_identification] })
       @subscriber = res
       @subscriber["success_count"] == 0
+    rescue Gibbon::MailChimpError => e
+      update_member e
+      raise e.inspect
     rescue Exception  => e
       Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
       raise e
@@ -19,6 +22,9 @@ module SacMailchimp
     def unsubscribe!
     	begin
       	client.lists.unsubscribe({:id => mailchimp_list_id, :email => { :email => self.user.email }})
+      rescue Gibbon::MailChimpError => e
+        update_member e
+        raise e.inspect
     	rescue Exception => e
 	      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
 	      raise e 
@@ -33,6 +39,9 @@ module SacMailchimp
 			options = {:double_optin => false}
       begin
       	client.lists.subscribe( subscriber({:email => self.user.email}, options) )
+      rescue Gibbon::MailChimpError => e
+        update_member e
+        raise e.inspect
       rescue Exception => e
         Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
         raise e
@@ -47,6 +56,9 @@ module SacMailchimp
         # TODO: if we have a marketing_client_id in prospect too we would be avoiding this step.
         mailchimp_identification = self.user.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.user.marketing_client_id
       	client.lists.subscribe( subscriber({:euid => mailchimp_identification}, options) )
+      rescue Gibbon::MailChimpError => e
+        update_member e
+        raise e.inspect
     	rescue Exception => e
 	      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
 	      raise e
@@ -60,10 +72,10 @@ module SacMailchimp
           marketing_client_last_sync_error: "Time out error.",
           marketing_client_last_sync_error_at: Time.zone.now
         }        
-      elsif res["error"] # {"status"=>"error", "code"=>-100, "name"=>"ValidationError", "error"=>"This email address looks fake or invalid. Please enter a real email address"}
+      elsif res.instance_of? Gibbon::MailChimpError 
         { 
           marketing_client_synced_status: 'error',
-          marketing_client_last_sync_error: res["error"],
+          marketing_client_last_sync_error: "Code: #{res.code} Message: #{res.message}.",
           marketing_client_last_sync_error_at: Time.zone.now
         }
       else

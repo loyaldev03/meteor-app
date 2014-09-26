@@ -17,8 +17,8 @@ module SacExactTarget
           Auditory.audit(@current_agent, @current_user, message, @current_user, Settings.operation_types.user_manually_synced_to_exact_target)
           redirect_to show_user_path, notice: message    
         end
-      rescue
-        flash[:error] = t('error_messages.airbrake_error_message')
+      rescue Exception => e
+        flash[:error] = t('error_messages.airbrake_error_message_for_mkt_sync', :response => e)
         Auditory.report_issue("Member:exact_target_sync", "Error on members#exact_target_sync: #{$!}", { :user => @current_user.inspect })
         redirect_to show_user_path
       end
