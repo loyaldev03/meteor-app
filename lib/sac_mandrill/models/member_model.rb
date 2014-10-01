@@ -29,7 +29,7 @@
       enrollment_fieldmap.each do |api_field, our_field| 
         attributes << SacMandrill.format_attribute(enrollment_info, api_field, our_field)
       end
-      if Rails.env.production? and self.member.preferences and preferences_fieldmap
+      if Rails.env.production? and self.user.preferences and preferences_fieldmap
         member_preferences = self.user.user_preferences
         preferences_fieldmap.each do |api_field, our_field|
           attributes << {"name" => api_field, "content" => self.user.preferences[our_field].to_s}

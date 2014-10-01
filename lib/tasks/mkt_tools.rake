@@ -13,7 +13,7 @@ namespace :mkt_tools do
     tall = Time.zone.now
     begin
       if defined? Pardot::Member
-        Member.sync_members_to_pardot
+        User.sync_members_to_pardot
       end
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run mkt_tools:sync_members_to_pardot task"
@@ -33,7 +33,7 @@ namespace :mkt_tools do
     tall = Time.zone.now
     begin
       if defined? SacExactTarget::MemberModel
-        Member.sync_members_to_exact_target
+        User.sync_members_to_exact_target
       end
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run mkt_tools:sync_members_to_exact_target task"
@@ -69,7 +69,7 @@ namespace :mkt_tools do
     tall = Time.zone.now
     begin
       if defined? SacMailchimp::MemberModel
-        Member.sync_members_to_mailchimp
+        User.sync_members_to_mailchimp
       end
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run mkt_tools:sync_members_to_mailchimp task"

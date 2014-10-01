@@ -2314,7 +2314,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     active_merchant_stubs
 
-    rand_date = @saved_user.bill_date.in_time_zone(@saved_user.club.time_zone) + rand(1..6).days
+    rand_date = @saved_user.bill_date + rand(1..6).days
     days_in_provisional = (rand_date.to_date - @saved_user.join_date.to_date).to_i
     nbd = rand_date + @tom_yearly.provisional_days.days
     Timecop.travel(rand_date) do
@@ -2325,7 +2325,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     assert_equal @saved_user.terms_of_membership.id, @tom_yearly.id
     assert_not_nil @saved_user.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
-    nbd_should_have_set = nbd - days_in_provisional.days
+    nbd_should_have_set = nbd.in_time_zone(@saved_user.club.time_zone) - days_in_provisional.days
     assert_equal @saved_user.next_retry_bill_date.in_time_zone(@saved_user.club.time_zone).to_date, nbd_should_have_set.to_date, "Dates: #{@saved_user.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
   end
 end

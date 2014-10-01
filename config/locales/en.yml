@@ -142,6 +142,7 @@ en:
     unable_to_perform_due_member_status: "Unable to perfom this action. The member is not in the right status to perform this."
     not_expecting_billing: "Unable to perfom this action. The member is not expected to get billed."
     airbrake_error_message: "Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience."
+    airbrake_error_message_for_mkt_sync: "Error while processing this request.  Verify user's information and that the marketing tool client is configurated ok. We have received the following response: %{response}"
     birth_date_is_invalid: "is invalid, it must be null or greater than '1900-01-01'"
     payment_gateway_time_out: "Time out trying to connect with the payment gateway."
     transaction_gateway_differs_from_current: "Transaction does not have the same active gateway."

@@ -21,7 +21,7 @@ module SacMailchimp
 
   def self.config_integration(mailchimp_api_key)
     Gibbon::API.api_key = mailchimp_api_key
-    Gibbon::API.throws_exceptions = false
+    Gibbon::API.throws_exceptions = true
   end
 
   def self.format_attribute(object, api_field, our_field)

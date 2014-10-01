@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_user_at_remote_domain
-    api_user.destroy! unless api_user.nil? || api_id.nil?
+    api_user.destroy! unless api_user.nil? or api_id.nil? or not self.club.billing_enable
   rescue Exception => e
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
@@ -76,7 +76,8 @@ class User < ActiveRecord::Base
   validates :birth_date, :birth_date => true
   validates :email, :email => true
 
-  scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }  
+  scope :billable, lambda { where('status IN (?, ?)', 'provisional', 'active') }
+  scope :with_billing_enable, lambda { joins(:club).where('billing_enable = true') }
 
   ########### SEARCH ###############
   searchable :auto_index => false do
@@ -319,7 +320,7 @@ class User < ActiveRecord::Base
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
 
   def can_be_synced_to_remote?
-    !(lapsed? or applied?)
+    !(lapsed? or applied?) and club.billing_enable
   end
 
   # Returns true if members is lapsed.
