@@ -135,7 +135,7 @@ class UsersCancelTest < ActionController::IntegrationTest
     confirm_ok_js
     click_link_or_button 'Cancel user'
     @saved_user.reload
-    assert_equal I18n.l(@saved_user.cancel_date, :format => :only_date), I18n.l(cancel_date, :format => :only_date)
+    assert_equal @saved_user.cancel_date.utc.to_date, cancel_date.to_datetime.change(:offset => @saved_user.get_offset_related).utc.to_date
   end
 
   #Check cancel email - It is send it by CS inmediate after user is lapsed
@@ -181,7 +181,6 @@ class UsersCancelTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_approval.name)
-
     confirm_ok_js
     click_link_or_button 'Reject'
 
