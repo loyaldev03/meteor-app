@@ -369,18 +369,16 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
 
   test "create user with gender male" do
     setup_user
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    fill_in_user(unsaved_user)
-    wait_until{ assert find_field('input_gender').value == ('Male') }
-    
+    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id, :gender => 'M')
+    create_user(unsaved_user)
+    assert find_field('input_gender').value == ('Male')
   end
 
   test "create user with gender female" do
     setup_user
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id, :gender => 'F')
-    
-    fill_in_user(unsaved_user)
-    wait_until{ assert find_field('input_gender').value == ('Male') }
+    create_user(unsaved_user)
+    assert find_field('input_gender').value == ('Female')  
   end
 
   test "create user without phone number" do
