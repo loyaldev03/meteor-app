@@ -301,7 +301,7 @@ module ActionController
             end
           end
         end
-        first(:link, date.day.to_s).click
+        first(:link, date.day.to_s, exact: true).click
       end
       date
     end
