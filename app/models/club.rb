@@ -221,7 +221,7 @@ class Club < ActiveRecord::Base
     def not_allow_multiple_mailchimp_clients_with_same_list_id
       if self.mailchimp_mandrill_client? and self.changes.include?(:marketing_tool_attributes) and not self.changes['marketing_tool_attributes'].last["mailchimp_list_id"].blank?
         mailchimp_list_id = self.changes['marketing_tool_attributes'].last["mailchimp_list_id"]
-        already_configured = Club.mailchimp_related.where("marketing_tool_attributes like ? and id != ?", "%#{mailchimp_list_id}%", id.to_i)
+        already_configured = Club.where("marketing_tool_client = 'mailchimp_mandrill' AND marketing_tool_attributes like ? and id != ?", "%#{mailchimp_list_id}%", id.to_i)
         unless already_configured.empty?
           already_configured.each do |club|
             if club.marketing_tool_attributes["mailchimp_list_id"] == mailchimp_list_id
