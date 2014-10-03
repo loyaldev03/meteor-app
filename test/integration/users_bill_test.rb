@@ -260,7 +260,7 @@ class UsersBillTest < ActionController::IntegrationTest
       change_next_bill_date(next_bill_date, "Change Next Bill Date for tomorrow")  
     end
     within("#td_mi_next_retry_bill_date")do
-      assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)), "Timezone: #{Time.zone}, date: #{next_bill_date}"
+      assert page.has_content?(I18n.l(next_bill_date, :format => :only_date)), "Timezone: #{Time.zone}, date searched: #{next_bill_date}, user's date: #{@saved_user.next_retry_bill_date}"
     end
   end  
 
@@ -536,5 +536,4 @@ class UsersBillTest < ActionController::IntegrationTest
     Time.zone = @club.time_zone
     bill_user(@saved_user, true, nil, true)
   end
-
 end
