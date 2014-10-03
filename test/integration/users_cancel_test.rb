@@ -117,7 +117,7 @@ class UsersCancelTest < ActionController::IntegrationTest
 
   test "changing the cancel date" do
     setup_user
-    cancel_date = Time.zone.now+1.day
+    cancel_date = Time.zone.now + 1.day
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     click_link_or_button 'cancel'
     cancel_date = select_from_datepicker("cancel_date", cancel_date)
@@ -127,7 +127,7 @@ class UsersCancelTest < ActionController::IntegrationTest
     click_link_or_button 'Cancel user'
     @saved_user.reload
     assert_equal I18n.l(@saved_user.cancel_date, :format => :only_date), I18n.l(cancel_date, :format => :only_date)
-    cancel_date = Time.zone.now+2.day
+    cancel_date = Time.zone.now + 2.day
 
     click_link_or_button 'cancel'
     cancel_date = select_from_datepicker("cancel_date", cancel_date)
@@ -135,7 +135,7 @@ class UsersCancelTest < ActionController::IntegrationTest
     confirm_ok_js
     click_link_or_button 'Cancel user'
     @saved_user.reload
-    assert_equal @saved_user.cancel_date.utc.to_date, cancel_date.to_datetime.change(:offset => @saved_user.get_offset_related).utc.to_date
+    assert_equal @saved_user.cancel_date.to_date, cancel_date.to_date
   end
 
   #Check cancel email - It is send it by CS inmediate after user is lapsed
