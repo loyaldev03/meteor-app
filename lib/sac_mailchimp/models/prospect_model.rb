@@ -4,7 +4,6 @@ module SacMailchimp
     def save!(club)
       return unless self.prospect.email
       setup_club(club)
-      # Find by email . I didnt have luck looking for a subscriber by email and List.
       subscriber = SacMailchimp::ProspectModel.find_by_email self.prospect.email, mailchimp_list_id
       res = if subscriber["status"]=='error'
         subscriber
