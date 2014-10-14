@@ -29,11 +29,10 @@ class Auditory
   end
   
   def self.report_issue(error = "Special Error", exception = '', params = {}, add_backtrace = true)
-    unless ["test"].include? Rails.env  
+    unless ["test", "development"].include? Rails.env  
     # Airbrake.notify(:error_class   => error, :error_message => message, :parameters => params)
       comment = exception.to_s
       comment = comment + "\n\n\n Parameters:\n" + params.collect{|k,v| "#{k}: #{v}" }.join("\n")
-      comment = comment + "\nBacktrace:\n " + caller.join("\n").to_s if add_backtrace
       if add_backtrace
         comment = comment + "\nBacktrace:\n " + (exception.kind_of?(Exception) ? exception.backtrace.to_s : caller.join("\n").to_s)
       end
