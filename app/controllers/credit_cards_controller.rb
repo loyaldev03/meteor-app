@@ -51,7 +51,7 @@ class CreditCardsController < ApplicationController
         flash[:error] = t('error_messages.credit_card_gateway_differs_from_current')
         redirect_to show_user_path
       rescue Exception => e
-        Auditory.report_issue("CreditCardsController::activate", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :params => params.inspect, :user => @current_user.inspect })
+        Auditory.report_issue("CreditCardsController::activate", e, { :params => params.inspect, :user => @current_user.inspect })
         flash[:error] = t('error_messages.airbrake_error_message')
         redirect_to show_user_path
         logger.error e.inspect
