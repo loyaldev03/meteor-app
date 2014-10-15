@@ -6,8 +6,9 @@ module SacMailchimp
     end
 
     def new_record?
-      # Find by subscriber key. We cant get the list of Lists to which this subscriber is subscribe it on. 
-      mailchimp_identification = self.user.marketing_client_id.nil? ? {email: self.user.email} : {euid: self.user.marketing_client_id}
+      # Find by subscriber key. We can search by email, euid or leid. euid is an ID attached to the email, it means it changes when the email changes. leid is an ID attached to the subscriber, it does not change when the email is updated.
+      # We are serching by leid, which is the ID attached to the subscriber.
+      mailchimp_identification = self.user.marketing_client_id.nil? ? {email: self.user.email} : {leid: self.user.marketing_client_id}
       res = Gibbon::API.lists.member_info({ id: mailchimp_list_id, emails: [mailchimp_identification] })
       @subscriber = res
       @subscriber["success_count"] == 0
@@ -49,7 +50,7 @@ module SacMailchimp
         # to the leid we do not have saved. In case it is not prospect we use marketing_client we have.
         # TODO: if we have a marketing_client_id in prospect too we would be avoiding this step.
         mailchimp_identification = self.user.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.user.marketing_client_id
-      	client.lists.subscribe( subscriber({:euid => mailchimp_identification}, options) )
+      	client.lists.subscribe( subscriber({:leid => mailchimp_identification}, options) )
       rescue Gibbon::MailChimpError => e
         Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
         update_member e
@@ -76,7 +77,7 @@ module SacMailchimp
           marketing_client_synced_status: 'synced',
           marketing_client_last_sync_error: nil,
           marketing_client_last_sync_error_at: nil,
-          marketing_client_id: res["euid"]
+          marketing_client_id: res["leid"]
         }
       end
       data = data.merge(need_sync_to_marketing_client: false)
