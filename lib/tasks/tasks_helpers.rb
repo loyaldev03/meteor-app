@@ -17,7 +17,7 @@ module TasksHelpers
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id} nbd: #{user.next_retry_bill_date}"
         user.bill_membership
       rescue Exception => e
-        Auditory.report_issue("Billing::Today", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :user => user.inspect, :credit_card => user.active_credit_card.inspect })
+        Auditory.report_issue("Billing::Today", e, { :user => user.inspect, :credit_card => user.active_credit_card.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
@@ -36,7 +36,7 @@ module TasksHelpers
         Rails.logger.info "   *[#{index}] processing user ##{user.id}"
         user.refresh_autologin_url!
       rescue
-        Auditory.report_issue("Users::Users", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :user => user.inspect })
+        Auditory.report_issue("Users::Users", e, { :user => user.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
@@ -56,7 +56,7 @@ module TasksHelpers
         Communication.deliver!(template, user)
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
       rescue Exception => e
-        Auditory.report_issue("Users::SendPillar", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :template => template.inspect, :membership => user.current_membership.inspect })
+        Auditory.report_issue("Users::SendPillar", e, { :template => template.inspect, :membership => user.current_membership.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
@@ -75,7 +75,7 @@ module TasksHelpers
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
         user.reset_club_cash
       rescue Exception => e
-        Auditory.report_issue("User::ClubCash", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :user => user.inspect })
+        Auditory.report_issue("User::ClubCash", e, { :user => user.inspect })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
@@ -99,7 +99,7 @@ module TasksHelpers
           user.cancel!(Time.zone.now.in_time_zone(user.get_club_timezone), "Billing date is overdue.", nil, Settings.operation_types.bill_overdue_cancel) if user.manual_payment and not user.cancel_date
           user.set_as_canceled!
         rescue Exception => e
-          Auditory.report_issue("Users::Cancel", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :user => user.inspect })
+          Auditory.report_issue("Users::Cancel", e, { :user => user.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
@@ -218,7 +218,7 @@ module TasksHelpers
           Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
           Communication.deliver!(:birthday, user)
         rescue Exception => e
-          Auditory.report_issue("Users::sendHappyBirthday", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :user => user.inspect })
+          Auditory.report_issue("Users::sendHappyBirthday", e, { :user => user.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
@@ -245,7 +245,7 @@ module TasksHelpers
           Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
           user.send_pre_bill
         rescue Exception => e
-          Auditory.report_issue("Billing::SendPrebill", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :user => user.inspect })
+          Auditory.report_issue("Billing::SendPrebill", e, { :user => user.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
@@ -312,7 +312,7 @@ module TasksHelpers
           Rails.logger.info "  *[#{index}] processing member ##{fulfillment.user_id} fulfillment ##{fulfillment.id}"
           fulfillment.renew!
         rescue Exception => e
-          Auditory.report_issue("User::Fulfillment", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :fulfillment => fulfillment.inspect })
+          Auditory.report_issue("User::Fulfillment", e, { :fulfillment => fulfillment.inspect })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end

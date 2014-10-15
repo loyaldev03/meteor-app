@@ -318,10 +318,9 @@ class UsersController < ApplicationController
       Auditory.audit(@current_agent, @current_user, message, @current_user, Settings.operation_types.user_manually_synced_to_drupal)
       redirect_to show_user_path, notice: message    
     end
-  rescue
+  rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    message = "Error on users#sync: #{$!}" 
-    Auditory.report_issue("User:sync", message, { :user => @current_user.inspect })
+    Auditory.report_issue("User:sync", e, { :user => @current_user.inspect })
     redirect_to show_user_path
   end
 
@@ -342,10 +341,9 @@ class UsersController < ApplicationController
     end
     Auditory.audit(@current_agent, @current_user, message, @current_user, Settings.operation_types.reset_password)
     redirect_to show_user_path, notice: message
-  rescue
+  rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    message = "Error on users#reset_password: #{$!}"
-    Auditory.report_issue("User:reset_password", message, { :user => @current_user.inspect })
+    Auditory.report_issue("User:reset_password", e, { :user => @current_user.inspect })
     redirect_to show_user_path
   end
 
@@ -358,10 +356,9 @@ class UsersController < ApplicationController
     end
     Auditory.audit(@current_agent, @current_user, message, @current_user, Settings.operation_types.resend_welcome)
     redirect_to show_user_path, notice: message
-  rescue
+  rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    message = "Error on users#resend_welcome: #{$!}"
-    Auditory.report_issue("User:resend_welcome", message, { :user => @current_user.inspect })
+    Auditory.report_issue("User:resend_welcome", e, { :user => @current_user.inspect })
     redirect_to show_user_path
   end
 

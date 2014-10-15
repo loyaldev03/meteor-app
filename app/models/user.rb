@@ -1006,7 +1006,7 @@ class User < ActiveRecord::Base
             end
           rescue Exception => e
             answer[:errors] = cct.errors_merged(self) unless cct.nil?
-            Auditory.report_issue('Club cash Transaction', e.to_s + answer[:message], { :user => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
+            Auditory.report_issue('Club cash Transaction', e, { :answer_message => answer[:message], :user => self.inspect, :amount => amount, :description => description, :club_cash_transaction => (cct.inspect unless cct.nil?) })
             answer[:message] = I18n.t('error_messages.airbrake_error_message')
             raise ActiveRecord::Rollback
           end
@@ -1025,7 +1025,7 @@ class User < ActiveRecord::Base
         Auditory.audit(agent, self, answer[:message], self, auditory_code)
       end
     rescue Exception => e
-      Auditory.report_issue('Club cash Transaction', e.to_s + answer[:message], { :user => self.inspect, :amount => amount, :description => description })
+      Auditory.report_issue('Club cash Transaction', e, { :answer_message => answer[:message], :user => self.inspect, :amount => amount, :description => description })
       answer[:message] = I18n.t('error_messages.airbrake_error_message')
       answer[:errors] = { :amount => "There has been an error while adding club cash amont." }
     end
@@ -1182,7 +1182,7 @@ class User < ActiveRecord::Base
               new_credit_card.set_as_active! if set_active
             end
           rescue Exception => e
-            Auditory.report_issue("Users::update_credit_card_from_drupal", "#{e.to_s}\n\n#{$@[0..9] * "\n\t"}", { :new_active_credit_card => new_credit_card.inspect, :user => self.inspect })
+            Auditory.report_issue("Users::update_credit_card_from_drupal", e, { :new_active_credit_card => new_credit_card.inspect, :user => self.inspect })
             raise ActiveRecord::Rollback
           end
         end

@@ -121,9 +121,9 @@ class FulfillmentsController < ApplicationController
     else
       flash[:notice] = "Fulfillment file was already marked as sent."
     end
-  rescue
+  rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    Auditory.report_issue("FulfillmentFile:mark_file_as_sent", $!, { :file => file.inspect })
+    Auditory.report_issue("FulfillmentFile:mark_file_as_sent", e, { :file => file.inspect })
   ensure
     redirect_to list_fulfillment_files_path
   end
