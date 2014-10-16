@@ -34,7 +34,7 @@ class Auditory
       comment = exception.to_s
       comment = comment + "\n\n\n Parameters:\n" + params.collect{|k,v| "#{k}: #{v}" }.join("\n")
       if add_backtrace
-        comment = comment + "\nBacktrace:\n " + (exception.kind_of?(Exception) ? exception.backtrace.to_s : caller.join("\n").to_s)
+        comment = comment + "\nBacktrace:\n " + (exception.kind_of?(Exception) ? exception.backtrace.join("\n").to_s : caller.join("\n").to_s)
       end
       ticket = Auditory.create_ticket(comment.truncate(10000), error)
 
