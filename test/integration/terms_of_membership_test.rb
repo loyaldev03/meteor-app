@@ -476,7 +476,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	  choose('if_cannot_bill_user_cancel')
 		click_link_or_button 'Create Plan'
 	  sleep 2
-		assert page.has_content?('was created succesfully') # TOM was created
+		assert page.has_content?('was created succesfully'), "Text alerted was:  #{find(".alert").text}" # TOM was created
 		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 
 		@terms_of_membership = TermsOfMembership.find_by_name tom_name
@@ -488,7 +488,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		visit show_user_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :user_prefix => @saved_user.id)
 	end
 
-	# # EDIT
+	# # # EDIT
 
 	test "Edit subcription plan with Initial Fee distinct of 0 - No membership associated" do
 		sign_in_as(@admin_agent)
