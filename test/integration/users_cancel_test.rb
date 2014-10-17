@@ -143,7 +143,7 @@ class UsersCancelTest < ActionController::IntegrationTest
     setup_user
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     click_on 'Cancel'
-    date_time = Time.zone.now + 1.day
+    date_time = (Time.zone.now + 1.day).utc
 
     date_time = select_from_datepicker("cancel_date", date_time)
     select(@member_cancel_reason.name, :from => 'reason')
