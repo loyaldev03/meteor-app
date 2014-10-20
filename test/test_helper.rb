@@ -400,10 +400,12 @@ module ActionController
     # Check Refund email -  It is send it by CS inmediate
     def bill_user(user, do_refund = true, refund_amount = nil, update_next_bill_date_to_today = true)
       active_merchant_stubs
+      Time.zone = user.club.time_zone
+
       diff_between_next_bill_date_and_today = user.next_retry_bill_date - Time.zone.now
       next_bill_date = user.next_retry_bill_date + user.terms_of_membership.installment_period.days
-
       user.update_attribute(:next_retry_bill_date, Time.zone.now)
+
       Time.zone = "UTC"
       user.reload
       answer = user.bill_membership
