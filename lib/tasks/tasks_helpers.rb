@@ -111,34 +111,36 @@ module TasksHelpers
   end
 
   def self.process_sync 
-    base = User.where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )').with_billing_enable
+    base = User.where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )').with_billing_enable.select('users.id')
     tz = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users lapsed and api_id not null, processing #{base.count} users"
     base.find_in_batches do |group|
-      group.each do |user|
+      group.each do |user_id|
         begin
+          user = User.find_by_id user_id
           api_m = user.api_user
           unless api_m.nil?
             api_m.destroy!
             Auditory.audit(nil, user, "User's drupal account destroyed by batch script", user, Settings.operation_types.user_drupal_account_destroyed_batch)
           end
         rescue Exception => e
-          Auditory.report_issue("Users::Sync", e, {:user => user.inspect})
+          Auditory.report_issue("Users::Sync", e, {:user => (user.nil? ? user_id : user.inspect)})
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
-    base =  User.where('last_sync_error like "There is no user with ID%"').with_billing_enable
-    base2 = User.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"').with_billing_enable
+    base =  User.where('last_sync_error like "There is no user with ID%"').with_billing_enable.select('users.id')
+    base2 = User.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"').with_billing_enable.select('users.id')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users with error sync related to wrong api_id, processing #{base.count+base2.count} users"
     tz = Time.zone.now
     index = 0
     [base,base2].each do |group|
-      group.each do |user|
+      group.each do |user_id|
         begin
-          Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
+          Rails.logger.info "  *[#{index+1}] processing user ##{user_id}"
+          user = User.find_by_id user_id
           user.api_id = nil 
           user.last_sync_error = nil
           user.last_sync_error_at = nil
@@ -157,19 +159,20 @@ module TasksHelpers
           end
           index = index + 1
         rescue Exception => e
-          Auditory.report_issue("Users::Sync", e, {:user => user.inspect})
+          Auditory.report_issue("Users::Sync", e, {:user => (user.nil? ? user_id : user.inspect)})
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
-    base = User.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").with_billing_enable.limit(2000)
+    base = User.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").with_billing_enable.select('users.id').limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users not_synced or with_error, processing #{base.count} users"
     tz = Time.zone.now
-    base.to_enum.with_index.each do |user,index|
+    base.to_enum.with_index.each do |user_id,index|
       begin
-        Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
+        Rails.logger.info "  *[#{index+1}] processing user ##{user_id}"
+        user = User.find_by_id user_id
         api_m = user.api_user
         unless api_m.nil?
           if api_m.save!(force: true)
@@ -179,7 +182,7 @@ module TasksHelpers
           end
         end
       rescue Exception => e
-        Auditory.report_issue("Users::Sync", e, {:user => user.inspect})
+        Auditory.report_issue("Users::Sync", e, {:user => (user.nil? ? user_id : user.inspect)})
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end       
