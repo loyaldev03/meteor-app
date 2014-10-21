@@ -161,7 +161,8 @@ module SacExactTarget
         'Gender' => 'gender',
         'Wrong_Phone' => 'wrong_phone_number',
         'Phone' => 'full_phone_number',
-        'Refunded_amount' => 'last_refunded_amount'
+        'Refunded_amount' => 'last_refunded_amount',
+        'Current_join_date' => 'current_join_date'
       }
     end
 
