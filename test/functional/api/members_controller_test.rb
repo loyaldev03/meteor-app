@@ -1783,6 +1783,49 @@ class Api::MembersControllerTest < ActionController::TestCase
     @saved_user = User.find_by_email @user.email
   end
 
+  test "User should not be updated if it is already active and the cc send it is wrong" do
+    sign_in @admin_user
+    @credit_card = FactoryGirl.build :credit_card
+    @user = FactoryGirl.build :user_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    assert_difference('Membership.count') do
+      assert_difference('EnrollmentInfo.count') do
+        assert_difference('Transaction.count') do
+          assert_difference('UserPreference.count',@preferences.size) do 
+            Delayed::Worker.delay_jobs = true
+            assert_difference('User.count') do
+              generate_post_message
+              assert_response :success
+            end
+            Delayed::Worker.delay_jobs = false
+            Delayed::Job.all.each{ |x| x.invoke_job }
+          end
+        end
+      end
+    end
+    email_used = @user.email
+    @user.first_name = "new_Name"
+    @credit_card.expire_month = (Time.zone.now - 1.day).year
+    @user = FactoryGirl.build :user_with_api, :email => email_used
+    assert_difference('Membership.count',0) do
+      assert_difference('EnrollmentInfo.count',0) do
+        assert_difference('Transaction.count',0) do
+          assert_difference('User.count',0) do
+            generate_post_message
+            assert_response :success
+          end
+        end
+      end
+    end
+    assert @response.body.include? "Member information is invalid."
+    assert @response.body.include? "\"expire_year\":[\"expired\"]"
+    saved_user = User.find_by_email @user.email
+    assert saved_user.first_name != "new_Name"
+  end
+
   def validate_transactions_upon_tom_update(previous_membership, new_membership, amount_to_process, amount_in_favor)
     #tom_change_billing
     tom_change_billing_transaction = @saved_user.transactions.where("operation_type = ?", Settings.operation_types.tom_change_billing).last
