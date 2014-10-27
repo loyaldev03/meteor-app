@@ -27,7 +27,7 @@ module MesAccountUpdater
       :userPass => Settings.mes_report_service.password, 
       :reportDateBegin => initial_date, 
       :reportDateEnd => end_date, 
-      :nodeId => gateway.login[0..11], 
+      :nodeId => 941000110028, 
       :reportType => 1, 
       :includeTridentTranId => true, 
       :includePurchaseId => true, 

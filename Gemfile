@@ -96,9 +96,7 @@ group :prototype do
   
 end
 
-
-gem 'sunspot_rails'
-gem 'sunspot_solr'
+gem 'tire'
 gem 'progress_bar'
 
 

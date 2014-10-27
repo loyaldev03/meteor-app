@@ -50,12 +50,12 @@ task :notify_campfire do
   campfire_room.speak "#{cplatform} #{application}: env #{rails_env}"
 end
 
-namespace :solr do
-  desc "start solr"
+namespace :elasticsearch do
+  desc "start elasticsearch"
   task :start, :roles => :app, :except => { :no_release => true } do 
     run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:start"
   end
-  desc "stop solr"
+  desc "stop elasticsearch"
   task :stop, :roles => :app, :except => { :no_release => true } do 
     run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:stop"
   end
@@ -211,7 +211,7 @@ after "deploy:update", "maintenance_mode:start" if fetch(:put_in_maintenance_mod
 after "deploy:update", "deploy:migrate"
 after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
 after 'deploy:update', 'restart_delayed_jobs'
-after "deploy:update", "solr:reindex" if fetch(:solr_reindex, false)
+after "deploy:update", "elasticsearch:reindex" if fetch(:solr_reindex, false)
 after 'deploy', 'notify_campfire'
 after "deploy", "deploy:tag"
 

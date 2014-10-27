@@ -39,8 +39,7 @@ class User < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_marketing_client_sync_as_needed
-  after_create :solr_index_asyn_call
-  after_update :solr_index_asyn_call
+  after_save :elasticsearch_asyn_call
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_user_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
@@ -80,54 +79,49 @@ class User < ActiveRecord::Base
   scope :with_billing_enable, lambda { joins(:club).where('billing_enable = true') }
 
   ########### SEARCH ###############
-  searchable :auto_index => false do
-    long :id
-    long :club_id
-    text :first_name
-    text :last_name
-    text :address
-    text :city
-    string :full_name
-    string :full_address
-    string :country
-    string :state
-    text :zip
-    text :email, :as => :code_textemail
-    string :status
-    time :next_retry_bill_date
-    integer :phone_country_code
-    integer :phone_area_code
-    integer :phone_local_number
-    string :sync_status
-    text :external_id
-    time :join_date do
-      join_date
-    end
-    text :notes do
-      user_notes.map { |comment| comment.description }
-    end
-    time :billed_dates, :multiple => true do
-      # filter by sales
-      transactions.where('transaction_type = "sale"').map { |transaction| transaction.created_at  }
-    end
-    string :cc_token do 
-      active_credit_card.token
-    end
-    string :last_digits do 
-      active_credit_card.last_digits
-    end
+  include Tire::Model::Search
+  mapping do
+    indexes :id,           :index    => :not_analyzed
+    indexes :first_name,        :analyzer => 'standard'
+    indexes :last_name,        :analyzer => 'standard'
+    indexes :full_name,        :analyzer => 'standard'
+    indexes :city,        :analyzer => 'standard'
+    indexes :address,        :analyzer => 'standard'
+    indexes :email,        :analyzer => 'standard'
+    indexes :country,        :analyzer => 'standard'
+    indexes :state,        :analyzer => 'standard'
+    indexes :full_address,        :analyzer => 'standard'
+    indexes :status,        :analyzer => 'standard'
+    indexes :club_id,      :analyzer => 'standard'
+  end
+
+  def to_indexed_json
+    {:id => id,
+    :first_name => first_name,
+    :last_name => last_name,
+    :full_name => full_name,
+    :city => city,
+    :address => address,
+    :email => email,
+    :country => country,
+    :full_address => full_address,
+    :state => state,
+    :status => status,
+    :club_id => club_id,
+    }.to_json
   end
   # Async indexing
-  def asyn_solr_index
-    solr_index
+  def asyn_elasticsearch_index
+    self.index.store self
+    # Tire.index('users').import [self]
   rescue Exception => e
-    Auditory.report_issue("User:IndexingAgainstSolr", e, { :user => self.inspect })
+    Auditory.report_issue("User:IndexingToElasticSearch", e, { :user => self.inspect })
     raise e
   end
-  handle_asynchronously :asyn_solr_index, queue: :solr_indexing, priority: 10
+  handle_asynchronously :asyn_elasticsearch_index, queue: :elasticsearch_indexing, priority: 10
 
-  def solr_index_asyn_call
-    asyn_solr_index if not (self.changed & ['id', 'club_id', 'first_name', 'last_name', 'address', 'city', 'country', 'state', 'zip', 'email', 'status', 'next_retry_bill_date', 'phone_country_code', 'phone_area_code', 'phone_local_number', 'sync_status', 'external_id', 'join_date']).empty?
+  def elasticsearch_asyn_call
+    asyn_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'address', 'city', 'country', 'state', 'email']).empty?
   end
   ########### SEARCH ###############
 
