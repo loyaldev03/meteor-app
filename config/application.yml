@@ -382,15 +382,11 @@ production:
 prototype:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
-  elasticsearch:
-    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
-
+  
 staging:
   <<: *defaults
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   xxxyyyzzz: reibel3y5estrada8
-  elasticsearch:
-    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
     
 demo:
   <<: *defaults

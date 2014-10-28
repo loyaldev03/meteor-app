@@ -61,7 +61,6 @@ namespace :elasticsearch do
   end
   desc "reindex the whole database"
   task :reindex, :roles => :app do
-    run "cd #{current_path} && rake environment tire:index:drop INDEX=user_#{rails_env}"
     run "cd #{current_path} && rake environment tire:import CLASS='User' FORCE=true"
   end
 end
