@@ -80,6 +80,7 @@ class User < ActiveRecord::Base
 
   ########### SEARCH ###############
   include Tire::Model::Search
+  index_name "users_#{Rails.env}"
   mapping do
     indexes :id,           :index    => :not_analyzed
     indexes :first_name,        :analyzer => 'standard'

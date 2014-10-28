@@ -11,6 +11,8 @@ defaults: &defaults
   others_product: "SLOOPS"
   kit_card_product: 'KIT-CARD'
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle']
+  elasticsearch:
+    url: 'localhost:9200/'
   lyris_service:
     domain: 'www.elabs10.com'
     url: '/API/mailing_list.html'
@@ -374,17 +376,22 @@ production:
     folder: <%= "#{Rails.root}/mes_account_updater_files" %>
     url: https://www.merchante-solutions.com/
   xxxyyyzzz: 7faf4f991bc44841a00423b8db9602bb
-
+  elasticsearch:
+    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
 
 prototype:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
+  elasticsearch:
+    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
 
 staging:
   <<: *defaults
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   xxxyyyzzz: reibel3y5estrada8
-
+  elasticsearch:
+    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
+    
 demo:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada82012

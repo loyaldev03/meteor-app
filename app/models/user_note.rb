@@ -5,10 +5,4 @@ class UserNote < ActiveRecord::Base
   belongs_to :disposition_type
   belongs_to :communication_type
   
-  after_create :solr_index_asyn_call
-
-	def solr_index_asyn_call
-    self.user.asyn_solr_index if self.user
-  end
-
 end

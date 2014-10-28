@@ -1,7 +1,7 @@
 # Do you want to put in mantainance mode the site during deployment?
 # Use :
 # cap -S put_in_maintenance_mode="true" prototype deploy
-# cap -S solr_reindex="true" prototype deploy
+# cap -S elasticsearch_reindex="true" prototype deploy
 # default value is false
 
 set :stages, %w(production prototype staging demo prototype_pantheon staging_pantheon)
@@ -53,15 +53,16 @@ end
 namespace :elasticsearch do
   desc "start elasticsearch"
   task :start, :roles => :app, :except => { :no_release => true } do 
-    run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:start"
+    # run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:start"
   end
   desc "stop elasticsearch"
   task :stop, :roles => :app, :except => { :no_release => true } do 
-    run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:stop"
+    # run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:stop"
   end
   desc "reindex the whole database"
   task :reindex, :roles => :app do
-    run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:reindex"
+    run "cd #{current_path} && rake environment tire:index:drop INDEX=user_#{rails_env}"
+    run "cd #{current_path} && rake environment tire:import CLASS='User' FORCE=true"
   end
 end
  
@@ -211,7 +212,7 @@ after "deploy:update", "maintenance_mode:start" if fetch(:put_in_maintenance_mod
 after "deploy:update", "deploy:migrate"
 after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
 after 'deploy:update', 'restart_delayed_jobs'
-after "deploy:update", "elasticsearch:reindex" if fetch(:solr_reindex, false)
+after "deploy:update", "elasticsearch:reindex" if fetch(:elasticsearch_reindex, false)
 after 'deploy', 'notify_campfire'
 after "deploy", "deploy:tag"
 

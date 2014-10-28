@@ -1,4 +1,4 @@
 Tire.configure do
-  url    'localhost:9200/'
-  # logger STDERR
+  url    Settings.elasticsearch.url
+  # logger 'log/elasticsearch.log', :level => 'debug'
 end
