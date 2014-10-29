@@ -56,4 +56,5 @@ After that make sure to replace:
 - mandrill_email: Used in communication model in method deliver_mandrill.
 - drupal_queue: Currently used for cancel_member_at_remote_domain method in member model.
 - generic_queue: To handle asorted delayed jobs.
+- elasticsearch_indexing: Indexing User's iformation with elasticsearch. 
 - lyris_email: Not used anymore since we currently don't use Lyris.
