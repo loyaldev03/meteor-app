@@ -45,17 +45,17 @@ class ActiveSupport::TestCase
   # Add more helper methods to be used by all tests here...
 
   setup do
-    stubs_solr_index
+    stubs_elasticsearch_index
   end
 
-  def unstubs_solr_index
-    User.any_instance.unstub(:solr_index)
-    User.any_instance.unstub(:solr_index!)
+  def unstubs_elasticsearch_index
+    Tire::Index.any_instance.unstub(:store)
+    Tire::Index.any_instance.unstub(:store)
   end
 
-  def stubs_solr_index
-    User.any_instance.stubs(:solr_index).returns(true) 
-    User.any_instance.stubs(:solr_index!).returns(true)
+  def stubs_elasticsearch_index
+    Tire::Index.any_instance.stubs(:store).returns({"ok"=>true}) 
+    Tire::Index.any_instance.stubs(:store).returns({"ok"=>true})
   end
 
   CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8", 
@@ -149,7 +149,7 @@ class ActionController::TestCase
   include Devise::TestHelpers
 
   setup do 
-    stubs_solr_index
+    stubs_elasticsearch_index
   end
 end
 
@@ -160,7 +160,7 @@ module ActionController
     self.use_transactional_fixtures = false # DOES WORK! Damn it!
 
     setup do
-      stubs_solr_index
+      stubs_elasticsearch_index
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by_email("batch@xagax.com")
       page.driver.browser.manage.window.resize_to(1024,720)
