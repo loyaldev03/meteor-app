@@ -82,18 +82,18 @@ class User < ActiveRecord::Base
   include Tire::Model::Search
   index_name "users_#{Rails.env}"
   mapping do
-    indexes :id,           :index    => :not_analyzed
-    indexes :first_name,        :analyzer => 'standard'
-    indexes :last_name,        :analyzer => 'standard'
-    indexes :full_name,        :analyzer => 'standard'
-    indexes :city,        :analyzer => 'standard'
-    indexes :address,        :analyzer => 'standard'
-    indexes :email,        :analyzer => 'standard'
-    indexes :country,        :analyzer => 'standard'
-    indexes :state,        :analyzer => 'standard'
-    indexes :full_address,        :analyzer => 'standard'
-    indexes :status,        :analyzer => 'standard'
-    indexes :club_id,      :analyzer => 'standard'
+    indexes :id,              :type => "integer", :index => :not_analyzed
+    indexes :first_name,      :type => "string",  :analyzer => 'standard'
+    indexes :last_name,       :type => "string",  :analyzer => 'standard'
+    indexes :full_name,       :type => "string",  :analyzer => 'standard'
+    indexes :city,            :type => "string",  :analyzer => 'standard'
+    indexes :address,         :type => "string",  :analyzer => 'standard'
+    indexes :email,           :type => "string",  :analyzer => 'standard'
+    indexes :country,         :type => "string",  :analyzer => 'standard'
+    indexes :state,           :type => "string",  :analyzer => 'standard'
+    indexes :full_address,    :type => "string",  :analyzer => 'standard'
+    indexes :status,          :type => "string",  :analyzer => 'standard'
+    indexes :club_id,         :type => "integer", :analyzer => 'standard'
   end
 
   def to_indexed_json
@@ -114,7 +114,6 @@ class User < ActiveRecord::Base
   # Async indexing
   def asyn_elasticsearch_index
     self.index.store self
-    # Tire.index('users').import [self]
   rescue Exception => e
     Auditory.report_issue("User:IndexingToElasticSearch", e, { :user => self.inspect })
     raise e
@@ -122,7 +121,7 @@ class User < ActiveRecord::Base
   handle_asynchronously :asyn_elasticsearch_index, queue: :elasticsearch_indexing, priority: 10
 
   def elasticsearch_asyn_call
-    asyn_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'address', 'city', 'country', 'state', 'email']).empty?
+    asyn_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'address', 'city', 'country', 'state', 'email', 'status']).empty?
   end
   ########### SEARCH ###############
 
