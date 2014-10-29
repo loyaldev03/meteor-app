@@ -37,7 +37,7 @@ class UsersController < ApplicationController
     end
     sort_column = @sort_column = params[:sort].nil? ? :id : params[:sort]
     sort_direction = @sort_direction = params[:direction].nil? ? 'desc' : params[:direction]
-    @users = User.search(:load => true, :page => (params[:page] || 1), per_page: 10) do
+    @users = User.search(:load => true, :page => (params[:page] || 1), per_page: 20) do
       query { string query_param, :default_operator => "AND" }
       sort { by sort_column, sort_direction }
     end

@@ -82,7 +82,7 @@ class User < ActiveRecord::Base
   include Tire::Model::Search
   index_name "users_#{Rails.env}"
   mapping do
-    indexes :id,              :type => "integer", :index => :not_analyzed
+    indexes :id,              :type => "long", :index => :not_analyzed
     indexes :first_name,      :type => "string",  :analyzer => 'standard'
     indexes :last_name,       :type => "string",  :analyzer => 'standard'
     indexes :full_name,       :type => "string",  :analyzer => 'standard'

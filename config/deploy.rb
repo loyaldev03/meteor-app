@@ -53,11 +53,11 @@ end
 namespace :elasticsearch do
   desc "start elasticsearch"
   task :start, :roles => :app, :except => { :no_release => true } do 
-    # run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:start"
+    run "#{sudo} service elasticsearch stop && #{sudo} service elasticsearch start" 
   end
   desc "stop elasticsearch"
   task :stop, :roles => :app, :except => { :no_release => true } do 
-    # run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake sunspot:solr:stop"
+    run "#{sudo} service elasticsearch stop" 
   end
   desc "reindex the whole database"
   task :reindex, :roles => :app do
