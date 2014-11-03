@@ -41,7 +41,7 @@ namespace :fulfillments do
         unless fulfillments.empty?
           fulfillments.each do |fulfillment|
             tz = Time.zone.now
-            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
+            Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.user_id}"
             member = fulfillment.user
             membership = member.current_membership
             row = [ member.first_name, member.last_name, member.id, 
@@ -429,7 +429,7 @@ namespace :fulfillments do
 
   def process_fulfillment(fulfillment, fulfillment_file, record_type)
     tz = Time.zone.now
-    Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.member_id}"
+    Rails.logger.info " *** Processing #{fulfillment.id} for member #{fulfillment.user_id}"
     line = ""
     @member = fulfillment.user
     @membership = @member.current_membership
