@@ -195,9 +195,8 @@ class UsersSearchTest < ActionController::IntegrationTest
     end
     
     visit users_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name)
-    fill_in 'user[email]', :with => '*a'
+    fill_in 'user[email]', :with => 'a'
     click_on 'Search'
-    sleep 20
     within(".pagination") do
       assert page.has_content?("1")
       assert page.has_content?("2")
@@ -212,16 +211,13 @@ class UsersSearchTest < ActionController::IntegrationTest
         assert page.has_content?(User.where("club_id = ?", @club.id).order("id DESC").first.full_name)
       end
       click_on("2")
+      sleep 2
       begin 
         assert assert page.has_no_content?(User.where("club_id = ?", @club.id).order("id DESC").last.full_name)
-        assert assert page.has_content?(User.where("club_id = ?", @club.id).order("id DESC")[40].full_name)
+        assert assert page.has_content?(User.where("club_id = ?", @club.id).order("id DESC")[21].full_name)
       end
-      click_on("3")
-      begin 
-        assert assert page.has_no_content?(User.where("club_id = ?", @club.id).order("id DESC").last.full_name)
-        assert assert page.has_content?(User.where("club_id = ?", @club.id).order("id DESC")[70].full_name)
-      end
-      click_on("4")
+      click_on("5")
+      sleep 2
       begin 
         assert page.has_content?(User.where("club_id = ?", @club.id).order("id DESC").last.full_name)
       end
