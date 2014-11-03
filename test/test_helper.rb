@@ -218,17 +218,23 @@ module ActionController
       end
     end
 
-    def search_user(field_selector, value, validate_obj)
-      fill_in field_selector, :with => value unless value.nil?
+    def search_user(fields_selector, user, country = nil, validate = true)
+      visit users_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name)
+      fields_selector.each do |field,value|
+        fill_in field, :with => value unless value.nil?
+      end
+      select_country_and_state(user.country) if country
       click_on 'Search'
-      within("#users") do
-        assert page.has_content?(validate_obj.status)
-        assert page.has_content?("#{validate_obj.id}")
-        assert page.has_content?(validate_obj.full_name)
-        assert page.has_content?(validate_obj.full_address)
+      if validate 
+        within("#users") do
+          assert page.has_content?(user.status)
+          assert page.has_content?("#{user.id}")
+          assert page.has_content?(user.full_name)
+          assert page.has_content?(user.full_address)
 
-        if !validate_obj.external_id.nil?
-          assert page.has_content?(validate_obj.external_id)
+          if !user.external_id.nil?
+            assert page.has_content?(user.external_id)
+          end
         end
       end
     end

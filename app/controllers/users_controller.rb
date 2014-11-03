@@ -31,12 +31,13 @@ class UsersController < ApplicationController
 
   def search_result
     current_club = @current_club
-    query_param = "club_id:#{current_club.id} "
+    query_param = "club_id:#{current_club.id}"
     [ :id, :first_name, :last_name, :address, :city, :email, :country, :state ].each do |field|
-      query_param << "#{field}:#{params[:user][field]} " unless params[:user][field].blank?
+      query_param << " #{field}:#{sanitize_string_for_elasticsearch_string_query(field,params[:user][field])}" unless params[:user][field].blank?
     end
     sort_column = @sort_column = params[:sort].nil? ? :id : params[:sort]
     sort_direction = @sort_direction = params[:direction].nil? ? 'desc' : params[:direction]
+
     @users = User.search(:load => true, :page => (params[:page] || 1), per_page: 20) do
       query { string query_param, :default_operator => "AND" }
       sort { by sort_column, sort_direction }
@@ -415,6 +416,18 @@ class UsersController < ApplicationController
 
     def check_permissions
       my_authorize! params[:action].to_sym, User, @current_club.id
+    end
+
+    def sanitize_string_for_elasticsearch_string_query(field, value)
+      escaped_characters = Regexp.escape('\\-+&|!(){}[]^~?:')
+      value = value.gsub(/([#{escaped_characters}])/, '\\\\\1')
+      ['AND', 'OR', 'NOT'].each do |word|
+        escaped_word = word.split('').map {|char| "\\#{char}" }.join('')
+        value = value.gsub(/\s*\b(#{word.upcase})\b\s*/, " #{escaped_word} ")
+      end
+      quote_count = value.count '"'
+      value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1
+      [:id, :email].include?(field) ? "#{value}" : "*#{value}*"
     end
 end
 
