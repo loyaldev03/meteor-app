@@ -92,6 +92,7 @@ class User < ActiveRecord::Base
     indexes :country,         :type => "string",  :analyzer => 'standard'
     indexes :state,           :type => "string",  :analyzer => 'standard'
     indexes :full_address,    :type => "string",  :analyzer => 'standard'
+    indexes :cc_last_digits,  :type => "integer", :analyzer => 'standard'
     indexes :status,          :type => "string",  :analyzer => 'standard'
     indexes :club_id,         :type => "integer", :analyzer => 'standard'
   end
@@ -108,6 +109,7 @@ class User < ActiveRecord::Base
     :full_address => full_address,
     :state => state,
     :status => status,
+    :cc_last_digits => active_credit_card.last_digits, 
     :club_id => club_id,
     }.to_json
   end

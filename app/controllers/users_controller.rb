@@ -32,7 +32,7 @@ class UsersController < ApplicationController
   def search_result
     current_club = @current_club
     query_param = "club_id:#{current_club.id}"
-    [ :id, :first_name, :last_name, :address, :city, :email, :country, :state ].each do |field|
+    [ :id, :first_name, :last_name, :address, :city, :email, :country, :state, :cc_last_digits, :status ].each do |field|
       query_param << " #{field}:#{sanitize_string_for_elasticsearch_string_query(field,params[:user][field])}" unless params[:user][field].blank?
     end
     sort_column = @sort_column = params[:sort].nil? ? :id : params[:sort]
@@ -419,7 +419,7 @@ class UsersController < ApplicationController
     end
 
     def sanitize_string_for_elasticsearch_string_query(field, value)
-      escaped_characters = Regexp.escape('\\-+&|!(){}[]^~?:')
+      escaped_characters = Regexp.escape('\\-+&|!(){}[]^~?:@')
       value = value.gsub(/([#{escaped_characters}])/, '\\\\\1')
       ['AND', 'OR', 'NOT'].each do |word|
         escaped_word = word.split('').map {|char| "\\#{char}" }.join('')
