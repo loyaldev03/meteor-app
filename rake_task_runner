@@ -75,6 +75,8 @@ if [ "$1" == "production" ]; then
   if [ "$DATE" == "1" ]; then
     echo "`date` rake fulfillments:send_print_magazine_hot_rod_file"
     cd /var/www/$2/current && rake fulfillments:send_print_magazine_hot_rod_file >> $LOGFILE 2>&1 
+  fi
+  if [`date +"%d"` == "1"]; then  
     echo "`date` rake users:send_magazine_cancellation_email"
     cd /var/www/$2/current && rake users:send_magazine_cancellation_email >> $LOGFILE 2>&1 
   fi
