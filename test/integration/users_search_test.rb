@@ -40,7 +40,7 @@ class UsersSearchTest < ActionController::IntegrationTest
     if create_new_users
       10.times{ create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent }) }
       10.times{ create_active_user(@terms_of_membership_with_gateway, :lapsed_user, nil, {}, { :created_by => @admin_agent }) }
-      10.times{ create_active_user(@terms_of_membership_with_gateway, :provisional_user, nil, {}, { :created_by => @admin_agent }) }
+      10.times{ create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc, nil, {}, { :created_by => @admin_agent }) }
     end
     Delayed::Job.all.each{ |x| x.invoke_job }
     Delayed::Worker.delay_jobs = false
@@ -123,6 +123,33 @@ class UsersSearchTest < ActionController::IntegrationTest
     setup_search
     user_to_search = User.order("id").last
     search_user({}, user_to_search, user_to_search.country)
+  end
+
+  test "search by last digits" do
+    setup_search
+    @search_user.active_credit_card.update_attribute :last_digits, 8965
+    @search_user.asyn_elasticsearch_index_without_delay
+    within("#payment_details")do
+      fill_in "user[cc_last_digits]", :with => @search_user.active_credit_card.last_digits
+    end
+    click_link_or_button 'Search'
+    within("#users")do
+      find("tr", :text => @search_user.full_name)
+    end
+  end
+
+  test "search by last status" do
+    setup_search
+    ["provisional", "active", "lapsed"].each do |status|
+      user_to_search = User.where("status = ?",status).last
+      within("#payment_details")do
+        select(status, :from => 'user[status]')
+      end
+      click_link_or_button 'Search'
+      within("#users")do
+        find("tr", :text => user_to_search.full_name)
+      end
+    end
   end
 
   # TODO: refactor this test. Create one test "go from user index to edit user's" something general. And create
