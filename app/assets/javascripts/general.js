@@ -242,14 +242,16 @@ function new_product_functions(){
 }
 
 function user_index_functions(){
+  $('#user_id').keyup(function(event) {
+    if (this.value.match(/[^0-9]/g)) {
+      this.value = this.value.replace(/[^0-9]/g, '');
+    }
+  });
+
   $('#index_search_form').submit(function (event){
     var atLeastOneFilled = false;
     $('form :text, form select').each( function(){
       if($(this).val() != "")
-        atLeastOneFilled = true;
-    });
-    $('form :checkbox').each( function(){
-      if($(this).is(":checked"))
         atLeastOneFilled = true;
     });
     if(atLeastOneFilled == false){
