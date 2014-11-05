@@ -39,7 +39,8 @@ class User < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_marketing_client_sync_as_needed
-  after_save :elasticsearch_asyn_call
+  after_create :elasticsearch_asyn_call
+  after_update :elasticsearch_asyn_call
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_user_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
