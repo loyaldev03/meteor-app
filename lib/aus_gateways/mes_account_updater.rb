@@ -34,6 +34,7 @@ module MesAccountUpdater
       :includeClientRefNum => true, 
       :dsReportId => 5
     }
+    Rails.logger.info "[MesChargebackReport-#{(Date.today - 1).strftime('%m/%d/%Y')}] Processing file: #{result.body}"
     process_chargebacks_result(result.body, gateway) if result.success?
   end 
 
