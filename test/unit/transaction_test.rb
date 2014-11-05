@@ -2,7 +2,6 @@
 
 class TransactionTest < ActiveSupport::TestCase
   setup do
-
     @current_agent = FactoryGirl.create(:agent)
     @club = FactoryGirl.create(:simple_club_with_gateway)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
@@ -86,6 +85,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "controlled refund (refund completely a transaction)" do
+    active_merchant_stubs_store
+    active_merchant_stubs_purchase
     active_user = create_active_user(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
     active_user.update_attribute :next_retry_bill_date, Time.zone.now
@@ -170,7 +171,7 @@ class TransactionTest < ActiveSupport::TestCase
     # bill users the day trial days expires. User should be billed
     Timecop.travel(Time.zone.now + user.terms_of_membership.provisional_days.days) do
       Delayed::Worker.delay_jobs = true
-      assert_difference('DelayedJob.count',3)do
+      assert_difference('DelayedJob.count',2)do  # asign_club_cash    elasticsearch_sync
         TasksHelpers.bill_all_members_up_today
       end
       Delayed::Worker.delay_jobs = false  
@@ -186,7 +187,7 @@ class TransactionTest < ActiveSupport::TestCase
       Timecop.travel(next_year) do
         next_year = next_year + user.terms_of_membership.installment_period.days
         Delayed::Worker.delay_jobs = true
-        assert_difference('DelayedJob.count',2)do
+        assert_difference('DelayedJob.count',1) do  # asign_club_cash
           TasksHelpers.bill_all_members_up_today
         end
         Delayed::Worker.delay_jobs = false
@@ -1479,13 +1480,25 @@ class TransactionTest < ActiveSupport::TestCase
     end
     
     Timecop.travel(active_user.next_retry_bill_date) do
-      assert_difference('Operation.count', 3) do
-        assert_difference('Transaction.count') do
-          active_user.bill_membership
+      if active_user.active_credit_card.expired?
+        cc_year = active_user.active_credit_card.expire_year
+        assert_difference('Operation.count', 4) do
+          require "ruby-debug";debugger
+          assert_difference('Transaction.count') do
+            active_user.bill_membership
+          end 
+          active_user.reload
+          assert_equal active_user.active_credit_card.expire_year, cc_year+3 #diff of 3 years because it already has 1 SD
         end
+      else
+        assert_difference('Operation.count', 3) do
+          assert_difference('Transaction.count') do
+            active_user.bill_membership
+          end
+        end
+        active_user.reload
+        assert_equal active_user.active_credit_card.expire_year, Time.zone.now.year
       end
-      active_user.reload
-      assert_equal active_user.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
     end
   end
 
@@ -1515,13 +1528,25 @@ class TransactionTest < ActiveSupport::TestCase
     end
 
     Timecop.travel(active_user.next_retry_bill_date) do
-      assert_difference('Operation.count', 3) do
-        assert_difference('Transaction.count') do
-          active_user.bill_membership
+      if active_user.active_credit_card.expired?
+        cc_year = active_user.active_credit_card.expire_year
+        assert_difference('Operation.count', 4) do
+          require "ruby-debug";debugger
+          assert_difference('Transaction.count') do
+            active_user.bill_membership
+          end 
+          active_user.reload
+          assert_equal active_user.active_credit_card.expire_year, cc_year+3 #diff of 3 years because it already has 1 SD
         end
+      else
+        assert_difference('Operation.count', 3) do
+          assert_difference('Transaction.count') do
+            active_user.bill_membership
+          end
+        end
+        active_user.reload
+        assert_equal active_user.active_credit_card.expire_year, Time.zone.now.year
       end
-      active_user.reload
-      assert_equal active_user.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
     end
   end
 end
