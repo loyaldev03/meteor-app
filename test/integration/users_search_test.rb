@@ -128,6 +128,7 @@ class UsersSearchTest < ActionController::IntegrationTest
       fill_in "user[cc_last_digits]", :with => @search_user.active_credit_card.last_digits
     end
     click_link_or_button 'Search'
+    sleep 2
     within("#users")do
       find("tr", :text => @search_user.full_name)
     end
