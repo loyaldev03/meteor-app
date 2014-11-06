@@ -72,6 +72,9 @@ class UsersSearchTest < ActionController::IntegrationTest
   test "search user by first_name" do
     setup_search
     search_user({"user[first_name]" => "#{@search_user.first_name}"}, @search_user)
+    @search_user.update_attribute :first_name, "Darrel Barry"
+    @search_user.index.store @search_user
+    search_user({"user[first_name]" => "Bar Dar"}, @search_user)
   end
 
   # Search user with duplicated letters at Last Name
