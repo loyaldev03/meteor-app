@@ -78,9 +78,9 @@ class UsersSearchTest < ActionController::IntegrationTest
   test "search by last name" do
     setup_search false
     2.times{ create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent }) }
-    2.times{ create_active_user(@terms_of_membership_with_gateway, :provisional_user, nil, {}, { :created_by => @admin_agent }) }
+    2.times{ create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc, nil, {}, { :created_by => @admin_agent }) }
     2.times{ create_active_user(@terms_of_membership_with_gateway, :lapsed_user, nil, {}, { :created_by => @admin_agent }) }
-    create_active_user(@terms_of_membership_with_gateway, :provisional_user, nil, {}, { :created_by => @admin_agent })
+    create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc, nil, {}, { :created_by => @admin_agent })
   
     active_user = User.find_by_status 'active'
     provisional_user = User.find_by_status 'provisional'
@@ -107,11 +107,6 @@ class UsersSearchTest < ActionController::IntegrationTest
     setup_search
     search_user({"user[email]" => "#{@search_user.email}"}, @search_user)
     search_user({"user[email]" => "#{@search_user.email.split('@').first}*"}, @search_user)
-  end
-
-  test "search user by address" do
-    setup_search
-    search_user({"user[address]" => "#{@search_user.address}"}, @search_user)
   end
 
   test "search user by city" do
@@ -218,7 +213,7 @@ class UsersSearchTest < ActionController::IntegrationTest
       create_active_user(@terms_of_membership_with_gateway, :lapsed_user, nil, {}, { :created_by => @admin_agent }) 
     end  
     30.times do 
-      create_active_user(@terms_of_membership_with_gateway, :provisional_user, nil, {}, { :created_by => @admin_agent }) 
+      create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc, nil, {}, { :created_by => @admin_agent }) 
     end
     
     visit users_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name)
@@ -281,13 +276,13 @@ class UsersSearchTest < ActionController::IntegrationTest
     user_to_search = User.first
     search_user({"user[id]" => "#{user_to_search.id}", "user[first_name]" => user_to_search.first_name, 
                  "user[last_name]" => user_to_search.last_name, "user[email]" => user_to_search.email,
-                 "user[city]" => user_to_search.city, "user[address]" => user_to_search.address}, user_to_search, user_to_search.country)
+                 "user[city]" => user_to_search.city, "user[zip]" => user_to_search.zip}, user_to_search, user_to_search.country)
     search_user({"user[id]" => "#{user_to_search.id}", "user[first_name]" => "  #{user_to_search.first_name}  ", 
                  "user[last_name]" => "  #{user_to_search.last_name}  ", "user[email]" => "  #{user_to_search.email}  ",
-                 "user[city]" => "  #{user_to_search.city}  ", "user[address]" => "  #{user_to_search.address}  "}, user_to_search, user_to_search.country)
+                 "user[city]" => "  #{user_to_search.city}  ", "user[zip]" => "  #{user_to_search.zip}  "}, user_to_search, user_to_search.country)
     search_user({"user[id]" => "#{user_to_search.id}", "user[first_name]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(", 
                  "user[last_name]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(", "user[email]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(",
-                 "user[city]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(", "user[address]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*("}, user_to_search, user_to_search.country, false)
+                 "user[city]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(", "user[zip]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*("}, user_to_search, user_to_search.country, false)
     within("#users")do
       assert page.has_content?('No records were found.')
     end
