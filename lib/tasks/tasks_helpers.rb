@@ -269,7 +269,7 @@ module TasksHelpers
       club = Club.find 21
     end
     Time.zone = club.time_zone
-    initial_date = Time.zone.now - 7.days
+    initial_date = Time.zone.now - 1.month
     end_date = Time.zone.now 
     users = User.joins(:current_membership).where(["users.club_id = ? AND memberships.status = 'lapsed' AND
       cancel_date BETWEEN ? and ? ", club.id, initial_date, end_date])
