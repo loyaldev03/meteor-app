@@ -427,7 +427,7 @@ class UsersController < ApplicationController
       end
       quote_count = value.count '"'
       value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1
-      [:id, :email].include?(field) ? "#{value}" : "*#{value}*".gsub(" ","* ")
+      [:id, :email].include?(field) ? "#{value}" : "*#{value}*".gsub(" ","* *")
     end
 end
 
