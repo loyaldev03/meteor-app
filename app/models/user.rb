@@ -88,6 +88,7 @@ class User < ActiveRecord::Base
     indexes :last_name,       :type => "string",  :analyzer => 'standard'
     indexes :full_name,       :type => "string",  :analyzer => 'standard'
     indexes :city,            :type => "string",  :analyzer => 'standard'
+    indexes :zip,             :type => "string",  :analyzer => 'standard'
     indexes :address,         :type => "string",  :analyzer => 'standard'
     indexes :email,           :type => "string",  :analyzer => 'standard'
     indexes :country,         :type => "string",  :analyzer => 'standard'
@@ -104,7 +105,7 @@ class User < ActiveRecord::Base
     :last_name => last_name,
     :full_name => full_name,
     :city => city,
-    :address => address,
+    :zip => zip,
     :email => email,
     :country => country,
     :full_address => full_address,
@@ -124,7 +125,7 @@ class User < ActiveRecord::Base
   handle_asynchronously :asyn_elasticsearch_index, queue: :elasticsearch_indexing, priority: 10
 
   def elasticsearch_asyn_call
-    asyn_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'address', 'city', 'country', 'state', 'email', 'status']).empty?
+    asyn_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'zip', 'city', 'country', 'state', 'address', 'email', 'status']).empty?
   end
   ########### SEARCH ###############
 

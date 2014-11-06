@@ -80,9 +80,9 @@
                       <%= render :partial => 'states', :locals => { :selected_state => (params[:user][:state] if params[:user])}%> </td>
                   </tr>
                   <tr>
-                    <td><%= t('activerecord.attributes.user.address') %></td>
-                    <td><%= text_field :user, :address, :class => 'test_field',
-                                     :value => (params[:user][:address] if params[:user]) %> </td>
+                    <td><%= t('activerecord.attributes.user.zip') %></td>
+                    <td><%= text_field :user, :zip, :class => 'test_field',
+                                     :value => (params[:user][:zip] if params[:user]) %> </td>
                   </tr>
                 </table>
               </td>

@@ -32,8 +32,8 @@ class UsersController < ApplicationController
   def search_result
     current_club = @current_club
     query_param = "club_id:#{current_club.id}"
-    [ :id, :first_name, :last_name, :address, :city, :email, :country, :state, :cc_last_digits, :status ].each do |field|
-      query_param << " #{field}:#{sanitize_string_for_elasticsearch_string_query(field,params[:user][field])}" unless params[:user][field].blank?
+    [ :id, :first_name, :last_name, :city, :email, :country, :state, :cc_last_digits, :status ].each do |field|
+      query_param << " #{field}:#{sanitize_string_for_elasticsearch_string_query(field,params[:user][field].strip)}" unless params[:user][field].blank?
     end
     sort_column = @sort_column = params[:sort].nil? ? :id : params[:sort]
     sort_direction = @sort_direction = params[:direction].nil? ? 'desc' : params[:direction]
@@ -427,7 +427,7 @@ class UsersController < ApplicationController
       end
       quote_count = value.count '"'
       value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1
-      [:id, :email].include?(field) ? "#{value}" : "*#{value}*"
+      [:id, :email].include?(field) ? "#{value}" : "*#{value}*".gsub(" ","* ")
     end
 end
 
