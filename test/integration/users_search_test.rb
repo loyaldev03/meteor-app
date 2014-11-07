@@ -123,6 +123,11 @@ class UsersSearchTest < ActionController::IntegrationTest
     search_user({}, user_to_search, user_to_search.country)
   end
 
+  test "search user by user zip" do
+    setup_search
+    search_user({"user[zip]" => "#{@search_user.zip}"}, @search_user)
+  end
+
   test "search by last digits" do
     setup_search
     @search_user.active_credit_card.update_attribute :last_digits, 8965
