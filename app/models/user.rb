@@ -82,22 +82,47 @@ class User < ActiveRecord::Base
   ########### SEARCH ###############
   include Tire::Model::Search
   index_name "users_#{Rails.env}"
-  mapping do
-    indexes :id,              :type => "long", :index => :not_analyzed
-    indexes :first_name,      :type => "string",  :analyzer => 'standard'
-    indexes :last_name,       :type => "string",  :analyzer => 'standard'
-    indexes :full_name,       :type => "string",  :analyzer => 'standard'
-    indexes :city,            :type => "string",  :analyzer => 'standard'
-    indexes :zip,             :type => "string",  :analyzer => 'standard'
-    indexes :address,         :type => "string",  :analyzer => 'standard'
-    indexes :email,           :type => "string",  :analyzer => 'standard'
-    indexes :country,         :type => "string",  :analyzer => 'standard'
-    indexes :state,           :type => "string",  :analyzer => 'standard'
-    indexes :full_address,    :type => "string",  :analyzer => 'standard'
-    indexes :cc_last_digits,  :type => "integer", :analyzer => 'standard'
-    indexes :status,          :type => "string",  :analyzer => 'standard'
-    indexes :club_id,         :type => "long", :analyzer => 'standard'
+  settings analysis: {
+    filter: {
+      email_filter: {
+         type: "pattern_capture",
+         preserve_original: 1,
+         patterns: [
+            "(\\w+)",
+            "(\\p{L}+)",
+            "(\\d+)",
+            "@(.+)",
+            "@(\\w+)"
+         ]
+      }
+    },
+    analyzer: {
+      email_analyzer: {
+        type: 'custom',
+        tokenizer: 'uax_url_email',
+        filter: ['email_filter', 'lowercase','asciifolding']
+      }
+    }
+  } do
+      mapping do
+        indexes :id,              :type => "long", :index => :not_analyzed
+        indexes :first_name,      :type => "string",  :analyzer => 'standard'
+        indexes :last_name,       :type => "string",  :analyzer => 'standard'
+        indexes :full_name,       :type => "string",  :analyzer => 'standard'
+        indexes :city,            :type => "string",  :analyzer => 'standard'
+        indexes :zip,             :type => "string",  :analyzer => 'standard'
+        indexes :address,         :type => "string",  :analyzer => 'standard'
+        indexes :email,           :type => "string",  :analyzer => 'email_analyzer'
+        indexes :country,         :type => "string",  :analyzer => 'standard'
+        indexes :state,           :type => "string",  :analyzer => 'standard'
+        indexes :full_address,    :type => "string",  :analyzer => 'standard'
+        indexes :cc_last_digits,  :type => "integer", :analyzer => 'standard'
+        indexes :status,          :type => "string",  :analyzer => 'standard'
+        indexes :club_id,         :type => "long", :analyzer => 'standard'
+      end
   end
+
+
 
   def to_indexed_json
     {:id => id,
