@@ -426,8 +426,8 @@ class UsersController < ApplicationController
         value = value.gsub(/\s*\b(#{word.upcase})\b\s*/, " #{escaped_word} ")
       end
       quote_count = value.count '"'
-      value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1
-      [:id].include?(field) ? "#{value}" : "*#{value}*".gsub(" ","* *")
+      value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1 
+      field == :id ? "#{value}".gsub(/[^\d]/,"") : "*#{value}*".gsub(" ","* *")
     end
 end
 

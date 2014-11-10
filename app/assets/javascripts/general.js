@@ -242,7 +242,12 @@ function new_product_functions(){
 }
 
 function user_index_functions(){
-  $('#user_id, #user_cc_last_digits').keyup(function(event) {
+  $('#user_id').keyup(function(event) {
+    if (this.value.match(/[^0-9]/g)) {
+      this.value = this.value.replace(/[^0-9]/g, '');
+    }
+  });
+  $('#user_cc_last_digits').keyup(function(event) {
     if (this.value.match(/[^0-9]/g)) {
       this.value = this.value.replace(/[^0-9\*]/g, '');
     }
