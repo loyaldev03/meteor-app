@@ -128,7 +128,7 @@ class Api::MembersControllerTest < ActionController::TestCase
             assert_difference('UserPreference.count',@preferences.size) do 
               assert_difference('User.count') do
                 Delayed::Worker.delay_jobs = true
-                assert_difference('DelayedJob.count',7)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x4, :assign_club_cash_without_delay
+                assert_difference('DelayedJob.count',5)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x2, :assign_club_cash_without_delay
                   generate_post_message
                   assert_response :success
                 end
@@ -164,7 +164,7 @@ class Api::MembersControllerTest < ActionController::TestCase
           assert_difference('UserPreference.count',@preferences.size) do 
             assert_difference('User.count') do
               Delayed::Worker.delay_jobs = true
-              assert_difference('DelayedJob.count',6) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
+              assert_difference('DelayedJob.count',5) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
                 generate_post_message
                 assert_response :success
               end
