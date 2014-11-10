@@ -242,7 +242,7 @@ function new_product_functions(){
 }
 
 function user_index_functions(){
-  $('#user_id').keyup(function(event) {
+  $('#user_id, #user_cc_last_digits').keyup(function(event) {
     if (this.value.match(/[^0-9]/g)) {
       this.value = this.value.replace(/[^0-9]/g, '');
     }
@@ -264,7 +264,7 @@ function user_index_functions(){
 
     $.ajax({
         type: "GET",
-        url: "users/search_result",
+        url: window.location.pathname.match("search_result") ? window.location.pathname : "users/search_result",
         dataType: 'script',
         contentType: 'application/javascript',
         data: $(this).serialize(),
@@ -297,8 +297,11 @@ function user_index_functions(){
     return false;  
   }); 
 
-  $("#clear_form").click( function() {
+  $("#clear_form").click( function(event) {
     $("#index_search_form input[type=text]").each(function() { $(this).val(''); }); 
+    $("select option[value='']").each(function() { $(this).attr('selected', true); ; });
+    $("#user_state option[value!='']").remove();
+    event.preventDefault();
   });
 
   $('#user_country').on('change',  function(){

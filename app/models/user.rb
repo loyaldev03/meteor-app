@@ -96,7 +96,7 @@ class User < ActiveRecord::Base
     indexes :full_address,    :type => "string",  :analyzer => 'standard'
     indexes :cc_last_digits,  :type => "integer", :analyzer => 'standard'
     indexes :status,          :type => "string",  :analyzer => 'standard'
-    indexes :club_id,         :type => "integer", :analyzer => 'standard'
+    indexes :club_id,         :type => "long", :analyzer => 'standard'
   end
 
   def to_indexed_json
