@@ -116,7 +116,7 @@ class User < ActiveRecord::Base
         indexes :country,         :type => "string",  :analyzer => 'standard'
         indexes :state,           :type => "string",  :analyzer => 'standard'
         indexes :full_address,    :type => "string",  :analyzer => 'standard'
-        indexes :cc_last_digits,  :type => "integer", :analyzer => 'standard'
+        indexes :cc_last_digits,  :type => "string",  :analyzer => 'standard'
         indexes :status,          :type => "string",  :analyzer => 'standard'
         indexes :club_id,         :type => "long", :analyzer => 'standard'
       end
