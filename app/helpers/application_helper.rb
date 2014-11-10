@@ -19,6 +19,11 @@ module ApplicationHelper
     select_tag name, options_for_select(@possible_status, :selected => selected), :class => 'select_field input-medium' 
   end
 
+  def user_selectable_statuses(name, selected = nil, allow_blank = false)
+    @possible_status = (allow_blank ? [''] : []) + User.state_machines[:status].states.map(&:name).delete_if{ |state| state == :none }
+    select_tag name, options_for_select(@possible_status, :selected => selected), :class => 'select_field input-medium' 
+  end
+
   def sortable(column, title = nil)
     title ||= column.titleize
     css_class = (column == @sort_column ? ( @sort_direction == "asc" ? 'icon-arrow-down' : 'icon-arrow-up') : nil)

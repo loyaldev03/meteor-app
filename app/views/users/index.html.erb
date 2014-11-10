@@ -21,7 +21,7 @@
           </thead>
           <tbody>
             <tr>
-              <td style="height: 233px;">
+              <td>
                 <table class="hidden_table_border">
                   <tr>
                     <td><%= t('activerecord.attributes.user.id') %></td>
@@ -47,48 +47,6 @@
                                      :value => (params[:user][:email] if params[:user]) %>         
                     </td>
                   </tr>
-                  <tr>
-                    <td><%= t('activerecord.attributes.user.phone_number') %></td>
-                    <td>
-                      <%= text_field :user, :phone_country_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_country_code'),
-                                     :value => (params[:user][:phone_country_code] if params[:user]), :maxlength => 3 %> 
-                      <%= text_field :user, :phone_area_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_area_code'),
-                                     :value => (params[:user][:phone_area_code] if params[:user]), :maxlength => 3 %> 
-                      <%= text_field :user, :phone_local_number, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_local_number'),
-                                     :value => (params[:user][:phone_local_number] if params[:user]), :maxlength => 8 %> 
-                    </td>
-                  </tr>
-                  <tr>
-                    <td> <%= t('activerecord.attributes.user.needs_approval') %></td>
-                    <td> <%= check_box :user, :needs_approval, :checked => (params[:user][:needs_approval] if params[:user]) %> </td>
-                  </tr>
-                  <% if @current_club.requires_external_id %>
-                    <tr>
-                      <td> <%= t('activerecord.attributes.user.external_id') %></td>
-                      <td> <%= text_field :user, :external_id, :class => 'text-field',
-                                       :value => (params[:user][:external_id] if params[:user]) %> </td>
-                    </tr>
-                  <% end %>
-                  </tr>
-                  <% if @current_club.sync? %>
-                    <tr>
-                      <td><%= t('activerecord.attributes.user.sync_error') %></td>
-                      <td>
-                        <%= 
-                          select :user, 
-                            :sync_status, 
-                            [
-                              ['Indifferent',   nil], 
-                              ['Synced',        'synced'], 
-                              ['Not Synced',    'unsynced'], 
-                              ['With Error',    'error'], 
-                              ['Without Error', 'noerror']
-                            ],
-                            :class => 'select_field'
-                        %>
-                      </td>
-                    </tr>
-                  <% end %>
                 </table>
               </td>
             </tr>
@@ -103,7 +61,7 @@
           </thead>
           <tbody>
             <tr>
-              <td style="height: 233px;">
+              <td>
 
                 <table class="hidden_table_border">
                   <tr>
@@ -122,14 +80,9 @@
                       <%= render :partial => 'states', :locals => { :selected_state => (params[:user][:state] if params[:user])}%> </td>
                   </tr>
                   <tr>
-                    <td><%= t('activerecord.attributes.user.address') %></td>
-                    <td><%= text_field :user, :address, :class => 'test_field',
-                                     :value => (params[:user][:address] if params[:user]) %> </td>
-                  </tr>
-                  <tr>
                     <td><%= t('activerecord.attributes.user.zip') %></td>
                     <td><%= text_field :user, :zip, :class => 'test_field',
-                                     :value => (params[:user][:zip] if params[:user]) %></td>
+                                     :value => (params[:user][:zip] if params[:user]) %> </td>
                   </tr>
                 </table>
               </td>
@@ -141,47 +94,20 @@
         
         <table  class="table table-bordered table-condensed table-nohover" id="payment_details">
           <thead>
-            <tr class="box_title"><th><h4>Payment Details</h4></th></tr>
+            <tr class="box_title"><th><h4>Additional Details</h4></th></tr>
           </thead>
           <tbody>
             <tr>
-              <td style="height: 233px;">
+              <td>
                 <table class="hidden_table_border">
                   <tr>
-                    <td> <%= t('activerecord.attributes.credit_card.next_bill_date') %></td>
-                    <td> <%= text_field :user, :next_retry_bill_date, :class => 'text_field datepicker_for_search_nbd', :readonly => 'readonly', :value => (params[:user][:next_retry_bill_date] if params[:user]) %> </td>
+                    <td><%= t('activerecord.attributes.credit_card.last_digits') %></td>
+                    <td><%= text_field :user, :cc_last_digits, :class => 'test_field',
+                                     :value => (params[:user][:cc_last_digits] if params[:user]), :maxlength => 4 %> </td>
                   </tr>
                   <tr>
-                    <td>CC <%= t('activerecord.attributes.credit_card.last_digits') %></td>
-                    <td> <%= text_field :user, :last_digits, :class => 'text_field',
-                                     :value => (params[:user][:last_digits] if params[:user]) %> </td>
-                  </tr>
-                  <% if can? :see_cc_token, CreditCard and not @current_club.use_pgc_authorize_net? %>
-                    <tr>
-                      <td>CC <%= t('activerecord.attributes.credit_card.token') %></td>
-                      <td> <%= text_field :user, :cc_token, :class => 'text_field',
-                                       :value => (params[:user][:cc_token] if params[:user]) %> </td>
-                    </tr>
-                  <% end %>
-                  <tr>
-                    <td><%= t('activerecord.attributes.user.user_notes') %></td>
-                    <td> <%= text_field :user, :notes, :class => 'text_field',
-                                     :value => (params[:user][:notes] if params[:user]) %> </td>
-                  </tr>
-                  <tr>
-                    <td> <%= t('activerecord.attributes.user.billed_date') %> </td>
-                    <td>
-                      <table>
-                        <tr id = "billed_at_start_date">
-                          <td> <%= t('activerecord.attributes.user.billed_date_from') %> </td>
-                          <td> <%= text_field :user, :billing_date_start, :class => 'text-field datepicker_for_search_billed_date', :readonly => 'readonly', :value => (params[:user][:billing_date_start] if params[:user]) %> </td>
-                        </tr>
-                        <tr id = "billed_at_end_date">
-                          <td> <%= t('activerecord.attributes.user.billed_date_to') %> </td>
-                          <td> <%= text_field :user, :billing_date_end, :class => 'text-field datepicker_for_search_billed_date', :readonly => 'readonly', :value => (params[:user][:billing_date_end] if params[:user]) %> </td>
-                        </tr>
-                      </table>
-                    </td>
+                    <td><%= t('activerecord.attributes.user.status') %></td>
+                    <td><%= user_selectable_statuses('user[status]',(params[:user][:status] if params[:user]),true) %> </td>
                   </tr>
                 </table>
               </td>

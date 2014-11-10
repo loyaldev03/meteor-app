@@ -136,6 +136,12 @@ def delete_enrollment_infos(user)
   @log.info "    ... took #{Time.now.utc - tz} to delete user enrollment infos."
 end
 
+def remove_from_elasticsearch(user)
+  tz = Time.now.utc
+  user.index.remove user
+  @log.info "    ... took #{Time.now.utc - tz} to delete user enrollment infos."
+end
+
 def delete_user(user)
   tz = Time.now.utc
   user.delete
@@ -153,6 +159,7 @@ def delete_functions(user)
   delete_fulfillments(user)
   delete_club_cash_transactions(user)
   delete_communications(user)
+  remove_from_elasticsearch(user)
   delete_user(user)
 end
 

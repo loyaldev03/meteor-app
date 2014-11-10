@@ -45,17 +45,17 @@ class ActiveSupport::TestCase
   # Add more helper methods to be used by all tests here...
 
   setup do
-    stubs_solr_index
+    stubs_elasticsearch_index
   end
 
-  def unstubs_solr_index
-    User.any_instance.unstub(:solr_index)
-    User.any_instance.unstub(:solr_index!)
+  def unstubs_elasticsearch_index
+    Tire::Index.any_instance.unstub(:store)
+    Tire::Index.any_instance.unstub(:store)
   end
 
-  def stubs_solr_index
-    User.any_instance.stubs(:solr_index).returns(true) 
-    User.any_instance.stubs(:solr_index!).returns(true)
+  def stubs_elasticsearch_index
+    Tire::Index.any_instance.stubs(:store).returns({"ok"=>true}) 
+    Tire::Index.any_instance.stubs(:store).returns({"ok"=>true})
   end
 
   CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8", 
@@ -149,7 +149,7 @@ class ActionController::TestCase
   include Devise::TestHelpers
 
   setup do 
-    stubs_solr_index
+    stubs_elasticsearch_index
   end
 end
 
@@ -160,7 +160,7 @@ module ActionController
     self.use_transactional_fixtures = false # DOES WORK! Damn it!
 
     setup do
-      stubs_solr_index
+      stubs_elasticsearch_index
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by_email("batch@xagax.com")
       page.driver.browser.manage.window.resize_to(1024,720)
@@ -218,17 +218,23 @@ module ActionController
       end
     end
 
-    def search_user(field_selector, value, validate_obj)
-      fill_in field_selector, :with => value unless value.nil?
+    def search_user(fields_selector, user, country = nil, validate = true)
+      visit users_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name)
+      fields_selector.each do |field,value|
+        fill_in field, :with => value unless value.nil?
+      end
+      select_country_and_state(user.country) if country
       click_on 'Search'
-      within("#users") do
-        assert page.has_content?(validate_obj.status)
-        assert page.has_content?("#{validate_obj.id}")
-        assert page.has_content?(validate_obj.full_name)
-        assert page.has_content?(validate_obj.full_address)
+      if validate 
+        within("#users") do
+          assert page.has_content?(user.status)
+          assert page.has_content?("#{user.id}")
+          assert page.has_content?(user.full_name)
+          assert page.has_content?(user.full_address)
 
-        if !validate_obj.external_id.nil?
-          assert page.has_content?(validate_obj.external_id)
+          if !user.external_id.nil?
+            assert page.has_content?(user.external_id)
+          end
         end
       end
     end

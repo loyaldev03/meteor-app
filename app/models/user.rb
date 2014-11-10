@@ -39,8 +39,8 @@ class User < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_marketing_client_sync_as_needed
-  after_create :solr_index_asyn_call
-  after_update :solr_index_asyn_call
+  after_create :elasticsearch_asyn_call
+  after_update :elasticsearch_asyn_call
   after_update :after_save_sync_to_remote_domain
   after_destroy 'cancel_user_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
@@ -80,54 +80,77 @@ class User < ActiveRecord::Base
   scope :with_billing_enable, lambda { joins(:club).where('billing_enable = true') }
 
   ########### SEARCH ###############
-  searchable :auto_index => false do
-    long :id
-    long :club_id
-    text :first_name
-    text :last_name
-    text :address
-    text :city
-    string :full_name
-    string :full_address
-    string :country
-    string :state
-    text :zip
-    text :email, :as => :code_textemail
-    string :status
-    time :next_retry_bill_date
-    integer :phone_country_code
-    integer :phone_area_code
-    integer :phone_local_number
-    string :sync_status
-    text :external_id
-    time :join_date do
-      join_date
-    end
-    text :notes do
-      user_notes.map { |comment| comment.description }
-    end
-    time :billed_dates, :multiple => true do
-      # filter by sales
-      transactions.where('transaction_type = "sale"').map { |transaction| transaction.created_at  }
-    end
-    string :cc_token do 
-      active_credit_card.token
-    end
-    string :last_digits do 
-      active_credit_card.last_digits
-    end
+  include Tire::Model::Search
+  index_name "users_#{Rails.env}"
+  settings analysis: {
+    filter: {
+      email_filter: {
+         type: "pattern_capture",
+         preserve_original: 1,
+         patterns: [
+            "(\\w+)",
+            "(\\p{L}+)",
+            "(\\d+)",
+            "@(.+)",
+            "@(\\w+)"
+         ]
+      }
+    },
+    analyzer: {
+      email_analyzer: {
+        type: 'custom',
+        tokenizer: 'uax_url_email',
+        filter: ['email_filter', 'lowercase','asciifolding']
+      }
+    }
+  } do
+      mapping do
+        indexes :id,              :type => "long", :index => :not_analyzed
+        indexes :first_name,      :type => "string",  :analyzer => 'standard'
+        indexes :last_name,       :type => "string",  :analyzer => 'standard'
+        indexes :full_name,       :type => "string",  :analyzer => 'standard'
+        indexes :city,            :type => "string",  :analyzer => 'standard'
+        indexes :zip,             :type => "string",  :analyzer => 'standard'
+        indexes :address,         :type => "string",  :analyzer => 'standard'
+        indexes :email,           :type => "string",  :analyzer => 'email_analyzer'
+        indexes :country,         :type => "string",  :analyzer => 'standard'
+        indexes :state,           :type => "string",  :analyzer => 'standard'
+        indexes :full_address,    :type => "string",  :analyzer => 'standard'
+        indexes :cc_last_digits,  :type => "string",  :analyzer => 'standard'
+        indexes :status,          :type => "string",  :analyzer => 'standard'
+        indexes :club_id,         :type => "long", :analyzer => 'standard'
+      end
+  end
+
+
+
+  def to_indexed_json
+    {:id => id,
+    :first_name => first_name,
+    :last_name => last_name,
+    :full_name => full_name,
+    :city => city,
+    :zip => zip,
+    :email => email,
+    :country => country,
+    :full_address => full_address,
+    :state => state,
+    :status => status,
+    :cc_last_digits => active_credit_card.last_digits, 
+    :club_id => club_id,
+    }.to_json
   end
   # Async indexing
-  def asyn_solr_index
-    solr_index
+  def asyn_elasticsearch_index
+    self.index.store self
   rescue Exception => e
-    Auditory.report_issue("User:IndexingAgainstSolr", e, { :user => self.inspect })
+    Auditory.report_issue("User:IndexingToElasticSearch", e, { :user => self.inspect })
     raise e
   end
-  handle_asynchronously :asyn_solr_index, queue: :solr_indexing, priority: 10
+  handle_asynchronously :asyn_elasticsearch_index, queue: :elasticsearch_indexing, priority: 10
 
-  def solr_index_asyn_call
-    asyn_solr_index if not (self.changed & ['id', 'club_id', 'first_name', 'last_name', 'address', 'city', 'country', 'state', 'zip', 'email', 'status', 'next_retry_bill_date', 'phone_country_code', 'phone_area_code', 'phone_local_number', 'sync_status', 'external_id', 'join_date']).empty?
+  def elasticsearch_asyn_call
+    asyn_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'zip', 'city', 'country', 'state', 'address', 'email', 'status']).empty?
   end
   ########### SEARCH ###############
 

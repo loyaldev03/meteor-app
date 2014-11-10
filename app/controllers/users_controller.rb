@@ -31,49 +31,23 @@ class UsersController < ApplicationController
 
   def search_result
     current_club = @current_club
-    @users = User.search do
-      # members
-      [ :first_name, :last_name, :address, :city, :zip, :email, :external_id, :notes ].each do |field|
-        fulltext("*#{params[:user][field].strip}*", :fields => field) unless params[:user][field].blank?
-      end
-      [ :id, :state, :country, :phone_country_code, :phone_area_code, :phone_local_number, :last_digits, :cc_token ].each do |field|
-        with(field, params[:user][field].strip) unless params[:user][field].blank?
-      end
-      if params[:user][:needs_approval].to_i != 0
-        with(:status, 'applied')
-      end
-      unless params[:user][:next_retry_bill_date].blank?
-        next_retry_bill_date = params[:user][:next_retry_bill_date].to_date.to_time_in_current_zone
-        with(:next_retry_bill_date, next_retry_bill_date.beginning_of_day..next_retry_bill_date.end_of_day)
-      end
-      case params[:user][:sync_status]
-        when true, 'true', 'synced'
-          with :sync_status, "synced"
-        when false, 'false', 'unsynced'
-          with :sync_status, "not_synced"
-        when 'error'
-          with :sync_status, "with_error"
-        when 'noerror'
-          with :sync_status, ["not_synced", "synced"]
-      end
-      unless params[:user][:billing_date_start].blank?
-        billing_date_start = params[:user][:billing_date_start].to_date.to_time_in_current_zone
-        with(:billed_dates).greater_than(billing_date_start)
-      end
-      unless params[:user][:billing_date_end].blank?
-        billing_date_end = params[:user][:billing_date_end].to_date.to_time_in_current_zone
-        with(:billed_dates).less_than(billing_date_end)
-      end
-      with :club_id, current_club.id
-      order_by sort_column, sort_direction
-      paginate :page => params[:page], :per_page => 25
-    end.results
+    query_param = "club_id:#{current_club.id}"
+    [ :id, :first_name, :last_name, :city, :email, :country, :state, :zip, :cc_last_digits, :status ].each do |field|
+      query_param << " #{field}:#{sanitize_string_for_elasticsearch_string_query(field,params[:user][field].strip)}" unless params[:user][field].blank?
+    end
+    sort_column = @sort_column = params[:sort].nil? ? :id : params[:sort]
+    sort_direction = @sort_direction = params[:direction].nil? ? 'desc' : params[:direction]
+
+    @users = User.search(:load => true, :page => (params[:page] || 1), per_page: 20) do
+      query { string query_param, :default_operator => "AND" }
+      sort { by sort_column, sort_direction }
+    end
   rescue Errno::ECONNREFUSED
-    @solr_is_down = true
-    Auditory.report_issue("User:search_result", "SOLR is down. Confirm that server is running, if problem persist restart it")
+    @elasticsearch_is_down = true
+    Auditory.report_issue("User:search_result", "Elasticsearch is down. Confirm that server is running, if problem persist restart it")
   rescue Errno::ETIMEDOUT
-    @solr_is_down = true
-    Auditory.report_issue("User:search_result", "SOLR Timeout Error received. Confirm that service is available.")  
+    @elasticsearch_is_down = true
+    Auditory.report_issue("User:search_result", "Elasticsearch Timeout Error received. Confirm that service is available.")  
   ensure
     render 'index'
   end
@@ -442,6 +416,18 @@ class UsersController < ApplicationController
 
     def check_permissions
       my_authorize! params[:action].to_sym, User, @current_club.id
+    end
+
+    def sanitize_string_for_elasticsearch_string_query(field, value)
+      escaped_characters = Regexp.escape('\\-+&|!(){}[]^~?:@')
+      value = value.gsub(/([#{escaped_characters}])/, '\\\\\1')
+      ['AND', 'OR', 'NOT'].each do |word|
+        escaped_word = word.split('').map {|char| "\\#{char}" }.join('')
+        value = value.gsub(/\s*\b(#{word.upcase})\b\s*/, " #{escaped_word} ")
+      end
+      quote_count = value.count '"'
+      value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1 
+      field == :id ? "#{value}".gsub(/[^\d]/,"") : "*#{value}*".gsub(" ","* *")
     end
 end
 
