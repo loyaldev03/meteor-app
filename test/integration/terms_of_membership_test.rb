@@ -34,7 +34,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 
-	# NEW
+	#	# NEW
 
 	test "Create subcription plan with Initial Fee distinct of 0" do
 		sign_in_as(@admin_agent)
@@ -474,10 +474,11 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 		find_button("Create Plan")
 	  choose('if_cannot_bill_user_cancel')
-		click_link_or_button 'Create Plan'
-	  sleep 2
-		assert page.has_content?('was created succesfully'), "Text alerted was:  #{find(".alert").text}" # TOM was created
-		assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
+
+
+		assert_difference("TermsOfMembership.count",1) do
+			click_link_or_button 'Create Plan'
+		end
 
 		@terms_of_membership = TermsOfMembership.find_by_name tom_name
 		unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
