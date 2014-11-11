@@ -224,7 +224,9 @@ module ActionController
         fill_in field, :with => value unless value.nil?
       end
       select_country_and_state(user.country) if country
+
       click_on 'Search'
+
       if validate 
         within("#users") do
           assert page.has_content?(user.status)
@@ -299,8 +301,7 @@ module ActionController
               date = date + 1.month
               find(".ui-icon-circle-triangle-e").click
             end
-          end
-          if (date.month < Time.zone.now.month)
+          elsif (date.month < Time.zone.now.month)
             (Time.zone.now.month-date.month).times do
               date = date - 1.month
               find(".ui-icon-circle-triangle-w").click 
