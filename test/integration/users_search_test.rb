@@ -13,10 +13,11 @@ class UsersSearchTest < ActionController::IntegrationTest
 
   setup do
     unstubs_elasticsearch_index
+    User.index.delete
+    User.create_elasticsearch_index
   end
 
   def setup_user(create_new_user = true)
-    User.index.delete
     @default_state = "Alabama" # when we select options we do it by option text not by value ?
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)

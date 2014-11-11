@@ -111,7 +111,6 @@ class User < ActiveRecord::Base
         indexes :full_name,       :type => "string",  :analyzer => 'standard'
         indexes :city,            :type => "string",  :analyzer => 'standard'
         indexes :zip,             :type => "string",  :analyzer => 'standard'
-        indexes :address,         :type => "string",  :analyzer => 'standard'
         indexes :email,           :type => "string",  :analyzer => 'email_analyzer'
         indexes :country,         :type => "string",  :analyzer => 'standard'
         indexes :state,           :type => "string",  :analyzer => 'standard'
