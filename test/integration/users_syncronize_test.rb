@@ -148,47 +148,6 @@ class UsersSyncronizeTest < ActionController::IntegrationTest
     within("#td_autologin_url"){ assert page.has_content?("none") }
   end
 
-  test "Search users by Indifferent Sync Status " do
-    setup_environment 
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    @saved_user = create_user(unsaved_user, credit_card)
-    sleep 30
-    @saved_user = User.find_by_email(unsaved_user.email)
-    visit users_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name)
-    fill_in( "user[email]", with: @saved_user.email )
-    select("Indifferent", :from => 'user[sync_status]')
-    click_link_or_button 'Search'
-    within("#users")do
-      assert page.has_content?(@saved_user.id.to_s)
-      assert page.has_content?(@saved_user.external_id.to_s)
-      assert page.has_content?(@saved_user.full_name)
-    end
-  end
-
-  test "Search users by Not Synced Sync Status " do
-    setup_environment 
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    @saved_user = create_user(unsaved_user, credit_card)
-    sleep 30
-    @saved_user = User.find_by_email(unsaved_user.email)
-    visit users_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name)
-
-    fill_in( "user[email]", with: @saved_user.email )
-    select("Not Synced", :from => 'user[sync_status]')
-    click_link_or_button 'Search'
-
-
-    within("#users")do
-      assert page.has_content?(@saved_user.id.to_s)
-      assert page.has_content?(@saved_user.external_id.to_s)
-      assert page.has_content?(@saved_user.full_name)
-    end
-  end
-
   test "Club without 'drupal domain'" do
     setup_environment 
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club_without_api.id)
@@ -198,76 +157,6 @@ class UsersSyncronizeTest < ActionController::IntegrationTest
 
     within(".nav-tabs") do
       page.has_no_selector?("#sync_status")
-    end
-  end
-
-  test "Search users by Synced Sync Status" do
-    unstubs_solr_index
-    setup_environment 
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    
-    @saved_user = create_user(unsaved_user, credit_card)
-    sleep 30
-    @saved_user = User.find_by_email(unsaved_user.email)
-    @saved_user.update_attribute(:updated_at, Time.zone.now-1)
-    @saved_user.update_attribute(:last_synced_at, Time.zone.now)
-    @saved_user.update_attribute(:sync_status, "synced")
-    sleep 10   #we need time to update this user. Whiout this the test fails
-
-    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    fill_in("user[last_name]", :with => unsaved_user.last_name)
-    select("Synced", :from => 'user[sync_status]')
-    click_link_or_button 'Search'
-
-    within("#users")do
-      find("tr", :text => @saved_user.full_name)
-      assert page.has_content?(@saved_user.id.to_s)
-      assert page.has_content?(@saved_user.external_id.to_s)
-    end
-  end
-
-  test "Search users by Without Error Sync Status " do
-    unstubs_solr_index
-    setup_environment 
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    @saved_user = create_user(unsaved_user, credit_card)
-    sleep 10   #we need time to create this user. Whiout this the test fails
-
-    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    select("Without Error", :from => 'user[sync_status]')
-    click_link_or_button 'Search'
-
-    within("#users")do
-      find("tr", :text => @saved_user.full_name)
-      assert page.has_content?(@saved_user.id.to_s)
-      assert page.has_content?(@saved_user.external_id.to_s)
-    end
-  end
-
-  test "Search users by With Error Sync Status " do
-    unstubs_solr_index
-    setup_environment 
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-
-    @saved_user = create_user(unsaved_user, credit_card)
-    sleep 30
-    @saved_user = User.find_by_email(unsaved_user.email)
-    @saved_user.update_attribute(:last_sync_error_at, Time.zone.now)
-    @saved_user.update_attribute(:sync_status, "with_error")
-    sleep 20   #we need time to upadte this user. Whiout this the test fails
-
-    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    fill_in( "user[email]", with: @saved_user.email )
-    select("With Error", :from => 'user[sync_status]')
-    click_link_or_button 'Search'
-
-    within("#users")do
-      find("tr", :text => @saved_user.full_name)
-      assert page.has_content?(@saved_user.id.to_s)
-      assert page.has_content?(@saved_user.external_id.to_s)
     end
   end
 
