@@ -110,7 +110,7 @@ class User < ActiveRecord::Base
         indexes :last_name,       :type => "string",  :analyzer => 'standard'
         indexes :full_name,       :type => "string",  :analyzer => 'standard'
         indexes :city,            :type => "string",  :analyzer => 'standard'
-        indexes :zip,             :type => "string",  :analyzer => 'standard'
+        indexes :zip,             :type => "string",  :analyzer => 'keyword'
         indexes :email,           :type => "string",  :analyzer => 'email_analyzer'
         indexes :country,         :type => "string",  :analyzer => 'standard'
         indexes :state,           :type => "string",  :analyzer => 'standard'

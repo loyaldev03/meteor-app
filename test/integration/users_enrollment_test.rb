@@ -875,7 +875,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     end
     within(".ui-datepicker-calendar") do
       click_on("13")
-    end    
+    end
     
     alert_ok_js
     click_link_or_button 'Update User'
