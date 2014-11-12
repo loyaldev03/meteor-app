@@ -637,9 +637,9 @@ class User < ActiveRecord::Base
       user.skip_api_sync! if user.api_id.present? || skip_api_sync
       # first update first name and last name, then validate credti card
       credit_card.get_token(tom.payment_gateway_configuration, user, cc_blank)
+      user.update_user_data_by_params user_params
       return { :message => I18n.t('error_messages.user_data_invalid'), :code => Settings.error_codes.user_data_invalid, 
                  :errors => user.errors_merged(credit_card) } unless credit_card.errors.size == 0
-      user.update_user_data_by_params user_params
     end
 
     answer = user.validate_if_credit_card_already_exist(tom, credit_card_params[:number], credit_card_params[:expire_year], credit_card_params[:expire_month], true, cc_blank, current_agent)
