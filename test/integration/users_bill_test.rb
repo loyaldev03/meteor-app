@@ -507,6 +507,7 @@ class UsersBillTest < ActionController::IntegrationTest
 
   # stubs isnt working correctly
   test "Litle payment gateway (Enrollment amount)" do
+    active_merchant_stubs_litle
     setup_user(false)
     @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
     Time.zone = @club.time_zone
