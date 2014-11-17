@@ -16,7 +16,6 @@ module SacExactTarget
               Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
               member.marketing_tool_exact_target_sync_without_delay
             rescue Exception => e
-              Auditory.report_issue("Member::sync_members_to_exact_target", e, { :member => member.inspect }) unless e.to_s.include?("Timeout")
               Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
             end
             Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
