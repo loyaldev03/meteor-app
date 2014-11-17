@@ -26,10 +26,10 @@ module SacExactTarget
 
     module InstanceMethods
       def exact_target_after_create_sync_to_remote_domain
-        exact_target_sync_to_remote_domain if exact_target_member
+        exact_target_sync_to_remote_domain! if exact_target_member
       end
 
-      def exact_target_sync_to_remote_domain
+      def exact_target_sync_to_remote_domain!
         return if @skip_exact_target_sync
         time_elapsed = Benchmark.ms do
           exact_target_member.save!

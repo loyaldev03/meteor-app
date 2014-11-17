@@ -26,10 +26,10 @@ module SacMailchimp
 
     module InstanceMethods
       def mailchimp_after_create_sync_to_remote_domain
-        mailchimp_sync_to_remote_domain if mailchimp_member
+        mailchimp_sync_to_remote_domain! if mailchimp_member
       end
 
-      def mailchimp_sync_to_remote_domain
+      def mailchimp_sync_to_remote_domain!
         return if @skip_mailchimp_sync
         time_elapsed = Benchmark.ms do
           mailchimp_member.save!
