@@ -16,7 +16,6 @@ module SacMailchimp
               Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
               member.marketing_tool_mailchimp_sync_without_delay
             rescue Exception => e
-              Auditory.report_issue("Member::sync_members_to_mailchimp", e, { :member => member.inspect }) unless e.to_s.include?("Timeout")
               Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
             end
             Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
@@ -27,10 +26,10 @@ module SacMailchimp
 
     module InstanceMethods
       def mailchimp_after_create_sync_to_remote_domain
-        mailchimp_sync_to_remote_domain if mailchimp_member
+        mailchimp_sync_to_remote_domain! if mailchimp_member
       end
 
-      def mailchimp_sync_to_remote_domain
+      def mailchimp_sync_to_remote_domain!
         return if @skip_mailchimp_sync
         time_elapsed = Benchmark.ms do
           mailchimp_member.save!
