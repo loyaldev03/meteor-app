@@ -43,9 +43,9 @@ private
     # if @current_agent.has_role_with_club? 'representative', @current_club.id or @current_agent.has_role_with_club? 'supervisor', @current_club.id
     if @current_agent.can? :see_nice, Transaction, @current_club.id
       begin
-        I18n.t('activerecord.attributes.transaction.transaction_types_messages.type_' + transaction.operation_type.to_s) + ' - ' + transaction.response_result
+        I18n.t('activerecord.attributes.transaction.transaction_types_messages.type_' + transaction.operation_type.to_s) + ' - ' + transaction.response_result.to_s
       rescue
-        transaction.response_result
+        transaction.response_result.to_s
       end
     else
       transaction.full_label
