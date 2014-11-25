@@ -641,7 +641,8 @@ module ActionController
         
         if validate
           fulfillments.each do |fulfillment|
-            wait_until{assert page.has_content?("Changed status on Fulfillment ##{fulfillment.id} #{type} from #{fulfillment.status} to #{new_status}")}
+            sleep 2
+            assert page.has_content?("Changed status on Fulfillment ##{fulfillment.id} #{type} from #{fulfillment.status} to #{new_status}")
           end
         end
       end
