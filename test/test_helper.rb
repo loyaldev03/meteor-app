@@ -623,6 +623,7 @@ module ActionController
     end
 
     def update_status_on_fulfillments(fulfillments, new_status, all = false, type = 'KIT-CARD', validate = true)
+      previous_status = fulfillments.first.status
       within("#report_results")do
         select new_status, :from => "new_status"
         if ['returned','bad_address'].include? new_status 
@@ -641,8 +642,7 @@ module ActionController
         
         if validate
           fulfillments.each do |fulfillment|
-            sleep 2
-            assert page.has_content?("Changed status on Fulfillment ##{fulfillment.id} #{type} from #{fulfillment.status} to #{new_status}")
+            find("tr", :text => "Changed status on Fulfillment ##{fulfillment.id} #{type} from #{previous_status} to #{new_status}")
           end
         end
       end

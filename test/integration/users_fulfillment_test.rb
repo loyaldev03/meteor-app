@@ -202,7 +202,6 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
       assert page.has_content?(@product.sku)
       assert page.has_content?('not_processed')  
-      assert page.has_no_selector?('Resend')
       assert page.has_no_selector?('Mark as sent')
       assert page.has_no_selector?('Set as wrong address')
     end
@@ -235,7 +234,6 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?(I18n.l fulfillment.renewable_at, :format => :only_date)
       assert page.has_content?(@product.sku)
       assert page.has_content?('not_processed') 
-      assert page.has_no_selector?('Resend')
       assert page.has_no_selector?('Mark as sent')
       assert page.has_no_selector?('Set as wrong address')
     end
@@ -312,7 +310,6 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
-      assert page.has_no_selector?('#resend')
     end
     stock = @product.stock
     @product.reload
@@ -597,65 +594,6 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  # test "resend fulfillment - Product out of stock" do
-  #   setup_user(false)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT-CARD')
-
-  #   create_user_throught_sloop(enrollment_info)
-  #   @saved_user = User.find_by_email(@user.email)
-
-  #   fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
-  #   fulfillment.set_as_out_of_stock
-  #   product = fulfillment.product
-  #   product.stock = 0
-  #   product.save
-
-  #   visit products_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-
-  #   within("#products_table") do 
-  #     within("tr", :text => product.name) do 
-  #       click_link_or_button 'Edit'
-  #     end
-  #   end    
-
-  #   page.has_content?('Edit Product')
-  #   fill_in 'product[stock]', :with => '10'
-  #   click_link_or_button('Update Product')
-
-  #   click_link_or_button("My Clubs")
-  #   within("#my_clubs_table"){click_link_or_button("Fulfillments")}
-  #   page.has_content?("Fulfillments")
-  #   within("#fulfillments_table")do
-  #     check('all_times')
-  #     select('out_of_stock', :from => 'status')
-  #     choose('radio_product_type_KIT-CARD')
-  #   end
-  #   click_link_or_button('Report')
-  #   within("#report_results")do
-  #     assert page.has_content?("#{fulfillment.user.id}")
-  #     assert page.has_content?(fulfillment.user.full_name)
-  #     assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-  #     assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
-  #     assert page.has_content?(fulfillment.product_sku)
-  #     assert page.has_content?(fulfillment.tracking_code)
-  #     assert page.has_content?('out_of_stock') 
-  #     assert page.has_content?('Actual stock: 10.')
-  #     assert page.has_selector?("#resend")
-  #     click_link_or_button('Resend')
-  #     assert page.has_content?('Fulfillment KIT was marked to be delivered next time.')
-  #   end
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   assert find_field('input_first_name').value == @saved_user.first_name
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
-  #     assert page.has_content?('KIT-CARD')
-  #     assert page.has_content?('not_processed')
-  #   end
-  # end
-
   # # TODO: When product has no stock and we try to renew a fulfillment related to it, it generetas a new one as "not_processed"... is that ok?
   # test "renewal as out_of_stock and set renewed when product does not have stock" do
   #   setup_user(false)
@@ -667,7 +605,6 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
   #   @saved_user.set_as_active
   #   @saved_user.update_attribute(:recycled_times,0)
   #   @saved_user.current_membership.update_attribute(:join_date,Time.zone.now-1.year)
-
 
   #   fulfillment = Fulfillment.find_by_product_sku(product.sku)
   #   fulfillment.set_as_in_process
@@ -760,7 +697,7 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  test "Resend fulfillment with status bad_address - Product with stock" do
+  test "Changing address should remove bad_address status - Product with stock" do
     setup_user
 
     @fulfillment.set_as_in_process
@@ -802,56 +739,6 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?('not_processed')
     end
   end
-
-  # test "resend fulfillment with status bad_address - Product without stock" do
-  #   setup_user(false)
-  #   product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku )
-  #   create_user_throught_sloop(enrollment_info)
-
-  #   @saved_user = User.find_by_email(@user.email)
-  #   @fulfillment = Fulfillment.first
-
-  #   @fulfillment.set_as_in_process
-  #   @saved_user.set_wrong_address(@admin_agent, 'admin')
-
-  #   click_link_or_button("My Clubs")
-  #   within("#my_clubs_table"){click_link_or_button("Fulfillments")}
-  #   page.has_content?("Fulfillments")
-  #   within("#fulfillments_table")do
-  #     check('all_times')
-  #     select('bad_address', :from => 'status')
-  #     choose('radio_product_type_SLOOPS')
-  #   end
-  #   click_link_or_button('Report')
-  #   @fulfillment.reload
-  #   within("#report_results")do
-  #     assert page.has_content?("#{@fulfillment.user.id}")
-  #     assert page.has_content?(@fulfillment.user.full_name)
-  #     assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :only_date)))
-  #     assert page.has_content?(@fulfillment.product_sku)
-  #     assert page.has_content?(@fulfillment.tracking_code)
-  #     assert page.has_content?('bad_address')
-  #   end
-  #   product.update_attribute(:stock,0)
-
-  #   click_link_or_button 'Edit'
-
-  #   within("#table_demographic_information")do
-  #     fill_in 'user[address]', :with => "NewAddress"
-  #   end
-  #   alert_ok_js
-  #   click_link_or_button 'Update User'
-  #   assert find_field('input_first_name').value == @saved_user.first_name
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #     assert page.has_content?(@fulfillment.product_sku)
-  #     assert page.has_content?('out_of_stock')
-  #   end
-  # end
 
   test "fulfillment record from not_processed to cancel status" do
     setup_user
@@ -983,25 +870,6 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(@fulfillment_renewable.renewed,false)
   end
 
-  # test "resend fulfillment" do
-  #   setup_user
-  #   @fulfillment.set_as_out_of_stock
-
-  #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-  #   assert find_field('input_first_name').value == @saved_user.first_name
-
-  #   within(".nav-tabs") do
-  #     click_on("Fulfillments")
-  #   end
-  #   within("#fulfillments")do
-  #       assert page.has_content?(@fulfillment.product_sku)
-  #       assert page.has_content?('out_of_stock')
-  #       click_link_or_button 'Resend'
-  #       page.has_content?("Fulfillment #{@fulfillment.product_sku} was marked to be delivered next time.")
-  #       assert_equal(Operation.last.description, "Fulfillment #{@fulfillment.product_sku} was marked to be delivered next time.")
-  #   end
-  # end
-
   test "fulfillments to be renewable with status sent" do
     setup_user
     @product_recurrent = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
@@ -1038,7 +906,6 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     assert_equal(last_fulfillment.renewed, false )
     assert_equal(@fulfillment_renewable.renewed, true )
   end
-
 
   # test "Fulfillments to be renewable with status out_of_stock" do
   #   setup_user
@@ -1820,277 +1687,277 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     end
   end
 
-  # test "Update the status of all the fulfillments - In Process selecting the All results checkbox" do
-  #   setup_user(false)
-  #   active_merchant_stubs
-  #   enrollment_info = FactoryGirl.build(:enrollment_info)
-  #   create_user_throught_sloop(enrollment_info)
+  test "Update the status of all the fulfillments - In Process selecting the All results checkbox" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_user_throught_sloop(enrollment_info)
 
-  #   3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
-  #   @saved_user.fulfillments.each &:set_as_in_process
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    @saved_user.fulfillments.each &:set_as_in_process
 
-  #   search_fulfillments(false,nil,nil,'in_process')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_in_process
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_in_process
 
-  #   search_fulfillments(false,nil,nil,'in_process')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_in_process
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_in_process
     
-  #   search_fulfillments(false,nil,nil,'in_process')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_in_process
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_in_process
     
-  #   search_fulfillments(false,nil,nil,'in_process')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_in_process
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_in_process
     
-  #   search_fulfillments(false,nil,nil,'in_process')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_in_process
+    search_fulfillments(false,nil,nil,'in_process')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_in_process
     
-  #   search_fulfillments(false,nil,nil,'in_process')
-  #   @saved_user.reload
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
-  # end
+    search_fulfillments(false,nil,nil,'in_process')
+    @saved_user.reload
+    update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
+  end
 
-  # test "Update the status of all the fulfillments - Not processed selecting the All results checkbox" do
-  #   setup_user(false)
-  #   active_merchant_stubs
-  #   enrollment_info = FactoryGirl.build(:enrollment_info)
-  #   create_user_throught_sloop(enrollment_info)
+  test "Update the status of all the fulfillments - Not processed selecting the All results checkbox" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_user_throught_sloop(enrollment_info)
 
-  #   3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
 
-  #   search_fulfillments(false,nil,nil,'not_processed')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_not_processed
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_not_processed
 
-  #   search_fulfillments(false,nil,nil,'not_processed')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_not_processed
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_not_processed
     
-  #   search_fulfillments(false,nil,nil,'not_processed')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_not_processed
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_not_processed
     
-  #   search_fulfillments(false,nil,nil,'not_processed')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_not_processed
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_not_processed
     
-  #   search_fulfillments(false,nil,nil,'not_processed')
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
-  #   @saved_user.reload
-  #   @saved_user.fulfillments.each &:set_as_not_processed
+    search_fulfillments(false,nil,nil,'not_processed')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_not_processed
     
-  #   search_fulfillments(false,nil,nil,'not_processed')
-  #   @saved_user.reload
-  #   update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
-  # end
+    search_fulfillments(false,nil,nil,'not_processed')
+    @saved_user.reload
+    update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
+  end
 
-#   test "Update the status of all the fulfillments - On Hold selecting the All results checkbox" do
-#     setup_user(false)
-#     active_merchant_stubs
-#     enrollment_info = FactoryGirl.build(:enrollment_info)
-#     create_user_throught_sloop(enrollment_info)
+  test "Update the status of all the fulfillments - On Hold selecting the All results checkbox" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_user_throught_sloop(enrollment_info)
 
-#     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
-#     @saved_user.fulfillments.each &:set_as_on_hold
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    @saved_user.fulfillments.each &:set_as_on_hold
 
-#     search_fulfillments(false,nil,nil,'on_hold')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_on_hold
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_on_hold
 
-#     search_fulfillments(false,nil,nil,'on_hold')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_on_hold
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_on_hold
     
-#     search_fulfillments(false,nil,nil,'on_hold')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_on_hold
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_on_hold
     
-#     search_fulfillments(false,nil,nil,'on_hold')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_on_hold
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_on_hold
     
-#     search_fulfillments(false,nil,nil,'on_hold')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_on_hold
+    search_fulfillments(false,nil,nil,'on_hold')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_on_hold
     
-#     search_fulfillments(false,nil,nil,'on_hold')
-#     @saved_user.reload
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
-#   end
+    search_fulfillments(false,nil,nil,'on_hold')
+    @saved_user.reload
+    update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
+  end
 
-# test "Update the status of all the fulfillments - Sent selecting the All results checkbox" do
-#     setup_user(false)
-#     active_merchant_stubs
-#     enrollment_info = FactoryGirl.build(:enrollment_info)
-#     create_user_throught_sloop(enrollment_info)
+test "Update the status of all the fulfillments - Sent selecting the All results checkbox" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_user_throught_sloop(enrollment_info)
 
-#     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
-#     @saved_user.fulfillments.each &:set_as_sent
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    @saved_user.fulfillments.each &:set_as_sent
 
-#     search_fulfillments(false,nil,nil,'sent')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_sent
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_sent
 
-#     search_fulfillments(false,nil,nil,'sent')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_sent
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_sent
     
-#     search_fulfillments(false,nil,nil,'sent')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_sent
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_sent
     
-#     search_fulfillments(false,nil,nil,'sent')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_sent
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_sent
     
-#     search_fulfillments(false,nil,nil,'sent')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_sent
+    search_fulfillments(false,nil,nil,'sent')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_sent
     
-#     search_fulfillments(false,nil,nil,'sent')
-#     @saved_user.reload
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
-#   end
+    search_fulfillments(false,nil,nil,'sent')
+    @saved_user.reload
+    update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
+  end
 
-#   test "Update the status of all the fulfillments - Out of Stock selecting the All results checkbox" do
-#     setup_user(false)
-#     active_merchant_stubs
-#     enrollment_info = FactoryGirl.build(:enrollment_info)
-#     create_user_throught_sloop(enrollment_info)
+  test "Update the status of all the fulfillments - Out of Stock selecting the All results checkbox" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_user_throught_sloop(enrollment_info)
 
-#     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
-#     @saved_user.fulfillments.each &:set_as_out_of_stock
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    @saved_user.fulfillments.each &:set_as_out_of_stock
 
-#     search_fulfillments(false,nil,nil,'out_of_stock')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_out_of_stock
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_out_of_stock
 
-#     search_fulfillments(false,nil,nil,'out_of_stock')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_out_of_stock
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_out_of_stock
     
-#     search_fulfillments(false,nil,nil,'out_of_stock')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_out_of_stock
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_out_of_stock
     
-#     search_fulfillments(false,nil,nil,'out_of_stock')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_out_of_stock
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_out_of_stock
     
-#     search_fulfillments(false,nil,nil,'out_of_stock')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_out_of_stock
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_out_of_stock
     
-#     search_fulfillments(false,nil,nil,'out_of_stock')
-#     @saved_user.reload
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
-#   end
+    search_fulfillments(false,nil,nil,'out_of_stock')
+    @saved_user.reload
+    update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
+  end
 
-#   test "Update the status of all the fulfillments - Returned selecting the All results checkbox" do
-#     setup_user(false)
-#     active_merchant_stubs
-#     enrollment_info = FactoryGirl.build(:enrollment_info)
-#     create_user_throught_sloop(enrollment_info)
+  test "Update the status of all the fulfillments - Returned selecting the All results checkbox" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_user_throught_sloop(enrollment_info)
 
-#     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
-#     @saved_user.fulfillments.each &:set_as_returned
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    @saved_user.fulfillments.each &:set_as_returned
 
-#     search_fulfillments(false,nil,nil,'returned')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_returned
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_returned
 
-#     search_fulfillments(false,nil,nil,'returned')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_returned
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_returned
     
-#     search_fulfillments(false,nil,nil,'returned')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_returned
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_returned
     
-#     search_fulfillments(false,nil,nil,'returned')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_returned
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_returned
     
-#     search_fulfillments(false,nil,nil,'returned')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_returned
+    search_fulfillments(false,nil,nil,'returned')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'bad_address', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_returned
     
-#     search_fulfillments(false,nil,nil,'returned')
-#     @saved_user.reload
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
-#   end
+    search_fulfillments(false,nil,nil,'returned')
+    @saved_user.reload
+    update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
+  end
 
-#   test "Update the status of all the fulfillments - Bad address selecting the All results checkbox" do
-#     setup_user(false)
-#     active_merchant_stubs
-#     enrollment_info = FactoryGirl.build(:enrollment_info)
-#     create_user_throught_sloop(enrollment_info)
+  test "Update the status of all the fulfillments - Bad address selecting the All results checkbox" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_user_throught_sloop(enrollment_info)
 
-#     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
-#     @saved_user.fulfillments.each &:set_as_bad_address
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    @saved_user.fulfillments.each &:set_as_bad_address
 
-#     search_fulfillments(false,nil,nil,'bad_address')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_bad_address
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_bad_address
 
-#     search_fulfillments(false,nil,nil,'bad_address')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_bad_address
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_bad_address
     
-#     search_fulfillments(false,nil,nil,'bad_address')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_bad_address
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'on_hold', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_bad_address
     
-#     search_fulfillments(false,nil,nil,'bad_address')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_bad_address
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_bad_address
     
-#     search_fulfillments(false,nil,nil,'bad_address')
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
-#     @saved_user.reload
-#     @saved_user.fulfillments.each &:set_as_bad_address
+    search_fulfillments(false,nil,nil,'bad_address')
+    update_status_on_fulfillments(@saved_user.fulfillments, 'returned', true)
+    @saved_user.reload
+    @saved_user.fulfillments.each &:set_as_bad_address
     
-#     search_fulfillments(false,nil,nil,'bad_address')
-#     @saved_user.reload
-#     update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
-#   end
+    search_fulfillments(false,nil,nil,'bad_address')
+    @saved_user.reload
+    update_status_on_fulfillments(@saved_user.fulfillments, 'sent', true)
+  end
 
   test "Update the status of the fulfillments - Not processed using individual checkboxes" do
     setup_user(false)
