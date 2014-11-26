@@ -54,16 +54,16 @@ class UsersSearchTest < ActionController::IntegrationTest
   # TESTS
   ##########################################################
 
-  test "search user with empty form" do
-    setup_search 
-    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_on 'Search'
+  # test "search user with empty form" do
+  #   setup_search 
+  #   visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  #   click_on 'Search'
     
-    within("#users")do
-      assert page.has_css?(".pagination")
-      find("tr", :text => User.last.full_name)
-    end
-  end
+  #   within("#users")do
+  #     assert page.has_css?(".pagination")
+  #     find("tr", :text => User.last.full_name)
+  #   end
+  # end
 
   test "search user by user id" do
     setup_search
