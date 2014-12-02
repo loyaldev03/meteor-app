@@ -1397,9 +1397,9 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-######################################################
-#######  FIRST DATA ##################################
-######################################################
+# ######################################################
+# #######  FIRST DATA ##################################
+# ######################################################
 
   # Tets FirstData transactions
   def club_with_first_data
@@ -1470,25 +1470,25 @@ class TransactionTest < ActiveSupport::TestCase
 
     active_user.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_user.first_name, active_user.last_name, @credit_card_first_data.expire_month, (Time.zone.now+2.year).year].join(";")
     Timecop.travel(active_user.next_retry_bill_date) do
+      previous_year = active_user.active_credit_card.expire_year
       assert_difference('Operation.count', 4) do
         assert_difference('Transaction.count') do
           active_user.bill_membership
         end
         active_user.reload
-        assert_equal active_user.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
+        assert_equal active_user.active_credit_card.expire_year, previous_year + 2 #diff of 2 years because it already has 1 SD
       end
     end
     
     Timecop.travel(active_user.next_retry_bill_date) do
       if active_user.active_credit_card.expired?
-        cc_year = active_user.active_credit_card.expire_year
+        previous_year = active_user.active_credit_card.expire_year
         assert_difference('Operation.count', 4) do
-          require "ruby-debug";debugger
           assert_difference('Transaction.count') do
             active_user.bill_membership
           end 
           active_user.reload
-          assert_equal active_user.active_credit_card.expire_year, cc_year+3 #diff of 3 years because it already has 1 SD
+          assert_equal active_user.active_credit_card.expire_year, previous_year + 3 #diff of 3 years because it already has 1 SD
         end
       else
         assert_difference('Operation.count', 3) do
@@ -1518,25 +1518,25 @@ class TransactionTest < ActiveSupport::TestCase
 
     active_user.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_user.first_name, active_user.last_name, @credit_card_first_data.expire_month, (Time.zone.now+2.year).year].join(";")
     Timecop.travel(active_user.next_retry_bill_date) do
+      previous_year = active_user.active_credit_card.expire_year
       assert_difference('Operation.count', 4) do
         assert_difference('Transaction.count') do
           active_user.bill_membership
         end
         active_user.reload
-        assert_equal active_user.active_credit_card.expire_year, (Time.zone.now+1.year).year #diff of 2 years because it already has 1 SD
+        assert_equal active_user.active_credit_card.expire_year, previous_year + 2 #diff of 2 years because it already has 1 SD
       end
     end
 
     Timecop.travel(active_user.next_retry_bill_date) do
       if active_user.active_credit_card.expired?
-        cc_year = active_user.active_credit_card.expire_year
+        previous_year = active_user.active_credit_card.expire_year
         assert_difference('Operation.count', 4) do
-          require "ruby-debug";debugger
           assert_difference('Transaction.count') do
             active_user.bill_membership
           end 
           active_user.reload
-          assert_equal active_user.active_credit_card.expire_year, cc_year+3 #diff of 3 years because it already has 1 SD
+          assert_equal active_user.active_credit_card.expire_year, previous_year+3 #diff of 3 years because it already has 1 SD
         end
       else
         assert_difference('Operation.count', 3) do
