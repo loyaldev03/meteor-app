@@ -295,18 +295,11 @@ module ActionController
     def select_from_datepicker(name, date)
       page.execute_script("window.jQuery('#"+name+"').next().click()")
       within("#ui-datepicker-div") do
-        if date.month != Time.zone.now.month
-          if (date.month > Time.zone.now.month)
-            (date.month-Time.zone.now.month).times do 
-              date = date + 1.month
-              find(".ui-icon-circle-triangle-e").click
-            end
-          elsif (date.month < Time.zone.now.month)
-            (Time.zone.now.month-date.month).times do
-              date = date - 1.month
-              find(".ui-icon-circle-triangle-w").click 
-            end
-          end
+        while( within(".ui-datepicker-year"){ page.has_no_content?(date.year)} )
+          find(".ui-icon-circle-triangle-e").click
+        end
+        while( within(".ui-datepicker-month"){ page.has_no_content?(date.strftime("%B"))} )
+          find(".ui-icon-circle-triangle-e").click
         end
         first(:link, date.day.to_s, exact: true).click
       end
