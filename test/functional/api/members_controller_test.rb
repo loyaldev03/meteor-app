@@ -110,6 +110,52 @@ class Api::MembersControllerTest < ActionController::TestCase
                                         :format => :json} )
   end
 
+  def prepare_upgrade_downgrade_toms(yearly = true, blank_credit_card = false)
+    sign_in @admin_user
+    @tom_yearly = FactoryGirl.create :terms_of_membership_with_gateway_yearly, :club_id => @club.id, 
+                                     :name => "YearlyTom", installment_amount: 100, provisional_days: 90,
+                                     club_cash_installment_amount: 300
+    @tom_monthly = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, 
+                                     :name => "MonthlyTom", installment_amount: 10
+    @credit_card = FactoryGirl.build :credit_card
+    @second_credit_card = FactoryGirl.build :credit_card_master_card
+    @user = FactoryGirl.build :user_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    @terms_of_membership = yearly ? @tom_yearly : @tom_monthly
+    if blank_credit_card
+      @enrollment_info = FactoryGirl.build :enrollment_info, :enrollment_amount => 0.0
+      @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
+      generate_post_message({}, {setter: { cc_blank: true }})
+    else
+      generate_post_message
+    end
+    @saved_user = User.find_by_email @user.email
+  end
+
+  def validate_transactions_upon_tom_update(previous_membership, new_membership, amount_to_process, amount_in_favor)
+    #tom_change_billing
+    tom_change_billing_transaction = @saved_user.transactions.where("operation_type = ?", Settings.operation_types.tom_change_billing).last
+    assert_equal tom_change_billing_transaction.amount, amount_to_process
+    assert_equal tom_change_billing_transaction.terms_of_membership_id, new_membership.terms_of_membership_id
+    assert_equal tom_change_billing_transaction.membership_id, new_membership.id
+    #membership_balance_transfer
+    transaction_balance_refund = @saved_user.transactions.where("operation_type = ? and amount < 0", Settings.operation_types.membership_balance_transfer).last
+    transaction_balance_sale = @saved_user.transactions.where("operation_type = ? and amount > 0", Settings.operation_types.membership_balance_transfer).last
+    if amount_in_favor and amount_in_favor > 0
+      assert_equal transaction_balance_refund.amount, -amount_in_favor
+      assert_equal transaction_balance_refund.terms_of_membership_id, previous_membership.terms_of_membership_id
+      assert_equal transaction_balance_refund.membership_id, previous_membership.id
+      assert_equal transaction_balance_sale.amount, amount_in_favor
+      assert_equal transaction_balance_sale.terms_of_membership_id, new_membership.terms_of_membership_id
+      assert_equal transaction_balance_sale.membership_id, new_membership.id
+    else
+      assert_nil transaction_balance_refund
+      assert_nil transaction_balance_sale
+    end
+  end
+
   # Store the membership id at enrollment_infos table when enrolling a new user
   # Admin should enroll/create user with preferences
   # Billing membership by Provisional amount
@@ -568,11 +614,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     active_merchant_stubs_store("5589548939080095")
 
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 2)
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 3)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 3)
     validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 4)
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589/5489/3908/0095", 5)
-    validate_credit_card_updated_only_year(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 6)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 5)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5589/5489/3908/0095", 6)
+    validate_credit_card_updated_only_year(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 7)
   end
 
   def validate_credit_card_updated_only_month(active_credit_card, token, number, amount_months)
@@ -1759,30 +1805,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include? "Member status does not allows us to change the terms of membership."
   end
 
-  def prepare_upgrade_downgrade_toms(yearly = true, blank_credit_card = false)
-    sign_in @admin_user
-    @tom_yearly = FactoryGirl.create :terms_of_membership_with_gateway_yearly, :club_id => @club.id, 
-                                     :name => "YearlyTom", installment_amount: 100, provisional_days: 90,
-                                     club_cash_installment_amount: 300
-    @tom_monthly = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, 
-                                     :name => "MonthlyTom", installment_amount: 10
-    @credit_card = FactoryGirl.build :credit_card
-    @second_credit_card = FactoryGirl.build :credit_card_master_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
-    @current_club = @terms_of_membership.club
-    @current_agent = @admin_user
-    @terms_of_membership = yearly ? @tom_yearly : @tom_monthly
-    if blank_credit_card
-      @enrollment_info = FactoryGirl.build :enrollment_info, :enrollment_amount => 0.0
-      @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
-      generate_post_message({}, {setter: { cc_blank: true }})
-    else
-      generate_post_message
-    end
-    @saved_user = User.find_by_email @user.email
-  end
-
   test "User should not be updated if it is already active and the cc send it is wrong" do
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
@@ -1824,28 +1846,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert @response.body.include? "\"expire_year\":[\"expired\"]"
     saved_user = User.find_by_email @user.email
     assert saved_user.first_name != "new_Name"
-  end
-
-  def validate_transactions_upon_tom_update(previous_membership, new_membership, amount_to_process, amount_in_favor)
-    #tom_change_billing
-    tom_change_billing_transaction = @saved_user.transactions.where("operation_type = ?", Settings.operation_types.tom_change_billing).last
-    assert_equal tom_change_billing_transaction.amount, amount_to_process
-    assert_equal tom_change_billing_transaction.terms_of_membership_id, new_membership.terms_of_membership_id
-    assert_equal tom_change_billing_transaction.membership_id, new_membership.id
-    #membership_balance_transfer
-    transaction_balance_refund = @saved_user.transactions.where("operation_type = ? and amount < 0", Settings.operation_types.membership_balance_transfer).last
-    transaction_balance_sale = @saved_user.transactions.where("operation_type = ? and amount > 0", Settings.operation_types.membership_balance_transfer).last
-    if amount_in_favor and amount_in_favor > 0
-      assert_equal transaction_balance_refund.amount, -amount_in_favor
-      assert_equal transaction_balance_refund.terms_of_membership_id, previous_membership.terms_of_membership_id
-      assert_equal transaction_balance_refund.membership_id, previous_membership.id
-      assert_equal transaction_balance_sale.amount, amount_in_favor
-      assert_equal transaction_balance_sale.terms_of_membership_id, new_membership.terms_of_membership_id
-      assert_equal transaction_balance_sale.membership_id, new_membership.id
-    else
-      assert_nil transaction_balance_refund
-      assert_nil transaction_balance_sale
-    end
   end
 
   test "Update TOM throught API - sending Email" do
