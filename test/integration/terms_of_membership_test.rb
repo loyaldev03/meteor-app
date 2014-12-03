@@ -34,7 +34,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 
-	#	# NEW
+		# NEW
 
 	test "Create subcription plan with Initial Fee distinct of 0" do
 		sign_in_as(@admin_agent)
@@ -475,11 +475,10 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		find_button("Create Plan")
 	  choose('if_cannot_bill_user_cancel')
 
-
 		assert_difference("TermsOfMembership.count",1) do
 			click_link_or_button 'Create Plan'
+			sleep 5
 		end
-
 		@terms_of_membership = TermsOfMembership.find_by_name tom_name
 		unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
 		credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -491,7 +490,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 
 	# # # EDIT
 
-	test "Edit subcription plan with Initial Fee distinct of 0 - No membership associated" do
+	test "Edit subcription plan with Initial Fee distinct of 0 - No membership 	associated" do
 		sign_in_as(@admin_agent)
 		tom_name = 'TOM Name'
 		tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
