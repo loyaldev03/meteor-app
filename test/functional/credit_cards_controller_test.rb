@@ -47,7 +47,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     
     cc_number = @active_credit_card.number
     
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryGirl.build :credit_card_american_express, expire_year: (Time.zone.now + 1.year).year
     @credit_card.number = @credit_card_master_card_number
     @credit_card.expire_month = @saved_user.active_credit_card.expire_month
 
@@ -65,9 +65,11 @@ class CreditCardsControllerTest < ActionController::TestCase
   test "Should not add a new credit_card with different month, instead should update actual credit card" do
     sign_in @admin_user
         
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryGirl.build :credit_card_american_express, expire_month: (Time.zone.now + 1.months).month
     @credit_card.number = @credit_card_master_card_number
-    @credit_card.expire_year = @saved_user.active_credit_card.expire_year
+    unless @credit_card.expire_month < Time.zone.now.month
+      @credit_card.expire_year = @saved_user.active_credit_card.expire_year
+    end
 
     assert_difference('Operation.count') do
       assert_difference('CreditCard.count',0) do
