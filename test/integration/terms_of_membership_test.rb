@@ -34,7 +34,7 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 	end
 
 
-		# NEW
+	#	# NEW
 
 	test "Create subcription plan with Initial Fee distinct of 0" do
 		sign_in_as(@admin_agent)
@@ -461,25 +461,16 @@ class TermsOfMembershipTests < ActionController::IntegrationTest
 		tom_name = 'TOM Name with upgrade'
 		tom_to_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Upgraded TOM')
 
-		visit terms_of_memberships_path(@partner.prefix, @club.name)
-		click_link_or_button 'Add New Plan'
-
-		fill_in_step_1(tom_name)
-		click_link_or_button 'Define Membership Terms'
-		fill_in_step_2({initial_fee_amount:1, trial_period_amount:0, trial_period_lasting:0, installment_amount:0, installment_amount_days:1})
-		click_link_or_button 'Define Upgrades / Downgrades'
-
-		select(tom_to_upgrade.name, :from => "upgrade_to_tom")
-		fill_in "upgrade_to_tom_days", :with => "1"
-
-		find_button("Create Plan")
-	  choose('if_cannot_bill_user_cancel')
-
 		assert_difference("TermsOfMembership.count",1) do
-			click_link_or_button 'Create Plan'
-			sleep 5
+			@terms_of_membership = FactoryGirl.create(:terms_of_membership, initial_fee:1, 
+																 name: tom_name, description: "", club_id: tom_to_upgrade.club_id,
+																 provisional_days:0, subscription_limits: 0, initial_club_cash_amount: 0,
+																 installment_amount:0, installment_period:1, upgrade_tom_period:1,
+																 is_payment_expected: true, needs_enrollment_approval: false,
+																 upgrade_tom_id: tom_to_upgrade.id, club_cash_installment_amount:0,
+																 skip_first_club_cash: false )
 		end
-		@terms_of_membership = TermsOfMembership.find_by_name tom_name
+		
 		unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
 		credit_card = FactoryGirl.build(:credit_card_master_card)
 		enrollment_info = FactoryGirl.build(:enrollment_info)
