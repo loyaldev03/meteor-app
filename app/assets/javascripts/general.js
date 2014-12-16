@@ -413,8 +413,6 @@ function new_payment_gateway_configuration_functions(){
     $('#div_report_group').hide('fast');
     $('#div_descriptor_name').hide('fast');
     $('#div_descriptor_phone').hide('fast');
-  };
-  if($('#payment_gateway_configuration_gateway').val() != 'litle' && $('#payment_gateway_configuration_gateway').val() != 'mes'){
     $('#div_merchant_key').hide('fast');
   };
   
@@ -428,7 +426,7 @@ function new_payment_gateway_configuration_functions(){
       $('#div_descriptor_name').show('fast');
       $('#div_descriptor_phone').show('fast');
     }
-    if($('#payment_gateway_configuration_gateway').val() != 'litle' && $('#payment_gateway_configuration_gateway').val() != 'mes'){
+    if($('#payment_gateway_configuration_gateway').val() != 'litle'){
       $('#div_merchant_key').hide('fast');
     }else{
       $('#div_merchant_key').show('fast');
