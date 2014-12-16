@@ -1321,7 +1321,7 @@ function test_communications_functions() {
           success: function(data){
             button.parent().next().empty();
             if (data.code == "000"){
-              button.parent().next().append("<div class='alert-info alert'>Successfully send</div>");
+              button.parent().next().append("<div class='alert-info alert'>"+data.message+"</div>");
             }else{
               button.parent().next().append("<div class='error-info alert'>"+data.message+"</div>");
             };
