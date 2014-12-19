@@ -138,7 +138,7 @@ Club.all.each_with_index do |c, i|
   tom.club = c
   tom.save!
   tom = TermsOfMembership.new :installment_amount => 25,
-    :needs_enrollment_approval => false, :name => "test paid", :club_cash_amount => 10,
+    :needs_enrollment_approval => false, :name => "test paid", :club_cash_installment_amount => 10,
     :installment_period => 30, :initial_fee => 0, :trial_period_amount => 0, :is_payment_expected => 1, :subscription_limits => 0, :if_cannot_bill => 'cancel'
   tom.club = c
   tom.save!
