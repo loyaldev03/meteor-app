@@ -99,9 +99,10 @@ class ActiveSupport::TestCase
   end 
 
   def active_merchant_stubs_first_data(code = "000", message = "This transaction has been approved with stub", success = true)
+    # ActiveMerchant::Billing::Response:0xbbf5350 @params={"transaction_approved"=>"false", "error_number"=>"400", "error_description"=>"Bad Request (22) - Invalid Credit Card Number"}, @message="Bad Request (22) - Invalid Credit Card Number", @success=false, @test=true, @authorization="", @fraud_review=nil, @avs_result={"code"=>nil, "message"=>nil, "street_match"=>nil, "postal_match"=>nil}, @cvv_result={"code"=>nil, "message"=>nil}>
     answer = ActiveMerchant::Billing::Response.new(success, message, 
-      {"response_code"=>code, "response_reason_code"=>"6", "response_reason_text"=> message, 
-       "avs_result_code"=>"P", "transaction_id"=>"0", "card_code"=>"", "action"=>"AUTH_CAPTURE"})
+      {"bank_resp_code"=> code, "error_description"=> message, "response_auth_code" => "a",
+       "transaction_tag"=>"0", "card_code"=>"", "action"=>"AUTH_CAPTURE"})
     ActiveMerchant::Billing::FirstdataE4Gateway.any_instance.stubs(:purchase).returns(answer)
     ActiveMerchant::Billing::FirstdataE4Gateway.any_instance.stubs(:refund).returns(answer)
     ActiveMerchant::Billing::FirstdataE4Gateway.any_instance.stubs(:credit).returns(answer)

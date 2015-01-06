@@ -1404,7 +1404,7 @@ class TransactionTest < ActiveSupport::TestCase
   # Tets FirstData transactions
   def club_with_first_data
     @first_data_club = FactoryGirl.create(:simple_club_with_first_data_gateway)
-    @first_data_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @first_data_club.id)
+    @first_data_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @first_data_club.id)
     @credit_card_first_data = FactoryGirl.build(:credit_card_visa_first_data)
   end
 
@@ -1456,49 +1456,38 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for FirstData
-  test "Try billing an user's membership when he was previously SD for credit_card_expired for FirstDate" do 
+  test "Try billing an user's membership when he was previously SD for credit_card_expired for FirstData" do 
     club_with_first_data
-    active_user = enroll_user(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
-    # active_merchant_stubs_first_data(@sd_first_data_expired_strategy.response_code, "decline stubbed", false)
+    active_user = create_active_user(@first_data_terms_of_membership)
     active_card = active_user.active_credit_card
-    active_user.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_user.first_name, active_user.last_name, @credit_card_first_data.expire_month, (Time.zone.now-1.year).year].join(";")
-    active_user.active_credit_card.update_attribute :expire_year, (Time.zone.now-1.year).year
     
+    active_merchant_stubs_first_data(@sd_first_data_expired_strategy.response_code, "decline stubbed", false)
     Timecop.travel(active_user.next_retry_bill_date) do
       active_user.bill_membership
     end
 
-    active_user.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_user.first_name, active_user.last_name, @credit_card_first_data.expire_month, (Time.zone.now+2.year).year].join(";")
+    active_merchant_stubs_first_data
     Timecop.travel(active_user.next_retry_bill_date) do
-      previous_year = active_user.active_credit_card.expire_year
+      old_year = active_user.active_credit_card.expire_year
+      old_month = active_user.active_credit_card.expire_month
       assert_difference('Operation.count', 4) do
         assert_difference('Transaction.count') do
           active_user.bill_membership
         end
-        active_user.reload
-        assert_equal active_user.active_credit_card.expire_year, previous_year + 2 #diff of 2 years because it already has 1 SD
       end
+      active_user.reload
+      assert_equal active_user.active_credit_card.expire_year, old_year+2
+      assert_equal active_user.active_credit_card.expire_month, old_month
     end
-    
+
     Timecop.travel(active_user.next_retry_bill_date) do
-      if active_user.active_credit_card.expired?
-        previous_year = active_user.active_credit_card.expire_year
-        assert_difference('Operation.count', 4) do
-          assert_difference('Transaction.count') do
-            active_user.bill_membership
-          end 
-          active_user.reload
-          assert_equal active_user.active_credit_card.expire_year, previous_year + 3 #diff of 3 years because it already has 1 SD
-        end
-      else
-        assert_difference('Operation.count', 3) do
-          assert_difference('Transaction.count') do
-            active_user.bill_membership
-          end
-        end
-        active_user.reload
-        assert_equal active_user.active_credit_card.expire_year, Time.zone.now.year
-      end
+      old_year = active_user.active_credit_card.expire_year
+      old_month = active_user.active_credit_card.expire_month
+      active_user.bill_membership
+      active_user.reload
+
+      assert_equal active_user.active_credit_card.expire_year, old_year
+      assert_equal active_user.active_credit_card.expire_month, old_month
     end
   end
 
@@ -1506,47 +1495,27 @@ class TransactionTest < ActiveSupport::TestCase
     club_with_first_data
     @first_data_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @first_data_club.id, :name =>"second_one")
     active_user = enroll_user(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
-    # active_merchant_stubs_first_data(@sd_first_data_expired_strategy.response_code, "decline stubbed", false)
     active_card = active_user.active_credit_card
-    active_user.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_user.first_name, active_user.last_name, @credit_card_first_data.expire_month, (Time.zone.now-1.year).year].join(";")
-    active_user.active_credit_card.update_attribute :expire_year, (Time.zone.now-1.year).year
-    
+
+    active_merchant_stubs_first_data(@sd_first_data_expired_strategy.response_code, "decline stubbed", false)
     Timecop.travel(active_user.next_retry_bill_date) do
       active_user.bill_membership
     end
     active_user.change_terms_of_membership(@first_data_terms_of_membership_second.id, "changing tom", 100)
 
-    active_user.active_credit_card.update_attribute :token, [@credit_card_first_data.number, "visa", active_user.first_name, active_user.last_name, @credit_card_first_data.expire_month, (Time.zone.now+2.year).year].join(";")
+    active_merchant_stubs_first_data
     Timecop.travel(active_user.next_retry_bill_date) do
-      previous_year = active_user.active_credit_card.expire_year
-      assert_difference('Operation.count', 4) do
+      old_year = active_user.active_credit_card.expire_year
+      old_month = active_user.active_credit_card.expire_month
+      
+      assert_difference('Operation.count', 3) do
         assert_difference('Transaction.count') do
           active_user.bill_membership
         end
-        active_user.reload
-        assert_equal active_user.active_credit_card.expire_year, previous_year + 2 #diff of 2 years because it already has 1 SD
       end
-    end
-
-    Timecop.travel(active_user.next_retry_bill_date) do
-      if active_user.active_credit_card.expired?
-        previous_year = active_user.active_credit_card.expire_year
-        assert_difference('Operation.count', 4) do
-          assert_difference('Transaction.count') do
-            active_user.bill_membership
-          end 
-          active_user.reload
-          assert_equal active_user.active_credit_card.expire_year, previous_year+3 #diff of 3 years because it already has 1 SD
-        end
-      else
-        assert_difference('Operation.count', 3) do
-          assert_difference('Transaction.count') do
-            active_user.bill_membership
-          end
-        end
-        active_user.reload
-        assert_equal active_user.active_credit_card.expire_year, Time.zone.now.year
-      end
+      active_user.reload
+      assert_equal active_user.active_credit_card.expire_year, old_year
+      assert_equal active_user.active_credit_card.expire_month, old_month
     end
   end
 end

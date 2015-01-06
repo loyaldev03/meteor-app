@@ -236,7 +236,7 @@ class Transaction < ActiveRecord::Base
     elsif self.litle?
       expired_codes = ['305']
     elsif self.first_data?
-      expire_codes = ['522']
+      expired_codes = ['522','605']
     end
     expired_codes.include? self.response_code 
   end
