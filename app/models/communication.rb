@@ -83,7 +83,7 @@ class Communication < ActiveRecord::Base
   def deliver_mandrill
     if self.user.mandrill_member
       result = self.user.mandrill_member.send_email(external_attributes[:template_name])
-      self.sent_success = (result["status"]=="sent")
+      self.sent_success = (["sent","queued"].include? result["status"])
       self.processed_at = Time.zone.now
       self.response = result
       self.save!
@@ -105,8 +105,8 @@ class Communication < ActiveRecord::Base
   def self.test_deliver_mandrill(template, user)
     if user.mandrill_member
       result = user.mandrill_member.send_email(template.external_attributes[:template_name])
-      sent_success = (result["status"]=="sent")
-      { sent_success: sent_success, response: (sent_success ? I18n.t('error_messages.testing_communication_send') : result) }
+      sent_success = (["sent","queued"].include? result["status"])
+      { sent_success: sent_success, response: (sent_success ? "#{I18n.t('error_messages.testing_communication_send')} #{'Email has been queued.' if result['status']=='queued' }" : result) }
     else
       { sent_success: false, response: I18n.t('error_messages.no_marketing_client_configure') }
     end

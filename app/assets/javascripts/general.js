@@ -413,8 +413,8 @@ function new_payment_gateway_configuration_functions(){
     $('#div_report_group').hide('fast');
     $('#div_descriptor_name').hide('fast');
     $('#div_descriptor_phone').hide('fast');
-  };
-  if($('#payment_gateway_configuration_gateway').val() != 'litle' && $('#payment_gateway_configuration_gateway').val() != 'mes'){
+  };  
+  if($('#payment_gateway_configuration_gateway').val() != 'litle'){
     $('#div_merchant_key').hide('fast');
   };
   
@@ -428,7 +428,7 @@ function new_payment_gateway_configuration_functions(){
       $('#div_descriptor_name').show('fast');
       $('#div_descriptor_phone').show('fast');
     }
-    if($('#payment_gateway_configuration_gateway').val() != 'litle' && $('#payment_gateway_configuration_gateway').val() != 'mes'){
+    if($('#payment_gateway_configuration_gateway').val() != 'litle'){
       $('#div_merchant_key').hide('fast');
     }else{
       $('#div_merchant_key').show('fast');
@@ -1321,7 +1321,7 @@ function test_communications_functions() {
           success: function(data){
             button.parent().next().empty();
             if (data.code == "000"){
-              button.parent().next().append("<div class='alert-info alert'>Successfully send</div>");
+              button.parent().next().append("<div class='alert-info alert'>"+data.message+"</div>");
             }else{
               button.parent().next().append("<div class='error-info alert'>"+data.message+"</div>");
             };

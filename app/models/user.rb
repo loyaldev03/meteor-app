@@ -1037,7 +1037,7 @@ class User < ActiveRecord::Base
         end
       elsif not api_id.nil?
         Drupal::UserPoints.new(self).create!({:amount => amount, :description => description})
-        message = last_sync_error || "Club cash processed at drupal correctly."
+        message = last_sync_error || "Club cash processed at drupal correctly. Amount: #{amount}. Concept: #{description}"
         auditory_code = Settings.operation_types.remote_club_cash_transaction_failed
         if self.last_sync_error.nil?
           auditory_code = Settings.operation_types.remote_club_cash_transaction
