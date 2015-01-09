@@ -185,6 +185,6 @@ class Admin::AgentsController < ApplicationController
     end
 
     def load_clubs_related
-      @clubs = @current_agent.has_global_role? ? Club.select("id,name") : @current_agent.clubs.where("club_roles.role = 'admin'")
+      @clubs = @current_agent.has_global_role? ? Club.order("name ASC").select("id,name") : @current_agent.clubs.where("club_roles.role = 'admin'")
     end
 end
