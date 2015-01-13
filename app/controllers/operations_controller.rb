@@ -27,7 +27,7 @@ class OperationsController < ApplicationController
     if operation.update_attributes(params[:operation])
       message = "Edited operation note #{@link}".html_safe
       Auditory.audit(@current_agent, operation, message, @current_user, Settings.operation_types.operation_updated)
-      redirect_to operation_path(:id => operation), notice: message
+      redirect_to show_user_path, notice: message
     else
       render action: "show" 
     end
