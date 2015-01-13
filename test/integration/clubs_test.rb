@@ -75,6 +75,13 @@ class ClubTest < ActionController::IntegrationTest
       assert page.has_content?(saved_club.name)
       assert page.has_content?(saved_club.description)
     end
+
+    visit my_clubs_path
+    within("#my_clubs_table") do
+      assert page.has_content?(saved_club.id.to_s)
+      assert page.has_content?(saved_club.name)
+      assert page.has_content?(saved_club.description)
+    end
   end
 
   test "should update club" do
@@ -146,6 +153,8 @@ class ClubTest < ActionController::IntegrationTest
         assert page.has_content?(club.name)
         assert page.has_content?(club.id.to_s)
       end
+      assert page.has_content?("Show")
+      assert page.has_content?("Edit")
       assert page.has_content?("Users")
       assert page.has_content?("Products")
       assert page.has_content?("Fulfillments")
