@@ -365,7 +365,7 @@ production:
   <<: *defaults
   call_these_users_recipients: 'ndavid@stoneacreinc.com,rcorner@stoneacreinc.com'
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
-  email_to_send_product_list: 'kflynn@stoneacreinc.com,tbrady@stoneacreinc.com'
+  email_to_send_product_list: 'tbrady@stoneacreinc.com,mhebb@stoneacreinc.com'
   hot_rod_cancellation_emails: 'arivera@zinio.com,clawler@fullcu.be'
   mes_report_service:
     user: Stoneacrereports
