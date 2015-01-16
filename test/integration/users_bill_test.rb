@@ -147,7 +147,6 @@ class UsersBillTest < ActionController::IntegrationTest
   test "create an user billing enroll = 0 provisional_days = 0 installment amount > 0" do
     active_merchant_stubs
     setup_user(0)
-    EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
     bill_user(@saved_user, false)
   end 
 
