@@ -7,6 +7,10 @@ defaults: &defaults
   call_these_users_recipients: platformadmins@xagax.com
   email_to_send_product_list: 'platformadmins@xagax.com'
   email_to_use_on_action_mailer_as_recipient: platformadmins@xagax.com
+  platform_email: 'platform@xagax.com'
+  platform_admins_email: 'platformadmins@xagax.com'
+  fulfillment_naamma_report_emails: 'sonia@xagax.com'
+  fulfillment_nfla_report_emails: 'sonia@xagax.com'
   hot_rod_cancellation_emails: 'sonia@xagax.com,clawler@fullcu.be'
   others_product: "SLOOPS"
   kit_card_product: 'KIT-CARD'
@@ -367,6 +371,8 @@ production:
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   email_to_send_product_list: 'tbrady@stoneacreinc.com,mhebb@stoneacreinc.com'
   hot_rod_cancellation_emails: 'arivera@zinio.com,clawler@fullcu.be'
+  fulfillment_naamma_report_emails: ''
+  fulfillment_nfla_report_emails: ''
   mes_report_service:
     user: Stoneacrereports
     password: do3!lAjo5

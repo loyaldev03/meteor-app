@@ -1,6 +1,6 @@
 class Notifier < ActionMailer::Base
-  default from: "platform@xagax.com"
-  default bcc: "platformadmins@xagax.com"
+  default from: Settings.platform_email
+  default bcc: Settings.platform_admins_email
   
   def pre_bill(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
@@ -51,7 +51,7 @@ class Notifier < ActionMailer::Base
     attachments["call_users_#{Date.today}.csv"] = { :mime_type => 'text/csv', :content => csv }
     mail :to => Settings.call_these_users_recipients, 
          :subject => "AUS answered CALL to these users #{Date.today}",
-         :bcc => 'platformadmins@xagax.com'
+         :bcc => Settings.platform_admins_email
   end
 
   def hard_decline(user)
@@ -73,14 +73,14 @@ class Notifier < ActionMailer::Base
   def fulfillment_naamma_report(fulfillment_xls_file, quantity)
     @quantity = quantity
     attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
-    mail :to => Rails.env=='production' ? 'bmiller@naamma.com,clawler@stoneacreinc.com,kflynn@stoneacreinc.com' : 'clawler@stoneacreinc.com,sonia@xagax.com',
+    mail :to => Settings.fulfillment_naamma_report_emails,
          :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NAAMMA fulfillments report"
   end
 
   def fulfillment_nfla_report(fulfillment_xls_file, quantity)
     @quantity = quantity
     attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
-    mail :to => Rails.env=='production' ? 'clawler@stoneacreinc.com,cball@stoneacreinc.com' : 'sonia@xagax.com',
+    mail :to => Settings.fulfillment_nfla_report_emails,
          :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NFLA kit-card fulfillments report"
   end
 
