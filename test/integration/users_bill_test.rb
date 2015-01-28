@@ -474,7 +474,7 @@ class UsersBillTest < ActionController::IntegrationTest
     assert page.has_content?("Amount, description and type cannot be blank.")
   end
 
-  test "Try billing an user without providing the amount and/or description." do
+  test "Try billing an user with negative amount." do
     setup_user
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
