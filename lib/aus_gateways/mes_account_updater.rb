@@ -50,7 +50,7 @@ module MesAccountUpdater
       0.upto(quantity) do |i|
         request_file_by_id answer["rspfId_#{i}"], "#{gateway.club_id}-rsp-"+answer["reqfId_#{i}"]+"-#{Time.now.to_i}.txt", gateway
       end
-      send_email_with_call_users
+      send_email_with_call_users(gateway.club.payment_gateway_errors_email)
     end
   end
 
@@ -61,13 +61,13 @@ module MesAccountUpdater
   end
 
   private
-    def self.send_email_with_call_users
+    def self.send_email_with_call_users(contact_email_list)
       ccs = CreditCard.where([" aus_status = 'CALL' AND date(aus_answered_at) = ? ", Time.zone.now.to_date ])
       if ccs.size > 0
         csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"
         csv += ccs.collect {|cc| [ cc.user_id, cc.user.first_name, cc.user.last_name, cc.user.email, cc.user.full_phone_number,
             cc.user.status, cc.user.next_retry_bill_date ].join(',') }.join("\n")
-        Notifier.call_these_users(csv).deliver
+        Notifier.call_these_users(csv,contact_email_list).deliver
       end
     end
 

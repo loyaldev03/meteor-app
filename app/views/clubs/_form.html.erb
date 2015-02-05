@@ -52,7 +52,7 @@
       <%= f.time_zone_select(:time_zone) %>
     </div>
   </div>
-  
+
   <h3>PTX Transactions</h3>
   <div class="control-group">
     <%= f.label :member_banner_url, :class => 'control-label' %>
@@ -118,6 +118,16 @@
   </div>
   <div id="div_mkt_tool_attributes"> </div>
 
+  <h3>Contact Emails</h3>
+  <div class="control-group">
+    <%= f.label :payment_gateway_errors_email, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :payment_gateway_errors_email, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { 
+        :title => t('activerecord.attributes.club.payment_gateway_errors_email'), 
+        :content => t('activerecord.attributes.club.payment_gateway_errors_email_help') } %>
+    </div> 
+  </div>
 
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
@@ -132,4 +142,8 @@
   var partner_prefix = "<%= @current_partner.prefix %>";
   var club_id = "<%= @club.id %>";
   var mkt_tool_errors = "<%= @club.errors.messages.nil? ? @club.errors.messages : @club.errors.messages[:marketing_tool_attributes] %>";
+</script>
+
+<script>
+  $('document').ready($('.help').popover({offset: 10}));
 </script>
