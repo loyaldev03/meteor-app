@@ -118,6 +118,7 @@ module SacMailchimp
     #If any of these variables are changed, please check Mandrill's variable too.
 		def fieldmap
 		  { 
+        'MEMBERID' => 'id',
         'EMAIL' => 'email',
 		    'FNAME' => 'first_name',
 		    'LNAME' => 'last_name',

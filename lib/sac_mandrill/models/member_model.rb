@@ -44,6 +44,7 @@
     #If any of these variables are changed, please check Mailchimp's variable too.
     def fieldmap
       { 
+        'MEMBERID' => 'id',
         'EMAIL' => 'email',
         'FNAME' => 'first_name',
         'LNAME' => 'last_name',
