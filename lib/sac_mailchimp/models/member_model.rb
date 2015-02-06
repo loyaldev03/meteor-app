@@ -2,7 +2,7 @@ module SacMailchimp
 	class MemberModel < Struct.new(:user)
 
     def save!
-      update_member(new_record? ? create! : update!)
+      update_member(new_record? ? create! : update!) unless has_fake_email?
     end
 
     def new_record?
@@ -20,7 +20,8 @@ module SacMailchimp
 
     def unsubscribe!
     	begin
-      	client.lists.unsubscribe({:id => mailchimp_list_id, :email => { :email => self.user.email }})
+        return if has_fake_email?
+      	 client.lists.unsubscribe({:id => mailchimp_list_id, :email => { :email => self.user.email }})
       rescue Gibbon::MailChimpError => e
         Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
         update_member e
@@ -198,6 +199,10 @@ module SacMailchimp
 
     def mailchimp_list_id
     	@list_id ||= self.user.club.marketing_tool_attributes["mailchimp_list_id"]
+    end
+
+    def has_fake_email?
+      self.user.email.include?("@mailinator.com")
     end
 	end
 end
