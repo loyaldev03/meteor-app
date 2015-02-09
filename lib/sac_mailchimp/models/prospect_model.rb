@@ -2,29 +2,33 @@ module SacMailchimp
 	class ProspectModel < Struct.new(:prospect)
 
     def save!(club)
-      return unless self.prospect.email and not self.prospect.email.include?("@mailinator.com")
+      return unless self.prospect.email
       setup_club(club)
-      subscriber = SacMailchimp::ProspectModel.find_by_email self.prospect.email, mailchimp_list_id
-      res = if subscriber["status"]=='error'
-        subscriber
-      elsif subscriber["success_count"] == 0
-        begin 
-          options = {:double_optin => false}
-          client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
-        rescue Exception => e
-          Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
-          raise e
-        end       
-      elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_user?(subscriber["data"].first["email"], club_id)
-        begin
-          options = { :update_existing => true, :double_optin => false }
-          client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
-        rescue Exception => e
-          Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
-          raise e
+      unless self.prospect.email.include?("@mailinator.com")
+        subscriber = SacMailchimp::ProspectModel.find_by_email self.prospect.email, mailchimp_list_id
+        res = if subscriber["status"]=='error'
+          subscriber
+        elsif subscriber["success_count"] == 0
+          begin 
+            options = {:double_optin => false}
+            client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
+          rescue Exception => e
+            Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
+            raise e
+          end       
+        elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_user?(subscriber["data"].first["email"], club_id)
+          begin
+            options = { :update_existing => true, :double_optin => false }
+            client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
+          rescue Exception => e
+            Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
+            raise e
+          end
+        else
+          res = { "error" => "Email already saved as member." }
         end
-      else
-        res = { "error" => "Email already saved as member." }
+      else 
+        res = { "error" => "Email has @mailinator.com within it." }
       end
       update_prospect(res)
     end

@@ -2,7 +2,13 @@ module SacMailchimp
 	class MemberModel < Struct.new(:user)
 
     def save!
-      update_member(new_record? ? create! : update!) unless has_fake_email?
+      if has_fake_email? 
+        res = Gibbon::MailChimpError.new "Email has @mailinator.com within it. Avoiding synchronization"
+        res.code = "-100"
+      else
+        res = new_record? ? create! : update!
+      end
+      update_member(res) 
     end
 
     def new_record?
