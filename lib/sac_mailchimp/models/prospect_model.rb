@@ -28,7 +28,7 @@ module SacMailchimp
           res = { "error" => "Email already saved as member." }
         end
       else 
-        res = { "error" => "Email has @mailinator.com within it." }
+        res = { "error" => "Email has 'mailinator' within it's domain. Synchronization was canceled" }
       end
       update_prospect(res)
     end
