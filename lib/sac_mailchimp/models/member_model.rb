@@ -3,7 +3,7 @@ module SacMailchimp
 
     def save!
       if has_fake_email? 
-        res = Gibbon::MailChimpError.new "Email has @mailinator.com within it. Avoiding synchronization"
+        res = Gibbon::MailChimpError.new "Email has @mailinator.com within it. Synchronization was canceled"
         res.code = "-100"
       else
         res = new_record? ? create! : update!
@@ -208,7 +208,7 @@ module SacMailchimp
     end
 
     def has_fake_email?
-      self.user.email.include?("@mailinator.com")
+      self.user.email.split("@")[1].include? "mailinator"
     end
 	end
 end

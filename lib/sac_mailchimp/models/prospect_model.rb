@@ -4,7 +4,7 @@ module SacMailchimp
     def save!(club)
       return unless self.prospect.email
       setup_club(club)
-      unless self.prospect.email.include?("@mailinator.com")
+      unless self.prospect.email.split("@")[1].include? "mailinator"
         subscriber = SacMailchimp::ProspectModel.find_by_email self.prospect.email, mailchimp_list_id
         res = if subscriber["status"]=='error'
           subscriber
