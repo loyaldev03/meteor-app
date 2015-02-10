@@ -340,6 +340,7 @@ function fetch_maketing_client_form(){
 };
 
 function clubs_form_functions(){
+  $('document').ready($('.help').popover({offset: 10}));
   $("#club_marketing_tool_client").change(function(){
     if($(this).val()!= ''){
       fetch_maketing_client_form(club_id, $(this).val());
