@@ -208,7 +208,7 @@ module SacMailchimp
     end
 
     def has_fake_email?
-      self.user.email.split("@")[1].include? "mailinator"
+      ["mailinator.com", "test.com", "noemail.com"].include? self.user.email.split("@")[1]
     end
 	end
 end
