@@ -28,7 +28,7 @@ module SacMailchimp
           res = { "error" => "Email already saved as member." }
         end
       else 
-        res = { "error" => "Email has 'mailinator' within it's domain. Synchronization was canceled" }
+        res = { "error" => "Email address looks fake or invalid. Synchronization was canceled" }
       end
       update_prospect(res)
     end

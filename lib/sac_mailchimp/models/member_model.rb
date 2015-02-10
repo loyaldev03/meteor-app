@@ -3,7 +3,7 @@ module SacMailchimp
 
     def save!
       if has_fake_email? 
-        res = Gibbon::MailChimpError.new "Email has 'mailinator' within it's domain. Synchronization was canceled"
+        res = Gibbon::MailChimpError.new "Email address looks fake or invalid. Synchronization was canceled"
         res.code = "-100"
       else
         res = new_record? ? create! : update!
