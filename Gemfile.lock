@@ -333,7 +333,7 @@ GEM
       nokogiri (>= 1.4.0)
       nori (~> 1.0)
       wasabi (~> 2.0)
-    selenium-webdriver (2.43.0)
+    selenium-webdriver (2.45.0.dev3)
       childprocess (~> 0.5)
       multi_json (~> 1.0)
       rubyzip (~> 1.0)
@@ -477,7 +477,7 @@ DEPENDENCIES
   ruby-prof
   rvm-capistrano
   sass-rails (~> 3.2.3)
-  selenium-webdriver (~> 2.43.0)
+  selenium-webdriver (>= 2.45.0.dev3)
   settingslogic (= 2.0.8)
   simplecov
   state_machine (= 1.1.2)
