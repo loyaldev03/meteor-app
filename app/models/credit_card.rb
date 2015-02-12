@@ -116,7 +116,9 @@ class CreditCard < ActiveRecord::Base
       begin              
         self.token = Transaction.store!(am, pgc)
       rescue Exception => e
-        Auditory.report_issue("CreditCard:GetToken", e, { credit_card: self.inspect, user: puser.inspect || self.user.inspect })
+        unless ["117"].include? e.to_s  
+          Auditory.report_issue("CreditCard:GetToken", e, { credit_card: self.inspect, user: puser.inspect || self.user.inspect })
+        end
         logger.error e.inspect
         self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
       end
