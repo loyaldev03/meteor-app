@@ -237,7 +237,7 @@ class Club < ActiveRecord::Base
 
     def payment_gateway_errors_email_is_well_formated 
       self.payment_gateway_errors_email.split(",").each do |email|
-        unless email.match(/^[0-9a-zA-Z\-_]([-_\.]?[+?]?[0-9a-zA-Z\-_])*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/)
+        unless email.strip.match(/^[0-9a-zA-Z\-_]([-_\.]?[+?]?[0-9a-zA-Z\-_])*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/)
           errors[:payment_gateway_errors_email] << "Invalid information. '#{email}' is an invalid email."
         end
       end
