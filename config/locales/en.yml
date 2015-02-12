@@ -335,6 +335,8 @@ en:
         members_count: 'Members count'
         family_memberships_allowed: Family memberships allowed
         club_without_domains: 'There are no domains related to this club. In order to assign a drupal domain, you should first relate domains to this club. (Once the club is created, you can relate the domain from its edit/creation page).'
+        payment_gateway_errors_email: 'Payment Gateway Errors related to AUS'
+        payment_gateway_errors_email_help: 'Errors related to AUS service (CALL error), will be notified to the emails specified. You can add several emails separated by commas. (Eg: "email+one@example.com, email+two@example.com, email+three@example.com") '
         marketing_tool_attributes:
           exact_target:
             et_username: 'Username'

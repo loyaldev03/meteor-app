@@ -47,9 +47,9 @@ class Notifier < ActionMailer::Base
     mail :to => emails, :subject => "User recovering needs approval"
   end
 
-  def call_these_users(csv)
+  def call_these_users(csv, contact_email_list)
     attachments["call_users_#{Date.today}.csv"] = { :mime_type => 'text/csv', :content => csv }
-    mail :to => Settings.call_these_users_recipients, 
+    mail :to => contact_email_list, 
          :subject => "AUS answered CALL to these users #{Date.today}",
          :bcc => Settings.platform_admins_email
   end
