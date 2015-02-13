@@ -25,7 +25,7 @@ class Club < ActiveRecord::Base
   attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id,
     :api_type, :api_username, :api_password, :time_zone, :pardot_email, :pardot_password, :pardot_user_key,
     :cs_phone_number, :family_memberships_allowed, :club_cash_enable, :member_banner_url, :non_member_banner_url,
-    :member_landing_url, :non_member_landing_url
+    :member_landing_url, :non_member_landing_url, :payment_gateway_errors_email
 
   acts_as_paranoid
 
@@ -38,7 +38,7 @@ class Club < ActiveRecord::Base
   validates :name, :presence => true, :uniqueness => true
   validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url,
             :format =>  /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
-  validate :payment_gateway_errors_email_is_well_formated 
+  validate :payment_gateway_errors_email_is_well_formated
 
   
   scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' AND (marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes not like '%\"et_business_unit\":\"\"%') AND (marketing_tool_attributes like '%et_prospect_list%'AND marketing_tool_attributes not like '%\"et_prospect_list\":\"\"%') AND (marketing_tool_attributes like '%et_members_list%' AND marketing_tool_attributes not like '%\"et_members_list\":\"\"%') AND (marketing_tool_attributes like '%et_username%' AND marketing_tool_attributes not like '%\"et_username\":\"\"%') AND ( marketing_tool_attributes like '%et_password%' AND marketing_tool_attributes not like '%\"et_password\":\"\"%') AND (marketing_tool_attributes like '%et_endpoint%' AND marketing_tool_attributes not like '%\"et_endpoint\":\"\"%')") }
@@ -235,8 +235,8 @@ class Club < ActiveRecord::Base
       end
     end
 
-    def payment_gateway_errors_email_is_well_formated 
-      self.payment_gateway_errors_email.split(",").each do |email|
+    def payment_gateway_errors_email_is_well_formated
+      self.payment_gateway_errors_email.to_s.split(",").each do |email|
         unless email.strip.match(/^[0-9a-zA-Z\-_]([-_\.]?[+?]?[0-9a-zA-Z\-_])*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/)
           errors[:payment_gateway_errors_email] << "Invalid information. '#{email}' is an invalid email."
         end
