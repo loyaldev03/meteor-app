@@ -901,8 +901,10 @@ function set_product_type_at_fulfillments_index(settings_kit_card_product, setti
   var radio_product_type = $('[name=radio_product_type]:checked');
   if (radio_product_type.val() == settings_kit_card_product || radio_product_type.val() == settings_others_product) {
     $('#product_type').val(radio_product_type.val());
-  } else {
+  }else if (radio_product_type.val() == "SLOOPS_others") {
     $('#product_type').val($('#input_product_type').val());
+  }else{
+    $('#product_type').val($('#input_product_package').val());
   }
 }
 
@@ -959,6 +961,10 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
 
   $('#input_product_type').blur(function() {
     $('#radio_product_type_'+settings_others_product+'_others').attr('checked', true);
+  });
+
+  $('#input_product_package').blur(function() {
+    $('#radio_product_type_'+settings_others_product+'_package').attr('checked', true);
   });
 
   $("#make_report").click(function() {

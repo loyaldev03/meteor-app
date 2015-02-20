@@ -2556,4 +2556,37 @@ test "Update the status of all the fulfillments - In process using individual ch
       assert_equal fulfillment.status, 'not_processed'
     end  
   end
+
+  test "Search Fulfillments by package" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:enrollment_info)
+    create_user_throught_sloop(enrollment_info)
+
+    FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAG", :sku => "Bracelet1")
+    FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAG", :sku => "Bracelet2")
+    FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAGTWO", :sku => "Bracelet3")
+    FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAGTWO", :sku => "Bracelet4")
+
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'Bracelet1', :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'Bracelet2', :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'Bracelet3', :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'Bracelet4', :club_id => @club.id)}
+
+    search_fulfillments(true, nil, nil, nil, nil, 'NCARFLAG')
+    within("#report_results")do
+      assert page.has_content? "Bracelet1"
+      assert page.has_content? "Bracelet2"
+      assert page.has_no_content? "Bracelet3"
+      assert page.has_no_content? "Bracelet4"
+    end
+
+    search_fulfillments(true, nil, nil, nil, nil, 'NCARFLAGTWO')
+    within("#report_results")do
+      assert page.has_no_content? "Bracelet1"
+      assert page.has_no_content? "Bracelet2"
+      assert page.has_content? "Bracelet3"
+      assert page.has_content? "Bracelet4"
+    end
+  end
 end
