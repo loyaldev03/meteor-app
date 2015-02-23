@@ -57,7 +57,8 @@
         'BILLDATE' => 'next_retry_bill_date',
         'EXTERNALID' => 'external_id',
         'GENDER' => 'gender',
-        'PHONE' => 'full_phone_number'
+        'PHONE' => 'full_phone_number',
+        'CJOINDATE' => 'current_join_date'
       }
     end
 
