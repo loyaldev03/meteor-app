@@ -68,6 +68,7 @@ class EmailTemplate < ActiveRecord::Base
       "Emails sent when successfully billing user's memberships. This communication is only send when the user is in active status."
     end
   end
+  
   def self.clients_options
     clients = [ ['Exact Target', 'exact_target'], ['Mailchimp/Mandrill', 'mailchimp_mandrill'] ]
     clients << ['Action Mailer', 'action_mailer'] unless Rails.env.production?
