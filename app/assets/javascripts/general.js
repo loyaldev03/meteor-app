@@ -1,4 +1,4 @@
-fulfillments_index_functions$(document).ready( function() {
+$(document).ready( function() {
   $('.confirm').click( function(event){
     var answer = confirm('Are you sure?');
     return answer 
