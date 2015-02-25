@@ -1,4 +1,4 @@
-$(document).ready( function() {
+fulfillments_index_functions$(document).ready( function() {
   $('.confirm').click( function(event){
     var answer = confirm('Are you sure?');
     return answer 
@@ -959,12 +959,14 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
     }
   });  
 
-  $('#input_product_type').blur(function() {
+  $('#input_product_type').click(function() {
     $('#radio_product_type_'+settings_others_product+'_others').attr('checked', true);
+    $("#input_product_package").val("");
   });
 
-  $('#input_product_package').blur(function() {
+  $('#input_product_package').click(function() {
     $('#radio_product_type_'+settings_others_product+'_package').attr('checked', true);
+    $("#input_product_type").val("");
   });
 
   $("#make_report").click(function() {
