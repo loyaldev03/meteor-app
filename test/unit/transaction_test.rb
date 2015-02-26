@@ -1518,4 +1518,23 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal active_user.active_credit_card.expire_month, old_month
     end
   end
+
+  test "Create an user and make sure we are sending membership_renewal communication each membership billing except the first one" do
+    user = enroll_user(@terms_of_membership, 0)
+
+    Timecop.travel(user.next_retry_bill_date) do
+      assert_difference('Communication.count',0) do
+        user.bill_membership
+      end
+    end
+    assert_nil Communication.find_by_template_type "membership_renewal"
+    
+    Timecop.travel(user.next_retry_bill_date) do
+      assert_difference('Communication.count') do
+        user.bill_membership
+      end
+    assert_not_nil Communication.find_by_template_type "membership_renewal"
+    end
+  end
+
 end

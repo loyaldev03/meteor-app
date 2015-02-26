@@ -13,7 +13,8 @@ class EmailTemplate < ActiveRecord::Base
     :birthday,                # Sent if birthday is on enrollment_info
     :pillar,                  # Emails sent after join date and active/prov status. they use days_after_join_date attribute
     :hard_decline,            # Emails sent when hard decline happens
-    :soft_decline             # Emails sent when soft decline happens  
+    :soft_decline,            # Emails sent when soft decline happens
+    :membership_renewal       # Emails sent when successfully billing user's memberships. We only send this communication if the user is already in active status when billing.
   ]
 
   CLIENTS = [ :exact_target, :action_mailer, :lyris ]
@@ -63,9 +64,11 @@ class EmailTemplate < ActiveRecord::Base
       "Emails sent when hard decline happens"
     when :soft_decline
       "Emails sent when soft decline happens"
+    when :membership_renewal
+      "Emails sent when successfully billing user's memberships. This communication is only send when the user is in active status."
     end
   end
-
+  
   def self.clients_options
     clients = [ ['Exact Target', 'exact_target'], ['Mailchimp/Mandrill', 'mailchimp_mandrill'] ]
     clients << ['Action Mailer', 'action_mailer'] unless Rails.env.production?
