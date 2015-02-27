@@ -567,7 +567,7 @@ module ActionController
       end
     end
 
-    def search_fulfillments(all_times = false, initial_date = nil, end_date = nil, status = nil, type = nil)
+    def search_fulfillments(all_times = false, initial_date = nil, end_date = nil, status = nil, type = nil, package = nil)
       visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
       within("#fulfillments_table")do
         check "all_times" if all_times
@@ -610,6 +610,11 @@ module ActionController
           else
             fill_in "product_type", :with => type
           end
+        end
+
+        unless package.nil?
+          find(:css, "#radio_product_type_SLOOPS_package").set(true)
+          fill_in "input_product_package", :with => package
         end
       end
 

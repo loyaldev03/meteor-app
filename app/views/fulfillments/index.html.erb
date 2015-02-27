@@ -38,9 +38,15 @@
           <%= radio_button_tag 'radio_product_type', Settings.others_product, Settings.others_product == params[:product_type] %>
           <%= label_tag Settings.others_product, nil, :class => 'help-inline' %>
           <br>
-          <%= radio_button_tag 'radio_product_type', Settings.others_product+'_others', ![Settings.others_product, Settings.kit_card_product].include?(params[:product_type]) %>
-          <%= text_field_tag :input_product_type, ([ Settings.others_product, Settings.kit_card_product ].include?(params[:product_type]) ? '' : params[:product_type] ), :class => 'help-inline' %>
+          <%= radio_button_tag 'radio_product_type', Settings.others_product+'_others', params[:radio_product_type] == Settings.others_product+'_others' %>
+          <%= text_field_tag :input_product_type, (params[:radio_product_type] == Settings.others_product+'_others' ? params[:product_type] : '' ), :class => 'help-inline', 
+            :placeholder => "Sku" %>
           <%= hidden_field_tag :product_type %>
+          <br>
+          <%= radio_button_tag 'radio_product_type', Settings.others_product+'_package', params[:radio_product_type] == Settings.others_product+'_package' %>
+          <%= text_field_tag :input_product_package, (params[:radio_product_type] == Settings.others_product+'_package' ? params[:product_type] : '' ), :class => 'help-inline',
+            :placeholder => "Package" %>
+          <%= hidden_field_tag :product_package %>
         </td>
     	</tr>
     	<tr>
