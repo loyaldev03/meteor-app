@@ -368,7 +368,7 @@ production:
   <<: *defaults
   email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   email_to_send_product_list: 'tbrady@stoneacreinc.com,mhebb@stoneacreinc.com'
-  hot_rod_cancellation_emails: 'arivera@zinio.com,clawler@fullcu.be'
+  hot_rod_cancellation_emails: 'jbrickman@zinio.com,clawler@fullcu.be'
   fulfillment_naamma_report_emails: ''
   fulfillment_nfla_report_emails: ''
   mes_report_service:
