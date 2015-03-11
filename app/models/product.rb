@@ -37,6 +37,11 @@ class Product < ActiveRecord::Base
     self.save 
   end
 
+  def replenish_stock(quantity=1)
+    self.stock = self.stock+quantity
+    self.save
+  end
+
   def has_stock?
     allow_backorder? ? true : stock>0
   end

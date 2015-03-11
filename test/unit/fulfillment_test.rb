@@ -180,4 +180,25 @@ class FulfillmentTest < ActiveSupport::TestCase
       assert_equal fulfillment.status, "canceled"
     end
   end
+
+  test "Canceling fulfillment should replenish stock" do
+    setup_products
+    @user = FactoryGirl.build(:user)
+    @credit_card = FactoryGirl.build(:credit_card)
+    user = enroll_user(@terms_of_membership_with_gateway)
+    fulfillment = user.fulfillments.first
+    assert_equal fulfillment.status, "not_processed"
+
+    prev_stock = fulfillment.product.stock
+    cancel_date = user.join_date + 1.day
+    user.cancel! cancel_date, "canceling"
+    Timecop.travel(cancel_date) do
+      TasksHelpers.cancel_all_member_up_today
+      user.reload
+      fulfillment.reload
+      assert_equal user.status, "lapsed"
+      assert_equal fulfillment.status, "canceled"
+      assert_equal fulfillment.product.reload.stock, prev_stock+1
+    end
+  end
 end
