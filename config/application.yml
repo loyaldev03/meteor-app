@@ -1,4 +1,4 @@
-fdefaults: &defaults
+defaults: &defaults
   max_reactivations: 3
   days_to_wait_to_cancel_fulfillments: 2
   next_retry_on_missing_decline: 20.days
