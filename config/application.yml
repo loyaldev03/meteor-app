@@ -1,4 +1,4 @@
-defaults: &defaults
+fdefaults: &defaults
   max_reactivations: 3
   days_to_wait_to_cancel_fulfillments: 2
   next_retry_on_missing_decline: 20.days
@@ -118,6 +118,7 @@ defaults: &defaults
     rejection_email: 307
     birthday_email: 308
     no_email_error: 309
+    membership_renewal_email: 310
     #fulfillments
     from_not_processed_to_in_process: 400
     from_not_processed_to_on_hold: 401
