@@ -14,6 +14,7 @@ class Fulfillment < ActiveRecord::Base
   has_and_belongs_to_many :fulfillment_files
 
   before_create :set_default_values
+  after_update :replenish_stock
 
   SLOOPS_HEADER = ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
               'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
@@ -121,6 +122,12 @@ class Fulfillment < ActiveRecord::Base
     end
   end
 
+  def replenish_stock
+    if status_changed? and status == 'canceled'
+      product.replenish_stock
+    end
+  end
+
   def update_status(agent, new_status, reason, file = nil)
     old_status = self.status
     if renewed?
@@ -136,12 +143,12 @@ class Fulfillment < ActiveRecord::Base
         answer = ( user.wrong_address.nil? ? user.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success, :message => "Member already set as wrong address."} )
       end
     elsif new_status == 'not_processed'
-      answer = decrease_stock! 
+      answer = decrease_stock!
     else
       answer = { :code => Settings.error_codes.success }
     end
     self.status = new_status
-    self.save    
+    self.save
     if answer[:code] == Settings.error_codes.success        
       self.audit_status_transition(agent, old_status, reason, file)
     else
