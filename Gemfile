@@ -12,7 +12,6 @@ gem "paperclip", "~> 3.0"
 
 gem 'acts_as_list', '0.2.0'
 gem 'delayed_job_active_record'
-gem 'daemons'
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
 
@@ -87,6 +86,7 @@ group :development do
   gem 'capistrano-campfire', '0.2.0'
   gem 'tinder', '1.9.2'
   #####
+  gem 'daemons'
   gem 'foreman'
   gem 'quiet_assets'
 end
