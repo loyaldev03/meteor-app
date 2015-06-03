@@ -15,6 +15,10 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
 
   before_create :only_one_is_allowed
   
+  def trust_commerce?
+    gateway == "trust_commerce"
+  end
+
   def mes?
     self.gateway == 'mes'
   end

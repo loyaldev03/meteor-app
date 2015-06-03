@@ -173,6 +173,7 @@ en:
       litle: Litle
       authorize_net: 'Authorize Net'
       first_data: 'First Data'
+      trust_commerce: 'Trust Commerce'
     user: 'User'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
