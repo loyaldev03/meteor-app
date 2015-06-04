@@ -4,8 +4,8 @@ class Transaction < ActiveRecord::Base
   belongs_to :payment_gateway_configuration
   belongs_to :decline_strategy
   belongs_to :credit_card
-  # This value will be not nil only if we are billing 
-  belongs_to :terms_of_membership 
+  # This value will be not nil only if we are billing
+  belongs_to :terms_of_membership
   has_many :operations, :as => :resource
 
   serialize :response, JSON
@@ -18,7 +18,7 @@ class Transaction < ActiveRecord::Base
 
   def full_label
     transaction_type ?
-    I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) + 
+    I18n.t('activerecord.attributes.transaction.transaction_types.'+transaction_type) +
       ( response_result.nil? ? '' : ' : ' + response_result) : ''
   end
 
@@ -67,7 +67,7 @@ class Transaction < ActiveRecord::Base
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
-    self.membership_id = membership.nil? ? user.current_membership_id : membership.id 
+    self.membership_id = membership.nil? ? user.current_membership_id : membership.id
     self.terms_of_membership_id = terms_of_membership_id || user.terms_of_membership.id
     self.operation_type = operation_type_to_set
     self.save
@@ -82,7 +82,7 @@ class Transaction < ActiveRecord::Base
         :phone    => phone_number
       },
       :expiration_date => "%02d%s" % [ self.expire_month.to_i, self.expire_year.to_s.last(2) ]
-    }    
+    }
   end
 
   def prepare_no_recurrent(user, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, type)
@@ -94,10 +94,10 @@ class Transaction < ActiveRecord::Base
     self.terms_of_membership_id = user.terms_of_membership.id
     self.user = user
     self.amount = amount
-    self.membership_id = user.current_membership_id 
+    self.membership_id = user.current_membership_id
     self.operation_type = operation_type_to_set
     self.gateway = :manual
-    self.save    
+    self.save
   end
 
   def can_be_refunded?
@@ -131,7 +131,7 @@ class Transaction < ActiveRecord::Base
       else
         { :message=>"Operation -#{transaction_type}- not supported", :code=> Settings.error_codes.not_supported }
     end
-  end  
+  end
 
   def mes?
     gateway == "mes"
@@ -149,6 +149,10 @@ class Transaction < ActiveRecord::Base
     gateway == "first_data"
   end
 
+  def trust_commerce?
+    gateway == "trust_commerce"
+  end
+
   def one_time_type?
     operation_type == Settings.operation_types.no_recurrent_billing
   end
@@ -163,6 +167,8 @@ class Transaction < ActiveRecord::Base
       AuthorizeNetTransaction.store!(am_credit_card, pgc)
     elsif pgc.first_data?
       FirstDataTransaction.store!(am_credit_card, pgc)
+    elsif pgc.trust_commerce?
+      TrustCommerceTransaction.store!(am_credit_card, pgc)
     else
       raise "No payment gateway configuration set for gateway \"#{pgc.gateway}\""
     end
@@ -178,6 +184,8 @@ class Transaction < ActiveRecord::Base
       AuthorizeNetTransaction.new
     when 'first_data'
       FirstDataTransaction.new
+    when 'trust_commerce'
+      TrustCommerceTransaction.new
     else
       raise "No payment gateway configuration set for gateway \"#{gateway}\""
     end
@@ -188,8 +196,8 @@ class Transaction < ActiveRecord::Base
     sale_transaction = Transaction.find sale_transaction_id, :lock => true
     if not sale_transaction.has_same_pgc_as_current?
       { :code => Settings.error_codes.transaction_gateway_differs_from_current, :message => I18n.t("error_messages.transaction_gateway_differs_from_current") }
-    else 
-      Transaction.transaction do 
+    else
+      Transaction.transaction do
         amount = amount.to_f
         if amount <= 0.0
           return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
@@ -240,7 +248,7 @@ class Transaction < ActiveRecord::Base
     elsif self.trust_commerce?
       expired_codes = ['expiredcard']
     end
-    expired_codes.include? self.response_code 
+    expired_codes.include? self.response_code
   end
 
   private
@@ -273,7 +281,7 @@ class Transaction < ActiveRecord::Base
       elsif self.token.nil? or self.token.size < 4
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
       else
-        load_gateway        
+        load_gateway
         refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
         save_response(refund_response)
       end
@@ -283,7 +291,7 @@ class Transaction < ActiveRecord::Base
       response = save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
       Auditory.report_issue("Transaction::Refund", e, {:user => self.user.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
       response
-    end    
+    end
 
     # Process only sale operations
     def sale
@@ -330,6 +338,6 @@ class Transaction < ActiveRecord::Base
         { :message => answer.message, :code=> Settings.error_codes.success }
       else
         { :message=>"Error: " + answer.message, :code=>self.response_code }
-      end      
-    end  
+      end
+    end
 end

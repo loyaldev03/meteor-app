@@ -16,6 +16,9 @@ if Rails.env.staging? or Rails.env.prototype?
 
 	ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_auth_net.log", "a+")  
 	ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device.sync = true
+
+  ActiveMerchant::Billing::TrustCommerceGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_trust_commerce.log", "a+")  
+  ActiveMerchant::Billing::TrustCommerceGateway.wiredump_device.sync = true
 end
 
 # config/initializers/delayed_job_config.rb
@@ -39,3 +42,9 @@ end
 require 'bureaucrat'
 require 'bureaucrat/quickfields'
 require 'bureaucrat/form'
+
+
+Tire.configure do
+  url    'https://test:test@67662be96db05a10000.qbox.io'
+  # logger STDERR
+end
