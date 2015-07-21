@@ -583,7 +583,6 @@ class UsersBillTest < ActionController::IntegrationTest
       make_a_chargeback(transaction, transaction.created_at.day, transaction.amount+100, "I have my reasons...", false)
       assert page.has_content? I18n.t("error_messages.chargeback_amount_greater_than_available")
     end
-
     make_a_chargeback(transaction, transaction.created_at.day, transaction.amount, "I have my reasons...")
   end
 

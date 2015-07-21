@@ -8,8 +8,6 @@
         <%= text_field_tag :adjudication_date, nil ,:class => 'datepicker required',
                            :readonly => 'readonly' %>
       </td>
-    </tr>
-    <tr>
       <td> 
         <div class="input-prepend input-append"> 
           <%= t('activerecord.attributes.transaction.refund_amount_help') %>: 
@@ -19,13 +17,13 @@
       </td>
     </tr>
     <tr>
-      <td> 
+      <td colspan="2"> 
         <%= label :reason, t('reason'), :class => 'help-inline' %> 
-        <%= text_area_tag :reason %>
+        <%= text_area_tag :reason, nil, :style => 'width: 99%; height: 50px'  %>
       </td>
     </tr>
     <tr>
-      <td>  
+      <td colspan="2">  
         <%= submit_tag t('buttons.chargeback_user'), :class => 'btn btn-primary' %>
         <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %> 
       </td>
