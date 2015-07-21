@@ -1,0 +1,38 @@
+<%= render :partial => "shared/user_information" %>
+
+<%= form_tag(user_chargeback_path(:transaction_id => @transaction)) do %>
+  <table class="table table-bordered">
+    <tr>
+      <td>
+        <%= label :adjudication_date, t('activerecord.attributes.transaction.adjudication_date'), :class => 'help-inline' %> 
+        <%= text_field_tag :adjudication_date, nil ,:class => 'datepicker required',
+                           :readonly => 'readonly' %>
+      </td>
+    </tr>
+    <tr>
+      <td> 
+        <div class="input-prepend input-append"> 
+          <%= t('activerecord.attributes.transaction.refund_amount_help') %>: 
+          (Max : <%= number_to_currency(@transaction.amount_available_to_refund) %>)
+          <span class="add-on">$</span><%= text_field_tag :amount, nil ,:id => "amount" %>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td> 
+        <%= label :reason, t('reason'), :class => 'help-inline' %> 
+        <%= text_area_tag :reason %>
+      </td>
+    </tr>
+    <tr>
+      <td>  
+        <%= submit_tag t('buttons.chargeback_user'), :class => 'btn btn-primary' %>
+        <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %> 
+      </td>
+    </tr>
+  </table>
+<% end%>
+
+<script>
+  $(document).ready(chargeback_user_functions());
+</script>

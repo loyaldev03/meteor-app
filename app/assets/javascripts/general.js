@@ -857,6 +857,29 @@ function refund_user_functions(){
   })
 };
 
+function chargeback_user_functions(){
+  $('form').submit( function(event) {
+    $('input:submit').attr("disabled", true);
+    if($("#amount").val().match(/^[0-9 .]+$/)){
+      
+    }else{
+      $('input:submit').attr("disabled", false);
+      alert("Incorrect chargeback value.");
+      event.preventDefault(); 
+    };
+  })
+
+  $("#adjudication_date").datepicker({ constrainInput: true, 
+                                maxDate: 0, 
+                                dateFormat: "yy-mm-dd",
+                                showOn: "both", 
+                                buttonImage: "/icon-calendar.png", 
+                                changeMonth: true,
+                                changeYear: true,
+                                yearRange: '1900',
+                                buttonImageOnly: true});
+}
+
 function fulfillments_not_processed_function(){
   $('#reason').hide();
   $('#new_status').change(function (value){

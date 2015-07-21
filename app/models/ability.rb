@@ -44,7 +44,7 @@ class Ability
     cannot :see_nice, Transaction
     cannot :manage, UserAdditionalData
     cannot :manage, EmailTemplate
-
+    cannot :chargeback, Transaction
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
 
@@ -196,6 +196,7 @@ class Ability
       can :show, TermsOfMembership
       can :show, EmailTemplate
       can :refund, Transaction
+      can :chargeback, Transaction
       can :list, Transaction
       can :list, ClubCashTransaction
       can :list, Communication

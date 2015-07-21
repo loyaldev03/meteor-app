@@ -132,6 +132,23 @@ class UsersController < ApplicationController
     end
   end
 
+  def chargeback
+    @transaction = Transaction.find(params[:transaction_id])
+    if request.post?
+      if params[:amount].to_f > @transaction.amount_available_to_refund
+        flash[:error] = I18n.t("error_messages.chargeback_amount_greater_than_available")
+      else 
+        begin
+          @current_user.chargeback!(@transaction, { reason: params[:reason], transaction_amount: params[:amount], adjudication_date: params[:adjudication_date], trident_transaction_id: @transaction.response_transaction_id })
+          flash[:notice] = "User successfully chargebacked."
+          redirect_to show_user_path
+        rescue
+          flash[:error] = "There has been an error. #{$!.to_s}"
+        end
+      end
+    end
+  end
+
   def full_save
     message = "Full save done"
     Auditory.audit(@current_agent, nil, message, @current_user, Settings.operation_types.full_save)

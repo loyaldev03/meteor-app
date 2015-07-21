@@ -19,9 +19,11 @@ private
         transaction.can_be_refunded? ? number_to_currency(transaction.amount_available_to_refund) : '',
         transaction.gateway + " " + transaction.response_transaction_id.to_s,
         transaction.last_digits,
-        transaction.can_be_refunded? ? link_to(I18n.t('refund'),
+        (transaction.can_be_refunded? ? link_to(I18n.t('refund'),
             @url_helpers.user_refund_path(@current_partner.prefix,@current_club.name,@current_user.id, :transaction_id => transaction.id), 
-            :class=>"btn btn-warning btn-mini", :id => 'refund' ,:disabled=>(!@current_agent.can? :refund, Transaction, @current_club.id)) : '',
+            :class=>"btn btn-warning btn-mini", :id => 'refund' ,:disabled=>(!@current_agent.can? :refund, Transaction, @current_club.id)) : '')+
+        (transaction.can_be_chargeback? ? link_to(I18n.t('chargeback'), @url_helpers.user_chargeback_path(@current_partner.prefix,@current_club.name,@current_user.id, :transaction_id => transaction.id), 
+            :class=>"btn btn-warning btn-mini", :id => 'chargeback' ,:disabled=>(!@current_agent.can? :chargeback, Transaction, @current_club.id)) : '')
       ]
     end
   end
