@@ -109,6 +109,18 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::FirstdataE4Gateway.any_instance.stubs(:store).returns(answer)
   end 
 
+  def active_merchant_stubs_trust_commerce(code = "000", message = "This transaction has been approved with stub", success = true)
+    answer = ActiveMerchant::Billing::Response.new(success, message, 
+      {"params"=>{"authcode"=>"123456", "transid"=>"028-0168943221", "status"=>"approved"}, 
+       "message"=>"The transaction was successful", "success"=>true, "test"=>true, 
+       "authorization"=>"028-0168943221", "fraud_review"=>nil, 
+       "avs_result"=>{"code"=>nil, "message"=>nil, "street_match"=>nil, 
+       "postal_match"=>nil}, "cvv_result"=>{"code"=>nil, "message"=>nil}})
+    ActiveMerchant::Billing::TrustCommerceGateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::TrustCommerceGateway.any_instance.stubs(:refund).returns(answer)
+    ActiveMerchant::Billing::TrustCommerceGateway.any_instance.stubs(:credit).returns(answer)
+  end
+
   def active_merchant_stubs_store(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)

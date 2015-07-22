@@ -156,6 +156,7 @@ en:
     no_marketing_client_configure: 'This club does not have marketing club configured.'
     testing_communication_send: 'Communication sent successfully'
     chargeback_amount_greater_than_available: "Amount to chargeback cannot be greater than transaction's available amount"
+    cannot_chargeback_transaction: "Transaction cannot be chargebacked."
   activerecord:
     errors:
       models:
