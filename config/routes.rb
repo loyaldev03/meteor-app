@@ -64,8 +64,7 @@ SacPlatform::Application.routes.draw do
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]
         resources :operations, :only => [:show, :update]
         resources :user_notes, :only => [ :new, :create ]
-        resources :transactions, :only => [ :index ] do
-        end
+        resources :transactions, :only => [ :index ]
         resources :memberships, :only => [ :index ]
         resources :club_cash_transactions, :only => [:index]
         resources :credit_cards, :only => [ :new, :create, :destroy ] do

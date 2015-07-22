@@ -139,7 +139,7 @@ class UsersController < ApplicationController
         flash[:error] = I18n.t("error_messages.chargeback_amount_greater_than_available")
       else 
         begin
-          @current_user.chargeback!(@transaction, { reason: params[:reason], transaction_amount: params[:amount], adjudication_date: params[:adjudication_date], trident_transaction_id: @transaction.response_transaction_id })
+          @current_user.chargeback!(@transaction, { reason: params[:reason], transaction_amount: params[:amount], adjudication_date: params[:adjudication_date], sale_transaction_id: @transaction.id })
           flash[:notice] = "User successfully chargebacked."
           redirect_to show_user_path
         rescue
