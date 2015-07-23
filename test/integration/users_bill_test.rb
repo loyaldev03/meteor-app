@@ -571,18 +571,19 @@ class UsersBillTest < ActionController::IntegrationTest
     bill_user(@saved_user, true, nil, true)
   end
 
-  # test "Chargeback user via web" do
-  #   active_merchant_stubs_trust_commerce
-  #   setup_user(nil, true, :simple_club_with_trust_commerce_gateway)
-  #   bill_user(@saved_user, false)
-  #   transaction = @saved_user.transactions.last
-  #   assert_difference('Transaction.count',0) do
-  #     make_a_chargeback(transaction, transaction.created_at.day, "asd", "I have my reasons...", false)
-  #   end
-  #   assert_difference('Transaction.count',0) do 
-  #     make_a_chargeback(transaction, transaction.created_at.day, transaction.amount+100, "I have my reasons...", false)
-  #     assert page.has_content? I18n.t("error_messages.chargeback_amount_greater_than_available")
-  #   end
-  #   make_a_chargeback(transaction, transaction.created_at.day, transaction.amount, "I have my reasons...")
-  # end
+  test "Chargeback user via web" do
+    active_merchant_stubs_trust_commerce
+    setup_user(nil, true, :simple_club_with_trust_commerce_gateway)
+    sleep(5)
+    bill_user(@saved_user, false)
+    transaction = @saved_user.transactions.last
+    assert_difference('Transaction.count',0) do
+      make_a_chargeback(transaction, transaction.created_at.day, "asd", "I have my reasons...", false)
+    end
+    assert_difference('Transaction.count',0) do 
+      make_a_chargeback(transaction, transaction.created_at.day, transaction.amount+100, "I have my reasons...", false)
+      assert page.has_content? I18n.t("error_messages.chargeback_amount_greater_than_available")
+    end
+    make_a_chargeback(transaction, transaction.created_at.day, transaction.amount, "I have my reasons...")
+  end
 end
