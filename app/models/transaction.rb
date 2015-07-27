@@ -100,8 +100,12 @@ class Transaction < ActiveRecord::Base
     self.save
   end
 
-  def can_be_refunded?
-    [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !user.blacklisted? and self.success? and has_same_pgc_as_current?
+  def can_be_chargeback?
+    [ 'sale' ].include?(transaction_type) and trust_commerce? and amount_available_to_refund > 0.0 and self.success? and Transaction.where("transaction_type = ? AND response like ?", "chargeback", "%#{self.id}%").empty?
+  end
+
+  def can_be_refunded?    
+    [ 'sale' ].include?(transaction_type) and amount_available_to_refund > 0.0 and !user.blacklisted? and self.success? and has_same_pgc_as_current? 
   end
 
   def has_same_pgc_as_current?

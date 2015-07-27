@@ -10,11 +10,11 @@ class UsersBillTest < ActionController::IntegrationTest
   setup do
   end
 
-  def setup_user(provisional_days = nil, create_user = true)
+  def setup_user(provisional_days = nil, create_user = true, club_with_gateway = :simple_club_with_gateway)
     active_merchant_stubs
 
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @club = FactoryGirl.create(club_with_gateway)
     @partner = @club.partner
 
     Time.zone = @club.time_zone
@@ -39,7 +39,7 @@ class UsersBillTest < ActionController::IntegrationTest
     visit user_refund_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id, :transaction_id => transaction.id)
     fill_in 'refund_amount', :with => amount.to_s  
   
-    alert_ok_js      
+    alert_ok_js
     click_on 'Refund'
     sleep(5) #wait for communication to be sent. 
     if check_refund
@@ -49,6 +49,40 @@ class UsersBillTest < ActionController::IntegrationTest
         assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Refund success $#{amount.to_f}")
       end
+    end
+  end
+
+  def make_a_chargeback(transaction, date, amount, reason, check_chargeback = true)
+    visit user_chargeback_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id, :transaction_id => transaction.id)
+
+    page.execute_script("window.jQuery('#adjudication_date').next().click()")
+    within("#ui-datepicker-div") do
+      if (date.month != Time.zone.now.month)
+        within(".ui-datepicker-header")do
+          find(".ui-icon-circle-triangle-e").click
+        end
+      end
+      if first(:link, date.day.to_s) 
+        first(:link, date.day.to_s).click
+      end
+    end    
+    fill_in 'amount', :with => amount.to_s  
+    fill_in 'reason', :with => reason 
+
+    alert_ok_js
+    click_on 'Chargeback'
+    if check_chargeback
+      page.has_content?("User successfully chargebacked.")
+      chargeback_transaction = Transaction.where(transaction_type: 'chargeback').last
+      @saved_user.reload
+
+      assert_equal chargeback_transaction.amount, -amount
+      assert_equal chargeback_transaction.response["transaction_amount"].to_f, amount.to_f
+      assert_equal chargeback_transaction.response["reason"], reason
+      assert_equal chargeback_transaction.response["sale_transaction_id"], transaction.id
+      assert_equal chargeback_transaction.operation_type, Settings.operation_types.chargeback
+      assert_equal @saved_user.status, 'lapsed'
+      assert_equal @saved_user.blacklisted, true
     end
   end
   
@@ -535,5 +569,21 @@ class UsersBillTest < ActionController::IntegrationTest
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     Time.zone = @club.time_zone
     bill_user(@saved_user, true, nil, true)
+  end
+
+  test "Chargeback user via web" do
+    active_merchant_stubs_trust_commerce
+    setup_user(nil, true, :simple_club_with_trust_commerce_gateway)
+    sleep(5)
+    bill_user(@saved_user, false)
+    transaction = @saved_user.transactions.last
+    assert_difference('Transaction.count',0) do
+      make_a_chargeback(transaction, transaction.created_at.day, "asd", "I have my reasons...", false)
+    end
+    assert_difference('Transaction.count',0) do 
+      make_a_chargeback(transaction, transaction.created_at.day, transaction.amount+100, "I have my reasons...", false)
+      assert page.has_content? I18n.t("error_messages.chargeback_amount_greater_than_available")
+    end
+    make_a_chargeback(transaction, transaction.created_at.day, transaction.amount, "I have my reasons...")
   end
 end

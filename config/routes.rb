@@ -74,6 +74,7 @@ SacPlatform::Application.routes.draw do
         post 'additional_data' => 'users#additional_data'
         match '/recover' => 'users#recover', as: 'user_recover', :via => [:get, :post]
         match '/refund/:transaction_id' => 'users#refund', as: 'user_refund', :via => [:get, :post]
+        match '/chargeback/:transaction_id' => 'users#chargeback', as: 'user_chargeback', via: [:get, :post]
         match '/full_save' => 'users#full_save', as: 'user_full_save', :via => [:get]
         match '/save_the_sale' => 'users#save_the_sale', as: 'user_save_the_sale', :via => [:get, :post]
         match '/cancel' => 'users#cancel', as: 'user_cancel', :via => [:get, :post]

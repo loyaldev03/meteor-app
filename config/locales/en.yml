@@ -24,6 +24,7 @@ en:
   ago: 'ago'
   example: 'Example'
   refund: 'Refund'
+  chargeback: 'Chargeback'
   recover: 'Recover'
   resend: 'Resend'
   search: 'Search'
@@ -57,6 +58,7 @@ en:
     cancel_user: 'Cancel user'
     change_bill_date: 'Change next bill date'
     refund_user: 'Refund'
+    chargeback_user: 'Chargeback'
     full_save: 'Full save'
     save_te_sale: 'Save the sale'
     set_wrong_address: 'Set wrong address'
@@ -153,6 +155,8 @@ en:
     club_payment_gateway_configuration_not_created: 'Payment Gateway Configuration is not configured within the club <a href="%{link}">Add Payment Gateway</a>'
     no_marketing_client_configure: 'This club does not have marketing club configured.'
     testing_communication_send: 'Communication sent successfully'
+    chargeback_amount_greater_than_available: "Amount to chargeback cannot be greater than transaction's available amount"
+    cannot_chargeback_transaction: "Transaction cannot be chargebacked."
   activerecord:
     errors:
       models:
@@ -224,6 +228,7 @@ en:
         gw_trans: 'Gw trans'
         cc_related: 'CC Last 4 Digits'
         not_found: 'No transactions were found.'
+        adjudication_date: 'Adjudication date'
       agent:  
         login: "Username or email"
         password: "Password"
