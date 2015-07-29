@@ -285,6 +285,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_not_nil user.bill_date          
           assert_not_nil user.next_retry_bill_date          
           assert_equal 1, user.operations.find_all_by_operation_type(Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries).count
+          assert_equal 0, user.recycled_times
         else
           nbd = nbd + @sd_strategy.days.days
           assert_equal nbd.to_date, user.next_retry_bill_date.to_date

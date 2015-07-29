@@ -276,6 +276,7 @@ class User < ActiveRecord::Base
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
       self.current_join_date = Time.zone.now
     end
+    self.recycled_times = 0
     self.save(:validate => false)
     assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
   end
