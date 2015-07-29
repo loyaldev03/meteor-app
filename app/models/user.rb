@@ -481,6 +481,10 @@ class User < ActiveRecord::Base
     answer = change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_user)
     if answer[:code] != Settings.error_codes.success
       Auditory.report_issue("DowngradeUser::Error", answer[:message], { :user => self.inspect, :answer => answer })
+    else
+      self.bill_date = current_membership.join_date + terms_of_membership.provisional_days.days
+      self.next_retry_bill_date = current_membership.join_date + terms_of_membership.provisional_days.days
+      self.save(validate: false)  
     end
     answer
   end
