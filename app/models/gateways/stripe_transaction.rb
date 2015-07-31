@@ -11,12 +11,12 @@ class StripeTransaction < Transaction
     if user.stripe_id
       answer = gateway.store(am_credit_card, { customer: user.stripe_id, :set_default => true}) 
       raise answer.params['code'] if answer.params['code']
-      answer.params["id"]
+      answer.params["fingerprint"]
     else
       answer = gateway.store(am_credit_card, { email: user.email, :set_default => true})
       raise answer.params['code'] if answer.params['code']
       user.stripe_id = answer.params["id"]
-      answer.params["sources"]["data"].first["id"]
+      answer.params["sources"]["data"].first["fingerprint"]
     end
   end
 
