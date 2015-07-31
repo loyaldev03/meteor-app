@@ -76,7 +76,7 @@ class CreditCard < ActiveRecord::Base
   end
 
   def can_be_activated?
-    not self.active and not self.user.lapsed? and not self.blacklisted and is_same_gateway_as_current_tom?
+    not self.active and not self.user.lapsed? and not self.blacklisted and is_same_gateway_as_current_tom? and gateway != 'stripe'
   end
 
   def is_same_gateway_as_current_tom?
@@ -113,8 +113,8 @@ class CreditCard < ActiveRecord::Base
     am = CreditCard.am_card(number, expire_month, expire_year, puser.first_name || user.first_name, puser.last_name || user.last_name)
     if am.valid?
       self.cc_type = am.brand
-      begin              
-        self.token = Transaction.store!(am, pgc)
+      begin
+        self.token = Transaction.store!(am, pgc, puser||user)
       rescue Exception => e
         unless ["117"].include? e.to_s  
           Auditory.report_issue("CreditCard:GetToken", e, { credit_card: self.inspect, user: puser.inspect || self.user.inspect })

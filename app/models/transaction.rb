@@ -153,12 +153,16 @@ class Transaction < ActiveRecord::Base
     gateway == "trust_commerce"
   end
 
+  def stripe?
+    gateway == "stripe"
+  end
+
   def one_time_type?
     operation_type == Settings.operation_types.no_recurrent_billing
   end
 
   # answer credit card token
-  def self.store!(am_credit_card, pgc)
+  def self.store!(am_credit_card, pgc, user=nil)
     if pgc.mes?
       MerchantESolutionsTransaction.store!(am_credit_card, pgc)
     elsif pgc.litle?
@@ -169,6 +173,8 @@ class Transaction < ActiveRecord::Base
       FirstDataTransaction.store!(am_credit_card, pgc)
     elsif pgc.trust_commerce?
       TrustCommerceTransaction.store!(am_credit_card, pgc)
+    elsif pgc.stripe?
+      StripeTransaction.store!(am_credit_card, pgc, user)
     else
       raise "No payment gateway configuration set for gateway \"#{pgc.gateway}\""
     end
@@ -186,6 +192,8 @@ class Transaction < ActiveRecord::Base
       FirstDataTransaction.new
     when 'trust_commerce'
       TrustCommerceTransaction.new
+    when 'stripe'
+      StripeTransaction.new
     else
       raise "No payment gateway configuration set for gateway \"#{gateway}\""
     end

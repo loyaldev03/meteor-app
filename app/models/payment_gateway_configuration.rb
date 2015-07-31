@@ -35,6 +35,10 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
     self.gateway == "first_data"
   end
 
+  def stripe?
+    self.gateway == "stripe"
+  end
+
   def only_one_is_allowed
     if club and self.club.payment_gateway_configurations.count > 0 
       errors.add :base, :error => "There is already one payment gateway configuration active on that club #{club_id}"
