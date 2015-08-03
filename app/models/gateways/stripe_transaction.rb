@@ -35,6 +35,7 @@ class StripeTransaction < Transaction
       self.response = answer
       self.success = answer.success?
       if answer.params
+        self.response_code = answer.params['status'] == 'succeeded' ? answer.params['status'] : answer.params['error']['code']
         self.response_transaction_id = answer.params['id']
       end
       self.response_result = answer.message
