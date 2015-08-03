@@ -35,10 +35,12 @@
   <strong><%= model_class.human_attribute_name(:gateway) %>:</strong><br>
   <%= @payment_gateway_configuration.gateway %>
 </p>
-<p>
-  <strong><%= model_class.human_attribute_name(:aus_login) %>:</strong><br>
-  <%= @payment_gateway_configuration.aus_login %>
-</p>
+<% unless @payment_gateway_configuration.stripe? %>
+  <p>
+    <strong><%= model_class.human_attribute_name(:aus_login) %>:</strong><br>
+    <%= @payment_gateway_configuration.aus_login %>
+  </p>
+<% end %>
 
 <% if @current_club.members_count.to_i == 0 and @current_club.users.count == 0 %>
   <%= link_to t("button.replace_payment_gateway"), new_payment_gateway_configuration_path, :class => "btn", id: "new_payment_gateway" %>
