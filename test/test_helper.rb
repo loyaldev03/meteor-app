@@ -124,6 +124,19 @@ class ActiveSupport::TestCase
      ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:process).returns(answer)
   end
 
+  def active_merchant_stubs_stripe(code = nil, message = "This transaction has been approved with stub", success = true)
+    answer_store = ActiveMerchant::Billing::Response.new(success, message, {"object"=>"customer", "created"=>1438698687, "id"=>"cus_6jZb5Ha7COWQeu", "livemode"=>false, "description"=>nil, "email"=>"user1@test.no", "delinquent"=>false, "metadata"=>{}, "subscriptions"=>{"object"=>"list", "total_count"=>0, "has_more"=>false, "url"=>"/v1/customers/cus_6jZb5Ha7COWQeu/subscriptions", "data"=>[]}, "discount"=>nil, "account_balance"=>0, "currency"=>nil, "sources"=>{"object"=>"list", "total_count"=>1, "has_more"=>false, "url"=>"/v1/customers/cus_6jZb5Ha7COWQeu/sources", "data"=>[{"id"=>"card_16W6RvHrcw1MEee7uPRq2cqR", "object"=>"card", "last4"=>"4242", "brand"=>"Visa", "funding"=>"credit", "exp_month"=>10, "exp_year"=>2017, "fingerprint"=>"oR2du9mINXNGpmF4", "country"=>"US", "name"=>"Lauriane Bednar", "address_line1"=>nil, "address_line2"=>nil, "address_city"=>nil, "address_state"=>nil, "address_zip"=>nil, "address_country"=>nil, "cvc_check"=>nil, "address_line1_check"=>nil, "address_zip_check"=>nil, "tokenization_method"=>nil, "dynamic_last4"=>nil, "metadata"=>{}, "customer"=>"cus_6jZb5Ha7COWQeu"}]}, "default_source"=>"card_16W6RvHrcw1MEee7uPRq2cqR"})
+    answer = if code 
+      ActiveMerchant::Billing::Response.new(success, message, {"id"=>"ch_16W6VMHrcw1MEee7FAOihpRK", "status"=>code})
+    else 
+      ActiveMerchant::Billing::Response.new(success, message, {"id"=>"ch_16W6VMHrcw1MEee7FAOihpRK", "object"=>"charge", "created"=>1438698900, "livemode"=>false, "paid"=>true, "status"=>"succeeded", "amount"=>10000, "currency"=>"usd", "refunded"=>false, "source"=>{"id"=>"card_16W6VJHrcw1MEee7rLFnC0Io", "object"=>"card", "last4"=>"4242", "brand"=>"Visa", "funding"=>"credit", "exp_month"=>10, "exp_year"=>2017, "fingerprint"=>"oR2du9mINXNGpmF4", "country"=>"US", "name"=>"Lauriane Bednar", "address_line1"=>nil, "address_line2"=>nil, "address_city"=>nil, "address_state"=>nil, "address_zip"=>nil, "address_country"=>nil, "cvc_check"=>nil, "address_line1_check"=>nil, "address_zip_check"=>nil, "tokenization_method"=>nil, "dynamic_last4"=>nil, "metadata"=>{}, "customer"=>"cus_6jZb5Ha7COWQeu"}, "captured"=>true, "balance_transaction"=>"txn_16W6VMHrcw1MEee7Eecakr8z", "failure_message"=>nil, "failure_code"=>nil, "amount_refunded"=>0, "customer"=>"cus_6jZb5Ha7COWQeu", "invoice"=>nil, "description"=>nil, "dispute"=>nil, "metadata"=>{}, "statement_descriptor"=>nil, "fraud_details"=>{}, "receipt_email"=>nil, "receipt_number"=>nil, "shipping"=>nil, "destination"=>nil, "application_fee"=>nil, "refunds"=>{"object"=>"list", "total_count"=>0, "has_more"=>false, "url"=>"/v1/charges/ch_16W6VMHrcw1MEee7FAOihpRK/refunds", "data"=>[]}})
+    end
+
+    ActiveMerchant::Billing::StripeGateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::StripeGateway.any_instance.stubs(:refund).returns(answer)
+    ActiveMerchant::Billing::StripeGateway.any_instance.stubs(:store).returns(answer_store)
+  end
+
   def create_active_user(tom, user_type = :active_user, enrollment_type = :enrollment_info, user_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
     if use_default_active_merchant_stub
       active_merchant_stubs 

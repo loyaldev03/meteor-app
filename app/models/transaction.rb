@@ -10,7 +10,7 @@ class Transaction < ActiveRecord::Base
 
   serialize :response, JSON
 
-  attr_accessor :refund_response_transaction_id
+  attr_accessor :refund_response_transaction_id, :stripe_customer_id
 
   scope :refunds, lambda { where('transaction_type IN (?, ?)', 'credit', 'refund') }
 
@@ -64,6 +64,7 @@ class Transaction < ActiveRecord::Base
 
   def prepare(user, credit_card, amount, payment_gateway_configuration, terms_of_membership_id = nil, membership = nil, operation_type_to_set = nil)
     self.user = user
+    self.stripe_customer_id = user.stripe_id
     self.credit_card = credit_card
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration

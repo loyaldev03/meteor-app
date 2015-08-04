@@ -45,6 +45,6 @@ class StripeTransaction < Transaction
 
     def load_gateway
       @gateway = ActiveMerchant::Billing::StripeGateway.new login: login
-      @options[:customer] = user.stripe_id
+      @options[:customer] = stripe_customer_id
     end
 end
