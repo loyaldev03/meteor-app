@@ -178,6 +178,7 @@ en:
       authorize_net: 'Authorize Net'
       first_data: 'First Data'
       trust_commerce: 'Trust Commerce'
+      stripe: 'Stripe'
     user: 'User'
     term_of_membership: 'Term of membership'
     email_template: 'Email template'
@@ -551,9 +552,9 @@ en:
         merchant_key: 'Merchant Key'
         merchant_key_help: 'Key used to authenticate with the gateway configured. For Merchant e Solutions and Litle is the merchant ID provided by them.'
         login: 'Login'
-        login_help: 'Login used to authenticate with the gateway. For Merchant e Solutions and Litle it is the Profile ID provided by them. For First Data is the exact Gateway ID. For Authorize Net is the API login.'
+        login_help: 'Login used to authenticate with the gateway. For Merchant e Solutions and Litle it is the Profile ID provided by them. For First Data is the exact Gateway ID. For Authorize Net is the API login. For Stripe it is the Api Key that you can obtain from Stripe Account section'
         password: 'Password'
-        password_help: "Password used to authenticate with the gateway. For Merchant e Solutions it is known as the Profile Key. For Litle it is the password provided by them. For First Data is the terminal password. For Authorize Net is the Transaction Key."
+        password_help: "Password used to authenticate with the gateway. For Merchant e Solutions it is known as the Profile Key. For Litle it is the password provided by them. For First Data is the terminal password. For Authorize Net is the Transaction Key. For Stripe just complete with any set of character since it is not used."
         password_update_help: "Password used to authenticate with the gateway. For Merchant e Solutions it is known as the Profile Key. For Litle it is the password provided by them. For First Data is the terminal password. For Authorize Net is the Transaction Key. Leaving this field empty will not change current password."
         descriptor_name: 'Descriptor Name'
         descriptor_name_help: 'Text that will appear on the credit card statement.'

@@ -414,26 +414,32 @@ function new_payment_gateway_configuration_functions(){
     $('#div_report_group').hide('fast');
     $('#div_descriptor_name').hide('fast');
     $('#div_descriptor_phone').hide('fast');
-  };  
-  if($('#payment_gateway_configuration_gateway').val() != 'litle'){
     $('#div_merchant_key').hide('fast');
-  };
+  };  
+  if($('#payment_gateway_configuration_gateway').val() == 'stripe'){
+    $('#div_aus_login').hide('fast');
+    $('#div_aus_password').hide('fast');
+  }
   
   $('#payment_gateway_configuration_gateway').change(function(){
     if($(this).val()!='litle'){
       $('#div_report_group').hide('fast');
       $('#div_descriptor_name').hide('fast');
       $('#div_descriptor_phone').hide('fast');
+      $('#div_merchant_key').hide('fast');
     }else{
       $('#div_report_group').show('fast');
       $('#div_descriptor_name').show('fast');
       $('#div_descriptor_phone').show('fast');
-    }
-    if($('#payment_gateway_configuration_gateway').val() != 'litle'){
-      $('#div_merchant_key').hide('fast');
-    }else{
       $('#div_merchant_key').show('fast');
-    };
+    }
+    if($(this).val()=='stripe'){
+      $('#div_aus_login').hide('fast');
+      $('#div_aus_password').hide('fast');
+    }else{
+      $('#div_aus_login').show('fast');
+      $('#div_aus_password').show('fast');
+    }
   });
 
   $('form').submit( function(event) { 

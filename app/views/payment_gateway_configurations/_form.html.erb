@@ -41,15 +41,17 @@
   </div>
 </div>
 
-<div class="control-group">
-  <%= f.label :password, :class => "control-label #{'required_asterisk' if @payment_gateway_configuration.new_record?}" %>
-  <div class="controls">
-    <%= f.password_field :password, :class => 'password_field' %>
-    <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.payment_gateway_configuration.password'), 
-        :content => t("activerecord.attributes.payment_gateway_configuration.#{@payment_gateway_configuration.new_record? ? 'password_help' : 'password_update_help'}")} %> 
+<% unless @payment_gateway_configuration.stripe? %>
+  <div class="control-group" id='div_password'>
+    <%= f.label :password, :class => "control-label #{'required_asterisk' if @payment_gateway_configuration.new_record?}" %>
+    <div class="controls">
+      <%= f.password_field :password, :class => 'password_field' %>
+      <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.payment_gateway_configuration.password'), 
+          :content => t("activerecord.attributes.payment_gateway_configuration.#{@payment_gateway_configuration.new_record? ? 'password_help' : 'password_update_help'}")} %> 
+    </div>
   </div>
-</div>
+<% end %>
 
 <% if @payment_gateway_configuration.new_record? or @payment_gateway_configuration.litle? %>
   <div class="control-group" id="div_descriptor_name">
@@ -75,26 +77,29 @@
   </div>
 <% end %>
   
-<div class="control-group">
-  <%= f.label :aus_login, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :aus_login, :class => 'text_field' %>
-    <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.payment_gateway_configuration.aus_login'), 
-        :content => t('activerecord.attributes.payment_gateway_configuration.aus_login_help') } %> 
+<% unless @payment_gateway_configuration.stripe? %>
+  <div class="control-group" id="div_aus_login">
+    <%= f.label :aus_login, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :aus_login, :class => 'text_field' %>
+      <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.payment_gateway_configuration.aus_login'), 
+          :content => t('activerecord.attributes.payment_gateway_configuration.aus_login_help') } %> 
+    </div>
   </div>
-</div>
+<% end %>
 
-<div class="control-group">
-  <%= f.label :aus_password, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.password_field :aus_password, :class => 'password_field' %>
-    <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.payment_gateway_configuration.aus_password'), 
-        :content => t("activerecord.attributes.payment_gateway_configuration.#{@payment_gateway_configuration.new_record? ? 'aus_password_help' : 'aus_password_update_help'}") } %> 
+<% unless @payment_gateway_configuration.stripe? %>
+  <div class="control-group" id="div_aus_password">
+    <%= f.label :aus_password, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.password_field :aus_password, :class => 'password_field' %>
+      <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.payment_gateway_configuration.aus_password'), 
+          :content => t("activerecord.attributes.payment_gateway_configuration.#{@payment_gateway_configuration.new_record? ? 'aus_password_help' : 'aus_password_update_help'}") } %> 
+    </div>
   </div>
-</div>
-
+<% end %>
 
 <div class="form-actions">
 	<%= f.submit nil, :class => 'btn btn-primary' %>

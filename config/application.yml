@@ -13,7 +13,7 @@ defaults: &defaults
   hot_rod_cancellation_emails: 'sonia@xagax.com,clawler@fullcu.be'
   others_product: "SLOOPS"
   kit_card_product: 'KIT-CARD'
-  payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce']
+  payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe']
   elasticsearch:
     url: 'localhost:9200/'
   lyris_service:
