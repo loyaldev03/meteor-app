@@ -286,6 +286,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_not_nil user.bill_date          
           assert_not_nil user.next_retry_bill_date          
           assert_equal 1, user.operations.find_all_by_operation_type(Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries).count
+          assert_equal 0, user.recycled_times
         else
           nbd = nbd + @sd_strategy.days.days
           assert_equal nbd.to_date, user.next_retry_bill_date.to_date
@@ -296,6 +297,33 @@ class TransactionTest < ActiveSupport::TestCase
         end
       end
     end
+  end
+
+  test "Downgrade due to soft decline should update NRBD and BD according to new Terms of membership provisional days." do 
+    active_merchant_stubs_store
+    active_merchant_stubs
+    @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id, provisional_days: 30)
+    @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
+    @terms_of_membership.if_cannot_bill = "downgrade_tom"
+    @terms_of_membership.save
+    
+    user = enroll_user(@terms_of_membership)
+    
+    Timecop.travel(user.next_retry_bill_date) do
+      user.bill_membership
+    end
+    user.reload
+    
+    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+
+    (@sd_strategy.max_retries + 1).times do |time| 
+      Timecop.travel(user.next_retry_bill_date) do
+        TasksHelpers.bill_all_members_up_today
+        user.reload
+      end
+    end
+    assert_equal user.bill_date.to_date, (user.current_membership.join_date + user.terms_of_membership.provisional_days.days).to_date
+    assert_equal user.next_retry_bill_date.to_date, (user.current_membership.join_date + user.terms_of_membership.provisional_days.days).to_date
   end
 
   test "Billing with SD is re-scheduled" do 

@@ -34,4 +34,11 @@ FactoryGirl.define do
     password "a"
     gateway "stripe"
   end
+
+  factory :trust_commerce_payment_gateway_configuration, class: PaymentGatewayConfiguration do
+    login  "3901042"
+    password "unacNev8"
+    gateway "trust_commerce"
+    report_group ""
+  end
 end
