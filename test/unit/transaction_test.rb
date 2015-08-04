@@ -464,7 +464,7 @@ class TransactionTest < ActiveSupport::TestCase
       active_user.reload
       assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
       assert active_user.provisional?
-      assert_equal active_user.recycled_times, 4, "recycled_times remain the same"
+      assert_equal active_user.recycled_times, 0
       assert_equal active_user.terms_of_membership.id, @terms_of_membership_for_downgrade.id
       trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
       assert_equal trans.operation_type, Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries
