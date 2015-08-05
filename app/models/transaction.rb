@@ -17,7 +17,8 @@ class Transaction < ActiveRecord::Base
   ONE_TIME_BILLINGS = ["one-time", "donation"]
   STORE_ERROR_NOT_REPORTABLE = {
     'mes' => %w{117},
-    'trust_commerce' => %w{decline call carderror}
+    'trust_commerce' => %w{decline call carderror},
+    'stripe' => %w{card_declined incorrect_number}
   }
 
   def full_label
