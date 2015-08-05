@@ -116,7 +116,7 @@ class CreditCard < ActiveRecord::Base
       begin
         self.token = Transaction.store!(am, pgc, puser||user)
       rescue Exception => e
-        unless ["117"].include? e.to_s  
+        unless Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway].include? e.to_s
           Auditory.report_issue("CreditCard:GetToken", e, { credit_card: self.inspect, user: puser.inspect || self.user.inspect })
         end
         logger.error e.inspect
