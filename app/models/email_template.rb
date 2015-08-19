@@ -14,6 +14,7 @@ class EmailTemplate < ActiveRecord::Base
     :pillar,                  # Emails sent after join date and active/prov status. they use days_after_join_date attribute
     :hard_decline,            # Emails sent when hard decline happens
     :soft_decline,            # Emails sent when soft decline happens
+    :membership_bill,         # Emails sent when successfully billing user's memberships
     :membership_renewal       # Emails sent when successfully billing user's memberships. We only send this communication if the user is already in active status when billing.
   ]
 
@@ -64,6 +65,8 @@ class EmailTemplate < ActiveRecord::Base
       "Emails sent when hard decline happens"
     when :soft_decline
       "Emails sent when soft decline happens"
+    when :memebrship_bill
+      "Emails sent when successfully billing user's memberships."
     when :membership_renewal
       "Emails sent when successfully billing user's memberships. This communication is only send when the user is in active status."
     end

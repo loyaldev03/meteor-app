@@ -70,7 +70,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     next_month = Time.zone.now.to_date + user.terms_of_membership.installment_period.days
     #first billing, it should not upgrade 
     Timecop.travel(user.next_retry_bill_date) do
-      assert_difference("Operation.count", 3) do
+      assert_difference("Operation.count", 4) do
         TasksHelpers.bill_all_members_up_today
       end      
       user.reload
@@ -78,7 +78,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     end
     #Second billing, it should not upgrade 
     Timecop.travel(user.next_retry_bill_date) do
-      assert_difference("Operation.count", 4) do
+      assert_difference("Operation.count", 5) do
         TasksHelpers.bill_all_members_up_today
       end
       user.reload
@@ -86,7 +86,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     end
     #Third billing, it should upgrade 
     Timecop.travel(user.next_retry_bill_date) do
-      assert_difference("Operation.count", 5) do
+      assert_difference("Operation.count", 6) do
         TasksHelpers.bill_all_members_up_today
       end
       user.reload

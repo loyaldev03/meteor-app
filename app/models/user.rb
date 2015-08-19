@@ -1415,6 +1415,8 @@ class User < ActiveRecord::Base
       unless set_as_active
         Auditory.report_issue("Billing::set_as_active", "we cant set as active this user.", { :user => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
+
+      Communication.deliver!(:membership_bill, self)
       if first_time 
         assign_first_club_cash 
       else
