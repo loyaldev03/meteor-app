@@ -119,6 +119,7 @@ defaults: &defaults
     birthday_email: 308
     no_email_error: 309
     membership_renewal_email: 310
+    membership_bill_email: 311
     #fulfillments
     from_not_processed_to_in_process: 400
     from_not_processed_to_on_hold: 401
