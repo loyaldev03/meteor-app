@@ -15,6 +15,11 @@ class Transaction < ActiveRecord::Base
   scope :refunds, lambda { where('transaction_type IN (?, ?)', 'credit', 'refund') }
 
   ONE_TIME_BILLINGS = ["one-time", "donation"]
+  STORE_ERROR_NOT_REPORTABLE = {
+    'mes' => %w{117},
+    'trust_commerce' => %w{decline call carderror},
+    'stripe' => %w{card_declined incorrect_number}
+  }
 
   def full_label
     transaction_type ?
