@@ -28,6 +28,7 @@ defaults: &defaults
   mes_aus_service:
     folder: <%= "#{Rails.root}/account_updater_files/mes/" %>
     url: https://www.merchante-solutions.com/
+  # Link to update operation for Reporting: https://docs.google.com/spreadsheets/d/1I76qwZfe3SdtQCg4gRNOPc09M5i9xWdz0w-a1NGEC-A/edit#gid=0
   operation_types: 
     #billing
     enrollment_billing: 100     
