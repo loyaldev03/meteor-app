@@ -50,7 +50,6 @@ class TrustCommerceTransaction < Transaction
       elsif self.token.nil? or self.token.size < 4
         save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
       else
-        debugger
         load_gateway
         credit_response=@gateway.credit(amount_to_send, refund_response_transaction_id, @options)
         save_response(credit_response)
