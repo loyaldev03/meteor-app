@@ -450,10 +450,10 @@ class User < ActiveRecord::Base
           response = { :message => "Nothing to change. Member is already enrolled on that TOM.", :code => Settings.error_codes.nothing_to_change_tom }
         else
           previous_membership = current_membership
-          response = if prorated           
+          response = if prorated
             prorated_enroll(new_tom, agent, credit_card_params, self.current_membership.enrollment_info)
           else 
-            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true)
+            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true, true)
           end
           if response[:code] == Settings.error_codes.success
             Auditory.audit(agent, new_tom, operation_message, self, operation_type)
@@ -677,7 +677,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, user_params = nil, skip_credit_card_validation = false, skip_product_validation = false)
+  def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, user_params = nil, skip_credit_card_validation = false, skip_product_validation = false, skip_user_validation = false)
     allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
     club = tom.club
 
@@ -701,7 +701,7 @@ class User < ActiveRecord::Base
     end
 
     # CLEAN ME: => This validation is done at self.enroll
-    unless self.valid? 
+    if not skip_user_validation and not self.valid? 
       return { :message => I18n.t('error_messages.user_data_invalid'), :code => Settings.error_codes.user_data_invalid, 
                :errors => self.errors_merged(credit_card) }
     end
@@ -738,7 +738,7 @@ class User < ActiveRecord::Base
       end
       self.enrollment_infos << enrollment_info
       self.memberships << membership
-      self.save!
+      self.save! validate: !skip_user_validation
 
       enrollment_info.membership = membership
       enrollment_info.save
@@ -785,7 +785,7 @@ class User < ActiveRecord::Base
     trans
   end
 
-  def prorated_enroll(tom, agent = nil, credit_card_params = nil, user_params = nil)
+  def prorated_enroll(tom, agent = nil, credit_card_params = nil, user_params = nil, skip_user_validation = false)
     return { :message => I18n.t('error_messages.prorated_enroll_failure', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.error_on_prorated_enroll } if tom.needs_enrollment_approval
     if credit_card_params and not credit_card_params.empty?
       response = self.update_credit_card_from_drupal(credit_card_params, agent) 
@@ -797,7 +797,7 @@ class User < ActiveRecord::Base
       credit_card = self.active_credit_card
     end
 
-    unless self.valid?
+    if not skip_user_validation and not self.valid?
       return { :message => I18n.t('error_messages.user_data_invalid'), :code => Settings.error_codes.user_data_invalid, :errors => self.errors.to_hash }
     end
 

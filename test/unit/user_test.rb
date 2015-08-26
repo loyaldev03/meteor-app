@@ -430,6 +430,20 @@ class UserTest < ActiveSupport::TestCase
     assert_equal saved_user.current_membership.parent_membership_id, old_membership_id
   end
 
+  test "Downgrade user should be done even when the user has invalid information" do
+    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    terms_of_membership.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => terms_of_membership_with_gateway_to_downgrade.id)
+    saved_user = create_active_user(terms_of_membership, :provisional_user_with_cc)
+    old_membership_id = saved_user.current_membership_id
+    saved_user.zip = 123
+    saved_user.save validate: false
+    saved_user.downgrade_user
+    saved_user.reload
+
+    assert_equal saved_user.current_membership.terms_of_membership_id, terms_of_membership_with_gateway_to_downgrade.id
+  end
+
   test "Upgrade user should fill parent_membership_id" do
     terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
