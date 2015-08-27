@@ -79,16 +79,17 @@ CREATE TABLE `clubs` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `club_cash_enable` tinyint(1) DEFAULT '1',
   `marketing_tool_attributes` text COLLATE utf8_unicode_ci,
-  `users_count` int(11) DEFAULT NULL,
+  `members_count` int(11) DEFAULT NULL,
   `member_banner_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `member_landing_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `non_member_banner_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `non_member_landing_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `marketing_tool_client` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `payment_gateway_errors_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_partner_id` (`partner_id`),
   KEY `index_drupal_domain_id` (`drupal_domain_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `communications` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -106,7 +107,7 @@ CREATE TABLE `communications` (
   `user_id` bigint(20) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_communications_on_member_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `credit_cards` (
   `active` tinyint(1) DEFAULT '1',
@@ -128,7 +129,7 @@ CREATE TABLE `credit_cards` (
   PRIMARY KEY (`id`),
   KEY `index2` (`user_id`),
   KEY `index_credit_card_on_token` (`token`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `decline_strategies` (
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -144,7 +145,7 @@ CREATE TABLE `decline_strategies` (
   `updated_at` datetime NOT NULL,
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2447 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2462 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `delayed_jobs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -160,7 +161,7 @@ CREATE TABLE `delayed_jobs` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=199 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `domains` (
   `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -184,12 +185,12 @@ CREATE TABLE `email_templates` (
   `external_attributes` text COLLATE utf8_unicode_ci,
   `template_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `terms_of_membership_id` bigint(20) DEFAULT NULL,
-  `days_after_join_date` int(11) DEFAULT '0',
+  `days` int(11) DEFAULT '0',
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `index_terms_of_membership_id` (`terms_of_membership_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=365 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `enrollment_infos` (
   `enrollment_amount` decimal(11,2) DEFAULT '0.00',
@@ -225,7 +226,7 @@ CREATE TABLE `enrollment_infos` (
   KEY `index_membership_id` (`membership_id`),
   KEY `index_terms_of_membership_id` (`terms_of_membership_id`),
   KEY `index_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `enumerations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -238,7 +239,7 @@ CREATE TABLE `enumerations` (
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=174 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `fulfillment_files` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -253,7 +254,7 @@ CREATE TABLE `fulfillment_files` (
   `updated_at` datetime NOT NULL,
   `fulfillment_count` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `fulfillment_files_fulfillments` (
   `fulfillment_id` bigint(20) DEFAULT NULL,
@@ -277,7 +278,7 @@ CREATE TABLE `fulfillments` (
   `club_id` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index2` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `memberships` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -294,7 +295,7 @@ CREATE TABLE `memberships` (
   KEY `index2` (`user_id`),
   KEY `index_terms_of_membership_id` (`terms_of_membership_id`),
   KEY `index_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `operations` (
   `description` text COLLATE utf8_unicode_ci,
@@ -311,7 +312,7 @@ CREATE TABLE `operations` (
   PRIMARY KEY (`id`),
   KEY `index2` (`user_id`),
   KEY `index_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `partners` (
   `prefix` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -344,7 +345,7 @@ CREATE TABLE `payment_gateway_configurations` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   KEY `index_club_id` (`club_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `products` (
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -362,7 +363,7 @@ CREATE TABLE `products` (
   `is_visible` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku_per_club_uniqueness` (`sku`,`club_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `prospects` (
   `first_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -447,7 +448,7 @@ CREATE TABLE `terms_of_memberships` (
   `skip_first_club_cash` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `index_club_id` (`club_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `transactions` (
   `terms_of_membership_id` bigint(20) DEFAULT NULL,
@@ -462,7 +463,6 @@ CREATE TABLE `transactions` (
   `gateway` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `expire_month` int(11) DEFAULT NULL,
   `expire_year` int(11) DEFAULT NULL,
-  `recurrent` tinyint(1) DEFAULT '0',
   `transaction_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `invoice_number` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `first_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -498,7 +498,7 @@ CREATE TABLE `transactions` (
   KEY `index_transactions_on_operation_type` (`operation_type`),
   KEY `index_response_transaction_id` (`response_transaction_id`),
   KEY `index_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE `user_additional_data` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -554,7 +554,7 @@ CREATE TABLE `users` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `blacklisted` tinyint(1) DEFAULT '0',
-  `user_group_type_id` int(11) DEFAULT NULL,
+  `member_group_type_id` int(11) DEFAULT NULL,
   `reactivation_times` int(11) DEFAULT '0',
   `member_since_date` datetime DEFAULT NULL,
   `wrong_address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -586,6 +586,7 @@ CREATE TABLE `users` (
   `need_sync_to_marketing_client` tinyint(1) DEFAULT '0',
   `current_join_date` datetime DEFAULT NULL,
   `marketing_client_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `stripe_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`club_id`,`email`),
   UNIQUE KEY `api_id_UNIQUE` (`club_id`,`api_id`),
@@ -593,7 +594,7 @@ CREATE TABLE `users` (
   KEY `index_members_on_email` (`email`),
   KEY `index_current_membership_id` (`current_membership_id`),
   KEY `index_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO schema_migrations (version) VALUES ('20120406144426');
 
@@ -718,3 +719,11 @@ INSERT INTO schema_migrations (version) VALUES ('20140707150034');
 INSERT INTO schema_migrations (version) VALUES ('20140826142133');
 
 INSERT INTO schema_migrations (version) VALUES ('20140905174148');
+
+INSERT INTO schema_migrations (version) VALUES ('20150107171639');
+
+INSERT INTO schema_migrations (version) VALUES ('20150205150047');
+
+INSERT INTO schema_migrations (version) VALUES ('20150731152024');
+
+INSERT INTO schema_migrations (version) VALUES ('20150827164603');

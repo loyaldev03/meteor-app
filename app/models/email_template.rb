@@ -1,5 +1,5 @@
 class EmailTemplate < ActiveRecord::Base
-  attr_accessible :name, :client, :template_type, :days_after_join_date, :external_attributes
+  attr_accessible :name, :client, :template_type, :days, :external_attributes
   
   belongs_to :terms_of_membership
   serialize :external_attributes
@@ -11,7 +11,7 @@ class EmailTemplate < ActiveRecord::Base
     :manual_payment_prebill,  # Sent 14 days before next billing day.
     :refund,                  # Sent when CS does a refund.
     :birthday,                # Sent if birthday is on enrollment_info
-    :pillar,                  # Emails sent after join date and active/prov status. they use days_after_join_date attribute
+    :pillar,                  # Emails sent after join date and active/prov status. they use days attribute
     :hard_decline,            # Emails sent when hard decline happens
     :soft_decline,            # Emails sent when soft decline happens
     :membership_bill,         # Emails sent when successfully billing user's memberships
@@ -28,7 +28,7 @@ class EmailTemplate < ActiveRecord::Base
   
   validates :external_attributes, length: { maximum: 2048 }
   
-  validates :days_after_join_date, numericality: { only_integer: true, :greater_than_or_equal_to => 1, :less_than_or_equal_to => 1000 }, :if => :is_pillar?
+  validates :days, numericality: { only_integer: true, :greater_than_or_equal_to => 1, :less_than_or_equal_to => 1000 }, :if => lambda {:is_pillar? or :is_prebill?}
 
   def self.external_attributes_related_to_client(client)
     case client
@@ -100,6 +100,10 @@ class EmailTemplate < ActiveRecord::Base
 
   def is_pillar?
     self.template_type.to_s == 'pillar'
+  end
+
+  def is_prebill?
+    self.template_type.to_s == 'prebill'
   end
 
   def fetch_external_attributes_data

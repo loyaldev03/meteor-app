@@ -56,7 +56,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_content?('was successfully created')
   end
 
-  test 'Do not allow enter days_after_join_date = 0 - Logged by General Admin' do
+  test 'Do not allow enter days = 0 - Logged by General Admin' do
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
@@ -67,7 +67,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     click_link_or_button 'New Communication'
     begin
       fill_in_form(
-        {email_template_name: 'Comm Name', email_template_days_after_join_date: '0'}, 
+        {email_template_name: 'Comm Name', email_template_days: '0'}, 
         {"email_template[template_type]" => "Pillar"}, [])
       click_link_or_button 'Create Email template'
     rescue Exception => e
@@ -308,7 +308,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     assert page.has_no_content? communication.name
   end
 
-  test 'Do not allow enter days_after_join_date = 0 - Logged by Admin_by_club' do
+  test 'Do not allow enter days = 0 - Logged by Admin_by_club' do
     @club_admin = FactoryGirl.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
@@ -326,7 +326,7 @@ class EmailTemplatesTest < ActionController::IntegrationTest
     click_link_or_button 'New Communication'
     begin
       fill_in_form(
-        {email_template_name: 'Comm Name', email_template_days_after_join_date: '0'}, 
+        {email_template_name: 'Comm Name', email_template_days: '0'}, 
         {"email_template[template_type]" => "Pillar"}, [])
       click_link_or_button 'Create Email template'
     rescue Exception => e

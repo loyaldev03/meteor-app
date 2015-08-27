@@ -173,8 +173,8 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     @club_admin.roles = nil
     @club_admin.save
     sign_in(@club_admin)
-    et = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'pillar', days_after_join_date: 1, external_attributes: nil)
-    et2 = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom2.id, :template_type => 'pillar', days_after_join_date: 1, external_attributes: nil)
+    et = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'pillar', days: 1, external_attributes: nil)
+    et2 = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom2.id, :template_type => 'pillar', days: 1, external_attributes: nil)
     get :show, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => et.id
     assert_response :unauthorized
     get :show, :partner_prefix => @partner.prefix, :club_prefix => @club2.name, :terms_of_membership_id => @tom2.id, :id => et2.id

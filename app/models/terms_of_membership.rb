@@ -81,6 +81,7 @@ class TermsOfMembership < ActiveRecord::Base
             et.name = "Test #{type}"
             et.client = :action_mailer
             et.template_type = type
+            et.days = 7 if et.is_prebill?
             et.terms_of_membership_id = self.id
             et.save
           end

@@ -1288,13 +1288,13 @@ function tom_create_wizard() {
 }
 
 // // Communications
-function switch_days_after_join_date() {
-  if ($("#email_template_template_type").val() == 'pillar') {
-    $("#control_group_days_after_join_date").show(100);
+function switch_days() {
+  if ($("#email_template_template_type").val() == 'pillar' || $("#email_template_template_type").val() == 'prebill') {
+    $("#control_group_days").show(100);
   }
   else {
-   $("#control_group_days_after_join_date").hide(100); 
-   $("#email_template_days_after_join_date").val(1);
+   $("#control_group_days").hide(100); 
+   $("#email_template_days").val(1);
   }
 }
 
@@ -1302,7 +1302,7 @@ function email_templates_functions() {
   $('.help').popover({offset: 10});
 
   $("#email_template_template_type").change(function() {
-    switch_days_after_join_date();
+    switch_days();
   });
 
   $("#et_form").submit(function(event) {

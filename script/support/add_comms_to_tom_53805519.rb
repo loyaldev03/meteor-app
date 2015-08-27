@@ -22,7 +22,7 @@ email_templates.each do |et|
     new_et.external_attributes = {:customer_key => et[2]}
     new_et.template_type = et[3]
     new_et.terms_of_membership_id = TOM_ID
-    new_et.days_after_join_date = et[1]
+    new_et.days = et[1]
   result = new_et.save
 
   logger << "Adding '#{et[0]}' - to TOM: ##{TOM_ID} - [#{result}]\n"

@@ -44,7 +44,7 @@ module TasksHelpers
 
   def self.send_pillar_emails 
     base = Membership.joins(:user).joins(:terms_of_membership).joins(:terms_of_membership => :club).joins(:terms_of_membership => :email_templates).
-           where("email_templates.template_type = 'pillar' AND email_templates.client = clubs.marketing_tool_client AND date(join_date) = DATE_SUB(?, INTERVAL email_templates.days_after_join_date DAY) AND users.status IN ('active','provisional') and billing_enable = true", Time.zone.now.to_date).
+           where("email_templates.template_type = 'pillar' AND email_templates.client = clubs.marketing_tool_client AND date(join_date) = DATE_SUB(?, INTERVAL email_templates.days DAY) AND users.status IN ('active','provisional') and billing_enable = true", Time.zone.now.to_date).
            select("memberships.user_id, email_templates.id")
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
     base.to_enum.with_index.each do |res,index|
@@ -233,14 +233,14 @@ module TasksHelpers
   end
 
   def self.send_prebill
-    base = User.joins(:current_membership => :terms_of_membership).where(
-                          ["((date(next_retry_bill_date) = ? AND recycled_times = 0) 
-                           OR (date(next_retry_bill_date) = ? AND manual_payment = true)) 
-                           AND terms_of_memberships.installment_amount != 0.0 
-                           AND terms_of_memberships.is_payment_expected = true", 
-                           (Time.zone.now + 7.days).to_date, (Time.zone.now + 14.days).to_date 
-                          ])
-
+    base = User.joins(current_membership: [terms_of_membership: :email_templates]).where(
+    ["((date(next_retry_bill_date) = DATE_ADD(?, INTERVAL email_templates.days DAY) AND recycled_times = 0) 
+     OR (date(next_retry_bill_date) = ? AND manual_payment = true))
+     AND terms_of_memberships.installment_amount != 0.0 
+     AND terms_of_memberships.is_payment_expected = true", 
+     (Time.zone.now).to_date, (Time.zone.now + 14.days).to_date 
+    ])
+    
     base.find_in_batches do |group|
       group.each_with_index do |user,index| 
         tz = Time.zone.now
