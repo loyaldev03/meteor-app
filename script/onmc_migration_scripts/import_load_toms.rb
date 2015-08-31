@@ -103,9 +103,9 @@ pgc.save!
     et.template_type = :pillar
     et.external_attributes = { :trigger_id => 6418, :mlid => 47386, :site_id => site_id }
     if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
-      et.days_after_join_date = 35
+      et.days = 35
     else
-      et.days_after_join_date = 3
+      et.days = 3
     end
     et.save!
 
@@ -115,9 +115,9 @@ pgc.save!
     et.template_type = :pillar
     et.external_attributes = { :trigger_id => 6419, :mlid => 47386, :site_id => site_id }
     if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
-      et.days_after_join_date = 40
+      et.days = 40
     else
-      et.days_after_join_date = 7
+      et.days = 7
     end
     et.save!
 
@@ -126,9 +126,9 @@ pgc.save!
     et.template_type = :pillar
     et.external_attributes = { :trigger_id => 6420, :mlid => 47386, :site_id => site_id }
     if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
-      et.days_after_join_date = 45
+      et.days = 45
     else
-      et.days_after_join_date = 11
+      et.days = 11
     end
     et.save!
 
@@ -137,9 +137,9 @@ pgc.save!
     et.template_type = :pillar
     et.external_attributes = { :trigger_id => 6421, :mlid => 47386, :site_id => site_id }
     if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
-      et.days_after_join_date = 50
+      et.days = 50
     else
-      et.days_after_join_date = 15
+      et.days = 15
     end
     et.save!
 
@@ -148,9 +148,9 @@ pgc.save!
     et.template_type = :pillar
     et.external_attributes = { :trigger_id => 6417, :mlid => 47386, :site_id => site_id }
     if [6,7,8,9,10,11,12,13,14,15,16,17,18].include?(internal_tom_id.to_i)
-      et.days_after_join_date = 7
+      et.days = 7
     else
-      et.days_after_join_date = 19
+      et.days = 19
     end
     et.save!
 

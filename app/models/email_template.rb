@@ -7,7 +7,7 @@ class EmailTemplate < ActiveRecord::Base
   TEMPLATE_TYPES = [
     :cancellation,            # Sent when member changes its status to lapsed
     :rejection,               # Sent when member is in applied status, and it is rejected by one of our agents
-    :prebill,                 # Sent 7 days before we bill member
+    :prebill,                 # Sent a pre-specified number of days before billing the member.
     :manual_payment_prebill,  # Sent 14 days before next billing day.
     :refund,                  # Sent when CS does a refund.
     :birthday,                # Sent if birthday is on enrollment_info
@@ -52,7 +52,7 @@ class EmailTemplate < ActiveRecord::Base
     when :rejection
       "Sent when member is in applied status, and it is rejected by one of our agents."
     when :prebill
-      "Sent 7 days before billing the member."
+      "Sent a pre-specified number of days before billing the member."
     when :manual_payment_prebill
       "Sent 14 days before next billing day."
     when :refund

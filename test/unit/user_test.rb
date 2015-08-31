@@ -430,6 +430,20 @@ class UserTest < ActiveSupport::TestCase
     assert_equal saved_user.current_membership.parent_membership_id, old_membership_id
   end
 
+  test "Downgrade user should be done even when the user has invalid information" do
+    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    terms_of_membership.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => terms_of_membership_with_gateway_to_downgrade.id)
+    saved_user = create_active_user(terms_of_membership, :provisional_user_with_cc)
+    old_membership_id = saved_user.current_membership_id
+    saved_user.zip = 123
+    saved_user.save validate: false
+    saved_user.downgrade_user
+    saved_user.reload
+
+    assert_equal saved_user.current_membership.terms_of_membership_id, terms_of_membership_with_gateway_to_downgrade.id
+  end
+
   test "Upgrade user should fill parent_membership_id" do
     terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
@@ -494,30 +508,35 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  # ##################################################
-  # # => PREBILL
-  # ##################################################
+  ##################################################
+  # => PREBILL
+  ##################################################
 
-  test "Send Prebill email (7 days before NBD)" do
+  test "Send Prebill email (7 or 30 days before NBD)" do
     user = create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc)    
-
-    excecute_like_server(@club.time_zone) do 
-      Timecop.travel(user.next_retry_bill_date-7.days) do
-        assert_difference("Operation.count") do
-         assert_difference("Communication.count") do
-            TasksHelpers.send_prebill
+    count = 0
+    [7, 30].each do |days|
+      email_template = @terms_of_membership_with_gateway.email_templates.where(template_type: 'prebill').first
+      email_template.update_attribute :days, days
+      email_template.save
+      excecute_like_server(@club.time_zone) do 
+        Timecop.travel(user.next_retry_bill_date - days.days) do
+          assert_difference("Operation.count") do
+           assert_difference("Communication.count") do
+              TasksHelpers.send_prebill
+            end
           end
         end
-      end
-    end 
-    user.reload
-    assert_equal user.communications.last.template_name, "Test prebill"
+      end 
+      user.reload
+      assert_equal user.communications.where(template_name: "Test prebill").count, count+=1
+    end
   end
 
   test "Do not Send Prebill email (7 days before NBD) when user's installment_amount is 0" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_amount => 0)
     user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
-    
+
     excecute_like_server(@club.time_zone) do 
       Timecop.travel(user.next_retry_bill_date-7.days) do
         assert_difference("Operation.count",0) do
@@ -551,7 +570,7 @@ class UserTest < ActiveSupport::TestCase
     #configure exact target
     user.club.update_attributes :marketing_tool_client => "exact_target", :marketing_tool_attributes => { "et_business_unit" => "12345", "et_prospect_list" => "1235", "et_members_list" => "12345", "et_username" => "12345", "et_password" => "12345" }
     excecute_like_server(@club.time_zone) do 
-      Timecop.travel(user.join_date + email_template_for_exact_target.days_after_join_date.days) do
+      Timecop.travel(user.join_date + email_template_for_exact_target.days.days) do
         assert_difference("Communication.count",1) do
           TasksHelpers.send_pillar_emails 
         end
@@ -565,7 +584,7 @@ class UserTest < ActiveSupport::TestCase
     #configure mandrill
     user.club.update_attributes :marketing_tool_client => "mailchimp_mandrill", :marketing_tool_attributes => { "mailchimp_api_key" => "12345", "mailchimp_list_id" => "1235", "mandrill_api_key" => "12345" }
     excecute_like_server(@club.time_zone) do 
-      Timecop.travel(user.join_date + email_template_for_mailchimp_mandrill.days_after_join_date.days) do
+      Timecop.travel(user.join_date + email_template_for_mailchimp_mandrill.days.days) do
         assert_difference("Communication.count",1) do
           TasksHelpers.send_pillar_emails
         end

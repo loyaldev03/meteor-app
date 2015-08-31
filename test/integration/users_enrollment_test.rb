@@ -35,31 +35,31 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     et = EmailTemplate.new :name => "Day 7 - Trial", :client => :action_mailer, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27648, :mlid => 226095, :site_id => 123 }
-    et.days_after_join_date = 7
+    et.days = 7
     et.save!
 
     et = EmailTemplate.new :name => "Day 35 - News", :client => :action_mailer, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27647, :mlid => 226095, :site_id => 123 }
-    et.days_after_join_date = 35
+    et.days = 35
     et.save!
 
     et = EmailTemplate.new :name => "Day 40 - Deals", :client => :action_mailer, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27651, :mlid => 226095, :site_id => 123 }
-    et.days_after_join_date = 40
+    et.days = 40
     et.save!
     
     et = EmailTemplate.new :name => "Day 45 - Local Chapters", :client => :action_mailer, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27650, :mlid => 226095, :site_id => 123 }
-    et.days_after_join_date = 45
+    et.days = 45
     et.save!
     
     et = EmailTemplate.new :name => "Day 50 - VIP", :client => :action_mailer, :template_type => 'pillar'
     et.terms_of_membership_id = @terms_of_membership_with_gateway.id
     et.external_attributes = { :trigger_id => 27649, :mlid => 226095, :site_id => 123 }
-    et.days_after_join_date = 50
+    et.days = 50
     et.save!
   end
 

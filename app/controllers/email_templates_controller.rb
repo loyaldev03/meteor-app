@@ -152,10 +152,10 @@ class EmailTemplatesController < ApplicationController
     def prepare_et_data_to_save(post_data)
       @et.name = post_data[:email_template][:name]
       @et.template_type = post_data[:email_template][:template_type]
-      if @et.template_type == 'pillar'
-        @et.days_after_join_date = post_data[:email_template][:days_after_join_date].to_i
+      if ['pillar','prebill'].include? @et.template_type
+        @et.days = post_data[:email_template][:days].to_i
       else
-        @et.days_after_join_date = nil
+        @et.days = nil
       end
       attributes = Hash.new()
       ea_keys = EmailTemplate.external_attributes_related_to_client(@et.client)
