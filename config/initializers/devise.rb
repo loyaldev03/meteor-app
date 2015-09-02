@@ -8,6 +8,7 @@ Devise.setup do |config|
 
   # Configure the class responsible to send e-mails.
   # config.mailer = "Devise::Mailer"
+  config.mailer = "Devise::Async::Proxy"
 
   # Automatically apply schema changes in tableless databases
   config.apply_schema = false
