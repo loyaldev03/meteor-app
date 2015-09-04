@@ -1,7 +1,7 @@
 class Product < ActiveRecord::Base
   belongs_to :club
 
-  validates :sku, :presence => true, :format => /^[0-9a-zA-Z\-_]+$/, :length => { :minimum => 2 }
+  validates :sku, :presence => true, :format => /^[0-9a-zA-Z\-_]+$/, :length => { :minimum => 2 }, :uniqueness => { scope: [:club_id, :deleted_at] }
   validates :cost_center, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 30 }, :allow_nil => true
 
   validates :package, :format => /^[a-zA-Z\-_]+$/, :length => { :maximum => 19 }
@@ -11,6 +11,9 @@ class Product < ActiveRecord::Base
   scope :not_kit_card, where('sku != "KIT-CARD" ')
 
   before_save :apply_upcase_to_sku
+  before_update :check_fulfillments_related
+
+  acts_as_paranoid
 
   def self.datatable_columns
     ['id', 'name', 'recurrent', 'stock', 'weight' ]
@@ -18,6 +21,13 @@ class Product < ActiveRecord::Base
 
   def apply_upcase_to_sku
     self.sku = self.sku.upcase
+  end
+
+  def check_fulfillments_related
+    if sku_changed? and Fulfillment.where(club_id: self.club_id, product_sku: self.sku).any?
+      errors.add :sku, :error => "Cannot change this sku. There are fulfillments related to it."
+      false
+    end
   end
 
   def update_product_data_by_params(params)
