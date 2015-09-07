@@ -13,10 +13,8 @@
       <% if current_agent %>
         <div class="container nav-collapse">
           <% if @current_club.nil? %>
-            <% cache do %>
-              <% if not @current_partner.nil? and @current_agent.can?(:read,Partner) %>
-                <%= link_to @current_partner.name, admin_partner_dashboard_path %>
-              <% end %>
+            <% if not @current_partner.nil? and @current_agent.can?(:read,Partner) %>
+              <%= link_to @current_partner.name, admin_partner_dashboard_path %>
             <% end %>
           <% else %>
             <% if @current_club.logo? %>
@@ -37,56 +35,53 @@
           </ul>
 
           <% unless @current_club.nil? %>
-            <% cache do %>
-              <ul class="nav pull-right">
-                <li class="divider-vertical"></li>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @current_club.name %><b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <% if @current_agent.can? :read, User, @current_club.id %>
-                      <li><%= link_to t('activerecord.model.users'), users_path(@current_club.partner.prefix, @current_club.name) %></li>
-                    <% end %>
-                    <% if @current_agent.can? :read, Product, @current_club.id %>
-                      <li><%= link_to t('activerecord.model.products'), products_path(@current_club.partner.prefix, @current_club.name) %></li>
-                    <% end %>
-                    <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
-                      <li><%= link_to t('activerecord.model.fulfillments'), fulfillments_index_path(@current_club.partner.prefix, @current_club.name) %></li>
-                    <% end %>
-                    <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
-                      <li><%= link_to t('activerecord.model.fulfillment_files'), list_fulfillment_files_path(@current_club.partner.prefix, @current_club.name) %></li>
-                    <% end %>
-                    <% if @current_agent.can? :read, DispositionType, @current_club.id %>
-                      <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>
-                    <% end %>                  
-                    <% if @current_agent.can? :read, TermsOfMembership, @current_club.id %>
-                      <li><%= link_to t('activerecord.model.subscription_plans'), terms_of_memberships_path(@current_club.partner.prefix, @current_club.name) %></li>
-                    <% end %>
-                    <% if @current_agent.can? :edit, Club, @current_club.id %>
-                      <li><%= link_to t('button.club_show'), club_path(@current_club.partner.prefix, @current_club.id) %></li>
-                    <% end %>
-                  </ul>
-                </li>
-              </ul>
-            <% end %>
+            <ul class="nav pull-right">
+              <li class="divider-vertical"></li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @current_club.name %><b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <% if @current_agent.can? :read, User, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.users'), users_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, Product, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.products'), products_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.fulfillments'), fulfillments_index_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.fulfillment_files'), list_fulfillment_files_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, DispositionType, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>                  
+                  <% if @current_agent.can? :read, TermsOfMembership, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.subscription_plans'), terms_of_memberships_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :edit, Club, @current_club.id %>
+                    <li><%= link_to t('button.club_show'), club_path(@current_club.partner.prefix, @current_club.id) %></li>
+                  <% end %>
+                </ul>
+              </li>
+            </ul>
           <% end %>
 
           <ul class="nav">
             <% if @current_agent.is_admin? %>
-              <% cache do %>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <%= I18n.t("menu.admin_menu") %> <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li><%= link_to t('menu.agents'), admin_agents_path if @current_agent.is_admin? %></li>
-                    <li><%= link_to t('menu.partners'), admin_partners_path if @current_agent.can? :read, Agent %></li>
-                    <li><%= link_to "DelayedJobs", admin_delayed_jobs_path if @current_agent.can? :read, DelayedJob %></li>
-                  </ul>
-                </li>
-              <% end %>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <%= I18n.t("menu.admin_menu") %> <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><%= link_to t('menu.agents'), admin_agents_path if @current_agent.is_admin? %></li>
+                <li><%= link_to t('menu.partners'), admin_partners_path if @current_agent.can? :read, Agent %></li>
+                <li><%= link_to "DelayedJobs", admin_delayed_jobs_path if @current_agent.can? :read, DelayedJob %></li>
+              </ul>
+            </li>
             <% end %>
             <li><%= link_to "My Clubs", root_path, {id: "my_clubs"} %></li>
             <li>
               <% selected = @current_club ? [ users_path(@current_partner.prefix, @current_club.name) ] : nil %>
               <%= select_tag "change_partner",
+                options_for_select((@current_agent.has_global_role? ? Club.includes(:partner).all : Club.includes(:partner).find(@current_agent.club_roles_without_api)).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", users_path(u.partner.prefix, u.name) ]}, 
                   selected ), 
                 :prompt => 'Select Partner-Club',
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')", :style => "margin-top: 5px;" %>
