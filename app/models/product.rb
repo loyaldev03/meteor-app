@@ -33,8 +33,7 @@ class Product < ActiveRecord::Base
   end
 
   def decrease_stock(quantity=1)
-    self.stock = self.stock-quantity
-    self.save 
+    ActiveRecord::Base.connection.execute("UPDATE products SET stock = stock - #{quantity} WHERE id = #{self.id}")
   end
 
   def replenish_stock(quantity=1)
