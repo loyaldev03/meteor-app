@@ -575,6 +575,7 @@ class User < ActiveRecord::Base
         else
           answer = { :message => trans.response_result, :code => Settings.error_codes.no_reccurent_billing_error }
           operation_type = trans.one_time_type? ? Settings.operation_types.no_recurrent_billing_with_error : Settings.operation_types.no_recurrent_billing_donation_with_error
+          trans.update_attribute :operation_type, operation_type
           Auditory.audit(nil, trans, answer[:message], self, operation_type)
         end
       else
