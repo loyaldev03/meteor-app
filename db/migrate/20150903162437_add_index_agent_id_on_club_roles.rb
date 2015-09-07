@@ -4,6 +4,6 @@ class AddIndexAgentIdOnClubRoles < ActiveRecord::Migration
   end
 
   def down
-    execute "DROP INDEX agent_id ON enrollment_infos"
+    execute "DROP INDEX agent_id ON club_roles"
   end
 end
