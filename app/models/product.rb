@@ -33,7 +33,7 @@ class Product < ActiveRecord::Base
   end
 
   def decrease_stock(quantity=1)
-    ActiveRecord::Base.connection.execute("UPDATE products SET stock = stock - #{quantity} WHERE id = #{self.id}")
+    Product.where(id: self.id).update_all "stock = stock - #{quantity}"
   end
 
   def replenish_stock(quantity=1)

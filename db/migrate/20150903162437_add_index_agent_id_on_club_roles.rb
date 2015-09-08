@@ -1,9 +1,9 @@
 class AddIndexAgentIdOnClubRoles < ActiveRecord::Migration
   def up
-    execute "ALTER TABLE `club_roles` ADD INDEX `agent_id` (`agent_id` ASC);"
+    add_index :club_roles, :agent_id
   end
 
   def down
-    execute "DROP INDEX agent_id ON club_roles"
+    remove_index :club_roles, :agent_id
   end
 end
