@@ -5,7 +5,7 @@
   </head>
   <body>
 
-    <% cache("header_#{current_agent.try(:id)}_#{@current_club.try(:id) || 0}") do %> 
+    <% cache(["header", current_agent, @current_club]) do %> 
       <%= render :partial => "shared/header" %>
     <% end %>
 
