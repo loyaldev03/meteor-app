@@ -1,6 +1,6 @@
 class ClubRole < ActiveRecord::Base
   belongs_to :club
-  belongs_to :agent
+  belongs_to :agent, touch: true
 
   validates :club_id, 
     presence: true

@@ -162,7 +162,7 @@ class Admin::AgentsController < ApplicationController
     my_authorize!(:update_club_role, Agent, club_role.club_id)
     if @current_agent.can_agent_by_role_delete_club_role(club_role)
       answer = { code: Settings.error_codes.wrong_data, message: "Role could not be deleted. It is the last one." }
-    elsif club_role.delete
+    elsif club_role.destroy
       answer = { code: "000", message: "Club Role deleted successfully" }
     else
       answer = { code: Settings.error_codes.wrong_data, message: "Role could not be deleted." }
