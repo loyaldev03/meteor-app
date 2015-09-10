@@ -21,7 +21,7 @@ module SacMailchimp
     rescue Gibbon::MailChimpError => e
         Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
       update_member e
-      raise e.inspect
+      raise e
     end
 
     def unsubscribe!
@@ -31,7 +31,7 @@ module SacMailchimp
       rescue Gibbon::MailChimpError => e
         Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
         update_member e
-        raise e.inspect
+        raise e
     	end
     end
 
@@ -45,8 +45,8 @@ module SacMailchimp
       	client.lists.subscribe( subscriber({:email => self.user.email}, options) )
       rescue Gibbon::MailChimpError => e
         Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
-        update_member e
-        raise e.inspect
+        update_member e 
+        raise e
       end
     end
 
@@ -61,7 +61,7 @@ module SacMailchimp
       rescue Gibbon::MailChimpError => e
         Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
         update_member e
-        raise e.inspect
+        raise e
     	end
     end
 
@@ -87,7 +87,11 @@ module SacMailchimp
           marketing_client_id: res["leid"]
         }
       end
-      data = data.merge(need_sync_to_marketing_client: false)
+      data = if res.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include? res.code
+        data.merge({marketing_client_id: nil, need_sync_to_marketing_client: true}) 
+      else
+        data.merge(need_sync_to_marketing_client: false)
+      end
       ::User.where(id: self.user.id).limit(1).update_all(data)
       self.user.reload rescue self.user
     end
