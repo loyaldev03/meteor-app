@@ -45,7 +45,6 @@ class Ability
     cannot :manage, UserAdditionalData
     cannot :manage, EmailTemplate
     cannot :chargeback, Transaction
-    cannot :quick_search, User
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
 
@@ -88,7 +87,6 @@ class Ability
       can :api_sale, User
       can :list, Communication
       can :manage, EmailTemplate
-      can :quick_search, User
     when 'representative' then
       can :manage, User
       cannot :api_profile, User

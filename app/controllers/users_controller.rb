@@ -57,7 +57,6 @@ class UsersController < ApplicationController
   def quick_search
     unless params[:user_id].blank?
       user = User.find_by_id(params[:user_id])
-      my_authorize! :quick_search, User
       if user 
         redirect_to show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
       else
