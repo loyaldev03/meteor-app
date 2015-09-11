@@ -43,8 +43,7 @@ class Product < ActiveRecord::Base
   end
 
   def decrease_stock(quantity=1)
-    self.stock = self.stock-quantity
-    self.save 
+    Product.where(id: self.id).update_all "stock = stock - #{quantity}"
   end
 
   def replenish_stock(quantity=1)

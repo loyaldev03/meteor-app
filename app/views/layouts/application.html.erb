@@ -5,7 +5,9 @@
   </head>
   <body>
 
-    <%= render :partial => "shared/header" %>
+    <% cache(["header", current_agent, @current_club]) do %> 
+      <%= render :partial => "shared/header" %>
+    <% end %>
 
     <div class="container">
       <div class="content">
