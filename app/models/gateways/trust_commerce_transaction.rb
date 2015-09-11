@@ -18,7 +18,7 @@ class TrustCommerceTransaction < Transaction
   end
 
   def fill_transaction_type_for_credit(sale_transaction)
-    self.transaction_type = "credit"
+    self.transaction_type = "refund"
     self.refund_response_transaction_id = sale_transaction.response_transaction_id
   end
   
@@ -43,25 +43,6 @@ class TrustCommerceTransaction < Transaction
   end
 
   private
-    #HACK: credit method is used by other GWs. they don't use the response id for credits. THat's why I'm overwriting this method only for TSYS
-    def credit
-      if payment_gateway_configuration.nil?
-        save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
-      elsif self.token.nil? or self.token.size < 4
-        save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
-      else
-        load_gateway
-        credit_response=@gateway.credit(amount_to_send, refund_response_transaction_id, @options)
-        save_response(credit_response)
-      end
-    rescue Timeout::Error
-      save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
-    rescue Exception => e
-      response = save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Credit", e, {:user => self.user.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
-      response
-    end
-
     def credit_card_token
       token
     end
