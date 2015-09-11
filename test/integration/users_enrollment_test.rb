@@ -1171,6 +1171,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
 
   test "Do not enroll an user with wrong payment gateway" do
     setup_user(false)
+    Transaction::STORE_ERROR_NOT_REPORTABLE = {"fail" => "000"}
     @club.payment_gateway_configurations.first.update_attribute(:gateway,'fail')
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
