@@ -107,7 +107,7 @@ class Transaction < ActiveRecord::Base
   end
 
   def can_be_chargeback?
-    [ 'sale' ].include?(transaction_type) and trust_commerce? and amount_available_to_refund > 0.0 and self.success? and Transaction.where("transaction_type = ? AND response like ?", "chargeback", "%#{self.id}%").empty?
+    [ 'sale' ].include?(transaction_type) and trust_commerce? and amount_available_to_refund > 0.0 and self.success? and Transaction.where("user_id = ? AND transaction_type = ? AND response like ?", self.user_id, "chargeback", "%#{self.id}%").empty?
   end
 
   def can_be_refunded?    
