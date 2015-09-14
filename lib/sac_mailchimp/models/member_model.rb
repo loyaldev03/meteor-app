@@ -87,10 +87,10 @@ module SacMailchimp
           marketing_client_id: res["leid"]
         }
       end
-      data = if res.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include? res.code
-        data.merge({marketing_client_id: nil, need_sync_to_marketing_client: true}) 
+      if res.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include? res.code.to_s
+        data.merge!({marketing_client_id: nil, need_sync_to_marketing_client: true}) 
       else
-        data.merge(need_sync_to_marketing_client: false)
+        data.merge!(need_sync_to_marketing_client: false)
       end
       ::User.where(id: self.user.id).limit(1).update_all(data)
       self.user.reload rescue self.user

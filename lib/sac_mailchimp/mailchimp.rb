@@ -1,7 +1,7 @@
 module SacMailchimp
   mattr_accessor :logger 
 
-  NO_REPORTABLE_ERRORS = [214]
+  NO_REPORTABLE_ERRORS = ["214"]
 
   def self.enable_integration!
     logger.info " ** Initializing SAC Mailchimp integration"
