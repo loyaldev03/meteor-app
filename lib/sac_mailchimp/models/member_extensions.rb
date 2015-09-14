@@ -36,7 +36,7 @@ module SacMailchimp
         end
         logger.info "SacMailchimp::sync took #{time_elapsed}ms"
       rescue Exception => e
-        Auditory.report_issue("Member:mailchimp_sync", e, { :member => self.inspect }) unless e.to_s.include?("Timeout")
+        Auditory.report_issue("Member:mailchimp_sync", e, { :member => self.inspect }) if not e.to_s.include?("Timeout") and not SacMailchimp::NO_REPORTABLE_ERRORS.include? e.code.to_s
         raise e
       end
 

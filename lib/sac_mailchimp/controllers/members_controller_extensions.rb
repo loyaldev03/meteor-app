@@ -20,7 +20,7 @@ module SacMailchimp
       rescue Exception => e
         message = e.to_s.include?("Gibbon::MailChimpError") ? t('error_messages.airbrake_error_message_for_mkt_sync', :response => e) : t('error_messages.airbrake_error_message')
         flash[:error] = message
-        Auditory.report_issue("Member:mailchimp_sync", e, { :member => @current_user.inspect })
+        Auditory.report_issue("Member:mailchimp_sync", e, { :member => @current_user.inspect }) unless SacMailchimp::NO_REPORTABLE_ERRORS.include? e.code.to_s
         redirect_to show_user_path
       end
     end

@@ -21,7 +21,7 @@ module SacMailchimp
     rescue Gibbon::MailChimpError => e
         Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
       update_member e
-      raise e.inspect
+      raise e
     end
 
     def unsubscribe!
@@ -31,7 +31,7 @@ module SacMailchimp
       rescue Gibbon::MailChimpError => e
         Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
         update_member e
-        raise e.inspect
+        raise e
     	end
     end
 
@@ -44,9 +44,9 @@ module SacMailchimp
       begin
       	client.lists.subscribe( subscriber({:email => self.user.email}, options) )
       rescue Gibbon::MailChimpError => e
-        Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
-        update_member e
-        raise e.inspect
+        Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout") and not SacMailchimp::NO_REPORTABLE_ERRORS.include? e.code.to_s
+        update_member e 
+        raise e
       end
     end
 
@@ -59,9 +59,9 @@ module SacMailchimp
         mailchimp_identification = self.user.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.user.marketing_client_id
       	client.lists.subscribe( subscriber({:leid => mailchimp_identification}, options) )
       rescue Gibbon::MailChimpError => e
-        Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
+        Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout") and not SacMailchimp::NO_REPORTABLE_ERRORS.include? e.code.to_s
         update_member e
-        raise e.inspect
+        raise e
     	end
     end
 
@@ -87,7 +87,12 @@ module SacMailchimp
           marketing_client_id: res["leid"]
         }
       end
-      data = data.merge(need_sync_to_marketing_client: false)
+      additional_data = if res.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include? res.code.to_s
+        {marketing_client_id: nil, need_sync_to_marketing_client: true}
+      else
+        {need_sync_to_marketing_client: false}
+      end
+      data.merge! additional_data
       ::User.where(id: self.user.id).limit(1).update_all(data)
       self.user.reload rescue self.user
     end
