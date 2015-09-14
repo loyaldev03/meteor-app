@@ -378,6 +378,7 @@ en:
         token: 'Token'
         active: 'active'
         type_unknown: 'unknown'
+        last_successful_bill_date: 'Last successful bill date'
       operation:
         operation_date: 'Operation date'
         description: 'Description'
