@@ -155,7 +155,7 @@
                   <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.model.subscription_plans'), :content => ( render :partial => "terms_of_memberships/resumed_information", :locals => {:tom => @terms_of_memberships.first})} %>
                 <% end %>
               </th>  
-            <% elsif can? :manual_billing, User and not @user.manual_payment %>
+            <% elsif can? :manual_billing, User %>
               <th>
               <%= f.label :manual_payment, t('activerecord.attributes.user.manual_payment'), :class => 'help-inline' %>
               </th>
