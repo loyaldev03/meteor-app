@@ -571,10 +571,23 @@ class UsersBillTest < ActionController::IntegrationTest
     bill_user(@saved_user, true, nil, true)
   end
 
+  ################################################
+  ## TRUST COMMERCE
+  ################################################
+
+  test "Refund from CS a transaction from TRUST COMMERCE" do
+    active_merchant_stubs_trust_commerce
+    setup_user(nil, true, :simple_club_with_trust_commerce_gateway)
+    bill_user(@saved_user, false)
+    transaction = @saved_user.transactions.last
+    within(".nav-tabs"){ click_on("Transactions") }
+    within("#transactions_table_wrapper"){ assert page.has_selector?('#refund') }
+    make_a_refund(transaction, transaction.amount)
+  end 
+
   test "Chargeback user via web" do
     active_merchant_stubs_trust_commerce
     setup_user(nil, true, :simple_club_with_trust_commerce_gateway)
-    sleep(5)
     bill_user(@saved_user, false)
     transaction = @saved_user.transactions.last
     assert_difference('Transaction.count',0) do
@@ -586,4 +599,5 @@ class UsersBillTest < ActionController::IntegrationTest
     end
     make_a_chargeback(transaction, transaction.created_at.day, transaction.amount, "I have my reasons...")
   end
+
 end
