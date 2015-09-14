@@ -24,7 +24,7 @@ class Product < ActiveRecord::Base
   end
 
   def check_fulfillments_related
-    if sku_changed? and Fulfillment.find_by_club_id_and_product_sku(self.club_id, self.sku)
+    if sku_changed? and Fulfillment.where(club_id: self.club_id, product_sku: self.sku).limit(1)
       errors.add :sku, :error => "Cannot change this sku. There are fulfillments related to it."
       false
     end
