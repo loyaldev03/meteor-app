@@ -55,7 +55,10 @@ class UsersController < ApplicationController
   end
 
   def quick_search
-    unless params[:user_id].blank?
+    if params[:user_id].blank?
+      flash[:error] = "User ID not provided."
+      redirect_to root_path
+    else
       user = User.find_by_id(params[:user_id])
       if user 
         redirect_to show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
@@ -63,9 +66,6 @@ class UsersController < ApplicationController
         flash[:error] = "User not found."
         redirect_to root_path
       end
-    else
-      flash[:error] = "User ID not provided."
-      redirect_to root_path
     end
   end
 

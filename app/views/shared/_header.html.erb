@@ -91,7 +91,7 @@
           <% if current_agent.can?(:read, User) or current_agent.club_roles.map{|club_role| club_role.agent.can?(:read, User, club_role.club_id)}.count(true) > 1 %>
             <ul class="nav">
               <li> 
-                <%= form_tag(users_quick_search_path, method: :post, class: "form-inline text-center") do %>
+                <%= form_tag(users_quick_search_path, method: :get, class: "form-inline text-center") do %>
                   <%= text_field_tag :user_id, nil, class: "input-medium", placeholder: 'Search user by ID', style: "margin-top:5px" %>
                   <%= submit_tag "Search", class: 'btn btn-success' %>
                 <% end %>
