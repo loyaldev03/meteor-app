@@ -11,7 +11,8 @@ class Product < ActiveRecord::Base
   scope :not_kit_card, where('sku != "KIT-CARD" ')
 
   before_save :apply_upcase_to_sku
-  before_update :check_fulfillments_related
+  before_update :validate_sku_update
+  before_destroy :any_fulfillment_related?
 
   acts_as_paranoid
 
@@ -23,9 +24,13 @@ class Product < ActiveRecord::Base
     self.sku = self.sku.upcase
   end
 
-  def check_fulfillments_related
-    if sku_changed? and Fulfillment.where(club_id: self.club_id, product_sku: self.sku).limit(1)
-      errors.add :sku, :error => "Cannot change this sku. There are fulfillments related to it."
+  def any_fulfillment_related?
+    Fulfillment.where(club_id: self.club_id, product_sku: self.sku).limit(1).empty?
+  end
+
+  def validate_sku_update
+    if sku_changed? and Fulfillment.where(club_id: self.club_id, product_sku: self.sku_was).limit(1).any?
+      errors.add :sku, "Cannot change this sku. There are fulfillments related to it."
       false
     end
   end
