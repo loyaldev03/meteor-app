@@ -88,7 +88,7 @@
                 <%=  %>
             </li>
           </ul>
-          <% if current_agent.can?(:read, User) or current_agent.club_roles.map{|club_role| club_role.agent.can?(:read, User, club_role.club_id)}.count(true) > 1 %>
+          <% if current_agent.has_role_or_has_club_role_where_can?(:read, User) %>
             <ul class="nav">
               <li> 
                 <%= form_tag(users_quick_search_path, method: :get, class: "form-inline text-center") do %>
