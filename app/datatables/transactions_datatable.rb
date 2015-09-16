@@ -61,7 +61,7 @@ private
   def modal(transaction)
     "<div id='myModal" + transaction.id.to_s + "' class='well modal hide' style='border: none;'>
       <div class='modal-header'>
-        <a href='#' class='close'>&times;</a>
+        <a href='#' class='close' data-dismiss='modal'>&times;</a>
         <h3> "+I18n.t('activerecord.attributes.transaction.description')+"</h3>
       </div>
       <div class='modal-body'>" + transaction_description(transaction) + " </div>

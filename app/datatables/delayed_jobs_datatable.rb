@@ -51,7 +51,7 @@ private
   def modal(modal_id, text, param)
     "<div id='"+modal_id+"' class='well modal hide' style='border: none;'>
       <div class='modal-header'>
-        <a href='#' class='close'>&times;</a>
+        <a href='#' class='close' data-dismiss='modal'>&times;</a>
         <h3> "+I18n.t("activerecord.attributes.delayed_job.#{param}")+"</h3>
       </div>
       <div class='modal-body'>"+text+" </div>
