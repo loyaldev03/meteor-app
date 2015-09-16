@@ -132,6 +132,7 @@ SacPlatform::Application.routes.draw do
     resources :domains
     match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard'
   end
+  match '/users/quick_search' => 'users#quick_search', as: 'users_quick_search', :via => [:get]
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

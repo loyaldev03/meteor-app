@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
   private
 
     def my_authorize!(action, what, club_id = nil)
-      raise CanCan::AccessDenied unless @current_agent.can?(action, what, club_id)
+      raise CanCan::AccessDenied unless current_agent.can?(action, what, club_id)
     end
 
     #TODO: Merge this method with 'my_authorize'
