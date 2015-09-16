@@ -49,11 +49,6 @@ class User < ActiveRecord::Base
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_user_at_remote_domain
     api_user.destroy! unless api_user.nil? or api_id.nil? or not self.club.billing_enable
-  rescue Exception => e
-    # refs #21133
-    # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
-    # Because maybe we have already bill this member.
-    Auditory.report_issue("User:account_cancel:sync", e, { :user => self.inspect })
   end
   handle_asynchronously :cancel_user_at_remote_domain, :queue => :drupal_queue, priority: 15
 
@@ -142,9 +137,6 @@ class User < ActiveRecord::Base
   # Async indexing
   def asyn_elasticsearch_index
     self.index.store self
-  rescue Exception => e
-    Auditory.report_issue("User:IndexingToElasticSearch", e, { :user => self.inspect })
-    raise e
   end
   handle_asynchronously :asyn_elasticsearch_index, queue: :elasticsearch_indexing, priority: 10
 
@@ -996,10 +988,6 @@ class User < ActiveRecord::Base
         self.update_attribute :club_cash_expire_date, join_date + 1.year
       end
     end
-  rescue Exception => e
-    # refs #21133
-    # If there is connectivity problems or data errors with drupal. Do not stop billing!! 
-    Auditory.report_issue("User:assign_club_cash:sync", e, { :user => self.inspect, :amount => amount, :message => message })
   end
   handle_asynchronously :assign_club_cash, :queue => :club_cash_queue, :run_at => Proc.new { 5.minutes.from_now }, priority: 5
 
