@@ -821,7 +821,20 @@ class TransactionTest < ActiveSupport::TestCase
         end
       end
     end
-    assert_equal user_manual_billing.next_retry_bill_date, nbd_manual
+    assert_difference("Transaction.count",1)do
+      user_manual_billing.manual_billing(100, 'cash_billing')
+    end
+
+    assert_equal user_manual_billing.next_retry_bill_date.to_date, nbd_manual.to_date
+    user_manual_billing.update_attribute :manual_payment, false
+    nbd_manual = user_manual_billing.bill_date
+    Timecop.travel(Time.zone.now + user_manual_billing.terms_of_membership.provisional_days.days) do
+      assert_difference("Operation.count",5)do
+        assert_difference("Transaction.count",1)do
+          TasksHelpers.bill_all_members_up_today
+        end
+      end
+    end
   end
 
   test "save response on transaction when an exception take place when processing it" do

@@ -88,7 +88,16 @@
                 <%=  %>
             </li>
           </ul>
-
+          <% if current_agent.has_role_or_has_club_role_where_can?(:read, User) %>
+            <ul class="nav">
+              <li> 
+                <%= form_tag(users_quick_search_path, method: :get, class: "form-inline text-center") do %>
+                  <%= text_field_tag :user_id, nil, class: "input-medium", placeholder: 'Search user by ID', style: "margin-top:5px" %>
+                  <%= submit_tag "Search", class: 'btn btn-success' %>
+                <% end %>
+              </li>
+            </ul>
+          <% end %>
         </div><!--/.nav-collapse -->
       <% end %>           
     </div>

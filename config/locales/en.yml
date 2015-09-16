@@ -157,6 +157,9 @@ en:
     testing_communication_send: 'Communication sent successfully'
     chargeback_amount_greater_than_available: "Amount to chargeback cannot be greater than transaction's available amount"
     cannot_chargeback_transaction: "Transaction cannot be chargebacked."
+    club_cash:
+      negative_amount: "Check amount value, please. Amount cannot be less than 0 (zero)."
+      null_amount: "Check amount value, please. Amount cannot be blank or null."
   activerecord:
     errors:
       models:

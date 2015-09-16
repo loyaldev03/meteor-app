@@ -351,10 +351,12 @@ class Api::MembersController < ApplicationController
     user = User.find(params[:id])
     my_authorize! :api_update_club_cash, User, user.club_id
     response = { :message => "This club is not allowed to fix the amount of the club cash on members.", :code => Settings.error_codes.club_cash_cant_be_fixed, :member_id => user.id }
-    if params[:amount].blank?
-      response = { :message => "Check amount value, please. Amount cannot be blank or null.", :code => Settings.error_codes.wrong_data }
-    elsif not user.club.allow_club_cash_transaction?
+    if not user.club.allow_club_cash_transaction?
       response = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
+    elsif params[:amount].blank?
+      response = { :message => I18n.t('error_messages.club_cash.null_amount'), :code => Settings.error_codes.wrong_data }
+    elsif params[:amount] < 0
+      response = { :message => I18n.t('error_messages.club_cash.negative_amount'), :code => Settings.error_codes.wrong_data}
     elsif not user.club.is_not_drupal?
       user.skip_api_sync!
       user.club_cash_amount = params[:amount]

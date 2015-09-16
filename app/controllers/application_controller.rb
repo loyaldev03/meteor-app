@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
 
   def after_sign_in_path_for(resource)
+    return session[:agent_return_to] if session[:agent_return_to]
     sign_in_url = url_for(:action => 'new', :controller => 'sessions', :only_path => false, :protocol => 'http')    
     if @current_agent and @current_agent.has_role? 'admin'
       return admin_partners_path
@@ -18,7 +19,7 @@ class ApplicationController < ActionController::Base
   private
 
     def my_authorize!(action, what, club_id = nil)
-      raise CanCan::AccessDenied unless @current_agent.can?(action, what, club_id)
+      raise CanCan::AccessDenied unless current_agent.can?(action, what, club_id)
     end
 
     #TODO: Merge this method with 'my_authorize'

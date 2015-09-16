@@ -1,12 +1,14 @@
 class UsersController < ApplicationController
   layout lambda { |c| c.request.xhr? ? false : "application" }
 
-  before_filter :validate_club_presence
-  before_filter :validate_user_presence, :except => [ :index, :new, :search_result ]
+  before_filter :validate_club_presence, :except => [ :quick_search ]
+  skip_before_filter :validate_partner_presence, :only => [ :quick_search ]
+  before_filter :validate_user_presence, :except => [ :index, :new, :search_result, :quick_search ]
   before_filter :check_permissions, :except => [ :additional_data, :transactions_content, :notes_content, 
                                                  :fulfillments_content, :communications_content, 
                                                  :operations_content, :credit_cards_content, 
-                                                 :club_cash_transactions_content, :memberships_content ]
+                                                 :club_cash_transactions_content, :memberships_content,
+                                                 :quick_search ]
   
   def index
     @countries = Carmen::Country.coded('US').subregions + Carmen::Country.coded('CA').subregions
@@ -50,6 +52,21 @@ class UsersController < ApplicationController
     Auditory.report_issue("User:search_result", "Elasticsearch Timeout Error received. Confirm that service is available.")  
   ensure
     render 'index'
+  end
+
+  def quick_search
+    if params[:user_id].blank?
+      flash[:error] = "User ID not provided."
+      redirect_to root_path
+    else
+      user = User.find_by_id(params[:user_id])
+      if user 
+        redirect_to show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
+      else
+        flash[:error] = "User not found."
+        redirect_to root_path
+      end
+    end
   end
 
   def show
