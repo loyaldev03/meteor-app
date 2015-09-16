@@ -110,6 +110,12 @@ class Api::MembersControllerTest < ActionController::TestCase
                                         :format => :json} )
   end
 
+  def generate_put_club_cash(user_id, amount, expire_date = nil)
+    data = { id: user_id, amount: amount, format: :json }
+    data.merge!({expire_date: expire_date}) if expire_date
+    put(:club_cash, data)
+  end
+
   def prepare_upgrade_downgrade_toms(yearly = true, blank_credit_card = false)
     sign_in @admin_user
     @tom_yearly = FactoryGirl.create :terms_of_membership_with_gateway_yearly, :club_id => @club.id, 
@@ -1250,6 +1256,17 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal(@user.club_cash_amount, old_amount)
     assert_equal(@user.club_cash_expire_date, old_expire_date)
+  end
+
+  test "Should not update club cash amount when provided a negative amount." do
+    sign_in @admin_user
+    @user = create_active_user(@terms_of_membership, :user_with_api)
+    old_club_cash = @user.club_cash_amount
+    generate_put_club_cash(@user.id, -1000)
+    @response.body.include? I18n.t('error_messages.club_cash.negative_amount')
+    assert_response :success
+    @user.reload
+    assert_equal old_club_cash, @user.club_cash_amount
   end
 
   test "Update Credit Card with expire this current month" do
