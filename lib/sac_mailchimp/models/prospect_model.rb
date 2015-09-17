@@ -2,7 +2,10 @@ module SacMailchimp
 	class ProspectModel < Struct.new(:prospect)
 
     def save!(club)
-      return unless self.prospect.email
+      unless self.prospect.email
+        self.update_attribute :need_sync_to_marketing_client, false
+        return
+      end
       setup_club(club)
       unless ["mailinator.com", "test.com", "noemail.com"].include? self.prospect.email.split("@")[1]
         subscriber = SacMailchimp::ProspectModel.find_by_email self.prospect.email, mailchimp_list_id

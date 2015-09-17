@@ -2,7 +2,10 @@ module SacExactTarget
   class ProspectModel < Struct.new(:prospect)
 
     def save!(club = nil)
-      return unless self.prospect.email
+      unless self.prospect.email
+        self.update_attribute :need_sync_to_marketing_client, false
+        return
+      end
       setup_club(club)
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       subscriber = SacExactTarget::ProspectModel.find_by_email self.prospect.email, club_id
