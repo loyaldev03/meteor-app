@@ -816,6 +816,11 @@ function show_user_functions(){
     $(".tab-content .active").removeClass("active");
     $(".tab-content #"+objects_to_search+"").addClass("active");
   });
+  $("#sync_to_remote").click(function(){
+    if(confirm("Are you sure?")){
+      startAjaxLoader();
+    }
+  });
 };
 
 function user_cancellation_functions(){
