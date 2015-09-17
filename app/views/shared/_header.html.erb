@@ -81,7 +81,7 @@
             <li>
               <% selected = @current_club ? [ users_path(@current_partner.prefix, @current_club.name) ] : nil %>
               <%= select_tag "change_partner",
-                options_for_select((@current_agent.has_global_role? ? Club.includes(:partner).all : Club.includes(:partner).find(@current_agent.club_roles_without_api)).collect{ |u| [ "#{u.partner.prefix} - #{u.name}", users_path(u.partner.prefix, u.name) ]}, 
+                options_for_select((@current_agent.has_global_role? ? Club.includes(:partner).all : Club.includes(:partner).find(@current_agent.club_roles_without_api)).collect{ |u| [ "#{u.partner.prefix} - #{u.name} #{'(disabled)' unless u.billing_enable}", users_path(u.partner.prefix, u.name) ]}, 
                   selected ), 
                 :prompt => 'Select Partner-Club',
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')", :style => "margin-top: 5px;" %>
