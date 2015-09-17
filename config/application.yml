@@ -369,7 +369,6 @@ test:
 
 production:
   <<: *defaults
-  email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   email_to_send_product_list: 'tbrady@stoneacreinc.com,mhebb@stoneacreinc.com'
   hot_rod_cancellation_emails: 'jbrickman@zinio.com,clawler@fullcu.be'
   fulfillment_naamma_report_emails: ''
@@ -394,7 +393,6 @@ prototype:
 
 staging:
   <<: *defaults
-  email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   xxxyyyzzz: reibel3y5estrada8
   elasticsearch:
     url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
@@ -409,5 +407,4 @@ prototype_pantheon:
 
 staging_pantheon:
   <<: *defaults
-  email_to_use_on_duplicated_email_sync_error: clawler@stoneacreinc.com
   xxxyyyzzz: reibel3y5estrada8
