@@ -66,7 +66,10 @@ class Product < ActiveRecord::Base
     status_list.each{|x| header << x}
 
     package = Axlsx::Package.new
-    Club.all.each do |club|
+    # We only take into account those clubs related to users which receive this information. 
+    # Right now would only be Nascar (id=1) and SCRF (id=15).
+    club_list = Rails.env.production? ? Club.where(id: [1,15], billing_enable: true) : Club.all 
+    club_list.each do |club|
       package.workbook.add_worksheet(:name => club.name) do |sheet|
         sheet.add_row header
         club.products.each do |product|
