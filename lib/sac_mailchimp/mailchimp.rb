@@ -4,7 +4,7 @@ module SacMailchimp
   NO_REPORTABLE_ERRORS = ["214"]
 
   def self.enable_integration!
-    logger.info " ** Initializing SAC Mailchimp integration"
+    logger.info " ** Initializing SAC Mailchimp integration at #{I18n.l(Time.zone.now, :format =>:dashed)}"
 
     require 'sac_mailchimp/models/member_extensions'
     require 'sac_mailchimp/models/member_model'
@@ -16,7 +16,7 @@ module SacMailchimp
     Prospect.send :include, SacMailchimp::ProspectExtensions
     UsersController.send :include, SacMailchimp::MembersControllerExtensions
     
-    logger.info "  * extending User and Prospect"
+    logger.info "  * extending User and Prospect at #{I18n.l(Time.zone.now, :format =>:dashed)}"
 
     nil
   end

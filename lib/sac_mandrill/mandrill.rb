@@ -2,7 +2,7 @@ module SacMandrill
   mattr_accessor :logger
 
   def self.enable_integration!
-    logger.info " ** Initializing SAC Mailchimp integration"
+    logger.info " ** Initializing SAC Mailchimp integration at #{I18n.l(Time.zone.now, :format =>:dashed)}"
 
     require 'mandrill'
     require 'sac_mandrill/models/member_extensions'
@@ -10,7 +10,7 @@ module SacMandrill
 
     User.send :include, SacMandrill::MemberExtensions
     
-    logger.info "  * extending User and Prospect"
+    logger.info "  * extending User and Prospect at #{I18n.l(Time.zone.now, :format =>:dashed)}"
 
     nil
   end
