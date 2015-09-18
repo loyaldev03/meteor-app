@@ -3,7 +3,7 @@ module SacExactTarget
 
     def save!(club = nil)
       unless self.prospect.email
-        self.update_attribute :need_sync_to_marketing_client, false
+        self.prospect.update_attribute :need_sync_to_marketing_client, false
         return
       end
       setup_club(club)
