@@ -73,7 +73,7 @@ class ApplicationController < ActionController::Base
             false
           else
             Time.zone = @current_club.time_zone
-            flash.now[:error] = "This club is currenlty disabled." unless @current_club.billing_enable
+            flash.now[:error] = "This club is currently disabled." unless @current_club.billing_enable
           end
         end
       end
