@@ -60,7 +60,7 @@ class ApplicationController < ActionController::Base
     end
 
     def validate_club_presence
-      if current_agent 
+      if current_agent
         if params[:club_prefix].nil?
           flash[:error] = "No club was selected."
           redirect_to clubs_path
@@ -73,6 +73,7 @@ class ApplicationController < ActionController::Base
             false
           else
             Time.zone = @current_club.time_zone
+            flash.now[:error] = "This club is currently disabled." unless @current_club.billing_enable
           end
         end
       end
