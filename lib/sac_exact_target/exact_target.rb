@@ -2,7 +2,7 @@ module SacExactTarget
   mattr_accessor :logger
 
   def self.enable_integration!
-    logger.info " ** Initializing SAC Exact Target integration at #{I18n.l(Time.zone.now, :format =>:dashed)}"
+    logger.info " ** Initializing SAC Exact Target integration at #{I18n.l(Time.zone.now)}"
 
     require 'sac_exact_target/models/club_extensions'
     require 'sac_exact_target/models/member_extensions'
@@ -17,7 +17,7 @@ module SacExactTarget
     Prospect.send :include, SacExactTarget::ProspectExtensions
     UsersController.send :include, SacExactTarget::MembersControllerExtensions
 
-    logger.info "  * extending User and Club at #{I18n.l(Time.zone.now, :format =>:dashed)}"
+    logger.info "  * extending User and Club at #{I18n.l(Time.zone.now)}"
 
     nil
   end

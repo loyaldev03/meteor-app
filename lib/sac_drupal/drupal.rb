@@ -2,7 +2,7 @@ module Drupal
   mattr_accessor :logger
 
   def self.enable_integration!
-    logger.info " ** Initializing SAC Drupal integration at #{I18n.l(Time.zone.now, :format =>:dashed)}"
+    logger.info " ** Initializing SAC Drupal integration at #{I18n.l(Time.zone.now)}"
 
     require 'sac_drupal/models/member'
     require 'sac_drupal/models/user_points'
@@ -11,7 +11,7 @@ module Drupal
     require 'sac_drupal/faraday_middleware/drupal_authentication'
     require 'sac_drupal/faraday_middleware/fix_non_json_body'
 
-    logger.info "  * extending Member and Club at #{I18n.l(Time.zone.now, :format =>:dashed)}"
+    logger.info "  * extending Member and Club at #{I18n.l(Time.zone.now)}"
     Club.send :include, Drupal::ClubExtensions
 
     if Faraday.respond_to? :register_middleware
