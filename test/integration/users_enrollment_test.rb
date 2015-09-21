@@ -879,8 +879,8 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     
     alert_ok_js
     click_link_or_button 'Update User'
-    @saved_user.reload
     within("#table_contact_information")do
+      @saved_user.reload
       assert page.has_content?(@saved_user.birth_date.to_s) 
     end
   end 
