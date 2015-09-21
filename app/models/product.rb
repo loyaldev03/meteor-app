@@ -60,15 +60,13 @@ class Product < ActiveRecord::Base
     allow_backorder? ? true : stock>0
   end
 
-  def self.generate_xls
+  def self.generate_xls(clubs_id = nil)
     header = ['Name', 'Sku']
     status_list = Fulfillment.state_machines[:status].states.map(&:name)
     status_list.each{|x| header << x}
 
     package = Axlsx::Package.new
-    # We only take into account those clubs related to users which receive this information. 
-    # Right now would only be Nascar (id=1) and SCRF (id=15).
-    club_list = Rails.env.production? ? Club.where(id: [1,15], billing_enable: true) : Club.all 
+    club_list = Rails.env.production? ? Club.where(id: clubs_id, billing_enable: true) : Club.all 
     club_list.each do |club|
       package.workbook.add_worksheet(:name => club.name) do |sheet|
         sheet.add_row header
@@ -84,7 +82,9 @@ class Product < ActiveRecord::Base
   end
 
   def self.send_product_list_email
-    product_xls = Product.generate_xls
+    # We only take into account those clubs related to users which receive this information. 
+    # Right now would only be Nascar (id=1) and SCRF (id=15).
+    product_xls = Product.generate_xls([1,15])
     temp = Tempfile.new("posts.xlsx") 
     
     product_xls.serialize temp.path
