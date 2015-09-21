@@ -92,7 +92,7 @@
             <ul class="nav">
               <li> 
                 <%= form_tag(users_quick_search_path, method: :get, class: "form-inline text-center") do %>
-                  <%= text_field_tag :user_id, nil, class: "input-small", placeholder: 'Search user by ID', style: "margin-top:5px" %>
+                  <%= text_field_tag :user_id, nil, class: "input-small", placeholder: 'User ID', style: "margin-top:5px" %>
                   <%= submit_tag "Search", class: 'btn btn-success' %>
                 <% end %>
               </li>
