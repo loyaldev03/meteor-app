@@ -248,8 +248,10 @@ module ActionController
       end
       select_country_and_state(user.country) if country
 
-      click_on 'Search'
-
+      within("#index_search_form") do 
+        click_on 'Search'
+      end
+      
       if validate 
         within("#users") do
           assert page.has_content?(user.status)

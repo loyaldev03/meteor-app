@@ -862,8 +862,8 @@ function user_change_next_bill_date(){
 };
 
 function refund_user_functions(){
-  $('form').submit( function(event) {
-    $('input:submit').attr("disabled", true);
+  $('#refund_form').submit( function(event) {
+    $('#refund_form input:submit').attr("disabled", true);
     if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
       
     }else{
@@ -875,8 +875,8 @@ function refund_user_functions(){
 };
 
 function chargeback_user_functions(){
-  $('form').submit( function(event) {
-    $('input:submit').attr("disabled", true);
+  $('#chargeback_form').submit( function(event) {
+    $('#chargeback_form input:submit').attr("disabled", true);
     if($("#amount").val().match(/^[0-9 .]+$/)){
       
     }else{

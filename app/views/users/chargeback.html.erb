@@ -1,6 +1,6 @@
 <%= render :partial => "shared/user_information" %>
 
-<%= form_tag(user_chargeback_path(:transaction_id => @transaction)) do %>
+<%= form_tag(user_chargeback_path(:transaction_id => @transaction), id: "chargeback_form") do %>
   <table class="table table-bordered">
     <tr>
       <td>
