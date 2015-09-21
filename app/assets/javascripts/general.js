@@ -842,7 +842,7 @@ function user_cancellation_functions(){
 };
 
 function blacklist_user_functions(){
-  $("form").validate({
+  $("#blacklist_form").validate({
      submitHandler: function(form) {
       if (confirm('This user will be blacklisted. Are you really sure?')) {
         form.submit();            
