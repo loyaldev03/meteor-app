@@ -69,7 +69,7 @@ class Club < ActiveRecord::Base
   end
 
   def self.datatable_columns
-    ['id', 'name', 'description' ]
+    ['id', 'name', 'description', 'status' ]
   end
 
   def sync?
