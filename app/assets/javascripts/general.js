@@ -137,7 +137,7 @@ function club_index_functions(column_count){
                      { "bSortable": false, "aTargets": [ column_count+1, column_count ] }],
     "sAjaxSource": $('#clubs_table').data('source'),
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-      if(aData[5] == false){ $('td', nRow).closest('tr').removeClass('even odd').addClass('alert'); }
+      if(aData[4] == 'Disabled'){ $('td', nRow).closest('tr').removeClass('even odd').addClass('alert'); }
     }
   });
 }
@@ -185,7 +185,7 @@ function my_club_index_functions(column_count){
                      { "sWidth": "360px", "aTargets": [ column_count+1 ] }],
     "sAjaxSource": $('#my_clubs_table').data('source'),
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-      if(aData[5] == false){ $('td', nRow).closest('tr').removeClass('even odd').addClass('alert'); }
+      if(aData[4] == 'Disabled'){ $('td', nRow).closest('tr').removeClass('even odd').addClass('alert'); }
     }
   });
 }
