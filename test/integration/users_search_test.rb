@@ -138,7 +138,9 @@ class UsersSearchTest < ActionController::IntegrationTest
     within("#payment_details")do
       fill_in "user[cc_last_digits]", :with => cc_last_digits.to_s
     end
-    click_link_or_button 'Search'
+    within('#index_search_form') do 
+      click_on 'Search'
+    end
     within("#users")do
       find("tr", :text => @search_user.full_name)
     end
@@ -151,7 +153,9 @@ class UsersSearchTest < ActionController::IntegrationTest
       within("#payment_details")do
         select(status, :from => 'user[status]')
       end
-      click_link_or_button 'Search'
+      within('#index_search_form') do 
+        click_link_or_button 'Search'
+      end
       within("#users")do
         find("tr", :text => user_to_search.full_name)
       end
@@ -229,7 +233,9 @@ class UsersSearchTest < ActionController::IntegrationTest
     
     visit users_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name)
     fill_in 'user[email]', :with => 'a'
-    click_on 'Search'
+    within('#index_search_form') do 
+      click_on 'Search'
+    end
     within(".pagination") do
       assert page.has_content?("1")
       assert page.has_content?("2")
@@ -305,7 +311,9 @@ class UsersSearchTest < ActionController::IntegrationTest
     within("#personal_details")do
       fill_in "user[first_name]", :with => 'Random text'
     end
-    click_link_or_button 'Search'
+    within('#index_search_form') do 
+      click_link_or_button 'Search'
+    end
     within("#users")do
       assert page.has_content?('No records were found.')
     end
