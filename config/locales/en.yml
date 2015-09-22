@@ -475,6 +475,8 @@ en:
         name: 'Name'
         type: 'Type'
         days: 'Days'
+        days_after_join_date: 'Days After Join Date'
+        days_before_bill_date: 'Days Before Billing Date'
         client: 'Client'
         external_attributes: 'External Attributes'
         help_for_name: 'Name of the Communication.'

@@ -9,7 +9,8 @@
       <div class="span4"><b><%= t('activerecord.attributes.email_template.template_type') %>: </b><%= @et.template_type %></div>
       <div class="span4"><b><%= t('activerecord.attributes.email_template.client') %>: </b><%= @et.client %></div>
       <% if @et.is_pillar? or @et.is_prebill? %>
-        <div class="span4"><b><%= t("activerecord.attributes.email_template.days") %>: </b><%= @et.days %></div>
+        <div class="span4"><b>
+        <%= t("activerecord.attributes.email_template.#{@et.is_pillar? ? 'days_after_join_date' : 'days_before_bill_date'}") %>: </b><%= @et.days %></div>
       <% end %>
     </div>
   </div>
