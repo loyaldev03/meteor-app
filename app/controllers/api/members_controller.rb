@@ -355,7 +355,7 @@ class Api::MembersController < ApplicationController
       response = { :message =>I18n.t("error_messages.club_cash_not_supported"), :code => Settings.error_codes.club_does_not_support_club_cash }
     elsif params[:amount].blank?
       response = { :message => I18n.t('error_messages.club_cash.null_amount'), :code => Settings.error_codes.wrong_data }
-    elsif params[:amount] < 0
+    elsif params[:amount].to_f < 0
       response = { :message => I18n.t('error_messages.club_cash.negative_amount'), :code => Settings.error_codes.wrong_data}
     elsif not user.club.is_not_drupal?
       user.skip_api_sync!
