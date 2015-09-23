@@ -39,7 +39,7 @@ module SacMailchimp
     if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of? Gibbon::MailChimpError and not ["214"].include? error.code.to_s)
       logger.info error.inspect
     else
-      Auditory.report_issue(message, error.to_s, { error: error.inspect, :subscriber => subscriber.inspect, club: subscriber.club.inspect })
+      Auditory.report_issue(message, error.inpsect, { error: error.inspect, :subscriber => subscriber.inspect, club: subscriber.club.inspect })
     end
   end
 
