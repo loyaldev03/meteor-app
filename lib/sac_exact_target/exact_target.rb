@@ -39,7 +39,7 @@ module SacExactTarget
   end 
 
   def self.report_error(message, error, subscriber)
-    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or ( [ 12002, 12004, 12000 ].include?( (error.Results.first.error_code rescue nil).to_i) )
+    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or ( [ 12002, 12004, 12000 ].include?((error.Results.first.error_code rescue nil).to_i))
       logger.info error.inspect
     else
       Auditory.report_issue(message, error.inspect, { error: error.inspect, :subscriber => subscriber.inspect, club: subscriber.club.inspect })

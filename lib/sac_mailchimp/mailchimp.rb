@@ -38,10 +38,10 @@ module SacMailchimp
   end
 
   def self.report_error(message, error, subscriber)
-    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of? Gibbon::MailChimpError and not SacMailchimp::NO_REPORTABLE_ERRORS.include? error.code.to_s)
+    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include? error.code.to_s)
       logger.info error.inspect
     else
-      Auditory.report_issue(message, error.inpsect, { error: error.inspect, :subscriber => subscriber.inspect, club: subscriber.club.inspect })
+      Auditory.report_issue(message, error.inspect, { error: error.inspect, :subscriber => subscriber.inspect, club: subscriber.club.inspect })
     end
   end
 
