@@ -19,7 +19,7 @@ module SacExactTarget
         end
       rescue Exception => e
         flash[:error] = t('error_messages.airbrake_error_message_for_mkt_sync', :response => e)
-        Auditory.report_issue("Member:exact_target_sync", e, { :user => @current_user.inspect })
+        SacExactTarget::report_error("Member:exact_target_sync", e, @current_user)
         redirect_to show_user_path
       end
     end

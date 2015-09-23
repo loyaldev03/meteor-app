@@ -37,4 +37,13 @@ module SacMailchimp
     end
   end
 
+  def self.report_error(message, error, subscriber)
+    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include? error.code.to_s)
+      subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false) unless subscriber.club.billing_enable
+      logger.info error.inspect
+    else
+      Auditory.report_issue(message, error.inspect, { error: error.inspect, :subscriber => subscriber.attributes.select{|attribute| ['id','email','club_id'].include? attribute}})
+    end
+  end
+
 end

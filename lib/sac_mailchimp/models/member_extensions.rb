@@ -36,7 +36,7 @@ module SacMailchimp
         end
         logger.info "SacMailchimp::sync took #{time_elapsed}ms"
       rescue Exception => e
-        Auditory.report_issue("Member:mailchimp_sync", e, { :member => self.inspect }) if not e.to_s.include?("Timeout") and not SacMailchimp::NO_REPORTABLE_ERRORS.include? e.code.to_s
+        SacMailchimp::report_error("Member:mailchimp_sync", e, self)
         raise e
       end
 
@@ -57,8 +57,7 @@ module SacMailchimp
         end
         logger.info "SacMailchimp::unsubscribe_subscriber took #{time_elapsed}ms"
       rescue Exception => e
-        logger.error "* * * * * #{e}"
-        Auditory.report_issue("Member:unsubscribe_subscriber", e, { :member => self.inspect }) unless e.to_s.include?("Timeout")
+        SacMailchimp::report_error("Member:unsubscribe_subscriber", e, self)
         raise e
       end
       handle_asynchronously :mailchimp_unsubscribe, :queue => :mailchimp_sync, priority: 30
@@ -79,7 +78,7 @@ module SacMailchimp
             SacMailchimp::MemberModel.new self
           end
         else
-          Auditory.report_issue("Member:mailchimp_member", 'Mailchimp not configured correctly', { :club => self.club.inspect, :member => self.inspect })
+          SacMailchimp::report_error('Member:mailchimp_member', 'Mailchimp not configured correctly', self)
           false
         end
       end

@@ -21,7 +21,7 @@ module SacExactTarget
                 Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
                 prospect.exact_target_after_create_sync_to_remote_domain(club) if defined?(SacExactTarget::ProspectModel)
               rescue Exception => e
-                Auditory.report_issue("ExactTarget::ProspectSync", e, { :prospect => prospect.inspect} )
+                SacExactTarget::report_error('ExactTarget::ProspectSync', e, prospect)
                 prospect.update_attribute :need_sync_to_marketing_client, 0
                 Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
               end
@@ -44,7 +44,7 @@ module SacExactTarget
             SacExactTarget::ProspectModel.new self
           end
         else
-          Auditory.report_issue("Prospect:exact_target_prospect", 'Exact Target not configured correctly', { :club => self.club.inspect, :prospect => self.inspect })
+          SacExactTarget::report_error('Prospect:exact_target_prospect', 'Exact Target not configured correctly', prospect)
           nil
         end
       end
@@ -60,7 +60,7 @@ module SacExactTarget
         end
         logger.info "SacExactTarget::sync took #{time_elapsed}ms"
       rescue Exception => e
-        Auditory.report_issue("Prospect:sync", e, { :prospect => self.inspect }) unless e.to_s.include?("Timeout")
+        SacExactTarget::report_error('Prospect:sync', e, prospect)
         raise e
       end
     end
