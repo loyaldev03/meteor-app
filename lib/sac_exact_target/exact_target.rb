@@ -40,7 +40,7 @@ module SacExactTarget
 
   def self.report_error(message, error, subscriber)
     if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or ( [ 12002, 12004, 12000 ].include?((error.Results.first.error_code rescue nil).to_i))
-      subscriber.update_attribute :need_sync_to_marketing_client, false
+      subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false) unless subscriber.club.billing_enable
       logger.info error.inspect
     else
       Auditory.report_issue(message, error.inspect, { error: error.inspect, :subscriber => subscriber.attributes.select{|attribute| ['id','email'].include? attribute}, club: subscriber.club_id })
