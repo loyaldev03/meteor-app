@@ -42,7 +42,7 @@ module SacMailchimp
       subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false) unless subscriber.club.billing_enable
       logger.info error.inspect
     else
-      Auditory.report_issue(message, error.inspect, { error: error.inspect, :subscriber => subscriber.attributes.select{|attribute| ['id','email'].include? attribute}, club: subscriber.club_id })
+      Auditory.report_issue(message, error.inspect, { error: error.inspect, :subscriber => subscriber.attributes.select{|attribute| ['id','email','club_id'].include? attribute}})
     end
   end
 
