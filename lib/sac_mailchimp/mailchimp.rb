@@ -1,6 +1,8 @@
 module SacMailchimp
   mattr_accessor :logger 
 
+  NO_REPORTABLE_ERRORS = ["214"]
+
   def self.enable_integration!
     logger.info " ** Initializing SAC Mailchimp integration at #{I18n.l(Time.zone.now)}"
 
@@ -36,7 +38,7 @@ module SacMailchimp
   end
 
   def self.report_error(message, error, subscriber)
-    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of? Gibbon::MailChimpError and not ["214"].include? error.code.to_s)
+    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of? Gibbon::MailChimpError and not SacMailchimp::NO_REPORTABLE_ERRORS.include? error.code.to_s)
       logger.info error.inspect
     else
       Auditory.report_issue(message, error.inpsect, { error: error.inspect, :subscriber => subscriber.inspect, club: subscriber.club.inspect })
