@@ -88,7 +88,7 @@ module SacExactTarget
           marketing_client_last_sync_error_at: Time.zone.now
         }        
       elsif res.OverallStatus != "OK"
-        SacExactTarget::report_error("SacExactTarget:Member:save", res)
+        SacExactTarget::report_error("SacExactTarget:Member:save", res, self.user)
         { 
           marketing_client_synced_status: 'error',
           marketing_client_last_sync_error: res.Results.first.status_message,

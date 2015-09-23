@@ -46,7 +46,7 @@ module SacMailchimp
         end
         logger.info "SacMailchimp::sync took #{time_elapsed}ms"
       rescue Exception => e
-        Auditory.report_issue("Prospect:mailchimp_sync", e, { :prospect => self.inspect }) unless e.to_s.include?("Timeout")
+        SacMailchimp::report_error('Prospect:mailchimp_sync', e, self )
         raise e
       end
 
@@ -63,7 +63,7 @@ module SacMailchimp
             SacMailchimp::ProspectModel.new self
           end
         else
-          Auditory.report_issue("Prospect:mailchimp_prospect", 'Mandrill not configured correctly', { :club => self.club.inspect, :prospect => self.inspect })
+          SacMailchimp::report_error('Prospect:mailchimp_prospect', 'Mailchimp not configured correctly', self )
           nil
         end
       end

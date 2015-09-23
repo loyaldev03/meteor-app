@@ -36,7 +36,7 @@ module SacExactTarget
         end
         logger.info "SacExactTarget::sync took #{time_elapsed}ms"
       rescue Exception => e
-        Auditory.report_issue("Member:ExactTargetsync", e, { :member => self.inspect }) unless e.to_s.include?("Timeout")
+        SacExactTarget::report_error("Member:ExactTargetsync", e, self)
         raise e
       end
 
@@ -57,8 +57,7 @@ module SacExactTarget
         end
         logger.info "SacExactTarget::unsubscribe_subscriber took #{time_elapsed}ms"
       rescue Exception => e
-        logger.error "* * * * * #{e}"
-        Auditory.report_issue("Member:unsubscribe_subscriber", e, { :member => self.inspect }) unless e.to_s.include?("Timeout")
+        SacExactTarget::report_error("Member:unsubscribe_subscriber", e, self)
         raise e
       end
       handle_asynchronously :exact_target_unsubscribe, :queue => :exact_target_sync, priority: 30
@@ -79,7 +78,7 @@ module SacExactTarget
             SacExactTarget::MemberModel.new self
           end
         else
-          Auditory.report_issue("Member:exact_target_member", 'Exact Target not configured correctly', { :club => self.club.inspect, :member => self.inspect })
+          SacExactTarget::report_error("Member:exact_target_member", 'Exact Target not configured correctly', self)
           false
         end
       end
