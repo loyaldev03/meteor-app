@@ -148,7 +148,7 @@ class Club < ActiveRecord::Base
   end
 
   def allow_club_cash_transaction?
-    club_cash_enable
+    club_cash_enable and billing_enable
   end
 
   def use_pgc_authorize_net?
