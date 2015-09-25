@@ -175,6 +175,7 @@ en:
       disposition_types: 'Disposition Types'
       subscription_plans: 'Subscription Plans'
       payment_gateway_configuration: 'Payment Gateway Configuration'
+      terms_of_membership: 'Subscription Plan'
     gateway:
       mes: 'Merchant e Solutions'
       litle: Litle
@@ -319,10 +320,12 @@ en:
           synced: success
           unsynced: warning
           error: important
+          not_synced: Not Synced
         sync_status_captions:
           synced: Synced
           unsynced: Not Synced
           error: Sync Error
+          not_synced: Not Synced
         is_lapsed: 'User was canceled.'
         billing_is_not_expected: 'Billing is not expected.'
       enrollment_info:
