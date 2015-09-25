@@ -234,13 +234,14 @@ module TasksHelpers
 
   def self.send_prebill
     base = User.joins(current_membership: [terms_of_membership: :email_templates]).where(
-    ["((date(next_retry_bill_date) = DATE_ADD(?, INTERVAL email_templates.days DAY) AND recycled_times = 0) 
+    ["email_templates.template_type = 'prebill' AND ((date(next_retry_bill_date) = DATE_ADD(?, INTERVAL email_templates.days DAY) AND recycled_times = 0) 
      OR (date(next_retry_bill_date) = ? AND manual_payment = true))
      AND terms_of_memberships.installment_amount != 0.0 
      AND terms_of_memberships.is_payment_expected = true", 
      (Time.zone.now).to_date, (Time.zone.now + 14.days).to_date 
     ])
-    
+
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:send_prebill rake task, processing #{base.length} users"
     base.find_in_batches do |group|
       group.each_with_index do |user,index| 
         tz = Time.zone.now
