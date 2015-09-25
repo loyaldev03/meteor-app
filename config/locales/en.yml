@@ -326,6 +326,7 @@ en:
           unsynced: Not Synced
           error: Sync Error
           not_synced: Not Synced
+        autologin_url: Autologin Url
         is_lapsed: 'User was canceled.'
         billing_is_not_expected: 'Billing is not expected.'
       enrollment_info:
