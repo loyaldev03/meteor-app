@@ -34,7 +34,7 @@
         <th><%= t("activerecord.attributes.user.marketing_client_last_sync_error_at") %></th>
       </tr>
       <tr>
-        <td><span class='label label-<%=t @current_user.marketing_client_synced_status, scope: 'activerecord.attributes.user.pardot_synced_status_priorities' -%>' id="span_mi_pardot_synced_status"><%=t @current_user.marketing_client_synced_status, scope: 'activerecord.attributes.user.pardot_synced_status_captions' -%></span></td>
+        <td><span class='label label-<%=t @current_user.marketing_client_synced_status, scope: 'activerecord.attributes.user.sync_status_priorities' -%>' id="span_synced_status"><%=t @current_user.marketing_client_synced_status, scope: 'activerecord.attributes.user.sync_status_captions' -%></span></td>
         <td><%= l(@current_user.marketing_client_last_synced_at, format: :dashed) if @current_user.marketing_client_last_synced_at %></td>
         <td><%= @current_user.marketing_client_last_sync_error %></td>
         <td><%= l(@current_user.marketing_client_last_sync_error_at, format: :dashed) if @current_user.marketing_client_last_sync_error_at %></td>

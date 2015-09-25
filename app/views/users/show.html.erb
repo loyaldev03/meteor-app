@@ -7,7 +7,7 @@
   <div class="span4">
     <table>
       <tr>
-        <td><%= t('activerecord.attributes.user.user_id') %>:</td>
+        <td><%= t('activerecord.attributes.user.id') %>:</td>
         <td><input id="input_id" readonly="true" type="text" class="test_field" value="<%= @current_user.id %>" /></td>
       </tr>
       <tr>
@@ -239,7 +239,7 @@
             <td id="td_mi_member_since_date"><%= I18n.l @current_user.member_since_date, :format => :only_date %></td>  
           </tr>
           <tr>
-            <th><%= t('menu.activerecord.term_of_membership') %>:</th>
+            <th><%= t('activerecord.model.terms_of_membership') %>:</th>
             <td id="td_mi_terms_of_membership_name">
               <%= link_to(terms_of_membership_path(:id => @current_membership.terms_of_membership), :class => "btn btn-mini btn-small", :disabled => (cannot? :show, TermsOfMembership)) do %> 
                 <i class="icon-zoom-in"></i> <%= @current_membership.terms_of_membership.name %>
