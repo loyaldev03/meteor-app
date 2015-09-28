@@ -47,7 +47,7 @@ SacPlatform::Application.routes.draw do
     match 'clubs/:client/marketing_tool_attributes' => 'clubs#marketing_tool_attributes', :via => :get
 
     scope '/club/:club_prefix' do
-      match '/users/new' => 'users#new', as: 'new_user'
+      match '/users/new' => 'users#new', as: 'new_user', :via => :get
       match '/users' => 'users#index', as: 'users', :via => [:get, :post]
       match '/users/search_result' => 'users#search_result', as: 'users_search_result', :via => [:get]
       
@@ -83,7 +83,7 @@ SacPlatform::Application.routes.draw do
         match '/set_undeliverable' => 'users#set_undeliverable', as: 'user_set_undeliverable', :via => [:get, :post]
         match '/set_unreachable' => 'users#set_unreachable', as: 'user_set_unreachable', :via => [:get, :post]
         match '/resend_fulfillment' => 'users#resend_fulfillment', as: 'user_resend_fulfillment', :via => [:post]
-        match '/add_club_cash' => 'users#add_club_cash', as: 'user_add_club_cash'
+        match '/add_club_cash' => 'users#add_club_cash', as: 'user_add_club_cash', :via => :get
         match '/approve' => 'users#approve', as: 'user_approve', :via => [:post]
         match '/reject' => 'users#reject', as: 'user_reject', :via => [:post]  
         match '/no_recurrent_billing' => 'users#no_recurrent_billing', as: 'user_no_recurrent_billing', :via => [:get, :post]  
@@ -130,7 +130,7 @@ SacPlatform::Application.routes.draw do
     end
 
     resources :domains
-    match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard'
+    match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard', :via => :get
   end
   match '/users/quick_search' => 'users#quick_search', as: 'users_quick_search', :via => [:get]
 

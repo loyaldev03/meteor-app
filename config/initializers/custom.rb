@@ -1,34 +1,8 @@
 require 'auditory'
 require 'exception_notification'
 SacPlatform::Application.config.middleware.use ExceptionNotifier if ['production', 'staging', 'prototype'].include?(Rails.env)
-require 'lyris_service'
 require 'axlsx'
 require "exceptions"
-
-# # We are commenting log writing due to https://www.pivotaltracker.com/story/show/68819072 since how logs are written is not pci compliant (Only for production).
-
-if Rails.env.staging? or Rails.env.prototype?
-	ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant.log", "a+")
-	ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device.sync = true
-
-	LitleOnline::Configuration.logger = Logger.new("#{Rails.root}/log/active_merchant_litle.log")  
-	LitleOnline::Configuration.logger.level = Logger::DEBUG
-
-	ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_auth_net.log", "a+")  
-	ActiveMerchant::Billing::AuthorizeNetGateway.wiredump_device.sync = true
-
-  ActiveMerchant::Billing::TrustCommerceGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_trust_commerce.log", "a+")  
-  ActiveMerchant::Billing::TrustCommerceGateway.wiredump_device.sync = true
-end
-
-# config/initializers/delayed_job_config.rb
-Delayed::Worker.destroy_failed_jobs = false
-Delayed::Worker.sleep_delay = 60
-Delayed::Worker.max_attempts = 3
-Delayed::Worker.max_run_time = 5.minutes
-Delayed::Worker.read_ahead = 10
-Delayed::Worker.delay_jobs = !Rails.env.test?
-
 
 class String
   def to_bool
@@ -39,12 +13,6 @@ class String
   end
 end
 
-require 'bureaucrat'
-require 'bureaucrat/quickfields'
-require 'bureaucrat/form'
-
-
-Tire.configure do
-  url    'https://test:test@67662be96db05a10000.qbox.io'
-  # logger STDERR
-end
+# require 'bureaucrat'
+# require 'bureaucrat/quickfields'
+# require 'bureaucrat/form'

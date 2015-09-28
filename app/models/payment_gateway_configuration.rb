@@ -5,7 +5,7 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   has_many :transactions
 
   acts_as_paranoid
-  validates_as_paranoid
+#  validates_as_paranoid
 
   validates :login, :presence => true
   validates :merchant_key, :presence => true, if: Proc.new{ |pgc| pgc.litle? }
