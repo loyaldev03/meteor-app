@@ -8,7 +8,7 @@ namespace :products do
       ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting products:send_product_list_email rake task"
-      Product.send_product_list_email
+      Product.send_product_list_email([1,15])
     rescue Exception => e
       Auditory.report_issue("Products::SendProductList", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"

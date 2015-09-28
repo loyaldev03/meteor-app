@@ -66,7 +66,8 @@ class Product < ActiveRecord::Base
     status_list.each{|x| header << x}
 
     package = Axlsx::Package.new
-    club_list = Rails.env.production? ? Club.where(id: clubs_id, billing_enable: true) : Club.all 
+    club_list = Club.where(billing_enable: true)
+    club_list = club_list.where(id: clubs_id) if clubs_id 
     club_list.each do |club|
       package.workbook.add_worksheet(:name => club.name) do |sheet|
         sheet.add_row header
@@ -81,10 +82,8 @@ class Product < ActiveRecord::Base
     package
   end
 
-  def self.send_product_list_email
-    # We only take into account those clubs related to users which receive this information. 
-    # Right now would only be Nascar (id=1) and SCRF (id=15).
-    product_xls = Product.generate_xls([1,15])
+  def self.send_product_list_email(clubs_id = nil)
+    product_xls = Product.generate_xls(clubs_id)
     temp = Tempfile.new("posts.xlsx") 
     
     product_xls.serialize temp.path
