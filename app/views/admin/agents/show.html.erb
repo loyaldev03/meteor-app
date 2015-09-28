@@ -82,11 +82,11 @@
 </ul>
 
 <div class="form-actions">
-  <%= link_to t('.back', :default => t("helpers.links.back")),
+  <%= link_to t('back', :default => t("helpers.links.back")),
               admin_agents_path, :class => 'btn'  %>
-  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+  <%= link_to t('edit', :default => t("helpers.links.edit")),
               edit_admin_agent_path(@agent), :class => 'btn' %>
-  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+  <%= link_to t('destroy', :default => t("helpers.links.destroy")),
               admin_agent_path(@agent),
               :method => 'delete',
               :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),

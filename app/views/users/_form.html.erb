@@ -189,7 +189,7 @@
       <tr class="box_title">
         <th>
           <h4>Credit Card
-          <%= f.label :allow_cc_blank,t('Allow blank credit card?'), :class => 'help-inline' %>
+          <%= f.label :allow_cc_blank, t('allow_blank_credit_card'), :class => 'help-inline' %>
           <%= check_box :setter, :cc_blank %>
           </h4>
         </th>
@@ -276,7 +276,7 @@ Please, have in mind that fields with ' * ' are required.
           <table class="hidden_table_border">
             <tr class = "control-group">
               <th>
-                <%= f.label :external_id, t('activerecord.attributes.credit_card.external_id'), :class => 'help-inline' %>
+                <%= f.label :external_id, t('activerecord.attributes.user.external_id'), :class => 'help-inline' %>
               </th>
               <td> 
                 <%= f.text_field :external_id, :class => 'text_field input-small' %>

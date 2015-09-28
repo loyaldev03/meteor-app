@@ -102,7 +102,7 @@
               clubs_path, :class => 'btn'  %>
   <%= link_to t(:edit),
               edit_club_path(:id => @club.id), :class => 'btn btn-success' %>
-  <%= link_to t(:new_domain),
+  <%= link_to t('buttons.new_domain'),
               new_domain_path(:club_id => @club.id), :class => 'btn btn-success' %>
   <%= link_to t(:test_api_connection),
               club_test_api_connection_path(:club_id => @club.id), :class => 'btn' %>

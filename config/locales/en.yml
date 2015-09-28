@@ -44,6 +44,7 @@ en:
   index: '#'
   lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
   days: "days"
+  allow_blank_credit_card: "Allow blank credit card?"
   menu: 
     admin_menu: 'Admin Menu'
     logout: 'Logout'
@@ -97,6 +98,7 @@ en:
     club_show: 'Show Club'
     new_payment_gateway: "New Payment Gateway"
     replace_payment_gateway: "Replace Payment Gateway"
+    new_domain: "New Domain"
   admin:
     agents:
       index:
@@ -329,6 +331,7 @@ en:
         autologin_url: Autologin Url
         is_lapsed: 'User was canceled.'
         billing_is_not_expected: 'Billing is not expected.'
+        birth_date: 'Birth date'
       enrollment_info:
         kit_card_product_sku: KIT-CARD
         product_sku: Product
@@ -474,10 +477,11 @@ en:
           no_downgrade_upgrade_configuration: 'According to the configuration you selected on step 2, there is nothing to configure on this step.'
           upgrade_help: "Upon successful billing we will check if the user should be upgraded or not. We will check if join date + upgrade period is older than date when it is billed, and If so, we will change user's subscriptions plan to the one especified."
       email_template:
+        id: ID
         title_new: 'New Communication'
         title_edit: 'Edit Communication'
         name: 'Name'
-        type: 'Type'
+        template_type: 'Type'
         days: 'Days'
         days_after_join_date: 'Days After Join Date'
         days_before_bill_date: 'Days Before Billing Date'
