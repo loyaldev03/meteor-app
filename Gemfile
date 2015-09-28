@@ -5,7 +5,7 @@ gem 'rails', '4.2.3'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'mysql2'
+gem 'mysql2', '~> 0.3.18'
 gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
@@ -39,6 +39,7 @@ gem 'country_code_select', '~> 1.0.0'
 gem 'i18n-country-translations'
 gem 'devise'
 gem 'devise-async'
+gem 'devise-encryptable'
 gem 'settingslogic', '2.0.8'
 gem 'wirble'
 gem 'bootstrap-will_paginate'
@@ -55,7 +56,7 @@ gem 'twitter-bootstrap-rails', '2.2.7'
 
 gem 'jquery-rails', '2.0.3'
 
-gem 'acts_as_paranoid'
+gem "paranoia", "~> 2.0"
 
 #gem "airbrake"
 gem "zendesk_api"
@@ -122,3 +123,4 @@ gem 'encryptor'
 
 gem 'bureaucrat'
 
+gem 'protected_attributes' # TODO: remove this gem after upgrading

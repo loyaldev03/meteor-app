@@ -6,12 +6,13 @@ class Agent < ActiveRecord::Base
 
   devise :database_authenticatable, :lockable, :timeoutable,
          :recoverable, :rememberable, :trackable, :validatable, 
-         :encryptable, :token_authenticatable, :async
+         :encryptable, # :token_authenticatable, 
+         :async
 
   ROLES = %W(admin api representative supervisor agency fulfillment_managment)
 
   acts_as_paranoid
-  validates_as_paranoid
+#  validates_as_paranoid
 
   has_many :created_members, :class_name => 'Membership'
   has_many :operations
@@ -26,7 +27,7 @@ class Agent < ActiveRecord::Base
   attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login, :first_name, 
     :last_name, :roles, :club_roles_attributes
 
-  validates_uniqueness_of_without_deleted :username
+#  validates_uniqueness_of_without_deleted :username
   validates :username, :presence => true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
 
   before_save :ensure_authentication_token
@@ -43,8 +44,8 @@ class Agent < ActiveRecord::Base
 
   has_many :club_roles
   has_many :clubs, 
-    through: :club_roles,
-    uniq: true
+    through: :club_roles
+   # uniq: true # TODO add uniqueness validation
 
   def which_is_the_role_for_this_club?(club_id)
     self.club_roles.where(club_id: club_id).first
