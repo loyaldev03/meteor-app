@@ -71,8 +71,8 @@ class Product < ActiveRecord::Base
         sheet.add_row header
         club.products.each do |product|
           row = [ product.name, product.sku ]
-          status_list.each {|status| row << Fulfillment.joins(:user).where([ "fulfillments.product_sku = ? AND fulfillments.status = ? AND users.club_id = ?", 
-                                                product.sku, status.to_s, club.id ]).count }
+          fulfillments_data = Fulfillment.where(product_sku: product.sku, club_id: club.id).group(:status).count
+          status_list.each {|status| row << fulfillments_data[status.to_s] }
           sheet.add_row row
         end
       end
