@@ -3,7 +3,7 @@ class MerchantESolutionsTransaction < Transaction
   def user=(user)
     super(user)
     # MeS supports only 17 characters on order_id
-    # litle had "#{Date.today}-#{order_mark}#{@transaction.user_id}"
+    # litle had "#{Date.today}-#{@transaction.user_id}"
     self.invoice_number = user.id
   end
 

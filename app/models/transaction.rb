@@ -62,7 +62,6 @@ class Transaction < ActiveRecord::Base
     self.password = pgc.password
     self.descriptor_name = pgc.descriptor_name
     self.descriptor_phone = pgc.descriptor_phone
-    self.order_mark = pgc.order_mark
     self.gateway = pgc.gateway
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
   end
