@@ -574,8 +574,6 @@ en:
         descriptor_name_help: 'Text that will appear on the credit card statement.'
         descriptor_phone: 'Descriptor Phone'
         descriptor_phone_help: 'The phone number that will appear on credit card statements for transactions'
-        order_mark: 'Order Mark'
-        order_mark_help: 'Not being used right now.'
         aus_login: 'AUS Login'
         aus_login_help: 'Account Updater Service service login'
         aus_password: 'AUS password'

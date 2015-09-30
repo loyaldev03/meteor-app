@@ -197,7 +197,6 @@ class PhoenixTransaction < ActiveRecord::Base
     self.mode = pgc.mode
     self.descriptor_name = pgc.descriptor_name
     self.descriptor_phone = pgc.descriptor_phone
-    self.order_mark = pgc.order_mark
     self.gateway = pgc.gateway
   end  
 end
