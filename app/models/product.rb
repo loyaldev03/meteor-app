@@ -60,13 +60,15 @@ class Product < ActiveRecord::Base
     allow_backorder? ? true : stock>0
   end
 
-  def self.generate_xls
+  def self.generate_xls(clubs_id = nil)
     header = ['Name', 'Sku']
     status_list = Fulfillment.state_machines[:status].states.map(&:name)
     status_list.each{|x| header << x}
 
     package = Axlsx::Package.new
-    Club.all.each do |club|
+    club_list = Club.where(billing_enable: true)
+    club_list = club_list.where(id: clubs_id) if clubs_id 
+    club_list.each do |club|
       package.workbook.add_worksheet(:name => club.name) do |sheet|
         sheet.add_row header
         club.products.each do |product|
@@ -80,8 +82,8 @@ class Product < ActiveRecord::Base
     package
   end
 
-  def self.send_product_list_email
-    product_xls = Product.generate_xls
+  def self.send_product_list_email(clubs_id = nil)
+    product_xls = Product.generate_xls(clubs_id)
     temp = Tempfile.new("posts.xlsx") 
     
     product_xls.serialize temp.path
