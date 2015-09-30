@@ -72,7 +72,7 @@ class Product < ActiveRecord::Base
         club.products.each do |product|
           row = [ product.name, product.sku ]
           fulfillments_data = Fulfillment.where(product_sku: product.sku, club_id: club.id).group(:status).count
-          status_list.each {|status| row << fulfillments_data[status.to_s] }
+          status_list.each {|status| row << (fulfillments_data[status.to_s] || 0) }
           sheet.add_row row
         end
       end
