@@ -65,7 +65,7 @@ class TermsOfMembership < ActiveRecord::Base
   end
 
   def can_update_or_delete
-    self.memberships.count == 0 && self.prospects.count == 0
+    not self.memberships.first and not self.prospects.first
   end
 
   private
