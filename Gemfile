@@ -12,6 +12,7 @@ gem "paperclip", "~> 3.0"
 
 gem 'acts_as_list', '0.2.0'
 gem 'delayed_job_active_record'
+gem "delayed_job_web"
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
 
