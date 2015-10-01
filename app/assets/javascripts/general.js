@@ -1282,13 +1282,16 @@ function tom_create_wizard() {
             $(this).remove();
           }
         })
-        error.removeClass("error");
-        error.appendTo($("#"+$(element).attr("id")).parent());
+        error.removeClass('error');
+        error.addClass('help-inline');
+        $("#"+error.attr("for")).parents('.control-group').addClass("error");
+        $("#"+error.attr("for")).parent().append(error);
       },
       success: function(error){
+        $("#"+error.attr("for")).parents('.control-group').removeClass("error");
         $("label[for="+error.attr("for")+"][generated=true]").each(function(){
           $(this).remove();
-        })
+        });
       }
     },
     focusFirstInput : true,

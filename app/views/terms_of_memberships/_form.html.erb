@@ -43,7 +43,7 @@
 </div>
 
 <% # Second step %>
-<div class="step" id="second">  
+<div class="step" id="second" style='width:100%'>  
   <div class="control-group"><%= wizard_steps_indicator(2) %></div>
   
 <!--   <div class="control-group">
@@ -89,16 +89,21 @@
     </div>
   </div>
 
-  <div class="control-group" id="recurring_amount_group">
+  <div class="control-group" id="recurring_amount_amount" style='float:left'>
     <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label required_asterisk' %>
     <div class="controls">
-      $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
+      $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %> 
+    </div>
+  </div>
+
+  <div class="control-group" id="recurring_amount_days">
+    <div class="controls">
       <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
       <%= text_field_tag 'installment_amount_days', @tom.installment_period, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 1 %>
       <%= select_for_date_span("installment_amount_days_time_span") %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount_help') } %> 
+      :content => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount_help') } %>
     </div>
   </div>
 
@@ -262,7 +267,8 @@
   }
 
   function select_payment_is_expected(){
-    $('#recurring_amount_group').show('fast');
+    $('#recurring_amount_amount').show('fast');
+    $('#recurring_amount_days').show('fast');
     $('#club_cash_installment').show('fast');
     $('#installment_amount').prop('required', true);
     $('#installment_amount_days').prop('required', true);
@@ -270,7 +276,8 @@
   }
 
   function select_payment_is_not_expected(){
-    $('#recurring_amount_group').hide('fast');
+    $('#recurring_amount_amount').hide('fast');
+    $('#recurring_amount_days').hide('fast');
     $('#club_cash_installment').hide('fast');
     $('#installment_amount').removeAttr('required');
     $('#installment_amount_days').removeAttr('required');
