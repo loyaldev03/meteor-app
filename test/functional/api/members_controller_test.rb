@@ -1811,7 +1811,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :applied_user, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
-    assert @response.body.include? "Member status does not allows us to change the terms of membership."
+    assert @response.body.include? "Member status does not allows us to change the subscription plan."
   end
 
   test "Do not allow change TOM throught API - lapsed user" do
@@ -1819,7 +1819,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :applied_user, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
-    assert @response.body.include? "Member status does not allows us to change the terms of membership."
+    assert @response.body.include? "Member status does not allows us to change the subscription plan."
   end
 
   test "User should not be updated if it is already active and the cc send it is wrong" do
@@ -1918,7 +1918,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :applied_user, nil, {}, { :created_by => @admin_user })
     post(:update_terms_of_membership, { :id_or_email => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
-    assert @response.body.include? "Member status does not allows us to change the terms of membership."
+    assert @response.body.include? "Member status does not allows us to change the subscription plan."
   end
 
   test "Do not allow update TOM throught API - lapsed user" do
@@ -1926,7 +1926,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :applied_user, nil, {}, { :created_by => @admin_user })
     post(:update_terms_of_membership, { :id_or_email => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
-    assert @response.body.include? "Member status does not allows us to change the terms of membership."
+    assert @response.body.include? "Member status does not allows us to change the subscription plan."
   end
 
   test "Do not upgrade if we enter a wrong CC - Provisional Status" do
@@ -2153,10 +2153,10 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     @saved_user.set_as_canceled
     generate_post_update_terms_of_membership(@saved_user.id, @tom_yearly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
-    assert @response.body.include? "Member status does not allows us to change the terms of membership"
+    assert @response.body.include? "Member status does not allows us to change the subscription plan"
     @saved_user.set_as_applied
     generate_post_update_terms_of_membership(@saved_user.id, @tom_yearly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
-    assert @response.body.include? "Member status does not allows us to change the terms of membership"
+    assert @response.body.include? "Member status does not allows us to change the subscription plan"
   end
 
   test "Upgrade/Downgrade a User Basic membership level by prorate logic - Provisional User - NewProvisionalDays < OldProvisionalDays" do

@@ -459,7 +459,7 @@ class User < ActiveRecord::Base
         { :message => "Tom(#{new_tom_id}) to change belongs to another club.", :code => Settings.error_codes.tom_to_downgrade_belongs_to_different_club }
       end
     else
-      { :message => "Member status does not allows us to change the terms of membership.", :code => Settings.error_codes.user_status_dont_allow }
+      { :message => "Member status does not allows us to change the subscription plan.", :code => Settings.error_codes.user_status_dont_allow }
     end
   end
 
@@ -592,7 +592,7 @@ class User < ActiveRecord::Base
       if amount.blank? or payment_type.blank?
         answer = { :message => "Amount and payment type cannot be blank.", :code => Settings.error_codes.wrong_data }
       elsif amount.to_f < current_membership.terms_of_membership.installment_amount
-        answer = { :message => "Amount to bill cannot be less than terms of membership installment amount.", :code => Settings.error_codes.manual_billing_with_less_amount_than_permitted }
+        answer = { :message => "Amount to bill cannot be less than subscription plan installment amount.", :code => Settings.error_codes.manual_billing_with_less_amount_than_permitted }
       else
         trans = Transaction.new
         trans.transaction_type = "sale_manual_#{payment_type}"
@@ -1423,7 +1423,7 @@ class User < ActiveRecord::Base
 
     def proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, club_cash_to_substract, sale_transaction)
       unless set_as_active
-        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member after prorated update of terms of membership.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
+        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member after prorated update of subscription plan.", { :member => self.inspect, :membership => current_membership.inspect, :trans => "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
       end
 
       if amount_in_favor > 0.0

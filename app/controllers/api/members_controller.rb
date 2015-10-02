@@ -93,7 +93,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] bill_date Only for drupal. Date when the billing will be done. In case bill date is not set (for example for applied member) the date will be send as blank.
   # @response_field [String] status Member's membership status after enrolling. There are two possibles status when the member is enrolled:
   #   <ul>
-  #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the subscription plan the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
   #     <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
   #   </ul> 
   #
@@ -110,7 +110,7 @@ class Api::MembersController < ApplicationController
       params[:setter] && params[:setter][:skip_api_sync].to_s.to_bool
     )
   rescue ActiveRecord::RecordNotFound
-    render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
+    render json: { :message => "Subscription plan not found", :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
     Auditory.report_issue("API::User::create", e, { :params => params.inspect })
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
@@ -508,13 +508,13 @@ class Api::MembersController < ApplicationController
   end
 
   ##
-  # Change actual terms of membership related to a member. (DEPRECATED by 'update_terms_of_membership')
+  # Change actual subscription plans related to a member. (DEPRECATED by 'update_terms_of_membership')
   #
   # @resource /api/v1/members/:id/change_terms_of_membership
   # @action POST
   #
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [Integer] terms_of_membership_id New Terms of membership's ID to set on members.
+  # @required [Integer] terms_of_membership_id New Subscription plan's ID to set on members.
   #
   # @response_field [String] message Shows the method results and also informs the errors.
   # @response_field [String] code Code related to the method result.
@@ -530,7 +530,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] bill_date Only for drupal. Date when the billing will be done. In case bill date is not set (for example for applied member) the date will be send as blank.
   # @response_field [String] status Member's membership status after enrolling. There are two possibles status when the member is enrolled:
   #   <ul>
-  #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the subscription plan the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
   #     <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
   #   </ul> 
   #
@@ -541,7 +541,7 @@ class Api::MembersController < ApplicationController
     render json: user.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.save_the_sale_through_api, @current_agent)
   rescue ActiveRecord::RecordNotFound => e 
     if e.to_s.include? "TermsOfMembership"
-      message = "Terms of membership not found"
+      message = "Subscription plan not found"
     elsif e.to_s.include? "User"
       message = "Member not found"
     end
@@ -552,13 +552,13 @@ class Api::MembersController < ApplicationController
   end
 
   ##
-  # Change actual terms of membership related to a member, with the option to prorate it.
+  # Change actual subscription plans related to a member, with the option to prorate it.
   #
   # @resource /api/v1/members/update_terms_of_membership
   # @action POST
   #
   # @required [String] id_or_email Member's ID or Member's email. You can either send id or email within this value. The ID is an integer autoincrement value that is used by platform.
-  # @required [Integer] terms_of_membership_id New Terms of membership's ID to set on members.
+  # @required [Integer] terms_of_membership_id New subscription plan's ID to set on members.
   # @optional [Boolean] prorate Boolean value to define if we will proceed with the prorate logic, or not. (1= follow prorate logic, 0= do not follow prorate logic). Default value is 1 (true)
   # @optional [Hash] credit_card Hash with credit cards information. It must have the following information:
   #     <ul>
@@ -582,7 +582,7 @@ class Api::MembersController < ApplicationController
   # @response_field [String] bill_date Only for drupal. Date when the billing will be done. In case bill date is not set (for example for applied member) the date will be send as blank.
   # @response_field [String] status Member's membership status after enrolling. There are two possibles status when the member is enrolled:
   #   <ul>
-  #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the subscription plan the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
   #     <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
   #   </ul> 
   #
@@ -596,7 +596,7 @@ class Api::MembersController < ApplicationController
 
     render json: user.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card])
   rescue ActiveRecord::RecordNotFound => e
-    message = (e.to_s.include? "TermsOfMembership") ? "Terms of membership not found" : "Member not found"
+    message = (e.to_s.include? "TermsOfMembership") ? "Subscription plan not found" : "Member not found"
     render json: { :message => message, :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
     Auditory.report_issue("API::TermsOfMembership::update", e, { :params => params.inspect })
@@ -633,7 +633,7 @@ class Api::MembersController < ApplicationController
     render json: user.no_recurrent_billing(params[:amount], params[:description], params[:type])
   rescue ActiveRecord::RecordNotFound => e
     if e.to_s.include? "TermsOfMembership"
-      message = "Terms of membership not found"
+      message = "Subscription plan not found"
     elsif e.to_s.include? "User"
       message = "Member not found"
     end

@@ -95,7 +95,7 @@ class UsersController < ApplicationController
   def save_the_sale
     if request.post?
       if TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id).nil?
-        flash[:error] = "Terms of membership not found"
+        flash[:error] = "Subscription plan not found"
         redirect_to show_user_path
       else
         answer = @current_user.save_the_sale(params[:terms_of_membership_id], current_agent)
@@ -113,7 +113,7 @@ class UsersController < ApplicationController
     if request.post?
       tom = TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id)
       if tom.nil?
-        flash[:error] = "Terms of membership not found"
+        flash[:error] = "Subscription plan not found"
       else
         answer = @current_user.recover(tom, current_agent, 
           { landing_url: request.env['HTTP_HOST'], referral_path: request.env['REQUEST_URI'], ip_address: request.env['REMOTE_ADDR'] })

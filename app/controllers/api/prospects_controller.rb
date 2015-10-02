@@ -76,7 +76,7 @@ class Api::ProspectsController < ApplicationController
       render json: response
     end
   rescue ActiveRecord::RecordNotFound
-    render json: { :message => "Terms of membership not found", :code => Settings.error_codes.not_found }
+    render json: { :message => "Subscription plan not found", :code => Settings.error_codes.not_found }
   end
 
   private 
