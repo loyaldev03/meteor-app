@@ -5,7 +5,7 @@
         <p> <b> Last name: </b> <%= @user.last_name %> </p>
         <p> <b> Address: </b> <%= @user.full_address %> </p>
         <p> <b> Club: </b> <%= @user.club_id %> - <%= @user.club.name %> </p> 
-        <p> <b> Terms of membership: </b> <%= @user.terms_of_membership_id %> - <%= @user.terms_of_membership.name %> </p>
+        <p> <b> Subscription plan: </b> <%= @user.terms_of_membership_id %> - <%= @user.terms_of_membership.name %> </p>
 
 <p> In order to accept or reject this user, please follow this link <%= link_to 'Link to user show page', show_user_url(@user.club.partner.prefix, @user.club.name , @user.id) %> .</p>.
 

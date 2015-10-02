@@ -290,7 +290,7 @@ en:
         recycled_times: 'Recycled times'
         recycled_times_explanation: 'The number of recycle attempts in the current recycle process. If greater than 0, then the member is currently in a recycle stage. This number resets upon HD or successful charge.'
         quota: 'Quota'
-        terms_of_membership_id: 'Terms of membership'
+        terms_of_membership_id: 'Subscription plan'
         date_of_primary_cc: 'Date Added of Primary CC'
         date_of_active_credit_card: 'Date Added of Active CC'
         last_successful_bill_date: 'Last successful bill date'

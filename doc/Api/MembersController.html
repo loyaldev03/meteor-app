@@ -6,7 +6,7 @@
 <title>
   Class: Api::MembersController
   
-    &mdash; Api Documentation
+    &mdash; Phoenix Api Documentation
   
 </title>
 
@@ -293,7 +293,7 @@
     
     <div id="content" style="padding-top: 12px;">
 		<div class="service">
-  <h1 class="noborder title">Api Documentation</h1>
+  <h1 class="noborder title">Phoenix Api Documentation</h1>
     <a class="back" href="../index.html" title="back to the overview">&laquo; back to overview</a>
     <h2>Members</h2>
     
@@ -464,7 +464,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<span class="type">String</span>
 								<span class="text">Member's membership status after enrolling. There are two possibles status when the member is enrolled:
 <ul>
-  <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the subscription plan the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
   <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
 </ul></span>
 							</li>
@@ -1470,7 +1470,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 		</div>	
     
 		<div class="method">
-			<p class="method_desc">Change actual terms of membership related to a member. (DEPRECATED by 'update_terms_of_membership')</p>
+			<p class="method_desc">Change actual subscription plans related to a member. (DEPRECATED by 'update_terms_of_membership')</p>
 			<h3 class="resource_url"><strong>/api/v1/members/:id/change_terms_of_membership</strong> [POST]</h3>
 
 			<div class="parameters">	
@@ -1490,7 +1490,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">terms_of_membership_id</span>
 									<span class="type">Integer</span>
-									<span class="text">New Terms of membership's ID to set on members.</span>
+									<span class="text">New Subscription plan's ID to set on members.</span>
 								</li>
 							</ul>
 						
@@ -1570,7 +1570,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<span class="type">String</span>
 								<span class="text">Member's membership status after enrolling. There are two possibles status when the member is enrolled:
 <ul>
-  <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the subscription plan the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
   <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
 </ul></span>
 							</li>
@@ -1583,7 +1583,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 		</div>	
     
 		<div class="method">
-			<p class="method_desc">Change actual terms of membership related to a member, with the option to prorate it.</p>
+			<p class="method_desc">Change actual subscription plans related to a member, with the option to prorate it.</p>
 			<h3 class="resource_url"><strong>/api/v1/members/update_terms_of_membership</strong> [POST]</h3>
 
 			<div class="parameters">	
@@ -1603,7 +1603,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<li>
 									<span class="name">terms_of_membership_id</span>
 									<span class="type">Integer</span>
-									<span class="text">New Terms of membership's ID to set on members.</span>
+									<span class="text">New subscription plan's ID to set on members.</span>
 								</li>
 							</ul>
 						
@@ -1710,7 +1710,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 								<span class="type">String</span>
 								<span class="text">Member's membership status after enrolling. There are two possibles status when the member is enrolled:
 <ul>
-  <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the terms of membership the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
+  <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the subscription plan the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
   <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
 </ul></span>
 							</li>
@@ -1969,7 +1969,7 @@ It will also send a welcome email and charge the enrollment to the member's cred
 	</div>
     
     <div id="footer">
-  Generated on Mon Sep 15 08:52:38 2014 with ruby-1.9.3
+  Generated on Fri Oct  2 09:51:14 2015 with ruby-2.0.0
 </div>
 
   </body>

@@ -45,7 +45,7 @@ class EmailTemplatesController < ApplicationController
       render action: "new"
     end
   rescue ActiveRecord::RecordNotFound 
-    flash[:error] = "Terms of membership not found."
+    flash[:error] = "Subscription plan not found."
     redirect_to terms_of_membership_email_templates_path
   end
 
@@ -82,7 +82,7 @@ class EmailTemplatesController < ApplicationController
       end
     end
   rescue ActiveRecord::RecordNotFound 
-    flash[:error] = "Terms of membership or email template not found."
+    flash[:error] = "Subscription plan or email template not found."
     redirect_to terms_of_memberships_url
   end
 
@@ -124,7 +124,7 @@ class EmailTemplatesController < ApplicationController
 	        elsif user.club_id != template.terms_of_membership.club_id
 	          { code: Settings.error_codes.wrong_data, message: "Member does not belong to same club as the Template."}
 	        elsif params[:terms_of_membership_id].to_i != template.terms_of_membership_id
-	          { code: Settings.error_codes.wrong_data, message: "Terms of membership does not belong to this Subscription Plan." }
+	          { code: Settings.error_codes.wrong_data, message: "Subscription plan is not the same as the template." }
 	        else
 	          Communication.test_deliver!(template, user)
 	        end
