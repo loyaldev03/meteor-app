@@ -552,14 +552,6 @@ en:
         is_visible: 'Is Visible?'
         is_visible_label: 'Will product be visible?'
         is_visible_help: 'This option makes a product invisible in the fulfillment file manager.'
-      delayed_job:
-        id: 'ID'
-        attempts: 'Attempts'
-        handler: 'Handler'
-        last_error: 'Last error'
-        run_at: 'Run at'
-        created_at: 'created_at'
-        rescheduled_job: "re-scheduled Job: %{job}"
       payment_gateway_configuration:
         report_group: 'Report Group'
         report_group_help: 'The exact name of the report group set up in Litle that you want all orders to be added to.'
