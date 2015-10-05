@@ -9,7 +9,6 @@
   </div>
   <br>
 <% end %>
-
 <% # First step %>
 <div class="step" id="first">
   <div class="control-group"><%= wizard_steps_indicator(1) %></div>
@@ -43,7 +42,7 @@
 </div>
 
 <% # Second step %>
-<div class="step" id="second" style='width:100%'>  
+<div class="step" id="second">  
   <div class="control-group"><%= wizard_steps_indicator(2) %></div>
   
 <!--   <div class="control-group">
@@ -89,21 +88,23 @@
     </div>
   </div>
 
-  <div class="control-group" id="recurring_amount_amount" style='float:left'>
-    <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label required_asterisk' %>
-    <div class="controls">
-      $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %> 
+  <div class='row span12' style='margin-left:-30px !important;'>
+    <div class="control-group span" id="recurring_amount_amount" >
+      <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %> 
+      </div>
     </div>
-  </div>
 
-  <div class="control-group" id="recurring_amount_days">
-    <div class="controls">
-      <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
-      <%= text_field_tag 'installment_amount_days', @tom.installment_period, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 1 %>
-      <%= select_for_date_span("installment_amount_days_time_span") %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
-      :content => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount_help') } %>
+    <div class="control-group" id="recurring_amount_days">
+      <div class="controls">
+        <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
+        <%= text_field_tag 'installment_amount_days', @tom.installment_period, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 1 %>
+        <%= select_for_date_span("installment_amount_days_time_span") %>
+        <%= render :partial => "shared/help", :locals => { 
+          :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount_help') } %>
+      </div>
     </div>
   </div>
 
