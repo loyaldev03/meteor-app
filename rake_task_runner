@@ -72,14 +72,6 @@ cd /var/www/$2/current && rake clubs:count_members_in_clubs >> $LOGFILE 2>&1
 
 DATE=`date +"%u"` # 1 monday
 if [ "$1" == "production" ]; then
-  if [ "$DATE" == "1" ]; then
-    echo "`date` rake fulfillments:send_print_magazine_hot_rod_file"
-    cd /var/www/$2/current && rake fulfillments:send_print_magazine_hot_rod_file >> $LOGFILE 2>&1 
-  fi
-  if [`date +"%d"` == "01"]; then  
-    echo "`date` rake users:send_magazine_cancellation_email"
-    cd /var/www/$2/current && rake users:send_magazine_cancellation_email >> $LOGFILE 2>&1 
-  fi
   echo "`date` running remote script distribute_production_data.sh"
   ssh deploy@50.116.28.74 -p 30003 '/home/deploy/sac-platform-reporting/current/scripts/distribute_production_data.sh >> /home/deploy/sac-platform-reporting/current/log/nightly.log 2>&1'
 fi

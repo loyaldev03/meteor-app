@@ -302,7 +302,7 @@ namespace :fulfillments do
     end
   end
 
-  desc "Create magazine fulfillment file for Hot Rod" 
+  desc "NO LONGER USED (https://www.pivotaltracker.com/story/show/104026972) - Create magazine fulfillment file for Hot Rod" 
   task :send_print_magazine_hot_rod_file => :environment do
     require 'csv'
     require 'net/ftp'    
