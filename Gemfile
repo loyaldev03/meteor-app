@@ -30,7 +30,7 @@ group :assets do
   gem 'coffee-rails'
 
   gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
-  gem 'jquery-ui-rails', '1.1.0'
+  gem 'jquery-ui-rails'
   gem 'uglifier', '>= 1.0.3'
 end
 
@@ -54,7 +54,7 @@ gem "axlsx", "~> 2.0.1"
 
 gem 'twitter-bootstrap-rails', '2.2.7'
 
-gem 'jquery-rails', '2.0.3'
+gem 'jquery-rails'
 
 gem "paranoia", "~> 2.0"
 
