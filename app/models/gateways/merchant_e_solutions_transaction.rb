@@ -44,6 +44,7 @@ class MerchantESolutionsTransaction < Transaction
       self.success = chargeback_success
       self.membership_id = sale_transaction.membership_id
       self.operation_type = chargeback_operation_type
+      self.created_at = args[:adjudication_date]
       self.save
       Auditory.audit(nil, self, operation_description, sale_transaction.user, chargeback_operation_type)
     end

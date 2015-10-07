@@ -37,6 +37,7 @@ class TrustCommerceTransaction < Transaction
       self.success = true
       self.membership_id = sale_transaction.membership_id
       self.operation_type = Settings.operation_types.chargeback
+      self.created_at = args[:adjudication_date]
       self.save
       Auditory.audit(nil, self, operation_description, sale_transaction.user, Settings.operation_types.chargeback)
     end
