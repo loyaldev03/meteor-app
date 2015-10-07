@@ -48,17 +48,17 @@ class ProductsController < ApplicationController
 
   # PUT /products/1
   def update
+    require "ruby-debug"; debugger
     @product = Product.find(params[:id])
     my_authorize! :update, Product, @product.club_id
     @product.update_product_data_by_params params[:product]
     if @product.save
-      redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully updated.' 
+      render json: { success: true }
     else
-      render action: "edit"
+      render json: { success: false, message: 'Product was not updated.' }
     end
   rescue ActiveRecord::RecordNotUnique => e
-    flash.now[:error] = "Sku '#{@product.sku}' is already taken within this club."
-    render action: "edit"  
+    render json: { success: false, message: "Sku '#{@product.sku}' is already taken within this club." }
   end
 
   # DELETE /products/1
