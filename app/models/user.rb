@@ -967,7 +967,7 @@ class User < ActiveRecord::Base
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
-    if allow_club_cash_transaction?
+    if club.allow_club_cash_transaction?
       add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.')
       if is_not_drupal?
         self.club_cash_expire_date = self.club_cash_expire_date + 12.months
