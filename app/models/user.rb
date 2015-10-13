@@ -6,15 +6,15 @@ class User < ActiveRecord::Base
   belongs_to :member_group_type
   has_many :user_notes
   has_many :credit_cards
-  has_many :transactions, order: "created_at ASC"
+  has_many :transactions #, order: "created_at ASC" # TODO: sort them when this method is used
   has_many :operations
-  has_many :communications, order: "created_at DESC"
+  has_many :communications#, order: "created_at DESC"
   has_many :fulfillments
   has_many :club_cash_transactions
-  has_many :enrollment_infos, order: "created_at DESC"
+  has_many :enrollment_infos#, order: "created_at DESC" # TODO: sort them when this method is used
   has_many :user_preferences
   has_many :user_additional_data
-  has_many :memberships, order: "created_at DESC"
+  has_many :memberships#, order: "created_at DESC" # TODO: sort them when this method is used
   belongs_to :current_membership, class_name: 'Membership'
   
   # TODO: should we use delegate??
