@@ -713,7 +713,12 @@ class User < ActiveRecord::Base
       answer = trans.process
       unless trans.success?
         operation_type = Settings.operation_types.error_on_enrollment_billing
-        Auditory.audit(agent, trans, "Transaction was not successful.", (self.new_record? ? nil : self), operation_type)
+        if self.new_record?
+          logger.error "* * * * * * Failed transaction upon enrollment. Trans ID: #{trans.id}"
+        else
+          Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
+        end
+      # TODO: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
         trans.operation_type = operation_type
         trans.membership_id = nil
         trans.save
@@ -757,7 +762,8 @@ class User < ActiveRecord::Base
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
       Auditory.report_issue(error_message, e, { :user => self.inspect, :credit_card => credit_card.inspect, :enrollment_info => enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
-      Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing) 
+      # TODO2: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
+      Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing) unless self.new_record?
       { :message => I18n.t('error_messages.user_not_saved', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.user_not_saved }
     end
   end
