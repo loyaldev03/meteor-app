@@ -11,7 +11,7 @@ class EnrollmentInfo < ActiveRecord::Base
                   :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,
                   :campaign_medium_version, :joint
 
-  scope :current, :order => ("created_at DESC"), :limit => 1
+  scope :current, order: ("created_at DESC"), limit: 1
 
   CS_MEGA_CHANNEL = 'other'
   CS_CAMPAIGN_MEDIUM = 'phone'

@@ -7,7 +7,7 @@ class FirstDataTransaction < Transaction
 
   def self.store!(am_credit_card, pgc)
   	ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
-    login_data = { :login => pgc.login, :password => pgc.password }
+    login_data = { login: pgc.login, password: pgc.password }
     gateway = ActiveMerchant::Billing::FirstdataE4Gateway.new(login_data)
     answer = gateway.store(am_credit_card)
     raise answer.message unless answer.success?    
@@ -42,7 +42,7 @@ class FirstDataTransaction < Transaction
     end
 
     def load_gateway(recurrent = false)
-      login_data = { :login => login, :password => password }
+      login_data = { login: login, password: password }
       @gateway = ActiveMerchant::Billing::FirstdataE4Gateway.new(login_data)
     end
 end

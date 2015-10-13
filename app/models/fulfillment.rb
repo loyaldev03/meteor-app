@@ -30,15 +30,15 @@ class Fulfillment < ActiveRecord::Base
 
   scope :not_renewed, lambda { where("renewed = false") }
 
-  scope :to_be_renewed, lambda { joins(:user => :club).readonly(false).where([ 
+  scope :to_be_renewed, lambda { joins(user: :club).readonly(false).where([ 
     " date(renewable_at) <= ? AND fulfillments.status NOT IN ('canceled', 'in_process') 
       AND recurrent = true AND renewed = false AND clubs.billing_enable = true 
       AND users.status = 'active' AND users.recycled_times = 0",  
     Time.zone.now.to_date]) }
 
-  delegate :club, :to => :user
+  delegate :club, to: :user
 
-  state_machine :status, :initial => :not_processed do
+  state_machine :status, initial: :not_processed do
 
     event :set_as_not_processed do
       transition all => :not_processed
@@ -113,12 +113,12 @@ class Fulfillment < ActiveRecord::Base
   def decrease_stock!
     old_status = self.status
     if product.nil? 
-      {:message => I18n.t('error_messages.product_empty'), :code => Settings.error_codes.product_empty}
+      {message: I18n.t('error_messages.product_empty'), code: Settings.error_codes.product_empty}
     elsif not product.has_stock?
-      {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
+      {message: I18n.t('error_messages.product_out_of_stock'), code: Settings.error_codes.product_out_of_stock}
     else
       product.decrease_stock
-      {:message => "Stock reduced with success", :code => Settings.error_codes.success}
+      {message: "Stock reduced with success", code: Settings.error_codes.success}
     end
   end
 
@@ -131,21 +131,21 @@ class Fulfillment < ActiveRecord::Base
   def update_status(agent, new_status, reason, file = nil)
     old_status = self.status
     if renewed?
-      return {:message => I18n.t("error_messages.fulfillment_is_renwed") , :code => Settings.error_codes.fulfillment_error }
+      return {message: I18n.t("error_messages.fulfillment_is_renwed") , code: Settings.error_codes.fulfillment_error }
     elsif new_status.blank?
-      return {:message => I18n.t("error_messages.fulfillment_new_status_blank") , :code => Settings.error_codes.fulfillment_error }
+      return {message: I18n.t("error_messages.fulfillment_new_status_blank") , code: Settings.error_codes.fulfillment_error }
     elsif old_status == new_status
-      return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
+      return {message: I18n.t("error_messages.fulfillment_new_status_equal_to_old", fulfillment_sku: self.product_sku) , code: Settings.error_codes.fulfillment_error }
     elsif new_status == 'bad_address' or new_status == 'returned'
       if reason.blank?
-        return {:message => I18n.t("error_messages.fulfillment_reason_blank"), :code => Settings.error_codes.fulfillment_reason_blank}
+        return {message: I18n.t("error_messages.fulfillment_reason_blank"), code: Settings.error_codes.fulfillment_reason_blank}
       else
-        answer = ( user.wrong_address.nil? ? user.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success, :message => "Member already set as wrong address."} )
+        answer = ( user.wrong_address.nil? ? user.set_wrong_address(agent, reason, false) : {code: Settings.error_codes.success, message: "Member already set as wrong address."} )
       end
     elsif new_status == 'not_processed'
       answer = decrease_stock!
     else
-      answer = { :code => Settings.error_codes.success }
+      answer = { code: Settings.error_codes.success }
     end
     self.status = new_status
     self.save
@@ -164,11 +164,11 @@ class Fulfillment < ActiveRecord::Base
       message = "Changed status on File ##{file} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     end
     Auditory.audit(agent, self, message, user, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
-    return { :message => message, :code => Settings.error_codes.success }
+    return { message: message, code: Settings.error_codes.success }
   rescue Exception => e
     message = I18n.t('error_messages.fulfillment_error')
     Auditory.audit(agent, self, message, user, Settings.error_codes.fulfillment_error )
-    return { :message => message, :code => Settings.error_codes.fulfillment_error }
+    return { message: message, code: Settings.error_codes.fulfillment_error }
   end
 
   # def resend(agent)
@@ -197,8 +197,8 @@ class Fulfillment < ActiveRecord::Base
     end
     user = self.user
     if fulfillment_file.kit_kard_type?
-      [ user.id, user.first_name, user.last_name, (I18n.l user.member_since_date, :format => :only_date_short),
-              (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), user.address, user.city,
+      [ user.id, user.first_name, user.last_name, (I18n.l user.member_since_date, format: :only_date_short),
+              (I18n.l self.renewable_at, format: :only_date_short if self.renewable_at), user.address, user.city,
               user.state,"=\"#{user.zip}\"", self.product_sku, ('C' if user.member_group_type_id) ]
     else
       [ self.tracking_code, self.product.cost_center, user.full_name, user.address, user.city,

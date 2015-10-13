@@ -11,7 +11,7 @@ class MerchantESolutionsTransaction < Transaction
   # AM::Store::Answer => #<ActiveMerchant::Billing::Response:0x0000000718c228 @params={"transaction_id"=>"1e9be6d0b4303619897d20524de49372", "error_code"=>"000", "auth_response_text"=>"Card Data Stored"}, @message="This transaction has been approved", @success=true, @test=true, @authorization="1e9be6d0b4303619897d20524de49372", @fraud_review=nil, @avs_result={"code"=>nil, "message"=>nil, "street_match"=>nil, "postal_match"=>nil}, @cvv_result={"code"=>nil, "message"=>nil}>
   def self.store!(am_credit_card, pgc)
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
-    login_data = { :login => pgc.login, :password => pgc.password, :merchant_key => pgc.merchant_key }
+    login_data = { login: pgc.login, password: pgc.password, merchant_key: pgc.merchant_key }
     gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(login_data)
     answer = gateway.store(am_credit_card)
     raise answer.params['error_code'] unless answer.success?
@@ -78,7 +78,7 @@ class MerchantESolutionsTransaction < Transaction
     end
 
     def load_gateway(recurrent = false)
-      @login_data = { :login => login, :password => password, :merchant_key => merchant_key }
+      @login_data = { login: login, password: password, merchant_key: merchant_key }
       @gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(@login_data)
       @options[:customer] = user_id 
       @options[:moto_ecommerce_ind] = 2 if recurrent

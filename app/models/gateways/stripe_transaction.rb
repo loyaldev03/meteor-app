@@ -9,11 +9,11 @@ class StripeTransaction < Transaction
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
     gateway = ActiveMerchant::Billing::StripeGateway.new login: pgc.login
     if user.stripe_id
-      answer = gateway.store(am_credit_card, { customer: user.stripe_id, :set_default => true}) 
+      answer = gateway.store(am_credit_card, { customer: user.stripe_id, set_default: true}) 
       raise answer.params["error"]["code"] if answer.params["error"]
       answer.params["fingerprint"]
     else
-      answer = gateway.store(am_credit_card, { email: user.email, :set_default => true})
+      answer = gateway.store(am_credit_card, { email: user.email, set_default: true})
       raise answer.params["error"]["code"] if answer.params["error"]
       user.stripe_id = answer.params["id"]
       answer.params["sources"]["data"].first["fingerprint"]

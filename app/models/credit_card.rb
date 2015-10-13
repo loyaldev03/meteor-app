@@ -8,8 +8,8 @@ class CreditCard < ActiveRecord::Base
   before_destroy :confirm_presence_of_another_credit_card_related_to_user
   after_save :elasticsearch_index_asyn_call
 
-  validates :expire_month, :numericality => { :only_integer => true, :greater_than => 0, :less_than_or_equal_to => 12 }
-  validates :expire_year, :numericality => { :only_integer => true, :greater_than => 2000 }
+  validates :expire_month, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 12 }
+  validates :expire_year, numericality: { only_integer: true, greater_than: 2000 }
 
   BLANK_CREDIT_CARD_TOKEN = 'a'
 
@@ -86,11 +86,11 @@ class CreditCard < ActiveRecord::Base
   def self.am_card(number, expire_month, expire_year, first_name, last_name)
     ActiveMerchant::Billing::CreditCard.require_verification_value = false
     ActiveMerchant::Billing::CreditCard.new(
-      :number     => number,
-      :month      => expire_month,
-      :year       => expire_year,
-      :first_name => first_name,
-      :last_name  => last_name
+      number: number,
+      month: expire_month,
+      year: expire_year,
+      first_name: first_name,
+      last_name: last_name
     )
   end
 
@@ -104,7 +104,7 @@ class CreditCard < ActiveRecord::Base
       self.update_attribute :active , true
       Auditory.audit(nil, self, "Credit card #{last_digits} marked as active.", self.user, Settings.operation_types.credit_card_activated)
     else
-      raise CreditCardDifferentGatewaysException.new(:message => "Different Gateway")
+      raise CreditCardDifferentGatewaysException.new(message: "Different Gateway")
     end
   end
 
@@ -169,14 +169,14 @@ class CreditCard < ActiveRecord::Base
 
   def update_expire(year, month, current_agent = nil)
     if year.to_i == expire_year.to_i and month.to_i == expire_month.to_i
-      { :code => Settings.error_codes.success, :message => "New expiration date its identically than the one we have in database." }
+      { code: Settings.error_codes.success, message: "New expiration date its identically than the one we have in database." }
     elsif Time.new(year, month, nil, nil, nil, nil, self.user.get_offset_related) >= Time.now.in_time_zone(self.user.get_club_timezone).beginning_of_month
       message = "Changed credit card XXXX-XXXX-XXXX-#{last_digits} from #{expire_month}/#{expire_year} to #{month}/#{year}"
-      update_attributes(:expire_month => month, :expire_year => year)
+      update_attributes(expire_month: month, expire_year: year)
       Auditory.audit(current_agent, self, message, self.user, Settings.operation_types.credit_card_updated)
-      { :code => Settings.error_codes.success, :message => message }
+      { code: Settings.error_codes.success, message: message }
     else
-      { :code => Settings.error_codes.invalid_credit_card, :message => I18n.t('error_messages.invalid_credit_card') + " Expiration date could be wrong.", :errors => { :number => "New expiration date is expired." }}
+      { code: Settings.error_codes.invalid_credit_card, message: I18n.t('error_messages.invalid_credit_card') + " Expiration date could be wrong.", errors: { number: "New expiration date is expired." }}
     end
   end
 

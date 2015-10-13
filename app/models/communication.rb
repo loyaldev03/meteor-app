@@ -17,7 +17,7 @@ class Communication < ActiveRecord::Base
         message = "'#{template_type}' and TOMID ##{user.terms_of_membership_id}"
         logger.error "* * * * * Template does not exist - Template missing: " + message + " - Member: #{user.inspect}"
       else
-        c = Communication.new :email => user.email
+        c = Communication.new email: user.email
         c.user_id = user.id
         c.template_name = template.name
         c.client = template.client
@@ -52,18 +52,18 @@ class Communication < ActiveRecord::Base
       self.save!
       Auditory.audit(nil, self, "Communication '#{template_name}' scheduled", user, Settings.operation_types["#{template_type}_email"])
     else
-      update_attributes :sent_success => false, :response => I18n.t('error_messages.no_marketing_client_configure') , :processed_at => Time.zone.now
+      update_attributes sent_success: false, response: I18n.t('error_messages.no_marketing_client_configure') , processed_at: Time.zone.now
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
+    update_attributes sent_success: false, response: e, processed_at: Time.zone.now
     unless e.to_s.include?("Timeout")
-      Auditory.report_issue("Communication deliver_exact_target", e, { :user => user.inspect, 
-        :current_membership => user.current_membership.inspect, :communication => self.inspect })
+      Auditory.report_issue("Communication deliver_exact_target", e, { user: user.inspect, 
+        current_membership: user.current_membership.inspect, communication: self.inspect })
       Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
     end
   end  
-  handle_asynchronously :deliver_exact_target, :queue => :exact_target_email, priority: 15
+  handle_asynchronously :deliver_exact_target, queue: :exact_target_email, priority: 15
 
   def self.test_deliver_exact_target(template, user)
     if user.exact_target_member
@@ -76,7 +76,7 @@ class Communication < ActiveRecord::Base
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { :user => user.inspect, :template => template.inspect })
+    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { user: user.inspect, template: template.inspect })
     { sent_success: false, response: e.to_s }
   end
 
@@ -89,18 +89,18 @@ class Communication < ActiveRecord::Base
       self.save!
       Auditory.audit(nil, self, "Communication '#{template_name}' scheduled", user, Settings.operation_types["#{template_type}_email"])
     else
-      update_attributes :sent_success => false, :response => I18n.t('error_messages.no_marketing_client_configure') , :processed_at => Time.zone.now
+      update_attributes sent_success: false, response: I18n.t('error_messages.no_marketing_client_configure') , processed_at: Time.zone.now
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
+    update_attributes sent_success: false, response: e, processed_at: Time.zone.now
     unless e.to_s.include?("Timeout")
-      Auditory.report_issue("Communication deliver_mandrill", e, { :user => user.inspect, 
-        :current_membership => user.current_membership.inspect, :communication => self.inspect })
+      Auditory.report_issue("Communication deliver_mandrill", e, { user: user.inspect, 
+        current_membership: user.current_membership.inspect, communication: self.inspect })
       Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
     end
   end
-  handle_asynchronously :deliver_mandrill, :queue => :mandrill_email, priority: 15
+  handle_asynchronously :deliver_mandrill, queue: :mandrill_email, priority: 15
 
   def self.test_deliver_mandrill(template, user)
     if user.mandrill_member
@@ -112,7 +112,7 @@ class Communication < ActiveRecord::Base
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { :user => user.inspect, :template => template.inspect })
+    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { user: user.inspect, template: template.inspect })
     { sent_success: false, response: e.to_s }
   end
 
@@ -122,24 +122,24 @@ class Communication < ActiveRecord::Base
     lyris.site_id = external_attributes[:site_id]
     lyris.subscribe_user!(self)
     if lyris.unsubscribed?(external_attributes[:mlid], email)
-      update_attributes :sent_success => false, 
-          :response => "Member requested unsubscription to mlid #{external_attributes[:mlid]} at lyris", 
-          :processed_at => Time.zone.now
+      update_attributes sent_success: false, 
+          response: "Member requested unsubscription to mlid #{external_attributes[:mlid]} at lyris", 
+          processed_at: Time.zone.now
       Auditory.audit(nil, self, "Communication '#{template_name}' wont be sent because email is unsubscribed", 
         user, Settings.operation_types["#{template_type}_email"])
     else
       response = lyris.send_email!(external_attributes[:mlid], external_attributes[:trigger_id], email)
-      update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
+      update_attributes sent_success: true, processed_at: Time.zone.now, response: response
       Auditory.audit(nil, self, "Communication '#{template_name}' sent", user, Settings.operation_types["#{template_type}_email"])
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
-    Auditory.report_issue("Communication deliver_lyris", e, { :user => user.inspect, 
-      :current_membership => user.current_membership.inspect, :communication => self.inspect })
+    update_attributes sent_success: false, response: e, processed_at: Time.zone.now
+    Auditory.report_issue("Communication deliver_lyris", e, { user: user.inspect, 
+      current_membership: user.current_membership.inspect, communication: self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
   end
-  handle_asynchronously :deliver_lyris, :queue => :lyris_email, priority: 15
+  handle_asynchronously :deliver_lyris, queue: :lyris_email, priority: 15
 
   def deliver_action_mailer
     response = case template_type.to_sym
@@ -163,18 +163,18 @@ class Communication < ActiveRecord::Base
       Notifier.soft_decline(user).deliver!
     else
       message = "Deliver action could not be done."
-      Auditory.report_issue("Communication deliver_action_mailer", message, { :user => user.inspect, :communication => self.inspect })
+      Auditory.report_issue("Communication deliver_action_mailer", message, { user: user.inspect, communication: self.inspect })
       logger.error "Template type #{template_type} not supported."
     end
-    update_attributes :sent_success => true, :processed_at => Time.zone.now, :response => response
+    update_attributes sent_success: true, processed_at: Time.zone.now, response: response
     Auditory.audit(nil, self, "Communication '#{template_name}' sent", user, Settings.operation_types["#{template_type}_email"])
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    update_attributes :sent_success => false, :response => e, :processed_at => Time.zone.now
-    Auditory.report_issue("Communication deliver_action_mailer", e, { :user => user.inspect, :communication => self.inspect })
+    update_attributes sent_success: false, response: e, processed_at: Time.zone.now
+    Auditory.report_issue("Communication deliver_action_mailer", e, { user: user.inspect, communication: self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
   end
-  handle_asynchronously :deliver_action_mailer, :queue => :email_queue, priority: 15
+  handle_asynchronously :deliver_action_mailer, queue: :email_queue, priority: 15
 
   def self.test_deliver_action_mailer(template, user)
     success = true
