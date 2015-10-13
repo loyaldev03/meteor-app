@@ -28,11 +28,12 @@ gem 'mandrill-api'
 group :assets do
   gem 'sass-rails'
   gem 'coffee-rails'
-
-  gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
-  gem 'jquery-ui-rails'
   gem 'uglifier', '>= 1.0.3'
 end
+
+
+gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
+gem 'jquery-ui-rails'
 
 gem 'carmen-rails'
 gem 'country_code_select', '~> 1.0.0' 

@@ -13,8 +13,8 @@ class Club < ActiveRecord::Base
   has_many :products
   has_many :club_roles
   has_many :agents,
-    through: :club_roles,
-    uniq: true
+    through: :club_roles
+#    uniq: true # TODO add uniqueness validation
   has_many :fulfillment_files
   has_many :disposition_types
 
