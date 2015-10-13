@@ -57,11 +57,12 @@
     </div>
   </div>
 
-  <div class="form-actions">
-    <%= f.submit nil, :class => 'btn btn-primary' %>
-    <%= link_to t('.cancel', :default => t("cancel")),
-                products_path, :class => 'btn' %>
-  </div>
+  <% unless f.object.persisted? %>
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to t('.cancel', :default => t("cancel")), products_path, :class => 'btn' %>
+    </div>
+  <% end %>
 
 <script>
   $(document).ready(new_product_functions())

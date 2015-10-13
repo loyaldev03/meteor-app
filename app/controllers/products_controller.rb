@@ -28,6 +28,7 @@ class ProductsController < ApplicationController
   def edit
     @product = Product.find(params[:id])
     my_authorize! :edit, Product, @product.club_id
+    render partial: "edit"
   end
 
   # POST /products
@@ -48,14 +49,13 @@ class ProductsController < ApplicationController
 
   # PUT /products/1
   def update
-    require "ruby-debug"; debugger
     @product = Product.find(params[:id])
     my_authorize! :update, Product, @product.club_id
     @product.update_product_data_by_params params[:product]
     if @product.save
       render json: { success: true }
     else
-      render json: { success: false, message: 'Product was not updated.' }
+      render json: { success: false, message: 'Product was not updated.', errors: @product.errors }
     end
   rescue ActiveRecord::RecordNotUnique => e
     render json: { success: false, message: "Sku '#{@product.sku}' is already taken within this club." }

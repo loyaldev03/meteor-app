@@ -55,6 +55,11 @@ $(document).ready( function() {
   });
 });
 
+function flash_message(message){
+  $(".container .row:first .alert").remove();
+  $(".container .row:first").prepend("<div class='alert alert-info'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
+}
+
 function global_ajax_error_messages(jqXHR){
   if (jqXHR.status == 401)
     return 'Agent is not authorized to make this request.';
@@ -217,7 +222,46 @@ function product_index_functions(column_count){
     "aaSorting": [[ 0, "asc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
     "sAjaxSource": $('#products_table').data('source'),
-  });       
+  });
+  $('a[data-toggle="custom-remote-modal"]').live("click", function(event){
+    event.preventDefault();
+    var targetModal = '#myModal'+ $(this).data('target');
+    $(targetModal + ' .modal-body').load($(this).attr('href'), function(e) {
+      $(targetModal).modal('show');
+    });
+  });
+  $('.modal-footer input').live("click", function(event){
+    $('#edit_product_'+$(this).data('target')).submit();
+  });
+  $('form').live('submit', function(event){
+    var productId = $(this).data('target');
+    startAjaxLoader();
+    event.preventDefault();
+    $.ajax({
+      type: 'put',
+      url: $(this).attr('action'),
+      data: $(this).serialize(),
+      success: function(data){
+        endAjaxLoader();
+        if(data.success == true){
+          $("#products_table").DataTable().fnReloadAjax();
+          $('#myModal'+productId).modal('hide');
+          flash_message("Product ID "+productId+" was updated successfully.")
+        }else{
+          $("#edit_product_"+productId+" span[data-type='errors']").remove()
+          $("#edit_product_"+productId+" .control-group").removeClass("error")
+          for (var key in data.errors){
+            $('#edit_product_'+productId+' #product_'+key).parents(".control-group").addClass("error")
+            $('#edit_product_'+productId+' #product_'+key).parent().append("<span class='help-inline' data-type='errors'>"+data.errors[key]+"</span>")
+          }
+        }
+      },
+      error: function(jqXHR, exception){
+        endAjaxLoader();
+        alert(global_ajax_error_messages(jqXHR));
+      }
+    })
+  });
 }
 
 function terms_of_memberships_table_index_functions(column_count) {
