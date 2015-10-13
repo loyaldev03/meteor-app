@@ -4,14 +4,14 @@ $(document).ready( function() {
     return answer 
   });
 
-  $('.datatable').dataTable({
+  $('.datatable').DataTable({
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-    "sPaginationType": "bootstrap"
+    "sPaginationType": "full_numbers"
   });
 
-  $('.datatable_only_sorting').dataTable({
+  $('.datatable_only_sorting').DataTable({
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
     "bLengthChange": false,
     "bFilter": false,
     "bSort": true,
@@ -100,11 +100,11 @@ function endAjaxLoader(){
 };
 
 function agent_index_functions(column_count){
-  $('#agents_table').dataTable({
+  $('#agents_table').DataTable({
     "bJQueryUI": false,
     "bProcessing": true,
-    "sPaginationType": "bootstrap",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
@@ -115,8 +115,8 @@ function agent_index_functions(column_count){
 }
 
 function partner_index_functions(column_count){
-  $('#partners_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#partners_table').DataTable({
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -130,8 +130,8 @@ function partner_index_functions(column_count){
 }
 
 function club_index_functions(column_count){
-  $('#clubs_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#clubs_table').DataTable({
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -149,8 +149,8 @@ function club_index_functions(column_count){
 }
 
 function delay_jobs_index_functions(column_count){
-  $('#delayed_jobs_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#delayed_jobs_table').DataTable({
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -166,8 +166,8 @@ function delay_jobs_index_functions(column_count){
 }
 
 function disposition_types_index_functions(column_count){
-  $('#disposition_types_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#disposition_types_table').DataTable({
+    "sPaginationType": "full_numbers",
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -180,8 +180,8 @@ function disposition_types_index_functions(column_count){
 }
 
 function my_club_index_functions(column_count){
-  $('#my_clubs_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#my_clubs_table').DataTable({
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -196,8 +196,8 @@ function my_club_index_functions(column_count){
   });
 }
 function domain_index_functions(column_count){
-  $('#domains_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#domains_table').DataTable({
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -212,8 +212,8 @@ function domain_index_functions(column_count){
 }
 
 function product_index_functions(column_count){
-  $('#products_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#products_table').DataTable({
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -266,8 +266,8 @@ function product_index_functions(column_count){
 }
 
 function terms_of_memberships_table_index_functions(column_count) {
-  $('#terms_of_memberships_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#terms_of_memberships_table').DataTable({
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -729,11 +729,11 @@ function sync_status_user_functions(column_count){
 }
 
 function operation_user_functions(column_count){
-  oTable2 = $('#operations_table').dataTable({
+  oTable2 = $('#operations_table').DataTable({
     "oLanguage": {"sSearch": "Filtered by:"},
     "bJQueryUI": false,
     "bProcessing": true,
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 1, "desc" ]],
@@ -750,11 +750,11 @@ function operation_user_functions(column_count){
 };
 
 function transactions_user_functions(column_count){
-  $('#transactions_table').dataTable({
+  $('#transactions_table').DataTable({
     "bJQueryUI": false,
     "bProcessing": true,
     "bFilter": false,
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
@@ -764,11 +764,11 @@ function transactions_user_functions(column_count){
 }
 
 function memberships_user_functions(column_count){
-  $('#memberships_table').dataTable({
+  $('#memberships_table').DataTable({
     "bJQueryUI": false,
     "bProcessing": true,
     "bFilter": false,
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "bLengthChange": false,
@@ -779,8 +779,8 @@ function memberships_user_functions(column_count){
 }
 
 function fulfillment_files_functions() {
-  $('#fulfillment_files_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#fulfillment_files_table').DataTable({
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -812,11 +812,11 @@ function fulfillment_files_functions() {
 }  
 
 function club_cash_transactions_functions(column_count){
-  $('#club_cash_transactions_table').dataTable({
+  $('#club_cash_transactions_table').DataTable({
     "oLanguage": {"sSearch": "Filtered by:"},
     "bJQueryUI": false,
     "bProcessing": true,
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
@@ -1384,11 +1384,11 @@ function email_templates_functions() {
 }
 
 function email_templates_table_index_functions(column_count) {
-  $('#email_templates_table').dataTable({
+  $('#email_templates_table').DataTable({
     "bJQueryUI": false,
     "bProcessing": true,
     "bFilter": true,
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"lf>rt<"bottom"pi>',
     "bServerSide": true,
     "bLengthChange": false,

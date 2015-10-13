@@ -63,7 +63,7 @@ class Product < ActiveRecord::Base
   def self.generate_xls(clubs_id = nil)
     header = ['Name', 'Sku']
     status_list = Fulfillment.state_machines[:status].states.map(&:name)
-    status_list.each{|x| header << x}
+    status_list.each {|x| header << x}
 
     package = Axlsx::Package.new
     club_list = Club.where(billing_enable: true)

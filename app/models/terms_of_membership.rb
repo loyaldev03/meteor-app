@@ -19,19 +19,19 @@ class TermsOfMembership < ActiveRecord::Base
   validates :name, presence: true, uniqueness: { scope: :club_id }
   #validates :needs_enrollment_approval, :presence => true
   validates :club, presence: true
-  validates :installment_period, numericality: { greater_than_or_equal_to: 1 }, if: Proc.new{ |tom| tom.is_payment_expected }
+  validates :installment_period, numericality: { greater_than_or_equal_to: 1 }, if: Proc.new { |tom| tom.is_payment_expected }
   validates :provisional_days, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :installment_amount, numericality: { greater_than_or_equal_to: 0 }, if: Proc.new{ |tom| tom.is_payment_expected }
+  validates :installment_amount, numericality: { greater_than_or_equal_to: 0 }, if: Proc.new { |tom| tom.is_payment_expected }
   validates :installment_type, presence: true
   validates :initial_club_cash_amount, numericality: { greater_than_or_equal_to: 0 }
-  validates :club_cash_installment_amount, numericality: { greater_than_or_equal_to: 0 }, if: Proc.new{ |tom| tom.is_payment_expected }
+  validates :club_cash_installment_amount, numericality: { greater_than_or_equal_to: 0 }, if: Proc.new { |tom| tom.is_payment_expected }
   # validates :initial_fee, :numericality => { :greater_than_or_equal_to => 0 }
   # validates :trial_period_amount, :numericality => { :greater_than_or_equal_to => 0 }
   validates :is_payment_expected, inclusion: { in: [true, false] } 
   validates :subscription_limits, numericality: { greater_than_or_equal_to: 0 }
   validates :if_cannot_bill, presence: true
   validates :downgrade_tom_id, presence: true, if: Proc.new { |tom| tom.downgradable? }
-  validates :upgrade_tom_period, presence: true, numericality: { greater_than_or_equal_to: 1 }, if: Proc.new{ |tom| tom.upgradable? }
+  validates :upgrade_tom_period, presence: true, numericality: { greater_than_or_equal_to: 1 }, if: Proc.new { |tom| tom.upgradable? }
 
   validate :validate_payment_gateway_configuration
 
