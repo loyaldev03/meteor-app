@@ -1,11 +1,11 @@
 class Product < ActiveRecord::Base
   belongs_to :club
 
-  validates :sku, :presence => true, :format => /^[0-9a-zA-Z\-_]+$/, :length => { :minimum => 2 }, :uniqueness => { scope: [:club_id, :deleted_at] }
-  validates :cost_center, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 30 }, :allow_nil => true
+  validates :sku, presence: true, format: /\A[0-9a-zA-Z\-_]+\z/, length: { minimum: 2 }, uniqueness: { scope: [:club_id, :deleted_at] }
+  validates :cost_center, format: /\A[a-zA-Z\-_]+\z/, length: { minimum: 2, maximum: 30 }, allow_nil: true
 
-  validates :package, :format => /^[a-zA-Z\-_]+$/, :length => { :maximum => 19 }
-  validates :stock, :numericality => { :only_integer => true, :less_than => 1999999 }, :allow_backorder => true
+  validates :package, format: /\A[a-zA-Z\-_]+\z/, length: { maximum: 19 }
+  validates :stock, numericality: { only_integer: true, less_than: 1999999 }, allow_backorder: true
 
   scope :with_stock, where('(allow_backorder = true) OR (allow_backorder = false and stock > 0)')
   scope :not_kit_card, where('sku != "KIT-CARD" ')

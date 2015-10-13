@@ -20,15 +20,15 @@ class EmailTemplate < ActiveRecord::Base
 
   CLIENTS = [ :exact_target, :action_mailer, :lyris ]
 
-  validates :name, :template_type, :terms_of_membership_id, :client, :presence => :true
+  validates :name, :template_type, :terms_of_membership_id, :client, presence: :true
 
   validates :name, uniqueness: { scope: [:terms_of_membership_id, :client] }
 
-  validates :template_type, uniqueness: { scope: [:terms_of_membership_id, :client] }, :unless => :is_pillar?
+  validates :template_type, uniqueness: { scope: [:terms_of_membership_id, :client] }, unless: :is_pillar?
   
   validates :external_attributes, length: { maximum: 2048 }
   
-  validates :days, numericality: { only_integer: true, :greater_than_or_equal_to => 1, :less_than_or_equal_to => 1000 }, :if => lambda { |record| record.is_pillar? or record.is_prebill? }
+  validates :days, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 1000 }, if: lambda { |record| record.is_pillar? or record.is_prebill? }
 
   def self.external_attributes_related_to_client(client)
     case client

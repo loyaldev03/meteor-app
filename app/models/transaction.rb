@@ -6,7 +6,7 @@ class Transaction < ActiveRecord::Base
   belongs_to :credit_card
   # This value will be not nil only if we are billing
   belongs_to :terms_of_membership
-  has_many :operations, :as => :resource
+  has_many :operations, as: :resource
 
   serialize :response, JSON
 
@@ -79,16 +79,16 @@ class Transaction < ActiveRecord::Base
     self.operation_type = operation_type_to_set
     self.save
     @options = {
-      :order_id => invoice_number,
-      :billing_address => {
-        :name     => "#{first_name} #{last_name}",
-        :address1 => address[0..34], # Litle has this restriction of characters.
-        :city     => city,
-        :state    => state,
-        :zip      => zip.to_s.gsub(/[a-zA-Z-]/, ''),
-        :phone    => phone_number
+      order_id: invoice_number,
+      billing_address: {
+        name: "#{first_name} #{last_name}",
+        address1: address[0..34], # Litle has this restriction of characters.
+        city: city,
+        state: state,
+        zip: zip.to_s.gsub(/[a-zA-Z-]/, ''),
+        phone: phone_number
       },
-      :expiration_date => "%02d%s" % [ self.expire_month.to_i, self.expire_year.to_s.last(2) ]
+      expiration_date: "%02d%s" % [ self.expire_month.to_i, self.expire_year.to_s.last(2) ]
     }
   end
 
@@ -140,7 +140,7 @@ class Transaction < ActiveRecord::Base
       #when "authorization_capture"
       #  authorization_capture
       else
-        { :message=>"Operation -#{transaction_type}- not supported", :code=> Settings.error_codes.not_supported }
+        { message: "Operation -#{transaction_type}- not supported", code: Settings.error_codes.not_supported }
     end
   end
 
@@ -212,16 +212,16 @@ class Transaction < ActiveRecord::Base
 
   def self.refund(amount, sale_transaction_id, agent=nil, update_refunded_amount = true, operation_type_to_set = Settings.operation_types.credit)
     # Lock transaction, so no one can use this record while we refund this member.
-    sale_transaction = Transaction.find sale_transaction_id, :lock => true
+    sale_transaction = Transaction.find sale_transaction_id, lock: true
     if not sale_transaction.has_same_pgc_as_current?
-      { :code => Settings.error_codes.transaction_gateway_differs_from_current, :message => I18n.t("error_messages.transaction_gateway_differs_from_current") }
+      { code: Settings.error_codes.transaction_gateway_differs_from_current, message: I18n.t("error_messages.transaction_gateway_differs_from_current") }
     else
       Transaction.transaction do
         amount = amount.to_f
         if amount <= 0.0
-          return { :message => I18n.t('error_messages.credit_amount_invalid'), :code => Settings.error_codes.credit_amount_invalid }
+          return { message: I18n.t('error_messages.credit_amount_invalid'), code: Settings.error_codes.credit_amount_invalid }
         elsif sale_transaction.amount_available_to_refund.to_f < amount
-          return { :message => I18n.t('error_messages.refund_invalid'), :code => Settings.error_codes.refund_invalid }
+          return { message: I18n.t('error_messages.refund_invalid'), code: Settings.error_codes.refund_invalid }
         end
         trans = Transaction.obtain_transaction_by_gateway!(sale_transaction.gateway)
         trans.prepare(sale_transaction.user, sale_transaction.credit_card, -amount, sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, sale_transaction.membership, operation_type_to_set)
@@ -278,48 +278,48 @@ class Transaction < ActiveRecord::Base
 
     def credit
       if payment_gateway_configuration.nil?
-        save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
+        save_custom_response({ message: "Payment gateway not found.", code: Settings.error_codes.not_found })
       elsif self.token.nil? or self.token.size < 4
-        save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
+        save_custom_response({ code: Settings.error_codes.credit_card_blank_without_grace, message: "Credit card is blank we wont bill" })
       else
         load_gateway
         credit_response=@gateway.credit(amount_to_send, credit_card_token, @options)
         save_response(credit_response)
       end
     rescue Timeout::Error
-      save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
+      save_custom_response({ code: Settings.error_codes.payment_gateway_time_out, message: I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
-      response = save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Credit", e, {:user => self.user.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
+      response = save_custom_response({ code: Settings.error_codes.payment_gateway_error, message: I18n.t('error_messages.airbrake_error_message') })
+      Auditory.report_issue("Transaction::Credit", e, {user: self.user.inspect, transaction: "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
       response
     end
 
     def refund
       if payment_gateway_configuration.nil?
-        save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
+        save_custom_response({ message: "Payment gateway not found.", code: Settings.error_codes.not_found })
       elsif self.token.nil? or self.token.size < 4
-        save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
+        save_custom_response({ code: Settings.error_codes.credit_card_blank_without_grace, message: "Credit card is blank we wont bill" })
       else
         load_gateway
         refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
         save_response(refund_response)
       end
     rescue Timeout::Error
-      save_custom_response({ :code => Settings.error_codes.payment_gateway_time_out, :message => I18n.t('error_messages.payment_gateway_time_out') })
+      save_custom_response({ code: Settings.error_codes.payment_gateway_time_out, message: I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
-      response = save_custom_response({ :code => Settings.error_codes.payment_gateway_error, :message => I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Refund", e, {:user => self.user.inspect, :transaction => "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
+      response = save_custom_response({ code: Settings.error_codes.payment_gateway_error, message: I18n.t('error_messages.airbrake_error_message') })
+      Auditory.report_issue("Transaction::Refund", e, {user: self.user.inspect, transaction: "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
       response
     end
 
     # Process only sale operations
     def sale
       if payment_gateway_configuration.nil?
-        save_custom_response({ :message => "Payment gateway not found.", :code => Settings.error_codes.not_found })
+        save_custom_response({ message: "Payment gateway not found.", code: Settings.error_codes.not_found })
       elsif amount.to_f == 0.0
-        save_custom_response({ :message => "Transaction success. Amount $0.0", :code => Settings.error_codes.success }, true)
+        save_custom_response({ message: "Transaction success. Amount $0.0", code: Settings.error_codes.success }, true)
       elsif self.token.nil? or self.token.size < 4
-        save_custom_response({ :code => Settings.error_codes.credit_card_blank_without_grace, :message => "Credit card is blank we wont bill" })
+        save_custom_response({ code: Settings.error_codes.credit_card_blank_without_grace, message: "Credit card is blank we wont bill" })
       else
         load_gateway
         purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
@@ -328,12 +328,12 @@ class Transaction < ActiveRecord::Base
     end
 
     def sale_manual
-      purchase_response = { :message => "Manual transaction success. Amount $#{self.amount}", :code => Settings.error_codes.success }
+      purchase_response = { message: "Manual transaction success. Amount $#{self.amount}", code: Settings.error_codes.success }
       save_custom_response(purchase_response, true)
     end
 
     def balance
-      save_custom_response({ :message => "Balance transaction.", :code => Settings.error_codes.success }, true)
+      save_custom_response({ message: "Balance transaction.", code: Settings.error_codes.success }, true)
     end
 
     def save_custom_response(answer, trans_success=false)
@@ -349,14 +349,14 @@ class Transaction < ActiveRecord::Base
       if answer.params and answer.params[:duplicate]=="true"
         # we keep this if, just because it was on Litle version (compatibility).
         # MeS seems to not send this param
-        { :message => I18n.t('error_messages.duplicate_transaction', :response => response.params[:response]), :code => Settings.error_codes.duplicate_transaction }
+        { message: I18n.t('error_messages.duplicate_transaction', response: response.params[:response]), code: Settings.error_codes.duplicate_transaction }
       elsif answer.success?
         unless self.credit_card.nil?
           self.credit_card.accepted_on_billing
         end
-        { :message => answer.message, :code=> Settings.error_codes.success }
+        { message: answer.message, code: Settings.error_codes.success }
       else
-        { :message=>"Error: " + answer.message, :code=>self.response_code }
+        { message: "Error: " + answer.message, code: self.response_code }
       end
     end
 

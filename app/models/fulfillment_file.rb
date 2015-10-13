@@ -4,11 +4,11 @@ class FulfillmentFile < ActiveRecord::Base
   belongs_to :agent
   belongs_to :club
 
-  state_machine :status, :initial => :in_process do
-    after_transition :in_process => :sent, :do => :mark_fulfillments_as_sent
+  state_machine :status, initial: :in_process do
+    after_transition in_process: :sent, do: :mark_fulfillments_as_sent
 
     event :processed do
-      transition :in_process => :sent
+      transition in_process: :sent
     end
     
     #First status. fulfillment file was created
@@ -39,7 +39,7 @@ class FulfillmentFile < ActiveRecord::Base
 
   def generateXLS(change_status = false)
     package = Axlsx::Package.new
-    package.workbook.add_worksheet(:name => "Fulfillments") do |sheet|
+    package.workbook.add_worksheet(name: "Fulfillments") do |sheet|
       if self.kit_kard_type?
         sheet.add_row Fulfillment::KIT_CARD_HEADER
       else
@@ -67,6 +67,6 @@ class FulfillmentFile < ActiveRecord::Base
     Notifier.manual_fulfillment_file(self.agent,self,temp_file).deliver!
     temp_file.unlink
   end
-  handle_asynchronously :send_email_with_file, :queue => :email_queue, priority: 5
+  handle_asynchronously :send_email_with_file, queue: :email_queue, priority: 5
 
 end

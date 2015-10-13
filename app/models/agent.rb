@@ -14,7 +14,7 @@ class Agent < ActiveRecord::Base
   acts_as_paranoid
 #  validates_as_paranoid
 
-  has_many :created_members, :class_name => 'Membership'
+  has_many :created_members, class_name: 'Membership'
   has_many :operations
   has_many :fulfillment_files
   has_many :terms_of_memberships
@@ -28,7 +28,7 @@ class Agent < ActiveRecord::Base
     :last_name, :roles, :club_roles_attributes
 
 #  validates_uniqueness_of_without_deleted :username
-  validates :username, :presence => true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
+  validates :username, presence: true, length: { maximum: 20, too_long: 'Pick a shorter username' }
 
   def self.datatable_columns
     [ 'id', 'email', 'username', 'created_at' ]
@@ -143,7 +143,7 @@ class Agent < ActiveRecord::Base
     def self.find_for_database_authentication(warden_conditions)
       conditions = warden_conditions.dup
       if login = conditions.delete(:login)
-        where(conditions.to_h).where(["lower(username) = :value OR lower(email) = :value", { :value => login.downcase }]).first
+        where(conditions.to_h).where(["lower(username) = :value OR lower(email) = :value", { value: login.downcase }]).first
       else
         where(conditions.to_h).first
       end
