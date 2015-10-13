@@ -11,8 +11,8 @@ class Partner < ActiveRecord::Base
 #  validates_as_paranoid
 #  validates_uniqueness_of_without_deleted :name
 #  validates_uniqueness_of_without_deleted :prefix
-  validates :name , :presence => true, :name_is_not_admin => true, :format => /^[a-zA-Z ]+$/
-  validates :prefix, :presence => true, :prefix_is_not_admin => true, :format => /^[a-zA-Z ]+$/
+  validates :name , :presence => true, :name_is_not_admin => true, :format => /\A[a-zA-Z ]+\z/
+  validates :prefix, :presence => true, :prefix_is_not_admin => true, :format => /\A[a-zA-Z ]+\z/
 
   def self.datatable_columns
     ['id', 'prefix', 'name', 'contract_uri', 'website_url' ]
