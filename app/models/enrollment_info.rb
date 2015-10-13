@@ -45,4 +45,3 @@ class EnrollmentInfo < ActiveRecord::Base
     end
   end 
 end
-

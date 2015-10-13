@@ -7,4 +7,3 @@ class MemberGroupType < Enumeration
   end
   
 end
-
