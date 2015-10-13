@@ -169,18 +169,25 @@
         :content => t('activerecord.attributes.terms_of_membership.wizard.downgrade_to_help') } %> 
     </div>
   </div>
-  <div class="control-group" id="upgrade_options">
-    <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
-    <div class="controls">
-      <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp;
-      <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
-      <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number', :min => 1 %>
-      <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
-      <%= render :partial => "shared/help", :locals => { 
+  <div class='row span12' style='margin-left:-30px !important;'>
+    <div class="control-group span" id="upgrade_options">
+      <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
+      <div class="controls">
+        <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp; 
+      </div>
+    </div> 
+    <div class="control-group">
+      <div class="controls">
+        <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
+        <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number', :min => 1 %>
+        <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
+        <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to_help') } %> 
+        :content => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to_help') } %>
+      </div>
     </div>
-  </div> 
+  </div>
+
   <div id="no_configuration_message" style="display:none">
     <%= t('activerecord.attributes.terms_of_membership.wizard.no_downgrade_upgrade_configuration') %>
   </div>
