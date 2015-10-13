@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   before_filter :authenticate_agent!
   before_filter :validate_partner_presence
+  before_action :configure_permitted_parameters, if: :devise_controller?
   protect_from_forgery
 
   def after_sign_in_path_for(resource)
@@ -15,6 +16,13 @@ class ApplicationController < ActionController::Base
   rescue_from CanCan::AccessDenied do |exception|
     render :file => "#{Rails.root}/public/401", :status => 401, :layout => false, :formats => [:html]
   end
+
+  protected
+
+    def configure_permitted_parameters
+      devise_parameter_sanitizer.for(:sign_in) { |u| u.permit(:login, :username, :email, :password, :remember_me) }
+      devise_parameter_sanitizer.for(:account_update) { |u| u.permit(:username, :email, :password, :password_confirmation, :current_password) }
+    end
 
   private
 

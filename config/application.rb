@@ -12,7 +12,7 @@ module SacPlatform
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
 
-    # config.autoload_paths += %W(#{config.root}/lib/validators/ #{config.root}/app/models/gateways/ #{config.root}/app/models/additional_data_forms/)
+    config.autoload_paths += %W(#{config.root}/lib/validators/ #{config.root}/app/models/gateways/ #{config.root}/app/models/additional_data_forms/)
 
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
