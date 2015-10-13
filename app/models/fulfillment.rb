@@ -21,16 +21,16 @@ class Fulfillment < ActiveRecord::Base
   KIT_CARD_HEADER = ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
                 'ADDRESS','CITY','STATE','ZIP','Product','Charter Member Status' ]
 
-  scope :where_bad_address, lambda { where("status in ('bad_address','returned')") }
-  scope :where_in_process, lambda { where("status = 'in_process'") }
-  scope :where_not_processed, lambda { where("status = 'not_processed'") }
-  scope :where_to_set_bad_address, lambda { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
-  scope :where_cancellable, lambda { where("status IN ('not_processed','in_process','out_of_stock','bad_address')") }
-  scope :type_others, lambda { where(["product_sku NOT IN (?)", Settings.kit_card_product])}
+  scope :where_bad_address, -> { where("status in ('bad_address','returned')") }
+  scope :where_in_process, -> { where("status = 'in_process'") }
+  scope :where_not_processed, -> { where("status = 'not_processed'") }
+  scope :where_to_set_bad_address, -> { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
+  scope :where_cancellable, -> { where("status IN ('not_processed','in_process','out_of_stock','bad_address')") }
+  scope :type_others, -> { where(["product_sku NOT IN (?)", Settings.kit_card_product])}
 
-  scope :not_renewed, lambda { where("renewed = false") }
+  scope :not_renewed, -> { where("renewed = false") }
 
-  scope :to_be_renewed, lambda { joins(user: :club).readonly(false).where([ 
+  scope :to_be_renewed, -> { joins(user: :club).readonly(false).where([ 
     " date(renewable_at) <= ? AND fulfillments.status NOT IN ('canceled', 'in_process') 
       AND recurrent = true AND renewed = false AND clubs.billing_enable = true 
       AND users.status = 'active' AND users.recycled_times = 0",  

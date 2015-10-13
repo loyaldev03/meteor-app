@@ -305,19 +305,18 @@ defaults: &defaults
       western:
         first_name:
           presence: true
-          format: !ruby/regexp /^[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/
-          # format: !ruby/regexp /^[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/u
+          format: !ruby/regexp /\A[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+\z/
         last_name:
           presence: true
-          format: !ruby/regexp /^[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/
+          format: !ruby/regexp /\A[a-zA-Z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+\z/
         address:
-          format: !ruby/regexp /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð\/ '-.,#]+$/
+          format: !ruby/regexp /\A[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð\/ '-.,#]+\z/
         state:
           presence: true
-          format: !ruby/regexp /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/
+          format: !ruby/regexp /\A[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+\z/
         city:
           presence: true
-          format: !ruby/regexp /^[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+$/
+          format: !ruby/regexp /\A[A-Za-z0-9àáâäãåèéêëìíîïòóôöõøùúûüÿýñçčšžÀÁÂÄÃÅÈÉÊËÌÍÎÏÒÓÔÖÕØÙÚÛÜŸÝÑßÇŒÆČŠŽ∂ð '-.,]+\z/
     countries:
 #     "US"=>"^\d{5}([\-]?\d{4})?$",
 #     "UK"=>"^(GIR|[A-Z]\d[A-Z\d]??|[A-Z]{2}\d[A-Z\d]??)[ ]??(\d[A-Z]{2})$",
@@ -344,7 +343,7 @@ defaults: &defaults
         zip:
           presence: true
           format: 
-            :with: !ruby/regexp /^[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}\s?[0-9]{1}[A-Za-z][0-9]{1}$/
+            :with: !ruby/regexp /\A[ABCEGHJKLMNPRSTVXYabceghjklmnprstvxy]{1}[0-9]{1}[A-Za-z]{1}\s?[0-9]{1}[A-Za-z][0-9]{1}\z/
             :message: 'The zip code is not valid for the selected country.'
 
 development:
