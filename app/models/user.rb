@@ -662,7 +662,7 @@ class User < ActiveRecord::Base
                  :errors => user.errors_merged(credit_card) } unless credit_card.errors.size == 0
     end
 
-    answer = user.validate_if_credit_card_already_exist(tom, credit_card_params[:number], credit_card_params[:expire_year], credit_card_params[:expire_month], true, cc_blank, current_agent)
+    answer = user.validate_if_credit_card_already_exist(tom, credit_card_params[:number], credit_card_params[:expire_year], credit_card_params[:expire_month], credit_card.token, true, cc_blank, current_agent)
     if answer[:code] == Settings.error_codes.success
       user.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, user_params, false, false)
     else
@@ -731,7 +731,7 @@ class User < ActiveRecord::Base
       if self.new_record?
         self.credit_cards << credit_card
       elsif not skip_credit_card_validation
-        validate_if_credit_card_already_exist(tom, credit_card.number, credit_card.expire_year, credit_card.expire_month, false, cc_blank, agent)
+        validate_if_credit_card_already_exist(tom, credit_card.number, credit_card.expire_year, credit_card.expire_month, credit_card.token, false, cc_blank, agent)
         credit_card = active_credit_card
       end
       self.enrollment_infos << enrollment_info
@@ -1175,11 +1175,15 @@ class User < ActiveRecord::Base
     end
   end
 
-  def validate_if_credit_card_already_exist(tom, number, new_year, new_month, only_validate = true, allow_cc_blank = false, current_agent = nil, set_active = true)
+  def validate_if_credit_card_already_exist(tom, number, new_year, new_month, new_token = nil, only_validate = true, allow_cc_blank = false, current_agent = nil, set_active = true)
     answer = { :message => "Credit card valid", :code => Settings.error_codes.success}
     family_memberships_allowed = tom.club.family_memberships_allowed
     new_credit_card = CreditCard.new(:number => number, :expire_month => new_month, :expire_year => new_year)
-    new_credit_card.get_token(tom.payment_gateway_configuration, self)
+    if new_token
+      new_credit_card.token = new_token
+    else
+      new_credit_card.get_token(tom.payment_gateway_configuration, self)
+    end
     credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:user).where(:token => new_credit_card.token, :users => { :club_id => club.id } )
 
     if credit_cards.empty? or allow_cc_blank
@@ -1244,7 +1248,7 @@ class User < ActiveRecord::Base
       end
     else # drupal or CS sends the complete credit card number.
       set_as_active = credit_card[:set_active].nil? ? true : credit_card[:set_active].to_s.to_bool
-      validate_if_credit_card_already_exist(terms_of_membership, credit_card[:number], new_year, new_month, false, false, current_agent, set_as_active)
+      validate_if_credit_card_already_exist(terms_of_membership, credit_card[:number], new_year, new_month, nil, false, false, current_agent, set_as_active)
     end
   end
 
