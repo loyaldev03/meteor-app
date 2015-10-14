@@ -99,6 +99,7 @@ module Drupal
           username: @options[:username], 
           password: @options[:password]
         }.map { |tuple| tuple * '=' } * '&'
+        res = nil
         time_elapsed = Benchmark.ms do
           res = simple_connection.post LOGIN_PATH, body
         end
