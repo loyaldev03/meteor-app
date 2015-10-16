@@ -41,8 +41,9 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "save operation" do
+    user = enroll_user(@terms_of_membership)
     assert_difference('Operation.count') do
-      Auditory.audit(@current_agent, nil, "test")
+      Auditory.audit(@current_agent, nil, "test", user)
     end
   end
 
