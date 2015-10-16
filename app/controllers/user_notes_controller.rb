@@ -5,7 +5,7 @@ class UserNotesController < ApplicationController
   def new
     my_authorize! :manage, UserNote, @current_club.id
     @user_note = UserNote.new
-    @disposition_types = DispositionType.find_all_by_club_id(@current_club.id)
+    @disposition_types = DispositionType.where(club_id: @current_club.id)
     @communication_types = CommunicationType.all
   end
 

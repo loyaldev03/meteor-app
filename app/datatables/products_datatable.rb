@@ -2,7 +2,7 @@ class ProductsDatatable < Datatable
 private
 
   def total_records
-    Product.find_all_by_club_id(@current_club.id).count
+    Product.where(club_id: @current_club.id).count
   end
 
   def total_entries

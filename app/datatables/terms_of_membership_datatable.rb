@@ -2,7 +2,7 @@ class TermsOfMembershipDatatable < Datatable
 private
 
   def total_records
-    toms.find_all_by_club_id(@current_club.id).count
+    toms.where(club_id: @current_club.id).count
   end
 
   def total_entries

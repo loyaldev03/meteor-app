@@ -209,7 +209,7 @@ class User < ActiveRecord::Base
     send_active_needs_approval_email_dj
   end
   def send_active_needs_approval_email_dj
-    representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
+    representatives = ClubRole.where(club_id: self.club_id, role: 'representative')
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.active_with_approval(emails,self).deliver!
   end
@@ -220,7 +220,7 @@ class User < ActiveRecord::Base
     send_recover_needs_approval_email_dj
   end
   def send_recover_needs_approval_email_dj
-    representatives = ClubRole.find_all_by_club_id_and_role(self.club_id,'representative')
+    representatives = ClubRole.where(club_id: self.club_id, role: 'representative')
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
     Notifier.recover_with_approval(emails,self).deliver!
   end
