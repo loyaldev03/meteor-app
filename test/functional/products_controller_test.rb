@@ -203,7 +203,7 @@ class ProductsControllerTest < ActionController::TestCase
     @product = FactoryGirl.create(:product)
     put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
                  product: { name: @product.name, recurrent: @product.recurrent, package: @product.package, sku: @product.sku, stock: @product.stock, weight: @product.weight }
-    assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert_response :success
   end
 
   test "Representative should not update product" do
@@ -235,7 +235,7 @@ class ProductsControllerTest < ActionController::TestCase
     @product = FactoryGirl.create(:product)
     put :update, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name, 
                  product: { name: @product.name, recurrent: @product.recurrent, package: @product.package,sku: @product.sku, stock: @product.stock, weight: @product.weight }
-    assert_redirected_to product_path(assigns(:product), :partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    assert_response :success
   end
 
   test "Admin should destroy product" do

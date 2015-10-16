@@ -233,7 +233,7 @@ function product_index_functions(column_count){
   $('.modal-footer input').live("click", function(event){
     $('#edit_product_'+$(this).data('target')).submit();
   });
-  $('form').live('submit', function(event){
+  $('.modal-body form').live('submit', function(event){
     var productId = $(this).data('target');
     startAjaxLoader();
     event.preventDefault();
