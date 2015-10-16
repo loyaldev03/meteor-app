@@ -2,7 +2,7 @@ class ClubsDatatable < Datatable
 private
 
   def total_records
-    Club.find_all_by_partner_id(@current_partner.id).count
+    Club.where(partner_id: @current_partner.id).count
   end
 
   def total_entries

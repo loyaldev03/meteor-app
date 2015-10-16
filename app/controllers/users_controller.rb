@@ -86,7 +86,7 @@ class UsersController < ApplicationController
 
   def edit  
     @user = @current_user
-    @member_group_types = MemberGroupType.find_all_by_club_id(@current_club)
+    @member_group_types = MemberGroupType.where(club_id: @current_club)
     @country = Carmen::Country.coded(@user.country)
     @months = 1..12
     @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
