@@ -1179,12 +1179,9 @@ class User < ActiveRecord::Base
     new_month, new_year, new_number = credit_card["expire_month"], credit_card["expire_year"], credit_card["number"].to_s
     answer = { :message => "Credit card valid", :code => Settings.error_codes.success}
     family_memberships_allowed = tom.club.family_memberships_allowed
-    new_credit_card = CreditCard.new(:number => new_number, :expire_month => new_month, :expire_year => new_year)
-    if credit_card["token"]
-      new_credit_card.token = credit_card["token"]
-    else
-      new_credit_card.get_token(tom.payment_gateway_configuration, self)
-    end
+    new_credit_card = CreditCard.new(:number => new_number, :expire_month => new_month, :expire_year => new_year, :token => credit_card["token"])
+    new_credit_card.get_token(tom.payment_gateway_configuration, self)
+
     credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:user).where(:token => new_credit_card.token, :users => { :club_id => club.id } )
 
     if credit_cards.empty? or allow_cc_blank
@@ -1199,7 +1196,7 @@ class User < ActiveRecord::Base
       unless only_validate
         answer = active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
       end
-     elsif not family_memberships_allowed and not credit_cards.select { |cc| cc.user_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.user_id != self.id and cc.active }.empty?
+    elsif not family_memberships_allowed and not credit_cards.select { |cc| cc.user_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.user_id != self.id and cc.active }.empty?
       answer = { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
     # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in inactive status?
     elsif not credit_cards.select { |cc| cc.user_id == self.id and not cc.active }.empty? and (family_memberships_allowed or credit_cards.select { |cc| cc.user_id != self.id and cc.active }.empty?)
