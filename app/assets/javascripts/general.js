@@ -55,6 +55,12 @@ $(document).ready( function() {
   });
 });
 
+function flash_message(message, error){
+  message_type = error ? "alert-error" : "alert-info"
+  $(".container .row:first .alert").remove();
+  $(".container .row:first").prepend("<div class='alert "+message_type+"'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
+}
+
 function global_ajax_error_messages(jqXHR){
   if (jqXHR.status == 401)
     return 'Agent is not authorized to make this request.';

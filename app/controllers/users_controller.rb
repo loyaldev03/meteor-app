@@ -50,6 +50,9 @@ class UsersController < ApplicationController
   rescue Errno::ETIMEDOUT
     @elasticsearch_is_down = true
     Auditory.report_issue("User:search_result", "Elasticsearch Timeout Error received. Confirm that service is available.")  
+  rescue Exception => e 
+    @elasticsearch_is_down = true
+    Auditory.report_issue("User:search_result", e)
   ensure
     render 'index'
   end

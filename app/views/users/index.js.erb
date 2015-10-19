@@ -6,7 +6,7 @@ if(update_select_only==true){
 	$('#states_td').html('<%=escape_javascript(render(:partial => "states" ))%>');
 }else{
   <% if @elasticsearch_is_down %>
-    alert("<%= t('error_messages.search_user_is_out_of_service') %>");
+    flash_message("<%= t('error_messages.search_user_is_out_of_service') %>", true)
   <% end %>
 	$('#users').html('<%=escape_javascript(render(:partial => "search"))%>');
 }
