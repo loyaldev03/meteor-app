@@ -1115,8 +1115,15 @@ class User < ActiveRecord::Base
 
   def chargeback!(transaction_chargebacked, args)
     trans = Transaction.obtain_transaction_by_gateway!(transaction_chargebacked.gateway)
-    trans.new_chargeback(transaction_chargebacked, args)
+    trans.new_chargeback!(transaction_chargebacked, args)
     self.blacklist nil, "Chargeback - "+args[:reason]
+  rescue Exception => e
+    if trans.errors.messages.any?
+      raise trans.errors.messages.map{|k,v| "#{k.to_s.humanize}: #{v.join(', ')}"}.join(".")
+    else
+      Auditory.report_issue("Users::chargeback", e, { :user => self.inspect, :transaction => trans.inspect })
+      raise I18n.t("error_messages.airbrake_error_message")
+    end
   end
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)

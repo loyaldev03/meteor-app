@@ -159,8 +159,6 @@ class UsersController < ApplicationController
     if request.post?
       if params[:amount].to_f > @transaction.amount_available_to_refund
         flash.now[:error] = I18n.t("error_messages.chargeback_amount_greater_than_available")
-      elsif params[:adjudication_date].blank?
-        flash.now[:error] = I18n.t("error_messages.chargeback_adjudication_date_not_blank")
       else
         begin
           @current_user.chargeback!(@transaction, { reason: params[:reason], transaction_amount: params[:amount], adjudication_date: params[:adjudication_date], sale_transaction_id: @transaction.id })
