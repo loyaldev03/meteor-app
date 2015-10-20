@@ -2,7 +2,7 @@ class CreditCard < ActiveRecord::Base
   belongs_to :user
   has_many :transactions
 
-  attr_accessible :active, :number, :expire_month, :expire_year, :blacklisted
+  attr_accessible :active, :number, :expire_month, :expire_year, :blacklisted, :token
 
   before_create :set_data_before_credit_card_number_disappear
   before_destroy :confirm_presence_of_another_credit_card_related_to_user
@@ -109,29 +109,31 @@ class CreditCard < ActiveRecord::Base
   end
 
   def get_token(pgc, puser, allow_cc_blank = false)
-    pgc ||= user.terms_of_membership.payment_gateway_configuration
-    am = CreditCard.am_card(number, expire_month, expire_year, puser.first_name || user.first_name, puser.last_name || user.last_name)
-    if am.valid?
-      self.cc_type = am.brand
-      begin
-        self.token = Transaction.store!(am, pgc, puser||user)
-      rescue Exception => e
-        unless Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway].include? e.to_s
-          Auditory.report_issue("CreditCard:GetToken", e, { credit_card: self.inspect, user: puser.inspect || self.user.inspect })
+    if not self.token
+      pgc ||= user.terms_of_membership.payment_gateway_configuration
+      am = CreditCard.am_card(number, expire_month, expire_year, puser.first_name || user.first_name, puser.last_name || user.last_name)
+      if am.valid?
+        self.cc_type = am.brand
+        begin
+          self.token = Transaction.store!(am, pgc, puser||user)
+        rescue Exception => e
+          unless Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway].include? e.to_s
+            Auditory.report_issue("CreditCard:GetToken", e, { credit_card: self.inspect, user: puser.inspect || self.user.inspect })
+          end
+          logger.error e.inspect
+          self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
         end
-        logger.error e.inspect
-        self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
+      elsif allow_cc_blank
+        self.cc_type = 'unknown'
+        self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards
+      else
+        # uncomment this line ONLY If #55804192 is approved
+        # self.errors[:number] << "is not a valid credit card number" if am.errors["number"].empty? and not am.errors["brand"].empty?
+        self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
+        self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
+        self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
+        self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards. #54934966
       end
-    elsif allow_cc_blank
-      self.cc_type = 'unknown'
-      self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards
-    else
-      # uncomment this line ONLY If #55804192 is approved
-      # self.errors[:number] << "is not a valid credit card number" if am.errors["number"].empty? and not am.errors["brand"].empty?
-      self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
-      self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
-      self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
-      self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards. #54934966
     end
     self.gateway = pgc.gateway
     self.token

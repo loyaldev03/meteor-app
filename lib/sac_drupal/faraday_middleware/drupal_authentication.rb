@@ -99,14 +99,16 @@ module Drupal
           username: @options[:username], 
           password: @options[:password]
         }.map { |tuple| tuple * '=' } * '&'
-        res = simple_connection.post LOGIN_PATH, body
-
+        res = nil
+        time_elapsed = Benchmark.ms do
+          res = simple_connection.post LOGIN_PATH, body
+        end
         raise AuthError.new("HTTP #{res.status} when getting auth cookie") unless res.status == 200
 
         json = JSON.parse res.body
         self.cookie = '%s=%s' % [json['session_name'], json['sessid']]
 
-        Drupal.logger.debug " ** [#{$$} #{Time.now.to_s(:db).gsub(/[\-\:]/, '')} ] got new cookie for #{@options[:url]}: #{self.cookie}"
+        Drupal.logger.debug " ** [#{$$} #{Time.now.to_s(:db).gsub(/[\-\:]/, '')} ] got new cookie for #{@options[:url]}: #{self.cookie}. Drupal took #{time_elapsed}ms"
         self.cookie
       end
 
