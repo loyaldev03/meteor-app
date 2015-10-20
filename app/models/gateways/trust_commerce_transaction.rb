@@ -22,23 +22,21 @@ class TrustCommerceTransaction < Transaction
     self.refund_response_transaction_id = sale_transaction.response_transaction_id
   end
   
-  def new_chargeback(sale_transaction, args)
+  def new_chargeback!(sale_transaction, args)
     trans = TrustCommerceTransaction.find_by_response args.to_json
     if trans.nil?
       chargeback_amount = -args[:transaction_amount].to_f
       operation_description = "Chargeback processed $#{chargeback_amount}"
-
       self.transaction_type = "chargeback"
+      self.response = args
       self.prepare(sale_transaction.user, sale_transaction.credit_card, chargeback_amount, 
-                    sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id)
+                    sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, nil, Settings.operation_types.chargeback)
       self.response_result = args[:reason]
       self.response_code ='000'
-      self.response = args
       self.success = true
       self.membership_id = sale_transaction.membership_id
-      self.operation_type = Settings.operation_types.chargeback
       self.created_at = args[:adjudication_date]
-      self.save
+      self.save!
       Auditory.audit(nil, self, operation_description, sale_transaction.user, Settings.operation_types.chargeback)
     end
   end

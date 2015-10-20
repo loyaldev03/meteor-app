@@ -12,6 +12,8 @@ class Transaction < ActiveRecord::Base
 
   attr_accessor :refund_response_transaction_id, :stripe_customer_id
 
+  before_save :validate_adjudication_date, :if => lambda {|record| [Settings.operation_types.chargeback, Settings.operation_types.chargeback_rebutted].include? record.operation_type}
+
   scope :refunds, lambda { where('transaction_type IN (?, ?)', 'credit', 'refund') }
 
   ONE_TIME_BILLINGS = ["one-time", "donation"]
@@ -355,6 +357,13 @@ class Transaction < ActiveRecord::Base
         { :message => answer.message, :code=> Settings.error_codes.success }
       else
         { :message=>"Error: " + answer.message, :code=>self.response_code }
+      end
+    end
+
+    def validate_adjudication_date
+      if HashWithIndifferentAccess.new(self.response)[:adjudication_date].blank?
+        errors[:adjudication_date] << "cannot be blank"
+        return false
       end
     end
 end
