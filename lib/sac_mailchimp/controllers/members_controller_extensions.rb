@@ -18,9 +18,9 @@ module SacMailchimp
           redirect_to show_user_path, notice: message    
         end
       rescue Exception => e
-        message = e.to_s.include?("Gibbon::MailChimpError") ? t('error_messages.airbrake_error_message_for_mkt_sync', :response => e) : t('error_messages.airbrake_error_message')
+        message = e.instance_of?(Gibbon::MailChimpError) ? t('error_messages.airbrake_error_message_for_mkt_sync', :response => e) : t('error_messages.airbrake_error_message')
         flash[:error] = message
-        SacMailchimp::report_error('Member:mailchimp_sync', e, @current_user)
+        SacMailchimp::report_error('Member:mailchimp_sync', e, @current_user, false)
         redirect_to show_user_path
       end
     end

@@ -46,8 +46,7 @@ module SacMailchimp
         end
         logger.info "SacMailchimp::sync took #{time_elapsed}ms"
       rescue Exception => e
-        SacMailchimp::report_error('Prospect:mailchimp_sync', e, self )
-        raise e
+        SacMailchimp::report_error('Prospect:mailchimp_sync', e, self)
       end
 
       def mailchimp_sync?
@@ -63,7 +62,7 @@ module SacMailchimp
             SacMailchimp::ProspectModel.new self
           end
         else
-          SacMailchimp::report_error('Prospect:mailchimp_prospect', 'Mailchimp not configured correctly', self )
+          SacMailchimp::report_error('Prospect:mailchimp_prospect', 'Mailchimp not configured correctly', self, false)
           nil
         end
       end

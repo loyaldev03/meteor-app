@@ -10,9 +10,6 @@ module SacExactTarget
       res = ExactTargetSDK::Subscriber.find [ ["SubscriberKey", ExactTargetSDK::SimpleOperator::EQUALS, subscriber_key ] ]
       @subscriber = res.Results.first
       @subscriber.nil?
-    rescue Exception  => e
-      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_retrieve) if e.to_s.include?("Timeout")
-      raise e
     end
 
     def unsubscribe!
@@ -31,9 +28,6 @@ module SacExactTarget
         'Client' => client_id,
         'Subscribers' => [s] )
       client.Create(trigger_to_send)
-    rescue Exception => e
-      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_trigger_create) if e.to_s.include?("Timeout")
-      raise e
     end
 
   private
@@ -52,9 +46,6 @@ module SacExactTarget
         'Attributes' => attributes
       })
       client.Update(s)
-    rescue Exception => e
-      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
-      raise e
     end
 
     def create!
@@ -62,12 +53,7 @@ module SacExactTarget
       # Remove email from prospect list
       SacExactTarget::ProspectModel.destroy_by_email! self.user.email, club_id
       # Add customer under member list
-      begin
-        client.Create(subscriber(subscriber_key, options))
-      rescue Exception => e
-        Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_create) if e.to_s.include?("Timeout")
-        raise e
-      end
+      client.Create(subscriber(subscriber_key, options))
     end
 
     def update!
@@ -75,9 +61,6 @@ module SacExactTarget
       # We assume that everyone in a Club has a list
       options = { :subscribe_to_list => !@subscriber.attributes.select { |s| s[:name] == 'Club' and s[:value].nil? }.empty? }
       client.Update(subscriber(subscriber_key, options))
-    rescue Exception => e
-      Auditory.audit(nil, self.user, e, self.user, Settings.operation_types.et_timeout_update) if e.to_s.include?("Timeout")
-      raise e 
     end
 
     def update_member(res)
@@ -88,7 +71,7 @@ module SacExactTarget
           marketing_client_last_sync_error_at: Time.zone.now
         }        
       elsif res.OverallStatus != "OK"
-        SacExactTarget::report_error("SacExactTarget:Member:save", res, self.user)
+        SacExactTarget::report_error("SacExactTarget:Member:save", res, self.user, false)
         { 
           marketing_client_synced_status: 'error',
           marketing_client_last_sync_error: res.Results.first.status_message,

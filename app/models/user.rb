@@ -396,6 +396,10 @@ class User < ActiveRecord::Base
     false
   end
 
+  def can_be_chargeback?
+    club.billing_enable
+  end
+
   # refs #21919
   def can_renew_fulfillment?
     self.active? and self.recycled_times == 0
@@ -1114,14 +1118,20 @@ class User < ActiveRecord::Base
   end
 
   def chargeback!(transaction_chargebacked, args)
-    trans = Transaction.obtain_transaction_by_gateway!(transaction_chargebacked.gateway)
-    trans.new_chargeback!(transaction_chargebacked, args)
-    self.blacklist nil, "Chargeback - "+args[:reason]
-  rescue ActiveRecord::RecordNotSaved
-    raise trans.errors.messages.map{|k,v| "#{k.to_s.humanize}: #{v.join(', ')}"}.join(".")
-  rescue Exception => e
-    Auditory.report_issue("Users::chargeback", e, { :user => self.inspect, :transaction => trans.inspect })
-    raise I18n.t("error_messages.airbrake_error_message")
+    if can_be_chargeback?
+      begin
+        trans = Transaction.obtain_transaction_by_gateway!(transaction_chargebacked.gateway)
+        trans.new_chargeback!(transaction_chargebacked, args)
+        self.blacklist nil, "Chargeback - "+args[:reason]
+      rescue ActiveRecord::RecordNotSaved
+        raise trans.errors.messages.map{|k,v| "#{k.to_s.humanize}: #{v.join(', ')}"}.join(".")
+      rescue Exception => e
+        Auditory.report_issue("Users::chargeback", e, { :user => self.inspect, :transaction => trans.inspect })
+        raise I18n.t("error_messages.airbrake_error_message")
+      end
+    else
+      raise "User cannot be chargebacked."
+    end
   end
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
@@ -1576,7 +1586,7 @@ class User < ActiveRecord::Base
     end
 
     def set_marketing_client_sync_as_needed
-      self.need_sync_to_marketing_client = true if defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel)
+      self.need_sync_to_marketing_client = true if not self.blacklisted and (defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel))
     end
     
     def days_until_next_bill_date

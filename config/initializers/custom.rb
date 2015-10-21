@@ -3,7 +3,7 @@ require 'exception_notification'
 SacPlatform::Application.config.middleware.use ExceptionNotifier if ['production', 'staging', 'prototype'].include?(Rails.env)
 require 'lyris_service'
 require 'axlsx'
-require "exceptions"
+Dir["#{Rails.root}/lib/exceptions/*.rb"].each {|file| require file }
 
 # # We are commenting log writing due to https://www.pivotaltracker.com/story/show/68819072 since how logs are written is not pci compliant (Only for production).
 
@@ -20,14 +20,6 @@ if Rails.env.staging? or Rails.env.prototype?
   ActiveMerchant::Billing::TrustCommerceGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant_trust_commerce.log", "a+")  
   ActiveMerchant::Billing::TrustCommerceGateway.wiredump_device.sync = true
 end
-
-# config/initializers/delayed_job_config.rb
-Delayed::Worker.destroy_failed_jobs = false
-Delayed::Worker.sleep_delay = 60
-Delayed::Worker.max_attempts = 3
-Delayed::Worker.max_run_time = 5.minutes
-Delayed::Worker.read_ahead = 10
-Delayed::Worker.delay_jobs = !Rails.env.test?
 
 
 class String

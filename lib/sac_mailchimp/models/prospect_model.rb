@@ -11,18 +11,12 @@ module SacMailchimp
           begin 
             options = {:double_optin => false}
             client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
-          rescue Exception => e
-            Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_create) if e.to_s.include?("Timeout")
-            raise e
           end       
         elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_user?(subscriber["data"].first["email"], club_id)
           begin
             options = { :update_existing => true, :double_optin => false }
             client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
-          rescue Exception => e
-            Auditory.audit(nil, self.prospect, e, Prospect.find_by_email_and_club_id(self.prospect.email,self.prospect.club_id), Settings.operation_types.mailchimp_timeout_update) if e.to_s.include?("Timeout")
-            raise e
-          end
+3          end
         else
           res = { "error" => "Email already saved as member." }
         end
@@ -127,9 +121,6 @@ module SacMailchimp
     def self.find_all_by_email!(email, list)
       # Find by email . I didnt have luck looking for a subscriber by email and List.
       res = Gibbon::API.lists.member_info({ id: list, emails: [{email: email}] })
-    rescue Exception => e
-      Auditory.audit(nil, nil, e, Prospect.find_by_email_and_club_id(email,club_id), Settings.operation_types.et_timeout_find) if e.to_s.include?("Timeout")
-      raise e
     end
     
     def setup_club(club)
