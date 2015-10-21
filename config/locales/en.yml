@@ -545,6 +545,7 @@ en:
         recurrent: 'Recurrent'
         stock: 'Stock'
         weight: 'Weight'
+        allow_backorder: 'Allow Backorder'
         created_at: 'Created at'
         sku: SKU
         package: Package

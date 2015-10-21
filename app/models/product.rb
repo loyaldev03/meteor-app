@@ -17,7 +17,7 @@ class Product < ActiveRecord::Base
   acts_as_paranoid
 
   def self.datatable_columns
-    ['id', 'name', 'recurrent', 'stock', 'weight' ]
+    ['id', 'name', 'sku', 'stock', 'allow_backorder' ]
   end
 
   def apply_upcase_to_sku

@@ -15,6 +15,7 @@
 //= require jquery-ui
 //= require dataTables/jquery.dataTables
 //= require dataTables/jquery.dataTables.bootstrap
+//= require dataTables/jquery.dataTables.api.fnReloadAjax
 //= require jquery.validate
 //= require jquery.tablesorter
 //= require spinner_generator
