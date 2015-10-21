@@ -55,9 +55,10 @@ $(document).ready( function() {
   });
 });
 
-function flash_message(message){
+function flash_message(message, error){
+  message_type = error ? "alert-error" : "alert-info"
   $(".container .row:first .alert").remove();
-  $(".container .row:first").prepend("<div class='alert alert-info'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
+  $(".container .row:first").prepend("<div class='alert "+message_type+"'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
 }
 
 function global_ajax_error_messages(jqXHR){
@@ -246,7 +247,7 @@ function product_index_functions(column_count){
         if(data.success == true){
           $("#products_table").DataTable().fnReloadAjax();
           $('#myModal'+productId).modal('hide');
-          flash_message("Product ID "+productId+" was updated successfully.")
+          flash_message("Product ID "+productId+" was updated successfully.", false)
         }else{
           $("#edit_product_"+productId+" span[data-type='errors']").remove()
           $("#edit_product_"+productId+" .control-group").removeClass("error")
