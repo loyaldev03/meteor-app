@@ -247,7 +247,7 @@ function product_index_functions(column_count){
         if(data.success == true){
           $("#products_table").DataTable().fnReloadAjax();
           $('#myModal'+productId).modal('hide');
-          flash_message("Product ID "+productId+" was updated successfully.", "alert-info")
+          flash_message("Product ID "+productId+" was updated successfully.", false)
         }else{
           $("#edit_product_"+productId+" span[data-type='errors']").remove()
           $("#edit_product_"+productId+" .control-group").removeClass("error")
