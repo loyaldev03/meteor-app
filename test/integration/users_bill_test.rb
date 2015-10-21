@@ -62,7 +62,7 @@ class UsersBillTest < ActionController::IntegrationTest
           find(".ui-icon-circle-triangle-e").click
         end
       end
-      if first(:link, date.day.to_s) 
+      if first(:link, date.day.to_s)
         first(:link, date.day.to_s).click
       end
     end    
@@ -591,13 +591,15 @@ class UsersBillTest < ActionController::IntegrationTest
     bill_user(@saved_user, false)
     transaction = @saved_user.transactions.last
     assert_difference('Transaction.count',0) do
-      make_a_chargeback(transaction, transaction.created_at.day, "asd", "I have my reasons...", false)
+      make_a_chargeback(transaction, transaction.created_at, "asd", "I have my reasons...", false)
     end
     assert_difference('Transaction.count',0) do 
-      make_a_chargeback(transaction, transaction.created_at.day, transaction.amount+100, "I have my reasons...", false)
+      make_a_chargeback(transaction, transaction.created_at, transaction.amount+100, "I have my reasons...", false)
       assert page.has_content? I18n.t("error_messages.chargeback_amount_greater_than_available")
     end
-    make_a_chargeback(transaction, transaction.created_at.day, transaction.amount, "I have my reasons...")
+    assert_difference('Transaction.count') do 
+      make_a_chargeback(transaction, transaction.created_at, transaction.amount, "I have my reasons...")
+    end
   end
 
 end

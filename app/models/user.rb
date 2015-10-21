@@ -662,7 +662,7 @@ class User < ActiveRecord::Base
                  :errors => user.errors_merged(credit_card) } unless credit_card.errors.size == 0
     end
 
-    answer = user.validate_if_credit_card_already_exist(tom, credit_card_params[:number], credit_card_params[:expire_year], credit_card_params[:expire_month], true, cc_blank, current_agent)
+    answer = user.validate_if_credit_card_already_exist(tom, credit_card, true, cc_blank, current_agent)
     if answer[:code] == Settings.error_codes.success
       user.enroll(tom, credit_card, enrollment_amount, current_agent, true, cc_blank, user_params, false, false)
     else
@@ -731,7 +731,7 @@ class User < ActiveRecord::Base
       if self.new_record?
         self.credit_cards << credit_card
       elsif not skip_credit_card_validation
-        validate_if_credit_card_already_exist(tom, credit_card.number, credit_card.expire_year, credit_card.expire_month, false, cc_blank, agent)
+        validate_if_credit_card_already_exist(tom, credit_card, false, cc_blank, agent)
         credit_card = active_credit_card
       end
       self.enrollment_infos << enrollment_info
@@ -1115,8 +1115,13 @@ class User < ActiveRecord::Base
 
   def chargeback!(transaction_chargebacked, args)
     trans = Transaction.obtain_transaction_by_gateway!(transaction_chargebacked.gateway)
-    trans.new_chargeback(transaction_chargebacked, args)
+    trans.new_chargeback!(transaction_chargebacked, args)
     self.blacklist nil, "Chargeback - "+args[:reason]
+  rescue ActiveRecord::RecordNotSaved
+    raise trans.errors.messages.map{|k,v| "#{k.to_s.humanize}: #{v.join(', ')}"}.join(".")
+  rescue Exception => e
+    Auditory.report_issue("Users::chargeback", e, { :user => self.inspect, :transaction => trans.inspect })
+    raise I18n.t("error_messages.airbrake_error_message")
   end
 
   def cancel!(cancel_date, message, current_agent = nil, operation_type = Settings.operation_types.future_cancel)
@@ -1175,11 +1180,13 @@ class User < ActiveRecord::Base
     end
   end
 
-  def validate_if_credit_card_already_exist(tom, number, new_year, new_month, only_validate = true, allow_cc_blank = false, current_agent = nil, set_active = true)
+  def validate_if_credit_card_already_exist(tom, credit_card, only_validate = true, allow_cc_blank = false, current_agent = nil, set_active = true)
+    new_month, new_year, new_number = credit_card["expire_month"], credit_card["expire_year"], credit_card["number"].to_s
     answer = { :message => "Credit card valid", :code => Settings.error_codes.success}
     family_memberships_allowed = tom.club.family_memberships_allowed
-    new_credit_card = CreditCard.new(:number => number, :expire_month => new_month, :expire_year => new_year)
+    new_credit_card = CreditCard.new(:number => new_number, :expire_month => new_month, :expire_year => new_year, :token => credit_card["token"])
     new_credit_card.get_token(tom.payment_gateway_configuration, self)
+
     credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:user).where(:token => new_credit_card.token, :users => { :club_id => club.id } )
 
     if credit_cards.empty? or allow_cc_blank
@@ -1194,7 +1201,7 @@ class User < ActiveRecord::Base
       unless only_validate
         answer = active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
       end
-     elsif not family_memberships_allowed and not credit_cards.select { |cc| cc.user_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.user_id != self.id and cc.active }.empty?
+    elsif not family_memberships_allowed and not credit_cards.select { |cc| cc.user_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.user_id != self.id and cc.active }.empty?
       answer = { :message => I18n.t('error_messages.credit_card_in_use', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.credit_card_in_use, :errors => { :number => "Credit card is already in use" }}
     # is this credit card already of this member but its inactive? and we found another credit card assigned to another member but in inactive status?
     elsif not credit_cards.select { |cc| cc.user_id == self.id and not cc.active }.empty? and (family_memberships_allowed or credit_cards.select { |cc| cc.user_id != self.id and cc.active }.empty?)
@@ -1244,7 +1251,7 @@ class User < ActiveRecord::Base
       end
     else # drupal or CS sends the complete credit card number.
       set_as_active = credit_card[:set_active].nil? ? true : credit_card[:set_active].to_s.to_bool
-      validate_if_credit_card_already_exist(terms_of_membership, credit_card[:number], new_year, new_month, false, false, current_agent, set_as_active)
+      validate_if_credit_card_already_exist(terms_of_membership, credit_card, false, false, current_agent, set_as_active)
     end
   end
 
