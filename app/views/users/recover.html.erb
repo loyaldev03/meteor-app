@@ -14,7 +14,7 @@
         <%= select_tag :terms_of_membership_id, options_from_collection_for_select(TermsOfMembership.where(:club_id => @current_club ), "id", "name") %> 
 			</td>
       <td>
-        <%= label :product_sku, t('activerecord.attributes.enrollment_info.kit_card_product_sku'), :class => 'help-inline' %>
+        <%= label :product_sku, t('activerecord.attributes.fulfillment.product'), :class => 'help-inline' %>
         <%= select_tag :product_sku, options_from_collection_for_select(@current_club.products.with_stock, "sku", "name"),  :include_blank => true %>
       </td>
 		</tr>
