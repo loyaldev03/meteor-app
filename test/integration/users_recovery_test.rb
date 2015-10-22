@@ -122,12 +122,6 @@ class UsersRecoveryTest < ActionController::IntegrationTest
   test "Recover an user using CS with a new product" do
     setup_user(true, true)
     product = FactoryGirl.create(:product, club_id: @club.id)
-    prods = Product.find_all_by_sku @saved_user.enrollment_infos.first.product_sku.split(',')
-    prods.each do |p| 
-      p.stock =  0
-      p.allow_backorder = false
-      p.save
-    end
     recover_user(@saved_user,@terms_of_membership_with_gateway, product)
     @saved_user.reload
     assert_not_nil @saved_user.fulfillments.where(product_sku: product.sku)
