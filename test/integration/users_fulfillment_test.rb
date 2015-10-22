@@ -972,16 +972,12 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     product_two = Product.last
     within("#products_table")do
       assert page.has_content?(product_one.sku)
-      assert page.has_content?('true')
+      assert page.has_content?(product_two.name)
       assert page.has_content?(product_one.stock.to_s)
-      assert page.has_content?(product_one.weight.to_s)
-      assert page.has_content?(product_two.sku)
-      assert page.has_content?('true')
-      assert page.has_content?(product_two.stock.to_s)
-      assert page.has_content?(product_two.weight.to_s)
+      assert page.has_content?('Yes')
     end
-      assert_equal(product_one.recurrent, true)
-      assert_equal(product_two.recurrent, true)
+    assert_equal(product_one.recurrent, true)
+    assert_equal(product_two.recurrent, true)
   end
 
   test "see product type at Fulfillment report page" do
