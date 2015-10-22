@@ -119,7 +119,10 @@ class UsersController < ApplicationController
         flash[:error] = "Subscription plan not found"
       else
         answer = @current_user.recover(tom, current_agent, 
-          { landing_url: request.env['HTTP_HOST'], referral_path: request.env['REQUEST_URI'], ip_address: request.env['REMOTE_ADDR'] })
+          { product_sku: params[:product_sku],
+            landing_url: request.env['HTTP_HOST'], 
+            referral_path: request.env['REQUEST_URI'], 
+            ip_address: request.env['REMOTE_ADDR'] })
         if answer[:code] == Settings.error_codes.success
           flash[:notice] = answer[:message]
         else
