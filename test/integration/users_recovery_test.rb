@@ -34,14 +34,17 @@ class UsersRecoveryTest < ActionController::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  def recover_user(user, tom)
+  def recover_user(user, tom, product = nil)
     visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name, :user_prefix => user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
-    
+
     click_on 'Recover'
 
     if tom.name != @terms_of_membership_with_gateway.name
       select(tom.name, :from => 'terms_of_membership_id')
+    end
+    if product
+      select(product.name, :from => 'product_sku')
     end
     confirm_ok_js
     click_on 'Recover'
@@ -104,7 +107,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
   ###########################################################
   # TESTS
   ###########################################################
-  
+
   test "Recover an user using CS which was enrolled with a product sku that does not have stock" do
     setup_user(true, true)
     prods = Product.find_all_by_sku @saved_user.enrollment_infos.first.product_sku.split(',')
@@ -114,6 +117,14 @@ class UsersRecoveryTest < ActionController::IntegrationTest
       p.save
     end
     recover_user(@saved_user,@terms_of_membership_with_gateway)
+  end
+
+  test "Recover an user using CS with a new product" do
+    setup_user(true, true)
+    product = FactoryGirl.create(:product, club_id: @club.id)
+    recover_user(@saved_user,@terms_of_membership_with_gateway, product)
+    @saved_user.reload
+    assert_not_nil @saved_user.fulfillments.where(product_sku: product.sku)
   end
 
   test "recovery an user with provisional TOM" do

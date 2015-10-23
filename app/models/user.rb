@@ -484,8 +484,7 @@ class User < ActiveRecord::Base
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom, agent = nil, options = {})
-    enrollment_info_params = options.merge({ 
-      product_sku: self.current_membership.enrollment_info.product_sku, 
+    enrollment_info_params = options.merge({
       mega_channel: EnrollmentInfo::CS_MEGA_CHANNEL,
       campaign_medium: EnrollmentInfo::CS_CAMPAIGN_MEDIUM,
       campaign_description: EnrollmentInfo::CS_CAMPAIGN_DESCRIPTION
