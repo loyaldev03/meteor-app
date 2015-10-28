@@ -280,7 +280,7 @@ class UserTest < ActiveSupport::TestCase
           answer = user.bill_membership
           user.reload
           assert_equal answer[:code], Settings.error_codes.success
-          assert_equal original_year+3, Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', user.id]).first.expire_year
+          assert_equal original_year+3, user.transactions.last.expire_year
           assert_equal user.recycled_times, 0
           assert_equal user.credit_cards.count, 1 # only one credit card
           assert_equal user.active_credit_card.expire_year, original_year+3 # expire_year should be +3 years. 

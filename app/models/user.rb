@@ -211,7 +211,7 @@ class User < ActiveRecord::Base
   def send_active_needs_approval_email_dj
     representatives = ClubRole.where(club_id: self.club_id, role: 'representative')
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
-    Notifier.active_with_approval(emails,self).deliver!
+    Notifier.active_with_approval(emails,self).deliver_now!
   end
   handle_asynchronously :send_active_needs_approval_email_dj, queue: :email_queue, priority: 20
 
@@ -222,7 +222,7 @@ class User < ActiveRecord::Base
   def send_recover_needs_approval_email_dj
     representatives = ClubRole.where(club_id: self.club_id, role: 'representative')
     emails = representatives.collect { |representative| representative.agent.email }.join(',')
-    Notifier.recover_with_approval(emails,self).deliver!
+    Notifier.recover_with_approval(emails,self).deliver_now!
   end
   handle_asynchronously :send_recover_needs_approval_email_dj, queue: :email_queue, priority: 20
 
@@ -316,7 +316,7 @@ class User < ActiveRecord::Base
 
   # Returns the active credit card that the member is using at the moment.
   def active_credit_card
-    self.credit_cards.find_by_active(true)
+    self.credit_cards.find_by(active: true)
   end
 
   # Returns a string with address, city and state concatenated. 
@@ -634,7 +634,7 @@ class User < ActiveRecord::Base
       return { message: I18n.t('error_messages.club_is_not_enable_for_new_enrollments', cs_phone_number: club.cs_phone_number), code: Settings.error_codes.club_is_not_enable_for_new_enrollments }      
     end
     
-    user = User.find_by_email_and_club_id(user_params[:email], club.id)
+    user = User.find_by(email: user_params[:email], club_id: club.id)
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
     credit_card = CreditCard.new credit_card_params
 
@@ -675,7 +675,7 @@ class User < ActiveRecord::Base
 
     unless skip_product_validation
       user_params[:product_sku].to_s.split(',').each do |sku|
-        product = Product.find_by_club_id_and_sku(club.id,sku)
+        product = Product.find_by(club_id: club.id, sku: sku)
         if product.nil?
           return { message: I18n.t('error_messages.product_does_not_exists'), code: Settings.error_codes.product_does_not_exists }
         else
@@ -776,7 +776,7 @@ class User < ActiveRecord::Base
       trans.prepare(self, credit_card, amount_to_process, tom.payment_gateway_configuration, tom.id, nil, operation_type)
       answer = trans.process
     else
-      answer = Transaction.refund(amount_to_process.abs, sale_transaction, agent, false, operation_type)
+      answer = Transaction.refund(amount_to_process.abs, sale_transaction.id, agent, false, operation_type)
       self.reload
       trans = self.transactions.last
     end
@@ -883,7 +883,7 @@ class User < ActiveRecord::Base
       fulfillments = fulfillments_products_to_send
       fulfillments.each do |sku|
         begin
-          product = Product.find_by_sku_and_club_id(sku, self.club_id)
+          product = Product.find_by(sku: sku, club_id: self.club_id)
           f = Fulfillment.new product_sku: sku
           unless product.nil?
             f.product_package = product.package
@@ -1299,7 +1299,7 @@ class User < ActiveRecord::Base
   def desnormalize_preferences
     if self.preferences.present?
       self.preferences.each do |key, value|
-        pref = UserPreference.find_or_create_by_user_id_and_club_id_and_param(self.id, self.club_id, key)
+        pref = UserPreference.find_or_create_by(user_id: self.id, club_id: self.club_id, param: key)
         pref.value = value
         pref.save
       end
@@ -1491,14 +1491,11 @@ class User < ActiveRecord::Base
 
     def set_decline_strategy(trans)
       # soft / hard decline
-
       tom = terms_of_membership
-      decline = DeclineStrategy.find_by_gateway_and_response_code_and_credit_card_type(trans.gateway.downcase, 
-                  trans.response_code, trans.cc_type) || 
-                DeclineStrategy.find_by_gateway_and_response_code_and_credit_card_type(trans.gateway.downcase, 
-                  trans.response_code, "all")
+      decline = DeclineStrategy.find_by(gateway: trans.gateway.downcase, response_code: trans.response_code, credit_card_type: trans.cc_type) || 
+                DeclineStrategy.find_by(gateway: trans.gateway.downcase, response_code: trans.response_code, 
+                                     credit_card_type: "all")
       cancel_member = false
-
       if decline.nil?
         # we must send an email notifying about this error. Then schedule this job to run in the future (1 month)
         message = "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
@@ -1534,8 +1531,8 @@ class User < ActiveRecord::Base
             cancel_member = true
           end
         end
-      end
-      
+      end 
+
       self.save(validate: false)
       Auditory.audit(nil, trans, message, self, operation_type )
       if cancel_member

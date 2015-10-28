@@ -10,7 +10,7 @@ gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
 
-gem 'acts_as_list', '0.2.0'
+gem 'acts_as_list', "0.7.2"
 gem 'delayed_job_active_record'
 gem "delayed_job_web"
 # uncomment if pardot is enabled again
@@ -76,7 +76,6 @@ gem 'oboe'
 
 # To use debugger
 group :development do
-  gem 'byebug'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
   gem "yard"  , :git => 'git://github.com/stoneacre/yard.git'
@@ -100,9 +99,7 @@ end
 gem 'tire'
 gem 'progress_bar'
 
-
 group :test do
-  gem 'turn'
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'mocha', require: false
@@ -112,6 +109,10 @@ group :test do
   gem 'simplecov'
   gem 'database_cleaner'
   gem "timecop"
+end
+
+group :test, :development do
+  gem 'byebug'
 end
 
 gem 'activemerchant'

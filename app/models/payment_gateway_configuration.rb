@@ -5,12 +5,13 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   has_many :transactions
 
   acts_as_paranoid
-#  validates_as_paranoid
 
   validates :login, presence: true
   validates :merchant_key, presence: true, if: Proc.new { |pgc| pgc.litle? }
   validates :password, presence: true
-  validates :gateway, presence: true # , uniqueness_without_deleted: { scope: [ :club_id ], message: "already created. There is a payment gateway already configured for this gateway." }  #FIXME: paranoid
+  validates :gateway, presence: true, 
+                      uniqueness: { scope: [ :club_id ], message: "already created. There is a payment gateway already configured for this gateway." }
+  
   validates :club, presence: true
 
   before_create :only_one_is_allowed

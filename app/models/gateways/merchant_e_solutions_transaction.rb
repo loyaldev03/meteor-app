@@ -50,10 +50,10 @@ class MerchantESolutionsTransaction < Transaction
   end
 
   def fill_transaction_type_for_credit(sale_transaction)
-    if sale_transaction.amount.to_f == amount.abs
+    if sale_transaction.amount.to_f == amount.abs.to_f
       self.transaction_type = "refund"
       self.refund_response_transaction_id = sale_transaction.response_transaction_id
-    elsif sale_transaction.amount.to_f > amount.abs
+    elsif sale_transaction.amount.to_f > amount.abs.to_f
       self.transaction_type = "credit"
     end
   end    

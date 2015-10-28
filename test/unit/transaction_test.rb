@@ -79,9 +79,7 @@ class TransactionTest < ActiveSupport::TestCase
         assert_not_nil user.join_date, "join date should not be nil"
         assert_not_nil user.bill_date, "bill date should not be nil"
         assert_equal user.recycled_times, 0, "recycled_times should be 0"
-        trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', user.id]).first
-        assert_equal trans.operation_type, Settings.operation_types.enrollment_billing
-        assert_equal trans.transaction_type, 'sale'
+        assert_not_nil user.transactions.find_by(operation_type: Settings.operation_types.enrollment_billing, transaction_type: 'sale')
       end
     end
   end
@@ -98,16 +96,14 @@ class TransactionTest < ActiveSupport::TestCase
     assert_difference('Operation.count', 2) do
       assert_difference('Transaction.count') do
         assert_difference('Communication.count') do
-          trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-          assert_equal trans.operation_type, Settings.operation_types.membership_billing
-          answer = Transaction.refund(amount, trans)
+          trans = active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing)
+          answer = Transaction.refund(amount, trans.id)
           assert_equal answer[:code], Settings.error_codes.success, answer[:message]
           trans.reload
+          active_user.reload
           assert_equal trans.refunded_amount, amount
           assert_equal trans.amount_available_to_refund, 0.0
-
-          trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ? and transaction_type = ?', active_user.id, 'refund']).first
-          assert_equal trans.operation_type, Settings.operation_types.credit
+          assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.credit)
         end 
       end
     end
@@ -239,14 +235,14 @@ class TransactionTest < ActiveSupport::TestCase
           assert_nil user.bill_date
           assert_not_nil user.cancel_date
           assert_equal 0, user.recycled_times
-          assert_equal 1, user.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_hard_decline_by_max_retries).count
+          assert_equal 1, user.operations.where(operation_type: Settings.operation_types.membership_billing_hard_decline_by_max_retries).count
         else
           nbd = nbd + @sd_strategy.days.days
           assert_equal nbd.to_date, user.next_retry_bill_date.to_date
           assert_equal bill_date, user.bill_date
           assert_not_equal user.bill_date, user.next_retry_bill_date
           assert_equal time, user.recycled_times
-          assert_equal time, user.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_soft_decline).count
+          assert_equal time, user.operations.where(operation_type: Settings.operation_types.membership_billing_soft_decline).count
         end
       end
     end
@@ -286,7 +282,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_nil user.cancel_date
           assert_not_nil user.bill_date          
           assert_not_nil user.next_retry_bill_date          
-          assert_equal 1, user.operations.find_all_by_operation_type(Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries).count
+          assert_equal 1, user.operations.where(operation_type: Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries).count
           assert_equal 0, user.recycled_times
         else
           nbd = nbd + @sd_strategy.days.days
@@ -294,7 +290,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_equal bill_date, user.bill_date
           assert_not_equal user.bill_date, user.next_retry_bill_date
           assert_equal time, user.recycled_times
-          assert_equal time, user.operations.find_all_by_operation_type(Settings.operation_types.membership_billing_soft_decline).count
+          assert_equal time, user.operations.where(operation_type: Settings.operation_types.membership_billing_soft_decline).count
         end
       end
     end
@@ -340,9 +336,7 @@ class TransactionTest < ActiveSupport::TestCase
         assert_equal active_user.next_retry_bill_date.to_date, @sd_strategy.days.days.from_now.to_date, "next_retry_bill_date should #{@sd_strategy.days.days.from_now}"
         assert_equal active_user.bill_date, nbd, "bill_date should not be touched #{nbd}"
         assert_equal active_user.recycled_times, 1, "recycled_times should be 1"
-        trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-        assert_equal trans.operation_type, Settings.operation_types.membership_billing_soft_decline
-        assert_equal trans.transaction_type, 'sale'
+        assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_soft_decline, transaction_type: 'sale')
       end
     end
   end
@@ -421,9 +415,7 @@ class TransactionTest < ActiveSupport::TestCase
         assert_nil active_user.next_retry_bill_date, "next_retry_bill_date should be nil"
         assert_nil active_user.bill_date, "bill_date should be nil"
         assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
-        trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-        assert_equal trans.operation_type, Settings.operation_types.membership_billing_hard_decline_by_max_retries
-        assert_equal trans.transaction_type, 'sale'
+        assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_hard_decline_by_max_retries, transaction_type: 'sale')
       end
     end
   end
@@ -432,7 +424,7 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs_store
     active_user = create_active_user(@terms_of_membership)
     active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
-    assert_difference('Operation.count', 5) do        
+    assert_difference('Operation.count', 5) do
       assert_difference('Communication.count', 2) do
         amount = @terms_of_membership.installment_amount
         answer = active_user.bill_membership
@@ -441,9 +433,7 @@ class TransactionTest < ActiveSupport::TestCase
         assert_nil active_user.next_retry_bill_date, "next_retry_bill_date should be nil"
         assert_nil active_user.bill_date, "bill_date should be nil"
         assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
-        trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-        assert_equal trans.operation_type, Settings.operation_types.membership_billing_hard_decline
-        assert_equal trans.transaction_type, 'sale'
+        assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_hard_decline, transaction_type: 'sale')
       end
     end
   end
@@ -467,9 +457,7 @@ class TransactionTest < ActiveSupport::TestCase
       assert active_user.provisional?
       assert_equal active_user.recycled_times, 0
       assert_equal active_user.terms_of_membership.id, @terms_of_membership_for_downgrade.id
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-      assert_equal trans.operation_type, Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries
-      assert_equal trans.transaction_type, 'sale'    
+      assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries, transaction_type: 'sale')
     end
   end
 
@@ -488,9 +476,7 @@ class TransactionTest < ActiveSupport::TestCase
       active_user.reload
       assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
       assert_equal active_user.terms_of_membership.id, @terms_of_membership_for_downgrade.id
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-      assert_equal trans.operation_type, Settings.operation_types.downgraded_because_of_hard_decline
-      assert_equal trans.transaction_type, 'sale'    
+      assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.downgraded_because_of_hard_decline, transaction_type: "sale")
     end
   end
 
@@ -502,10 +488,9 @@ class TransactionTest < ActiveSupport::TestCase
     answer = active_user.bill_membership
     active_user.reload
     assert_equal active_user.next_retry_bill_date.to_date, (Time.zone.now + eval(Settings.next_retry_on_missing_decline)).to_date, "Next retry bill date incorrect"
-    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-    assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy
-    assert_equal trans.transaction_type, 'sale' 
-    assert_equal Operation.find_by_user_id_and_operation_type(active_user.id, Settings.operation_types.membership_billing_without_decline_strategy).description, "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
+    trans = active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_without_decline_strategy, transaction_type: "sale")
+    assert_not_nil trans
+    assert_equal Operation.find_by(user_id: active_user.id, operation_type: Settings.operation_types.membership_billing_without_decline_strategy).description, "Billing error. No decline rule configured: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
   end
 
   test "Billing declined, but there is no decline rule and limit is reached. Send email" do 
@@ -516,9 +501,8 @@ class TransactionTest < ActiveSupport::TestCase
     amount = @terms_of_membership.installment_amount
     answer = active_user.bill_membership
     active_user.reload
-    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-    assert_equal trans.operation_type, Settings.operation_types.membership_billing_without_decline_strategy_max_retries
-    assert_equal trans.transaction_type, 'sale' 
+    trans = active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_without_decline_strategy_max_retries, transaction_type: "sale")
+    assert_not_nil trans
     assert_equal Operation.find_by_user_id_and_operation_type(active_user.id, Settings.operation_types.membership_billing_without_decline_strategy_max_retries).description, "Billing error. No decline rule configured limit reached: #{trans.response_code} #{trans.gateway}: #{trans.response_result}"
   end
 
@@ -570,85 +554,152 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.status, "active"
   end
 
-  # Tets Litle transactions
-  def club_with_litle
-    @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
-    @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-    @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)
-  end
+  # # Tets Litle transactions
+  # def club_with_litle
+  #   @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
+  #   @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+  #   @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)
+  #   active_merchant_stubs_litle
+  # end
 
-  test "Bill membership with Litle" do
-    club_with_litle
-    @credit_card = @credit_card_litle # overwrite credit card
-    active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
-    amount = @litle_terms_of_membership.installment_amount
-    Timecop.travel(active_user.next_retry_bill_date) do
-      answer = active_user.bill_membership
-      active_user.reload
-      assert_equal active_user.status, 'active'
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-      assert_equal trans.operation_type, Settings.operation_types.membership_billing
-      assert_equal trans.transaction_type, 'sale'
-    end
-  end
+  # test "Bill membership with Litle" do
+  #   club_with_litle
+  #   @credit_card = @credit_card_litle # overwrite credit card
+  #   active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
+  #   amount = @litle_terms_of_membership.installment_amount
+  #   Timecop.travel(active_user.next_retry_bill_date) do
+  #     answer = active_user.bill_membership
+  #     active_user.reload
+  #     assert_equal active_user.status, 'active'
+  #     assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing, transaction_type: 'sale')
+  #   end
+  # end
   
-  test "Bill membership with wrong payment gateway cofiguration set" do
-    user = enroll_user(@terms_of_membership)
-    user.club.payment_gateway_configurations.first.update_attribute :gateway, "random_gateway"
-    Timecop.travel(user.next_retry_bill_date) do
-      answer = user.bill_membership
-      assert answer[:message].include?("Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience")
-    end
-  end 
+  # test "Bill membership with wrong payment gateway cofiguration set" do
+  #   user = enroll_user(@terms_of_membership)
+  #   user.club.payment_gateway_configurations.first.update_attribute :gateway, "random_gateway"
+  #   Timecop.travel(user.next_retry_bill_date) do
+  #     answer = user.bill_membership
+  #     assert answer[:message].include?("Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience")
+  #   end
+  # end 
 
-#   test "Enroll with Litle" do
-#     club_with_litle
-#     enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
-#   end
+  # test "Enroll with Litle" do
+  #   club_with_litle
+  #   enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
+  # end
 
-  test "Full refund with Litle" do
-    club_with_litle
-    @credit_card = @credit_card_litle # overwrite credit card
-    active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
-    amount = @litle_terms_of_membership.installment_amount
-    Timecop.travel(active_user.next_retry_bill_date) do
-      answer = active_user.bill_membership
-      active_user.reload
-      assert_equal active_user.status, 'active'
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-      answer = Transaction.refund(amount, trans)
-      assert_equal answer[:code], Settings.error_codes.success, answer[:message]
-      trans.reload
-      assert_equal trans.refunded_amount, amount
-      assert_equal trans.amount_available_to_refund, 0.0
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', 
-                               :conditions => ['user_id = ? AND transaction_type = ?', active_user.id, 'credit']).first
-      assert_equal trans.operation_type, Settings.operation_types.credit
-      assert_equal trans.transaction_type, 'credit'
-    end
-  end
+  # test "Full refund with Litle" do
+  #   club_with_litle
+  #   @credit_card = @credit_card_litle # overwrite credit card
+  #   active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
+  #   amount = @litle_terms_of_membership.installment_amount
+  #   Timecop.travel(active_user.next_retry_bill_date) do
+  #     answer = active_user.bill_membership
+  #     active_user.reload
+  #     assert_equal active_user.status, 'active'
+  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
+  #     answer = Transaction.refund(amount, trans.id)
+  #     assert_equal answer[:code], Settings.error_codes.success, answer[:message]
+  #     trans.reload
+  #     assert_equal trans.refunded_amount, amount
+  #     assert_equal trans.amount_available_to_refund, 0.0
+  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', 
+  #                              :conditions => ['user_id = ? AND transaction_type = ?', active_user.id, 'credit']).first
+  #     assert_equal trans.operation_type, Settings.operation_types.credit
+  #     assert_equal trans.transaction_type, 'credit'
+  #   end
+  # end
 
-  test "Partial refund with Litle" do
-    club_with_litle
-    @credit_card = @credit_card_litle # overwrite credit card
-    active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
-    amount = @litle_terms_of_membership.installment_amount
-    Timecop.travel(active_user.next_retry_bill_date) do
-      answer = active_user.bill_membership
-      active_user.reload
-      assert_equal active_user.status, 'active'
-      trans = Transaction.find(:all, :limit => 1, :conditions => ['user_id = ? and operation_type = ?', active_user.id, Settings.operation_types.membership_billing]).first
-      refunded_amount = amount-0.34
-      answer = Transaction.refund(refunded_amount, trans)
-      assert_equal answer[:code], Settings.error_codes.success, answer[:message]
-      trans.reload
-      assert_equal trans.refunded_amount, refunded_amount
-      assert_not_equal trans.amount_available_to_refund, 0.0
-      trans = Transaction.find(:all, :limit => 1, :conditions => ['user_id = ? and operation_type = ?', active_user.id, Settings.operation_types.credit]).first
-      assert_equal trans.operation_type, Settings.operation_types.credit
-      assert_equal trans.transaction_type, 'credit'
-    end
-  end
+  # test "Partial refund with Litle" do
+  #   club_with_litle
+  #   @credit_card = @credit_card_litle # overwrite credit card
+  #   active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
+  #   amount = @litle_terms_of_membership.installment_amount
+  #   Timecop.travel(active_user.next_retry_bill_date) do
+  #     answer = active_user.bill_membership
+  #     active_user.reload
+  #     assert_equal active_user.status, 'active'
+  #     trans = Transaction.find(:all, :limit => 1, :conditions => ['user_id = ? and operation_type = ?', active_user.id, Settings.operation_types.membership_billing]).first
+  #     refunded_amount = amount-0.34
+  #     answer = Transaction.refund(refunded_amount, trans.id)
+  #     assert_equal answer[:code], Settings.error_codes.success, answer[:message]
+  #     trans.reload
+  #     assert_equal trans.refunded_amount, refunded_amount
+  #     assert_not_equal trans.amount_available_to_refund, 0.0
+  #     trans = Transaction.find(:all, :limit => 1, :conditions => ['user_id = ? and operation_type = ?', active_user.id, Settings.operation_types.credit]).first
+  #     assert_equal trans.operation_type, Settings.operation_types.credit
+  #     assert_equal trans.transaction_type, 'credit'
+  #   end
+  # end
+
+  # # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Litle
+  # test "Try billing an user's membership when he was previously SD for credit_card_expired for Litle" do 
+  #   @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
+  #   @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+  #   @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)    
+
+  #   active_user = create_active_user(@litle_terms_of_membership)
+  #   active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
+  #   active_user.active_credit_card.update_attribute :token, @credit_card_litle.token
+
+  #   active_user.bill_membership
+
+  #   active_merchant_stubs_litle
+  #   Timecop.travel(active_user.next_retry_bill_date) do
+  #     old_year = active_user.active_credit_card.expire_year
+  #     old_month = active_user.active_credit_card.expire_month
+      
+  #     assert_difference('Operation.count',6) do
+  #       assert_difference('Transaction.count') do
+  #         active_user.bill_membership
+  #       end
+  #     end
+  #     active_user.reload
+  #     assert_equal active_user.active_credit_card.expire_year, old_year+2
+  #     assert_equal active_user.active_credit_card.expire_month, old_month
+  #   end
+
+  #   Timecop.travel(active_user.next_retry_bill_date) do
+  #     old_year = active_user.active_credit_card.expire_year
+  #     old_month = active_user.active_credit_card.expire_month
+  #     active_user.bill_membership
+  #     active_user.reload
+
+  #     assert_equal active_user.active_credit_card.expire_year, old_year
+  #     assert_equal active_user.active_credit_card.expire_month, old_month
+  #   end
+  # end
+
+  # test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for Litle" do 
+  #   @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
+  #   @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+  #   @litle_terms_of_membership_the_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id, :name =>"second_one")
+  #   @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)
+
+  #   active_user = create_active_user(@litle_terms_of_membership)
+  #   active_user.active_credit_card.update_attribute :token, @credit_card_litle.token
+
+  #   active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
+  #   active_user.bill_membership
+  #   active_user.change_terms_of_membership(@litle_terms_of_membership_the_second.id, "changing tom", 100)
+
+  #   Timecop.travel(active_user.next_retry_bill_date) do
+  #     active_merchant_stubs_litle
+
+  #     old_year = active_user.active_credit_card.expire_year
+  #     old_month = active_user.active_credit_card.expire_month
+      
+  #     assert_difference('Operation.count', 4) do
+  #       assert_difference('Transaction.count') do
+  #         active_user.bill_membership
+  #       end
+  #     end
+  #     active_user.reload
+  #     assert_equal active_user.active_credit_card.expire_year, old_year
+  #     assert_equal active_user.active_credit_card.expire_month, old_month
+  #   end
+  # end
 
   test "should not update NBD after save the sale from monthly-tom to monthly-tom" do
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
@@ -748,9 +799,7 @@ class TransactionTest < ActiveSupport::TestCase
         user.no_recurrent_billing(amount,"testing event", "one-time")
       end
     end
-    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', user.id]).first
-    assert_equal trans.operation_type, Settings.operation_types.no_recurrent_billing
-    assert_equal trans.transaction_type, 'sale'
+    assert_not_nil user.transactions.find_by(operation_type: Settings.operation_types.no_recurrent_billing, transaction_type: 'sale')
 
     operation = Operation.last
     transaction = Transaction.last
@@ -760,14 +809,12 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal(transaction.full_label, "Sale : This transaction has been approved. Reason: testing event")
     assert transaction.success?
 
-    answer = Transaction.refund(amount, transaction)
+    answer = Transaction.refund(amount, transaction.id)
     assert_equal answer[:code], Settings.error_codes.success, answer[:message]
     transaction.reload
     assert_equal transaction.refunded_amount, amount
     assert_equal transaction.amount_available_to_refund, 0.0
-    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', user.id]).first
-    assert_equal trans.operation_type, Settings.operation_types.credit
-    assert_equal trans.transaction_type, 'refund'
+    assert_not_nil user.transactions.find_by(operation_type: Settings.operation_types.credit, transaction_type: 'refund')
   end
 
   test "Should be able to do a full refund 9.97." do
@@ -777,14 +824,13 @@ class TransactionTest < ActiveSupport::TestCase
     user.no_recurrent_billing(amount,"testing event", "one-time")
     transaction = Transaction.last
 
-    answer = Transaction.refund(amount, transaction)
+    answer = Transaction.refund(amount, transaction.id)
     assert_equal answer[:code], Settings.error_codes.success, answer[:message]
     transaction.reload
     assert_equal transaction.refunded_amount.to_f, amount.to_f
     assert_equal transaction.amount_available_to_refund, 0.0
-    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', user.id]).first
-    assert_equal trans.operation_type, Settings.operation_types.credit
-    assert_equal trans.transaction_type, 'refund'
+    user.reload
+    assert_not_nil user.transactions.find_by(operation_type: Settings.operation_types.credit, transaction_type: 'refund')
   end
 
   test "Make no recurrent billing with user not expecting billing" do
@@ -846,8 +892,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_difference("Transaction.count")do
       user.bill_membership
     end
-    trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', user.id]).first
-    assert_equal trans.response_result, I18n.t('error_messages.airbrake_error_message')
+    assert_not_nil user.transactions.find_by(response_result: I18n.t('error_messages.airbrake_error_message'))
   end
 
   # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for MeS
@@ -890,74 +935,6 @@ class TransactionTest < ActiveSupport::TestCase
 
     active_merchant_stubs
     Timecop.travel(active_user.next_retry_bill_date) do
-      old_year = active_user.active_credit_card.expire_year
-      old_month = active_user.active_credit_card.expire_month
-      
-      assert_difference('Operation.count', 4) do
-        assert_difference('Transaction.count') do
-          active_user.bill_membership
-        end
-      end
-      active_user.reload
-      assert_equal active_user.active_credit_card.expire_year, old_year
-      assert_equal active_user.active_credit_card.expire_month, old_month
-    end
-  end
-
-  # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Litle
-  test "Try billing an user's membership when he was previously SD for credit_card_expired for Litle" do 
-    @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
-    @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-    @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)    
-
-    active_user = create_active_user(@litle_terms_of_membership)
-    active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
-    active_user.active_credit_card.update_attribute :token, @credit_card_litle.token
-
-    active_user.bill_membership
-
-    active_merchant_stubs_litle
-    Timecop.travel(active_user.next_retry_bill_date) do
-      old_year = active_user.active_credit_card.expire_year
-      old_month = active_user.active_credit_card.expire_month
-      
-      assert_difference('Operation.count',6) do
-        assert_difference('Transaction.count') do
-          active_user.bill_membership
-        end
-      end
-      active_user.reload
-      assert_equal active_user.active_credit_card.expire_year, old_year+2
-      assert_equal active_user.active_credit_card.expire_month, old_month
-    end
-
-    Timecop.travel(active_user.next_retry_bill_date) do
-      old_year = active_user.active_credit_card.expire_year
-      old_month = active_user.active_credit_card.expire_month
-      active_user.bill_membership
-      active_user.reload
-
-      assert_equal active_user.active_credit_card.expire_year, old_year
-      assert_equal active_user.active_credit_card.expire_month, old_month
-    end
-  end
-
-  test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for Litle" do 
-    @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
-    @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-    @litle_terms_of_membership_the_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id, :name =>"second_one")
-    @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)
-
-    active_user = create_active_user(@litle_terms_of_membership)
-    active_user.active_credit_card.update_attribute :token, @credit_card_litle.token
-
-    active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
-    active_user.bill_membership
-    active_user.change_terms_of_membership(@litle_terms_of_membership_the_second.id, "changing tom", 100)
-
-    Timecop.travel(active_user.next_retry_bill_date) do
-      active_merchant_stubs_litle
-
       old_year = active_user.active_credit_card.expire_year
       old_month = active_user.active_credit_card.expire_month
       
@@ -1308,8 +1285,8 @@ class TransactionTest < ActiveSupport::TestCase
     assert_difference('Operation.count', 0) do
       assert_difference('Transaction.count', 0) do
         assert_difference('Communication.count', 0) do
-          trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-          answer = Transaction.refund(amount, trans)
+          trans = active_user.transactions.last
+          answer = Transaction.refund(amount, trans.id)
         end 
       end
     end
@@ -1352,7 +1329,7 @@ class TransactionTest < ActiveSupport::TestCase
   #     active_member.reload
   #     assert_equal active_member.status, 'active'
   #     trans = active_member.transactions.last
-  #     answer = Transaction.refund(amount, trans)
+  #     answer = Transaction.refund(amount, trans.id)
   #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
   #   end
   #   assert_equal Transaction.find_by_transaction_type('credit').operation_type, Settings.operation_types.credit
@@ -1368,7 +1345,7 @@ class TransactionTest < ActiveSupport::TestCase
   #     assert_equal active_member.status, 'active'
   #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
   #     refunded_amount = amount-0.34
-  #     answer = Transaction.refund(refunded_amount, trans)
+  #     answer = Transaction.refund(refunded_amount, trans.id)
   #     assert_equal answer[:code], 3, answer[:message] # refunds cant be processed on Auth.net test env
   #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['member_id = ?', active_member.id]).first
   #     assert_equal trans.operation_type, Settings.operation_types.credit
@@ -1441,9 +1418,9 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
-# ######################################################
-# #######  FIRST DATA ##################################
-# ######################################################
+######################################################
+#######  FIRST DATA ##################################
+######################################################
 
   # Tets FirstData transactions
   def club_with_first_data
@@ -1477,7 +1454,7 @@ class TransactionTest < ActiveSupport::TestCase
       active_user.reload
       assert_equal active_user.status, 'active'
       trans = active_user.transactions.last
-      answer = Transaction.refund(amount, trans)
+      answer = Transaction.refund(amount, trans.id)
       assert_equal answer[:code], "000", answer[:message]
     end
     assert_equal Transaction.find_by_transaction_type('refund').operation_type, Settings.operation_types.credit
@@ -1491,9 +1468,9 @@ class TransactionTest < ActiveSupport::TestCase
       answer = active_user.bill_membership
       active_user.reload
       assert_equal active_user.status, 'active'
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
+      trans = active_user.transactions.find_by(transaction_type: 'sale')
       refunded_amount = amount-0.34
-      answer = Transaction.refund(refunded_amount, trans)
+      answer = Transaction.refund(refunded_amount, trans.id)
       assert_equal answer[:code], "000", answer[:message] # refunds cant be processed on Auth.net test env
       assert_equal Transaction.where("user_id = ? and operation_type = ? and transaction_type = 'refund'", active_user.id, Settings.operation_types.credit).count, 1
     end
@@ -1620,7 +1597,7 @@ class TransactionTest < ActiveSupport::TestCase
       active_user.reload
       assert_equal active_user.status, 'active'
       trans = active_user.transactions.last
-      answer = Transaction.refund(amount, trans)
+      answer = Transaction.refund(amount, trans.id)
       assert_equal answer[:code], "000", answer[:message]
     end
     assert_equal Transaction.find_by_transaction_type('refund').operation_type, Settings.operation_types.credit
@@ -1634,9 +1611,9 @@ class TransactionTest < ActiveSupport::TestCase
       answer = active_user.bill_membership
       active_user.reload
       assert_equal active_user.status, 'active'
-      trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
+      trans = active_user.transactions.find_by(transaction_type: 'sale')
       refunded_amount = amount-0.34
-      answer = Transaction.refund(refunded_amount, trans)
+      answer = Transaction.refund(refunded_amount, trans.id)
       assert_equal answer[:code], "000", answer[:message] # refunds cant be processed on Auth.net test env
       assert_equal Transaction.where("user_id = ? and operation_type = ? and transaction_type = 'refund'", active_user.id, Settings.operation_types.credit).count, 1
     end

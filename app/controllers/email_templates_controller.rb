@@ -113,7 +113,7 @@ class EmailTemplatesController < ApplicationController
   def test_communications
     if request.post? 
       begin
-        template = EmailTemplate.find_by_id (params[:email_template_id]) 
+        template = EmailTemplate.find(params[:email_template_id])
         if template.nil?
           response = { code: Settings.error_codes.not_found, message: "Template not found."}
         else

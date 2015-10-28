@@ -1,3 +1,4 @@
+require "active_merchant/billing/rails"
 require 'lyris_service'
 # # We are commenting log writing due to https://www.pivotaltracker.com/story/show/68819072 since how logs are written is not pci compliant (Only for production).
 if Rails.env.staging? or Rails.env.prototype?

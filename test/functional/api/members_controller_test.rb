@@ -137,7 +137,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     else
       generate_post_message
     end
-    @saved_user = User.find_by_email @user.email
+    @saved_user = User.find_by(email: @user.email)
   end
 
   def validate_transactions_upon_tom_update(previous_membership, new_membership, amount_to_process, amount_in_favor)
@@ -180,7 +180,7 @@ class Api::MembersControllerTest < ActionController::TestCase
             assert_difference('UserPreference.count',@preferences.size) do 
               assert_difference('User.count') do
                 Delayed::Worker.delay_jobs = true
-                assert_difference('DelayedJob.count',5)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x2, :assign_club_cash_without_delay
+                assert_difference('DelayedJob.count',6)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x3, :assign_club_cash_without_delay
                   generate_post_message
                   assert_response :success
                 end
@@ -192,7 +192,7 @@ class Api::MembersControllerTest < ActionController::TestCase
         end
       end
     end
-    saved_user = User.find_by_email(@user.email)
+    saved_user = User.find_by(email: @user.email)
     membership = Membership.last
     enrollment_info = EnrollmentInfo.last
     assert_equal(enrollment_info.membership_id, membership.id)
@@ -216,7 +216,7 @@ class Api::MembersControllerTest < ActionController::TestCase
           assert_difference('UserPreference.count',@preferences.size) do 
             assert_difference('User.count') do
               Delayed::Worker.delay_jobs = true
-              assert_difference('DelayedJob.count',5) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
+              assert_difference('DelayedJob.count',6) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
                 generate_post_message
                 assert_response :success
               end
@@ -227,7 +227,7 @@ class Api::MembersControllerTest < ActionController::TestCase
         end
       end
     end
-    saved_user = User.find_by_email(@user.email)
+    saved_user = User.find_by(email: @user.email)
     membership = Membership.last
     enrollment_info = EnrollmentInfo.last
     assert_equal(enrollment_info.membership_id, membership.id)
@@ -258,7 +258,7 @@ class Api::MembersControllerTest < ActionController::TestCase
         end
       end
     end
-    @user_created = User.find_by_email @user.email
+    @user_created = User.find_by(email: @user.email)
     assert @response.body.include? '"api_role":["91284557"]'
     assert @response.body.include? '"bill_date":"'+@user_created.next_retry_bill_date.strftime("%m/%d/%Y")+'"'
   end
@@ -1321,7 +1321,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed).to_datetime
     assert_difference('Operation.count') do
       generate_put_next_bill_date(next_bill_date)
-      puts @user.get_club_timezone
     end
     @user.reload
     date_to_check = next_bill_date.to_datetime.change(:offset => @user.get_offset_related)
@@ -1861,7 +1860,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     assert @response.body.include? "Member information is invalid."
     assert @response.body.include? "\"expire_year\":[\"expired\"]"
-    saved_user = User.find_by_email @user.email
+    saved_user = User.find_by(email: @user.email)
     assert saved_user.first_name != "new_Name"
   end
 
@@ -2140,7 +2139,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
 
     membership_transaction = @saved_user.transactions.where("operation_type = ?", Settings.operation_types.membership_billing).last
-    Transaction.refund(membership_transaction.amount/2, membership_transaction)
+    Transaction.refund(membership_transaction.amount/2, membership_transaction.id)
     
     Timecop.travel(first_nbd + (@saved_user.terms_of_membership.installment_period/2).days) do
       generate_post_update_terms_of_membership(@saved_user.id, @tom_yearly.id)

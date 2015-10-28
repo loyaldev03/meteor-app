@@ -16,10 +16,6 @@ require 'tasks/tasks_helpers'
 DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
 
-require 'turn/autorun'
-
-Turn.config.format = :outline
-
 ## do you use firefox??
 Capybara.current_driver = :selenium
 ## end configuration for firefox
@@ -180,16 +176,16 @@ module ActionController
   class IntegrationTest
     include Capybara::DSL
 
-    self.use_transactional_fixtures = false # DOES WORK! Damn it!
+    # self.use_transactional_fixtures = false # FIXME : DOES NOT WORK! IN RAILS4
 
-    setup do
+    def setup
       stubs_elasticsearch_index
       DatabaseCleaner.start
       FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by_email("batch@xagax.com")
       page.driver.browser.manage.window.resize_to(1024,720)
     end
 
-    teardown do
+    def teardown
       sleep 5
       Capybara.reset_sessions!  
       DatabaseCleaner.clean
