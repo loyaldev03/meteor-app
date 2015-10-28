@@ -144,23 +144,23 @@ class Communication < ActiveRecord::Base
   def deliver_action_mailer
     response = case template_type.to_sym
     when :cancellation
-      Notifier.cancellation(email).deliver!
+      Notifier.cancellation(email).deliver_now!
     when :rejection
-      Notifier.rejection(email).deliver!
+      Notifier.rejection(email).deliver_now!
     when :prebill
-      Notifier.pre_bill(email).deliver!
+      Notifier.pre_bill(email).deliver_now!
     when :manual_payment_prebill
-      Notifier.manual_payment_pre_bill(email).deliver!
+      Notifier.manual_payment_pre_bill(email).deliver_now!
     when :refund
-      Notifier.refund(email).deliver!
+      Notifier.refund(email).deliver_now!
     when :birthday
-      Notifier.birthday(email).deliver!
+      Notifier.birthday(email).deliver_now!
     when :pillar
-      Notifier.pillar(email).deliver!
+      Notifier.pillar(email).deliver_now!
     when :hard_decline
-      Notifier.hard_decline(user).deliver!
+      Notifier.hard_decline(user).deliver_now!
     when :soft_decline
-      Notifier.soft_decline(user).deliver!
+      Notifier.soft_decline(user).deliver_now!
     else
       message = "Deliver action could not be done."
       Auditory.report_issue("Communication deliver_action_mailer", message, { user: user.inspect, communication: self.inspect })
@@ -180,23 +180,23 @@ class Communication < ActiveRecord::Base
     success = true
     case template.template_type.to_sym
     when :cancellation
-      Notifier.cancellation(user.email).deliver!
+      Notifier.cancellation(user.email).deliver_now!
     when :rejection
-      Notifier.rejection(user.email).deliver!
+      Notifier.rejection(user.email).deliver_now!
     when :prebill
-      Notifier.pre_bill(user.email).deliver!
+      Notifier.pre_bill(user.email).deliver_now!
     when :manual_payment_prebill
-      Notifier.manual_payment_pre_bill(user.email).deliver!
+      Notifier.manual_payment_pre_bill(user.email).deliver_now!
     when :refund
-      Notifier.refund(user.email).deliver!
+      Notifier.refund(user.email).deliver_now!
     when :birthday
-      Notifier.birthday(user.email).deliver!
+      Notifier.birthday(user.email).deliver_now!
     when :pillar
-      Notifier.pillar(user.email).deliver!
+      Notifier.pillar(user.email).deliver_now!
     when :hard_decline
-      Notifier.hard_decline(user).deliver!
+      Notifier.hard_decline(user).deliver_now!
     when :soft_decline
-      Notifier.soft_decline(user).deliver!
+      Notifier.soft_decline(user).deliver_now!
     else
       success = false 
     end

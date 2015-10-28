@@ -64,7 +64,7 @@ class FulfillmentFile < ActiveRecord::Base
     xls_package.serialize temp_file.path
     
     temp_file.close
-    Notifier.manual_fulfillment_file(self.agent,self,temp_file).deliver!
+    Notifier.manual_fulfillment_file(self.agent,self,temp_file).deliver_now!
     temp_file.unlink
   end
   handle_asynchronously :send_email_with_file, queue: :email_queue, priority: 5

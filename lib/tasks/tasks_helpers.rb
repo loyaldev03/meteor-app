@@ -8,9 +8,8 @@ module TasksHelpers
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
 
-    base = User.includes(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND users.club_id IN (select id from clubs where billing_enable = true) AND users.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now.to_date).limit(4000)
-
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:billing rake task, processing #{base.count} users"
+    base = User.joins(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND users.club_id IN (select id from clubs where billing_enable = true) AND users.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now.to_date).limit(4000)
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:billing rake task, processing #{base.size} users"
     base.to_enum.with_index.each do |user,index| 
       tz = Time.zone.now
       begin
@@ -46,7 +45,7 @@ module TasksHelpers
     base = Membership.joins(:user).joins(:terms_of_membership).joins(:terms_of_membership => :club).joins(:terms_of_membership => :email_templates).
            where("email_templates.template_type = 'pillar' AND email_templates.client = clubs.marketing_tool_client AND date(join_date) = DATE_SUB(?, INTERVAL email_templates.days DAY) AND users.status IN ('active','provisional') and billing_enable = true", Time.zone.now.to_date).
            select("memberships.user_id, email_templates.id")
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.count} templates"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:send_pillar_emails rake task, processing #{base.size} templates"
     base.to_enum.with_index.each do |res,index|
       begin
         tz = Time.zone.now
@@ -68,7 +67,7 @@ module TasksHelpers
   # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
     base = User.includes(:club).where("date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member' AND club_cash_enable = true", Time.zone.now.to_date).limit(2000)
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{base.count} users"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{base.size} users"
     base.to_enum.with_index.each do |user,index|
       tz = Time.zone.now
       begin
@@ -87,11 +86,11 @@ module TasksHelpers
 
   # Method used from rake task and also from tests!
   def self.cancel_all_member_up_today
-    base = User.includes(:current_membership).where("date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
-    base_for_manual_payment = User.includes(:current_membership).where("manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", Time.zone.now.to_date, 'lapsed')
-   
+    base = User.joins(:current_membership).where("date(memberships.cancel_date) <= ? AND memberships.status != ? ", Time.zone.now.to_date, 'lapsed')
+    base_for_manual_payment = User.joins(:current_membership).where("manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", Time.zone.now.to_date, 'lapsed')
+    
     [base, base_for_manual_payment].each do |list|
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:cancel_all_member_up_today rake task, processing #{base.count} users"
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:cancel_all_member_up_today rake task, processing #{base.size} users"
       list.each_with_index do |user, index| 
         tz = Time.zone.now
         begin
@@ -113,7 +112,7 @@ module TasksHelpers
   def self.process_sync 
     base = User.where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )').with_billing_enable.select('users.id')
     tz = Time.zone.now
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users lapsed and api_id not null, processing #{base.count} users"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users lapsed and api_id not null, processing #{base.size} users"
     base.find_in_batches do |group|
       group.each do |user_id|
         begin
@@ -133,7 +132,7 @@ module TasksHelpers
 
     base =  User.where('last_sync_error like "There is no user with ID%"').with_billing_enable.select('users.id')
     base2 = User.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"').with_billing_enable.select('users.id')
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users with error sync related to wrong api_id, processing #{base.count+base2.count} users"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users with error sync related to wrong api_id, processing #{base.size+base2.size} users"
     tz = Time.zone.now
     index = 0
     [base,base2].each do |group|
@@ -167,7 +166,7 @@ module TasksHelpers
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
     base = User.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").with_billing_enable.select('users.id').limit(2000)
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users not_synced or with_error, processing #{base.count} users"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users not_synced or with_error, processing #{base.size} users"
     tz = Time.zone.now
     base.to_enum.with_index.each do |user_id,index|
       begin
@@ -196,7 +195,7 @@ module TasksHelpers
   def self.process_email_sync_error
     user_list = {}
     base = User.where("sync_status = 'with_error' AND last_sync_error like '%The e-mail address%is already taken%'")
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_email_sync_error rake task, processing #{base.count} users"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_email_sync_error rake task, processing #{base.size} users"
     base.find_in_batches do |group|
       group.each_with_index do |user, index|
         club = user.club
@@ -213,7 +212,7 @@ module TasksHelpers
   def self.send_happy_birthday
     today = Time.zone.now.to_date
     base = User.billable.joins(:club).where(" birth_date IS NOT NULL and DAYOFMONTH(birth_date) = ? and MONTH(birth_date) = ? and billing_enable = true", today.day, today.month)
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:send_happy_birthday rake task, processing #{base.count} users"
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:send_happy_birthday rake task, processing #{base.size} users"
     base.find_in_batches do |group|
       group.to_enum.with_index.each do |user,index| 
         tz = Time.zone.now
@@ -309,7 +308,7 @@ module TasksHelpers
   def self.process_fulfillments_up_today
     index = 0
     Fulfillment.to_be_renewed.find_in_batches do |group|
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_fulfillments_up_today rake task, processing #{group.count} fulfillments"
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_fulfillments_up_today rake task, processing #{group.size} fulfillments"
       group.each do |fulfillment| 
         begin
           index = index+1

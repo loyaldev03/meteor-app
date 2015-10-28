@@ -61,7 +61,7 @@ namespace :fulfillments do
       temp = Tempfile.new("naamma_kit-card_report.xlsx") 
       
       package.serialize temp.path
-      Notifier.fulfillment_naamma_report(temp, fulfillment_file.fulfillments.count).deliver!
+      Notifier.fulfillment_naamma_report(temp, fulfillment_file.fulfillments.count).deliver_later!
       
       temp.close 
       temp.unlink
@@ -246,7 +246,7 @@ namespace :fulfillments do
       temp = Tempfile.new("nfla_kit-card_report.xlsx") 
       
       package.serialize temp.path
-      Notifier.fulfillment_nfla_report(temp, fulfillment_file.fulfillments.count).deliver!
+      Notifier.fulfillment_nfla_report(temp, fulfillment_file.fulfillments.count).deliver_later!
       
       temp.close 
       temp.unlink

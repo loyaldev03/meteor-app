@@ -85,7 +85,7 @@ class Product < ActiveRecord::Base
     temp = Tempfile.new("posts.xlsx") 
     
     product_xls.serialize temp.path
-    Notifier.product_list(temp).deliver!
+    Notifier.product_list(temp).deliver_now!
     
     temp.close 
     temp.unlink

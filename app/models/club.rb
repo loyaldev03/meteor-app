@@ -25,7 +25,7 @@ class Club < ActiveRecord::Base
   attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id,
     :api_type, :api_username, :api_password, :time_zone, :pardot_email, :pardot_password, :pardot_user_key,
     :cs_phone_number, :family_memberships_allowed, :club_cash_enable, :member_banner_url, :non_member_banner_url,
-    :member_landing_url, :non_member_landing_url, :payment_gateway_errors_email
+    :member_landing_url, :non_member_landing_url, :payment_gateway_errors_email, :marketing_tool_client, :marketing_tool_attributes
 
   acts_as_paranoid
 

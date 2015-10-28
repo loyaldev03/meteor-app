@@ -18,7 +18,8 @@ class Transaction < ActiveRecord::Base
   STORE_ERROR_NOT_REPORTABLE = {
     'mes' => %w{117},
     'trust_commerce' => %w{decline call carderror rejected},
-    'stripe' => %w{card_declined incorrect_number}
+    'stripe' => %w{card_declined incorrect_number},
+    'litle' => %{}
   }
 
   def full_label
@@ -62,7 +63,7 @@ class Transaction < ActiveRecord::Base
     self.password = pgc.password
     self.descriptor_name = pgc.descriptor_name
     self.descriptor_phone = pgc.descriptor_phone
-    self.order_mark = pgc.order_mark
+#    self.order_mark = pgc.order_mark
     self.gateway = pgc.gateway
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
   end
@@ -210,8 +211,7 @@ class Transaction < ActiveRecord::Base
   end
 
   def self.refund(amount, sale_transaction_id, agent=nil, update_refunded_amount = true, operation_type_to_set = Settings.operation_types.credit)
-    # Lock transaction, so no one can use this record while we refund this member.
-    sale_transaction = Transaction.find sale_transaction_id, lock: true
+    sale_transaction = Transaction.lock(true).find(sale_transaction_id)
     if not sale_transaction.has_same_pgc_as_current?
       { code: Settings.error_codes.transaction_gateway_differs_from_current, message: I18n.t("error_messages.transaction_gateway_differs_from_current") }
     else
