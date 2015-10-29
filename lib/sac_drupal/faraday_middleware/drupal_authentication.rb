@@ -28,7 +28,7 @@ module Drupal
         time_elapsed = Benchmark.ms do
           res = @app.call(env)
         end
-        Drupal.logger.info "Drupal::#{env[:url]} took #{time_elapsed}ms"
+        Drupal.logger.info "Drupal::Call::#{env[:url]} took #{time_elapsed}ms"
   
         if [401, 403].include?(res.status) && cookie # retry if cookie is invalid
           Drupal.logger.debug(" ** invalidating %.2f seconds-old cookie. old body #{old_body.inspect}" % self.cookie_age)
@@ -41,7 +41,7 @@ module Drupal
           time_elapsed = Benchmark.ms do
             res = @app.call(env)
           end
-          Drupal.logger.info "Drupal::#{env[:url]} took #{time_elapsed}ms"
+          Drupal.logger.info "Drupal::Call::#{env[:url]} took #{time_elapsed}ms"
         end
         res
       end
@@ -108,7 +108,7 @@ module Drupal
         json = JSON.parse res.body
         self.cookie = '%s=%s' % [json['session_name'], json['sessid']]
 
-        Drupal.logger.debug " ** [#{$$} #{Time.now.to_s(:db).gsub(/[\-\:]/, '')} ] got new cookie for #{@options[:url]}: #{self.cookie}. Drupal took #{time_elapsed}ms"
+        Drupal.logger.info "Drupal::GenerateCookie::#{@options[:url]} took #{time_elapsed}ms"
         self.cookie
       end
 
