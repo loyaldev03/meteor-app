@@ -10,11 +10,9 @@ class TrustCommerceTransaction < Transaction
     login_data = { :login => pgc.login, :password => pgc.password }
     gateway = ActiveMerchant::Billing::TrustCommerceGateway.new(login_data)
     answer = gateway.store(am_credit_card)
+    logger.error "AM::Store::Answer => " + answer.inspect
     raise answer.params['status'] unless answer.success?    
     answer.params["billingid"] if answer.params
-  rescue Exception => e
-    logger.error "AM::Store::Answer => " + answer.inspect
-    raise e
   end
 
   def fill_transaction_type_for_credit(sale_transaction)

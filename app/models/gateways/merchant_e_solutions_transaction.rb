@@ -14,9 +14,9 @@ class MerchantESolutionsTransaction < Transaction
     login_data = { :login => pgc.login, :password => pgc.password, :merchant_key => pgc.merchant_key }
     gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(login_data)
     answer = gateway.store(am_credit_card)
-    raise answer.params['error_code'] unless answer.success?
     logger.error "AM::Store::Answer => " + answer.inspect
-    answer.params['transaction_id']  
+    raise answer.params['error_code'] unless answer.success?
+    answer.params['transaction_id']
   end
 
   def new_chargeback!(sale_transaction, args)
