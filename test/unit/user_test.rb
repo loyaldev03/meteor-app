@@ -124,7 +124,7 @@ class UserTest < ActiveSupport::TestCase
     assert_difference('Fulfillment.count',Club::DEFAULT_PRODUCT.count) do
       user = create_active_user(@terms_of_membership_with_gateway, :lapsed_user)
       old_membership_id = user.current_membership_id 
-      answer = user.recover(@terms_of_membership_with_gateway)
+      answer = user.recover(@terms_of_membership_with_gateway, nil, {product_sku: Club::DEFAULT_PRODUCT.join(',')})
       assert answer[:code] == Settings.error_codes.success, answer[:message]
       assert_equal 'provisional', user.status, "Status was not updated."
       assert_equal 1, user.reactivation_times, "Reactivation_times was not updated."
