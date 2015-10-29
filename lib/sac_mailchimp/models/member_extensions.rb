@@ -37,7 +37,6 @@ module SacMailchimp
         logger.info "SacMailchimp::sync took #{time_elapsed}ms"
       rescue Exception => e
         SacMailchimp::report_error("Member:mailchimp_sync", e, self)
-        raise e
       end
 
       def marketing_tool_mailchimp_sync
@@ -47,6 +46,8 @@ module SacMailchimp
 
       def mailchimp_subscribe
         mailchimp_member.subscribe! if mailchimp_member
+      rescue Exception => e
+        SacMailchimp::report_error("Member:subscribe", e, self)
       end
       handle_asynchronously :mailchimp_subscribe, :queue => :mailchimp_sync, priority: 30
 
@@ -58,7 +59,6 @@ module SacMailchimp
         logger.info "SacMailchimp::unsubscribe_subscriber took #{time_elapsed}ms"
       rescue Exception => e
         SacMailchimp::report_error("Member:unsubscribe_subscriber", e, self)
-        raise e
       end
       handle_asynchronously :mailchimp_unsubscribe, :queue => :mailchimp_sync, priority: 30
 
@@ -78,7 +78,7 @@ module SacMailchimp
             SacMailchimp::MemberModel.new self
           end
         else
-          SacMailchimp::report_error('Member:mailchimp_member', 'Mailchimp not configured correctly', self)
+          SacMailchimp::report_error('Member:mailchimp_member', 'Mailchimp not configured correctly', self, false)
           false
         end
       end

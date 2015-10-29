@@ -19,7 +19,6 @@ module SacMailchimp
       @subscriber = res
       @subscriber["success_count"] == 0
     rescue Gibbon::MailChimpError => e
-        Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
       update_member e
       raise e
     end
@@ -27,9 +26,8 @@ module SacMailchimp
     def unsubscribe!
     	begin
         return if has_fake_email?
-      	 client.lists.unsubscribe({:id => mailchimp_list_id, :email => { :email => self.user.email }})
+      	client.lists.unsubscribe({:id => mailchimp_list_id, :email => { :email => self.user.email }})
       rescue Gibbon::MailChimpError => e
-        Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout")
         update_member e
         raise e
     	end
@@ -44,8 +42,7 @@ module SacMailchimp
       begin
       	client.lists.subscribe( subscriber({:email => self.user.email}, options) )
       rescue Gibbon::MailChimpError => e
-        Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout") and not SacMailchimp::NO_REPORTABLE_ERRORS.include? e.code.to_s
-        update_member e 
+        update_member e
         raise e
       end
     end
@@ -59,7 +56,6 @@ module SacMailchimp
         mailchimp_identification = self.user.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.user.marketing_client_id
       	client.lists.subscribe( subscriber({:leid => mailchimp_identification}, options) )
       rescue Gibbon::MailChimpError => e
-        Auditory.audit(nil, self.user, e.to_s, self.user, Settings.operation_types.mailchimp_timeout_retrieve) if e.to_s.include?("Timeout") and not SacMailchimp::NO_REPORTABLE_ERRORS.include? e.code.to_s
         update_member e
         raise e
     	end

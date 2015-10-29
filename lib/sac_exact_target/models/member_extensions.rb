@@ -37,7 +37,6 @@ module SacExactTarget
         logger.info "SacExactTarget::sync took #{time_elapsed}ms"
       rescue Exception => e
         SacExactTarget::report_error("Member:ExactTargetsync", e, self)
-        raise e
       end
 
       def marketing_tool_exact_target_sync
@@ -47,6 +46,8 @@ module SacExactTarget
 
       def exact_target_subscribe
         exact_target_member.subscribe! if exact_target_member
+      rescue Exception => e
+        SacExactTarget::report_error("Member:subscribe", e, self)
       end
       handle_asynchronously :exact_target_subscribe, :queue => :exact_target_sync, priority: 30
 
@@ -58,7 +59,6 @@ module SacExactTarget
         logger.info "SacExactTarget::unsubscribe_subscriber took #{time_elapsed}ms"
       rescue Exception => e
         SacExactTarget::report_error("Member:unsubscribe_subscriber", e, self)
-        raise e
       end
       handle_asynchronously :exact_target_unsubscribe, :queue => :exact_target_sync, priority: 30
 
@@ -78,7 +78,7 @@ module SacExactTarget
             SacExactTarget::MemberModel.new self
           end
         else
-          SacExactTarget::report_error("Member:exact_target_member", 'Exact Target not configured correctly', self)
+          SacExactTarget::report_error("Member:exact_target_member", 'Exact Target not configured correctly', self, false)
           false
         end
       end

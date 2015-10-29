@@ -2,7 +2,7 @@ module MesAccountUpdater
   CHARGEBACKS_TO_NOT_PROCESS = [ 'Duplicate Processing' ]
 
   def self.process_chargebacks
-    PaymentGatewayConfiguration.find_all_by_gateway('mes').each do |gateway|
+    PaymentGatewayConfiguration.joins(:club).where(clubs: {billing_enable: true}).find_all_by_gateway('mes').each do |gateway|
       MesAccountUpdater.process_chargebacks_for_gateway gateway
     end
   end
