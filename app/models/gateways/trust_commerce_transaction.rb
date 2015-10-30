@@ -21,7 +21,7 @@ class TrustCommerceTransaction < Transaction
   end
   
   def new_chargeback!(sale_transaction, args)
-    trans = TrustCommerceTransaction.find_by_response args.to_json
+    trans = TrustCommerceTransaction.find_by(response: args.to_json)
     if trans.nil?
       chargeback_amount = -args[:transaction_amount].to_f
       operation_description = "Chargeback processed $#{chargeback_amount}"

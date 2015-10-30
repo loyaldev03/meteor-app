@@ -62,7 +62,7 @@ class UsersController < ApplicationController
       flash[:error] = "User ID not provided."
       redirect_to root_path
     else
-      user = User.find_by_id(params[:user_id])
+      user = User.find_by(id: params[:user_id])
       if user 
         redirect_to show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
       else
@@ -97,7 +97,7 @@ class UsersController < ApplicationController
 
   def save_the_sale
     if request.post?
-      if TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id).nil?
+      if TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id).nil?
         flash[:error] = "Subscription plan not found"
         redirect_to show_user_path
       else
@@ -114,7 +114,7 @@ class UsersController < ApplicationController
 
   def recover
     if request.post?
-      tom = TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id)
+      tom = TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id)
       if tom.nil?
         flash[:error] = "Subscription plan not found"
       else
@@ -134,7 +134,7 @@ class UsersController < ApplicationController
   end
 
   def refund
-    @transaction = Transaction.find_by_id_and_user_id params[:transaction_id], @current_user.id
+    @transaction = Transaction.find_by(id: params[:transaction_id], user_id: @current_user.id)
     if @transaction.nil?
       flash[:error] = "Transaction not found."
       redirect_to show_user_path

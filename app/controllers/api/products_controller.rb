@@ -26,7 +26,7 @@ class Api::ProductsController < ApplicationController
   #
   def get_stock
     my_authorize! :manage_product_api, Product, params[:club_id]
-    product = Product.find_by_sku_and_club_id(params[:sku],params[:club_id])
+    product = Product.find_by(sku: params[:sku], club_id: params[:club_id])
     if product.nil?
       render json: { code: Settings.error_codes.not_found, message: 'Product not found' }
     else

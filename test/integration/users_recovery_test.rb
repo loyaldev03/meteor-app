@@ -110,7 +110,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
 
   test "Recover an user using CS which was enrolled with a product sku that does not have stock" do
     setup_user(true, true)
-    prods = Product.find_all_by_sku @saved_user.enrollment_infos.first.product_sku.split(',')
+    prods = Product.where(sku: @saved_user.enrollment_infos.first.product_sku.split(','))
     prods.each do |p| 
       p.stock =  0
       p.allow_backorder = false

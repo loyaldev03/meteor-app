@@ -28,7 +28,7 @@ class Domain < ActiveRecord::Base
   end
 
   def check_association
-    club = Club.find_by_drupal_domain_id self.id
+    club = Club.find_by(drupal_domain_id: self.id)
     unless club.nil?
       errors.add :base, error: "Cannot destroy this domain. It is set as drupal domain for club #{club.name}. Please unset this before proceding to delete this domain."
       false

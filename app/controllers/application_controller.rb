@@ -57,7 +57,7 @@ class ApplicationController < ActionController::Base
           redirect_to admin_partners_path
           false
         elsif not params[:partner_prefix].nil?
-          @current_partner = Partner.find_by_prefix(params[:partner_prefix])
+          @current_partner = Partner.find_by(prefix: params[:partner_prefix])
           if @current_partner.nil?
             flash[:error] = "No partner was selected."
             redirect_to admin_partners_path
@@ -74,7 +74,7 @@ class ApplicationController < ActionController::Base
           redirect_to clubs_path
           false
         else
-          @current_club = @current_partner.clubs.find_by_name(params[:club_prefix])
+          @current_club = @current_partner.clubs.find_by(name: params[:club_prefix])
           if @current_club.nil?
             flash[:error] = "No club was selected."
             redirect_to clubs_path
@@ -94,7 +94,7 @@ class ApplicationController < ActionController::Base
           redirect_to clubs_path
           false
         else
-          @current_user = User.find_by_id_and_club_id(params[:user_prefix], @current_club.id)
+          @current_user = User.find_by(id: params[:user_prefix], club_id: @current_club.id)
           if @current_user.nil?
             flash[:error] = "No user was selected."
             redirect_to clubs_path

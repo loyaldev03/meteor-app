@@ -20,7 +20,7 @@ class MerchantESolutionsTransaction < Transaction
   end
 
   def new_chargeback!(sale_transaction, args)
-    trans = MerchantESolutionsTransaction.find_by_response args.to_json
+    trans = MerchantESolutionsTransaction.find_by(response: args.to_json)
     if trans.nil?
       if args[:adjudication_date].last == '+'
         chargeback_amount = args[:transaction_amount].to_f

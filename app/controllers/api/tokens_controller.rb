@@ -36,10 +36,10 @@ class Api::TokensController < ApplicationController
       return
     end
 
-    @user = Agent.find_by_username(email) unless email.nil?
+    @user = Agent.find_by(email: email) unless email.nil?
       
     if @user.nil?
-      @user = Agent.find_by_email(email.downcase) unless email.nil?
+      @user = Agent.find_by(email: email.downcase) unless email.nil?
     end
 
     if @user.nil?
@@ -79,7 +79,7 @@ class Api::TokensController < ApplicationController
   # @example_response_description Example response to a valid request.
   #
   def destroy
-    @user=Agent.find_by_authentication_token(params[:id])
+    @user=Agent.find_by(authentication_token: params[:id])
     if @user.nil?
       logger.info("Token not found.")
       render :status=>404, :json=>{:message=>"Invalid token."}
