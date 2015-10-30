@@ -65,6 +65,10 @@ class Transaction < ActiveRecord::Base
     self.password = pgc.password
     self.descriptor_name = pgc.descriptor_name
     self.descriptor_phone = pgc.descriptor_phone
+<<<<<<< HEAD
+=======
+#    self.order_mark = pgc.order_mark
+>>>>>>> 3013503ffb1b694980ad82962c9837f3523306cf
     self.gateway = pgc.gateway
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
   end
@@ -357,6 +361,7 @@ class Transaction < ActiveRecord::Base
         { message: answer.message, code: Settings.error_codes.success }
       else
         { message: "Error: " + answer.message, code: self.response_code }
+<<<<<<< HEAD
       end
     end
 
@@ -364,6 +369,8 @@ class Transaction < ActiveRecord::Base
       if HashWithIndifferentAccess.new(self.response)[:adjudication_date].blank?
         errors[:adjudication_date] << "cannot be blank"
         return false
+=======
+>>>>>>> 3013503ffb1b694980ad82962c9837f3523306cf
       end
     end
 end
