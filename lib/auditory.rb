@@ -11,8 +11,10 @@ class Auditory
       :resource => object, :description => description, :operation_type => operation_type
     o.created_by = (current_agent.nil? ? @batch_agent : current_agent)
     o.notes = notes
-    o.user = user unless user.new_record?
-    o.club_id = user.club_id
+    if user
+      o.user_id = user.id
+      o.club_id = user.club_id
+    end
     o.save!
   rescue Exception => e
     Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"

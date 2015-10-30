@@ -765,8 +765,7 @@ class User < ActiveRecord::Base
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
       Auditory.report_issue(error_message, e, { :user => self.inspect, :credit_card => credit_card.inspect, :enrollment_info => enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
-      # TODO2: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
-      Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing) unless self.new_record?
+      Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing)
       { :message => I18n.t('error_messages.user_not_saved', :cs_phone_number => self.club.cs_phone_number), :code => Settings.error_codes.user_not_saved }
     end
   end
