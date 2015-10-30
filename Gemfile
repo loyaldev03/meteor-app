@@ -12,7 +12,7 @@ gem "paperclip", "~> 3.0"
 
 gem 'acts_as_list', "0.7.2"
 gem 'delayed_job_active_record'
-gem "delayed_job_web"
+gem "delayed_job_web" # FIXME it is not working in rails 4 
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
 

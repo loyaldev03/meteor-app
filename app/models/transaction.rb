@@ -65,10 +65,6 @@ class Transaction < ActiveRecord::Base
     self.password = pgc.password
     self.descriptor_name = pgc.descriptor_name
     self.descriptor_phone = pgc.descriptor_phone
-<<<<<<< HEAD
-=======
-#    self.order_mark = pgc.order_mark
->>>>>>> [#53198527] Fixed models, controllers and tests code to work with rails4 syntax. Added paranoia. Removed Turn gem.
     self.gateway = pgc.gateway
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
   end

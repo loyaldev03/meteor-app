@@ -335,7 +335,7 @@ defaults: &defaults
         zip:
           presence: true
           format: 
-            :with: !ruby/regexp /^\d{5}([\-]\d{4})?$/
+            :with: !ruby/regexp /\A\d{5}([\-]\d{4})?\z/
             :message: 'The zip code is not valid for the selected country.'
       ca:
         sets:

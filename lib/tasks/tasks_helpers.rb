@@ -88,7 +88,7 @@ module TasksHelpers
   def self.cancel_all_member_up_today
     enabled_clubs = Club.where(billing_enable: true).pluck(:id)
     base = User.joins(:current_membership).where("club_id IN (?) AND date(memberships.cancel_date) <= ? AND memberships.status != ? ", enabled_clubs, Time.zone.now.to_date, 'lapsed')
-    base_for_manual_payment = User.includes(:current_membership).where("club_id IN (?) AND manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", enabled_clubs, Time.zone.now.to_date, 'lapsed')
+    base_for_manual_payment = User.joins(:current_membership).where("club_id IN (?) AND manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", enabled_clubs, Time.zone.now.to_date, 'lapsed')
    
     [base, base_for_manual_payment].each do |list|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:cancel_all_member_up_today rake task, processing #{base.length} users"

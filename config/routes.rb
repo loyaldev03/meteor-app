@@ -40,7 +40,6 @@ SacPlatform::Application.routes.draw do
   authenticated :agent do
     match "/delayed_job" => DelayedJobWeb, :anchor => false, via: [:get, :post]
   end
-  
 
   scope '/partner/:partner_prefix' do
     resources :clubs do
