@@ -90,6 +90,7 @@ SacPlatform::Application.routes.draw do
         match '/reject' => 'users#reject', as: 'user_reject', :via => [:post]  
         match '/no_recurrent_billing' => 'users#no_recurrent_billing', as: 'user_no_recurrent_billing', :via => [:get, :post]  
         match '/manual_billing' => 'users#manual_billing', as: 'user_manual_billing', :via => [:get, :post]
+        match '/toggle_testing_account' => 'users#toggle_testing_account', as: 'user_toggle_testing_account', :via => [:put]
         match '/' => 'users#show', as: 'show_user', :via => [:get, :post]
 
         post '/sync' => 'users#sync', as: 'user_sync'

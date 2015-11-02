@@ -20,6 +20,10 @@ class UsersControllerTest < ActionController::TestCase
                                 user_prefix: @saved_user.id, amount: amount, payment_type: payment_type
   end
 
+  def generate_put_toggle_testing_account
+    put :toggle_testing_account, partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id
+  end
+
   test "Change Next Bill Date for today" do
   	correct_date = @saved_user.next_retry_bill_date
 		post :change_next_bill_date, partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id, next_bill_date: Time.zone.now
@@ -102,6 +106,24 @@ class UsersControllerTest < ActionController::TestCase
     ['api', 'agency', 'fulfillment_managment'].each do |role|
       @agent.update_attribute :roles, role
       generate_post_manual_bill(200, "cash")
+      assert_response :unauthorized
+    end
+  end
+
+  test "Toggle testing account value" do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    ['admin', 'supervisor', 'fulfillment_managment', 'representative'].each do |role|
+      @agent.update_attribute :roles, role
+      generate_put_toggle_testing_account
+      assert_response :success
+    end
+  end
+
+  test "should not bill an event" do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    ['api', 'agency'].each do |role|
+      @agent.update_attribute :roles, role
+      generate_put_toggle_testing_account
       assert_response :unauthorized
     end
   end

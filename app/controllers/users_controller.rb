@@ -177,6 +177,16 @@ class UsersController < ApplicationController
     end
   end
 
+  def toggle_testing_account
+    @current_user.toggle :testing_account
+    if @current_user.save
+      flash[:notice] = "User is no longer set as testing account." unless @current_user.testing_account
+    else
+      flash[:error] = "User could not be set as testing account."
+    end
+    redirect_to show_user_path
+  end
+
   def full_save
     message = "Full save done"
     Auditory.audit(@current_agent, nil, message, @current_user, Settings.operation_types.full_save)

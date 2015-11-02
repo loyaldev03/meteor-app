@@ -99,6 +99,8 @@ en:
     new_payment_gateway: "New Payment Gateway"
     replace_payment_gateway: "Replace Payment Gateway"
     new_domain: "New Domain"
+    mark_as_testing_account: "Mark as testing account"
+    unmark_as_testing_account: "Unmark as testing account"
   admin:
     agents:
       index:
