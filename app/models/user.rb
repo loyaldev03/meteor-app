@@ -716,11 +716,7 @@ class User < ActiveRecord::Base
       answer = trans.process
       unless trans.success?
         operation_type = Settings.operation_types.error_on_enrollment_billing
-        if self.new_record?
-          logger.error "* * * * * * Failed transaction upon enrollment. Trans ID: #{trans.id}"
-        else
-          Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
-        end
+        Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
       # TODO: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
         trans.operation_type = operation_type
         trans.membership_id = nil
