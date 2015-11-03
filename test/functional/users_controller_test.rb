@@ -115,7 +115,7 @@ class UsersControllerTest < ActionController::TestCase
     ['admin', 'supervisor', 'fulfillment_managment', 'representative'].each do |role|
       @agent.update_attribute :roles, role
       generate_put_toggle_testing_account
-      assert_response :success
+      assert_response :redirect
     end
   end
 
