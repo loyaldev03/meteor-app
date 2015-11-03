@@ -110,7 +110,7 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
-  test "Toggle testing account value" do
+  test "should toggle testing account value" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['admin', 'supervisor', 'fulfillment_managment', 'representative'].each do |role|
       @agent.update_attribute :roles, role
@@ -119,7 +119,7 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
-  test "should not bill an event" do
+  test "should not toggle testing account value" do
     club = FactoryGirl.create(:simple_club_with_gateway)
     ['api', 'agency'].each do |role|
       @agent.update_attribute :roles, role
