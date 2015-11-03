@@ -645,4 +645,15 @@ class UserProfileEditTest < ActionController::IntegrationTest
     assert page.has_content?("There was an error with your credit card information. Please call member services at: #{@club.cs_phone_number}.")
     assert page.has_content?('{:number=>"Credit card is blacklisted"}')
   end
+
+  test "Mark an unmark an user as testing account" do
+    setup_user
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    click_link_or_button I18n.t('buttons.mark_as_testing_account')
+    assert page.has_content? "This user is set as testing account."
+    assert @saved_user.reload.testing_account
+    click_link_or_button I18n.t('buttons.unmark_as_testing_account')
+    assert page.has_content? "User is no longer set as testing account."
+    assert !@saved_user.reload.testing_account
+  end
 end
