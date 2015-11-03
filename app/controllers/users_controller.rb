@@ -182,7 +182,7 @@ class UsersController < ApplicationController
     if @current_user.save
       flash[:notice] = "User is no longer set as testing account." unless @current_user.testing_account
     else
-      flash[:error] = "User could not be set as testing account."
+      flash[:error] = "User could not be updated"
     end
     redirect_to show_user_path
   end
