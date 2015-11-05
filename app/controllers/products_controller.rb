@@ -61,6 +61,22 @@ class ProductsController < ApplicationController
     render json: { success: false, message: "Sku '#{@product.sku}' is already taken within this club." }
   end
 
+  def bulk_update
+    if params[:file]
+    if params[:file].content_type == 'text/csv'
+        temporary_file = File.open("tmp/bulk_update_#{Time.current}.csv", "w")
+        temporary_file.write params[:file].open.read
+        temporary_file.close
+        Product.delay.bulk_update(@current_club.id, current_agent.email, temporary_file.path)
+        redirect_to products_url, notice: "File will be processed in a few moments. We will send you the results on your email."
+      else 
+        redirect_to products_url, alert: "Format not supported. Please, provide a .csv file"
+      end
+    else 
+      redirect_to products_url, alert: "No file provided for to bulk update products."
+    end
+  end
+
   # DELETE /products/1
   def destroy
     @product = Product.find(params[:id])

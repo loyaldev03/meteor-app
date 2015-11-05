@@ -70,6 +70,12 @@ class Notifier < ActionMailer::Base
          :subject => "[#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )} - Product list"
   end
 
+  def product_bulk_update_result(product_xls_file, email)
+    attachments["product_bulk_update_result#{Date.today}.xlsx"] = File.read(product_xls_file)
+    mail :to => email,
+         :subject => "[#{Rails.env}] - #{I18n.l(Time.zone.now, :format => :default )} - Product Bulk Update Results"
+  end
+
   def fulfillment_naamma_report(fulfillment_xls_file, quantity)
     @quantity = quantity
     attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
