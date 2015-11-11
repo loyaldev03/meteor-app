@@ -1,6 +1,6 @@
 module ApplicationHelper
   def twitterized_type(type)
-    case type
+    case type.to_sym
       when :alert
         "alert alert-block"
       when :error

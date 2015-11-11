@@ -1,6 +1,6 @@
 require 'test_helper'
  
-class UsersClubCashTest < ActionController::IntegrationTest
+class UsersClubCashTest < ActionDispatch::IntegrationTest
 
   ############################################################
   # SETUP
@@ -335,4 +335,3 @@ class UsersClubCashTest < ActionController::IntegrationTest
     within(".nav-tabs"){ assert page.has_no_content?("Club Cash") }
   end
 end
-

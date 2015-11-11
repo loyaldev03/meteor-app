@@ -1,15 +1,15 @@
 require 'test_helper'
 
-class PaymentGatewayConfigurationTest < ActionController::IntegrationTest
+class PaymentGatewayConfigurationTest < ActionDispatch::IntegrationTest
   setup do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:club, partner_id: @partner.id)
     sign_in_as(@admin_agent)
   end
 
   def fill_in_payment_gateway_configuration(new_pgc, new=true)
-    select(I18n.t("activerecord.gateway.#{new_pgc.gateway}"), :from => 'payment_gateway_configuration[gateway]') if new
+    select(I18n.t("activerecord.gateway.#{new_pgc.gateway}"), from: 'payment_gateway_configuration[gateway]') if new
     fill_in "payment_gateway_configuration[report_group]", with: new_pgc.report_group if new_pgc.report_group and new_pgc.litle?
     fill_in "payment_gateway_configuration[merchant_key]", with: new_pgc.merchant_key if new_pgc.merchant_key and (new_pgc.litle?)
     fill_in "payment_gateway_configuration[login]", with: new_pgc.login if new_pgc.login
@@ -51,7 +51,7 @@ class PaymentGatewayConfigurationTest < ActionController::IntegrationTest
 
   test "Add PGC and Show a PGC - Login by Admin by role" do
     @admin_agent.update_attribute :roles, nil
-    club_role = ClubRole.new :club_id => @club.id
+    club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @admin_agent.id
     club_role.role = "admin"
     club_role.save
@@ -74,7 +74,7 @@ class PaymentGatewayConfigurationTest < ActionController::IntegrationTest
   end
 
   test "Do not allow enter PGC duplicated - Login by General Admin" do
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
     visit club_path(@partner.prefix, @club.id)
     click_link_or_button "Payment Gateway Configuration"
     new_pgc = FactoryGirl.build(:payment_gateway_configuration)
@@ -85,8 +85,8 @@ class PaymentGatewayConfigurationTest < ActionController::IntegrationTest
   end
 
   test "Do not allow to edit a PGC if it has users - Login by General Admin" do
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @user = FactoryGirl.create(:user, :club_id => @club.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
+    @user = FactoryGirl.create(:user, club_id: @club.id)
     visit club_path(@partner.prefix, @club.id)
 
     click_link_or_button "Payment Gateway Configuration"

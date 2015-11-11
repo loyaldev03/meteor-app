@@ -107,8 +107,8 @@ group :test do
   gem 'selenium-webdriver', '>=2.45.0'
   gem 'brakeman'
   gem 'simplecov'
-  gem 'database_cleaner'
   gem "timecop"
+  gem 'connection_pool'
 end
 
 group :test, :development do

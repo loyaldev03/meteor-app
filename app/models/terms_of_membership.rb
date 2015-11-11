@@ -1,7 +1,7 @@
 class TermsOfMembership < ActiveRecord::Base
   attr_accessible :needs_enrollment_approval, :provisional_days, 
     :installment_amount, :description, :installment_type, :club, :name, :initial_club_cash_amount, 
-    :club_cash_installment_amount, :skip_first_club_cash, :downgrade_tom_id
+    :club_cash_installment_amount, :skip_first_club_cash, :downgrade_tom_id, :if_cannot_bill
 
   belongs_to :club
   has_many :transactions

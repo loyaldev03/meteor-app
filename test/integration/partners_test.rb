@@ -1,6 +1,6 @@
 require 'test_helper' 
  
-class PartnersTest < ActionController::IntegrationTest
+class PartnersTest < ActionDispatch::IntegrationTest
  
   setup do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
@@ -13,9 +13,9 @@ class PartnersTest < ActionController::IntegrationTest
     click_link_or_button 'New Partner'
     assert page.has_content?('New Partner')
     click_link_or_button 'Create Partner'
-    assert page.has_content?(I18n.t('errors.messages.blank')) #page.has_content?("errors")
+    assert page.has_content?("errors")
+    assert page.has_content?(I18n.t('errors.messages.blank'))
   end
-
 
   test "Required fields marks in New Partner page" do
     visit admin_partners_path
@@ -38,12 +38,12 @@ class PartnersTest < ActionController::IntegrationTest
     unsaved_domain = FactoryGirl.build(:simple_domain)
 
     visit new_admin_partner_path
-    fill_in 'partner[name]', :with => unsaved_partner.name
-    fill_in 'partner[prefix]', :with => unsaved_partner.prefix
-    fill_in 'partner[description]', :with => unsaved_partner.description
-    fill_in 'partner[contract_uri]', :with => unsaved_partner.contract_uri
-    fill_in 'partner[website_url]', :with => unsaved_partner.website_url
-    fill_in 'domain_url', :with => unsaved_domain.url
+    fill_in 'partner[name]', with: unsaved_partner.name
+    fill_in 'partner[prefix]', with: unsaved_partner.prefix
+    fill_in 'partner[description]', with: unsaved_partner.description
+    fill_in 'partner[contract_uri]', with: unsaved_partner.contract_uri
+    fill_in 'partner[website_url]', with: unsaved_partner.website_url
+    fill_in 'domain_url', with: unsaved_domain.url
     check('domain_hosted')
     assert_difference('Partner.count') do
       click_link_or_button 'Create Partner'
@@ -56,19 +56,19 @@ class PartnersTest < ActionController::IntegrationTest
     saved_partner = FactoryGirl.create(:partner)
     saved_domain = FactoryGirl.create(:simple_domain)
     visit new_admin_partner_path
-    fill_in 'partner[name]', :with => saved_partner.name
-    fill_in 'partner[prefix]', :with => saved_partner.prefix
-    fill_in 'domain_url', :with => saved_domain.url
+    fill_in 'partner[name]', with: saved_partner.name
+    fill_in 'partner[prefix]', with: saved_partner.prefix
+    fill_in 'domain_url', with: saved_domain.url
     assert_difference('Partner.count', 0) do
       click_link_or_button 'Create Partner'
     end
-    assert page.has_content?(I18n.t('activerecord.errors.messages.taken'))
+    assert page.has_content?("Domains url has already been taken")
   end
 
   test "create a partner with invalid characters" do
     visit new_admin_partner_path
-    fill_in 'partner[name]', :with => '!"#$%&/()'
-    fill_in 'partner[prefix]', :with => '!"#$%&/()'
+    fill_in 'partner[name]', with: '!"#$%&/()'
+    fill_in 'partner[prefix]', with: '!"#$%&/()'
 
     assert_difference('Partner.count', 0) do
       click_link_or_button 'Create Partner'
@@ -96,14 +96,14 @@ class PartnersTest < ActionController::IntegrationTest
     within("#partners_table") do
         click_link_or_button 'Edit'
     end
-    fill_in 'partner[name]', :with => 'My new name'
+    fill_in 'partner[name]', with: 'My new name'
     click_link_or_button 'Update Partner'
     saved_partner.reload
     assert page.has_content?("The partner #{saved_partner.prefix} - #{saved_partner.name} was successfully updated.")
   end
 
   test "Should delete partner" do
-    saved_partner = FactoryGirl.create(:partner, :prefix => 'WIEGANDTOY')
+    saved_partner = FactoryGirl.create(:partner, prefix: 'WIEGANDTOY')
     visit admin_partners_path
     confirm_ok_js
     within("#partners_table") do
@@ -111,6 +111,6 @@ class PartnersTest < ActionController::IntegrationTest
     end
     saved_partner.reload
       assert page.has_content?('Partner WIEGANDTOY was successfully destroyed')
-      assert Partner.with_deleted.where(:id => saved_partner.id).first
+      assert Partner.with_deleted.where(id: saved_partner.id).first
   end
 end

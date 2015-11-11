@@ -1,5 +1,5 @@
 require 'test_helper' 
-class UsersEnrollmentTest < ActionController::IntegrationTest
+class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
 	transactions_table_empty_text = "No data available in table"
 	operations_table_empty_text = "No data available in table"
@@ -88,7 +88,7 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
           end
         end
       end 
-      EmailTemplate.find_all_by_terms_of_membership_id(saved_user.terms_of_membership.id).each do |et|
+      EmailTemplate.where(terms_of_membership_id: saved_user.terms_of_membership.id).each do |et|
         assert page.has_content?(et.client)
         assert page.has_content?(et.template_type)
         assert page.has_content?(et.external_attributes.to_s)
@@ -156,9 +156,9 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
   end
 
-  ###########################################################
+  # ##########################################################
   # TESTS
-  ###########################################################
+  # ##########################################################
 
   #Create an user selecting only a kit-card
   test "create user" do
@@ -238,9 +238,9 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
       assert page.has_content?("first_name: can't be blank,is invalid"), "Failure on first_name validation message"
       assert page.has_content?("last_name: can't be blank,is invalid"), "Failure on last_name validation message"
       assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
-      assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_country_code validation message"
-      assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_area_code validation message"
-      assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)"), "Failure on phone_local_number validation message"
+      assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 character)"), "Failure on phone_country_code validation message"
+      assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 character)"), "Failure on phone_area_code validation message"
+      assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 character)"), "Failure on phone_local_number validation message"
       assert page.has_content?("address: is invalid"), "Failure on address validation message"
       assert page.has_content?("state: can't be blank,is invalid"), "Failure on state validation message"
       assert page.has_content?("city: can't be blank,is invalid"), "Failure on city validation message"
@@ -386,9 +386,9 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id, :phone_country_code => nil, :phone_area_code => nil, :phone_local_number => nil)
     fill_in_user(unsaved_user)
     within("#error_explanation") do
-        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 characters)")
-        assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 characters)")
-        assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 characters)")
+        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 character)")
+        assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 character)")
+        assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 character)")
     end
   end
 
@@ -1171,7 +1171,6 @@ class UsersEnrollmentTest < ActionController::IntegrationTest
 
   test "Do not enroll an user with wrong payment gateway" do
     setup_user(false)
-    Transaction::STORE_ERROR_NOT_REPORTABLE = {"fail" => "000"}
     @club.payment_gateway_configurations.first.update_attribute(:gateway,'fail')
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)

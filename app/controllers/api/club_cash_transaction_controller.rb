@@ -1,4 +1,5 @@
 class Api::ClubCashTransactionController < ApplicationController
+  skip_before_filter :verify_authenticity_token # TODO: is this method working on production? Because I had to add this in order to access this API method
 
   ##
   # This method adds or deducts an specific amount of club cash on a member. In case you want to add club cash, the amount value has to be a positive number, while if you want to remove club cash, the amount value has to be negative. Have in mind that in order to use this feature, member's club must allow club cash transaction within it.  

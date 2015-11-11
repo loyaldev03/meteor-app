@@ -143,10 +143,10 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.9.1.1)
+    connection_pool (2.2.0)
     country_code_select (1.0.1)
       activesupport (>= 3.0)
     daemons (1.1.9)
-    database_cleaner (1.0.1)
     delayed_job (4.1.1)
       activesupport (>= 3.0, < 5.0)
     delayed_job_active_record (4.1.0)
@@ -443,9 +443,9 @@ DEPENDENCIES
   capybara
   carmen-rails
   coffee-rails
+  connection_pool
   country_code_select (~> 1.0.0)
   daemons
-  database_cleaner
   delayed_job_active_record
   delayed_job_web
   devise

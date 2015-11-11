@@ -1,6 +1,6 @@
 require 'test_helper' 
  
-class RolesTest < ActionController::IntegrationTest
+class RolesTest < ActionDispatch::IntegrationTest
  
   setup do
   end
@@ -72,7 +72,7 @@ class RolesTest < ActionController::IntegrationTest
         enrollment_info = FactoryGirl.build(:enrollment_info)
         create_user_by_sloop(@agent_admin, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
       end
-      @saved_user = User.find_by_email(unsaved_user.email)
+      @saved_user = User.find_by(email: unsaved_user.email)
     end
    end
 
@@ -100,8 +100,8 @@ class RolesTest < ActionController::IntegrationTest
     @agent_no_role = FactoryGirl.create :confirmed_agent
     7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
     club1 = Club.first
-    club2 = Club.find(2)
-    club3 = Club.find(3)
+    club2 = Club.second
+    club3 = Club.third
     club_last = Club.last
     visit edit_admin_agent_path(@agent_no_role.id)
     within(".table-condensed")do
@@ -461,7 +461,7 @@ test "Agency role - Recover an user" do
     setup_user false
     unsaved_user = FactoryGirl.build(:user_with_api, :club_id => @club.id)
     create_user(unsaved_user)
-    saved_user = User.find_by_email(unsaved_user.email)
+    saved_user = User.find_by(email: unsaved_user.email)
 
     validate_view_user_base(saved_user)
   end

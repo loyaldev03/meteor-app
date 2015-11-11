@@ -1,6 +1,6 @@
 require 'test_helper' 
  
-class DomainTest < ActionController::IntegrationTest
+class DomainTest < ActionDispatch::IntegrationTest
  
   setup do
     @partner = FactoryGirl.create(:partner)
@@ -27,7 +27,7 @@ class DomainTest < ActionController::IntegrationTest
     visit domains_path(@partner.prefix)
     click_link_or_button 'New Domain'
     
-    fill_in 'domain[url]', :with => unsaved_domain.url
+    fill_in 'domain[url]', with: unsaved_domain.url
     assert_difference('Domain.count') do
       click_link_or_button 'Create Domain'
     end
@@ -38,13 +38,13 @@ class DomainTest < ActionController::IntegrationTest
     saved_domain = FactoryGirl.create(:simple_domain)
     visit domains_path(@partner.prefix)
     click_link_or_button 'New Domain'
-    fill_in 'domain[url]', :with => saved_domain.url
+    fill_in 'domain[url]', with: saved_domain.url
     click_link_or_button 'Create Domain'
     assert page.has_content?('has already been taken')
   end
 
   test "can read domain" do
-    saved_domain = FactoryGirl.create(:simple_domain, :partner_id => @partner.id)
+    saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
     visit admin_partners_path
     within("#partners_table") do
       click_link_or_button 'Dashboard'
@@ -54,14 +54,14 @@ class DomainTest < ActionController::IntegrationTest
   end
 
   test "can update domain" do
-    saved_domain = FactoryGirl.create(:simple_domain, :partner_id => @partner.id)
+    saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
     visit domains_path(@partner.prefix)
     within("#domains_table") do
       click_link_or_button 'Edit'
     end
-    fill_in 'domain[url]', :with => 'http://test.com.ar'
-    fill_in 'domain[description]', :with => 'new description'
-    fill_in 'domain[data_rights]', :with => 'new data rights'
+    fill_in 'domain[url]', with: 'http://test.com.ar'
+    fill_in 'domain[description]', with: 'new description'
+    fill_in 'domain[data_rights]', with: 'new data rights'
     check('domain[hosted]')
     click_link_or_button 'Update Domain'
     saved_domain.reload
@@ -72,14 +72,14 @@ class DomainTest < ActionController::IntegrationTest
   end
 
   test "should delete domain" do
-    saved_domain = FactoryGirl.create(:simple_domain, :partner_id => @partner.id)
-    second_saved_domain = FactoryGirl.create(:simple_domain, :partner_id => @partner.id)
+    saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
+    second_saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
     visit domains_path(@partner.prefix)
     confirm_ok_js
     within("#domains_table") do
       first(:link, 'Destroy').click
     end
     assert page.has_content?("Domain #{saved_domain.url} was successfully destroyed")
-    assert Domain.with_deleted.where(:id => saved_domain.id).first
+    assert Domain.with_deleted.where(id: saved_domain.id).first
   end
 end

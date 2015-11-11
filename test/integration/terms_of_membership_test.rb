@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TermsOfMembershipTests < ActionController::IntegrationTest
+class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 	setup do
 		@admin_agent = FactoryGirl.create(:confirmed_admin_agent)
 		@partner = FactoryGirl.create(:partner)
