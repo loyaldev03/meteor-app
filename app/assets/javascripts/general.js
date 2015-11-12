@@ -212,6 +212,7 @@ function domain_index_functions(column_count){
 }
 
 function product_index_functions(column_count){
+  $('.help').popover({offset: 10});
   $('#products_table').dataTable({
     "sPaginationType": "bootstrap",
   "sDom": '<"top"fp>rt<"bottom"il>',
@@ -262,6 +263,18 @@ function product_index_functions(column_count){
         alert(global_ajax_error_messages(jqXHR));
       }
     })
+  });
+  $("#bulk_update_submit").click(function(event){
+    event.preventDefault();
+    if($("#bulk_update_file").prop('files').length == 0){
+      alert("No file provided for to bulk update products.");
+    }else{
+      if($("#bulk_update_file").prop('files')[0].size > 1002867){
+        alert("File exceeds maximum size limit.");
+      }else{
+        $("#bulk_update_form").submit();
+      }
+    }
   });
 }
 

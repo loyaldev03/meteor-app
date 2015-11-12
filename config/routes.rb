@@ -114,7 +114,11 @@ SacPlatform::Application.routes.draw do
         get  '/memberships_content' => 'users#memberships_content', as: 'memberships_content'
       end
 
-      resources :products
+      resources :products do 
+        collection do
+          put 'bulk_update'
+        end
+      end
       resources :disposition_types, :except => [ :show, :destroy ]
 
       match '/fulfillments' => 'fulfillments#index', as: 'fulfillments_index', :via => [:post, :get]
