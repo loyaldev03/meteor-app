@@ -63,7 +63,7 @@ class ProductsController < ApplicationController
 
   def bulk_update
     if params[:file]
-      if params[:file].content_type == 'text/csv'
+      if params[:file].content_type.include? 'text/csv'
         temporary_file = File.open("tmp/bulk_update_#{Time.current}.csv", "w")
         temporary_file.write params[:file].open.read
         temporary_file.close
