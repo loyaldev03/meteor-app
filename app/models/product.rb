@@ -48,12 +48,18 @@ class Product < ActiveRecord::Base
   end
 
   def decrease_stock(quantity=1)
-    Product.where(id: self.id).update_all "stock = stock - #{quantity}"
+    if self.reload.has_stock?
+      Product.where(id: self.id).update_all "stock = stock - #{quantity}"
+      logger.info "Product ID: #{self.id} Stock decreased to: #{stock-quantity}"
+      {:message => "Stock reduced with success", :code => Settings.error_codes.success}
+    else
+      {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
+    end
   end
 
   def replenish_stock(quantity=1)
-    self.stock = self.stock+quantity
-    self.save
+    Product.where(id: self.id).update_all "stock = stock + #{quantity}"
+    logger.info "Product ID: #{self.id} Stock replenished to: #{stock+quantity}"
   end
 
   def has_stock?
