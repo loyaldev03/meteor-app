@@ -676,7 +676,6 @@ class User < ActiveRecord::Base
   def replenish_stock_on_enrollment_failure(skip_product_validation, product_sku)
     unless skip_product_validation
       Product.where(sku: product_sku.split(','), club_id: club.id).update_all "stock = stock + 1"
-      logger.info "Product ID: #{self.id} Stock replenished to: #{stock+1}"
     end
   end
 
