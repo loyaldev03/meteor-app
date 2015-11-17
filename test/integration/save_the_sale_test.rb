@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SaveTheSaleTest < ActionController::IntegrationTest
+class SaveTheSaleTest < ActionDispatch::IntegrationTest
 
   ############################################################
   # SETUP
@@ -12,14 +12,14 @@ class SaveTheSaleTest < ActionController::IntegrationTest
   def setup_user(approval = false, active = false)
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership_with_gateway2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'second_tom_without_aproval')
-    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    @terms_of_membership_with_approval2 = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id, :name => 'second_tom_aproval')
-    @new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_hold_card, :club_id => @club.id)
-    @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id)
+    @terms_of_membership_with_gateway2 = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'second_tom_without_aproval')
+    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id)
+    @terms_of_membership_with_approval2 = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id, name: 'second_tom_aproval')
+    @new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_hold_card, club_id: @club.id)
+    @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, club_id: @club.id)
     
     @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
     
@@ -32,7 +32,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     else
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     end
-    @saved_user = User.find_by_email(unsaved_user.email)
+    @saved_user = User.find_by(email: unsaved_user.email)
     @saved_user.set_as_provisional if @saved_user.can_be_approved?
 
     if active
@@ -52,7 +52,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    prods = Product.find_all_by_sku @saved_user.enrollment_infos.first.product_sku.split(',')
+    prods = Product.where sku: @saved_user.enrollment_infos.first.product_sku.split(',')
     prods.each {|p| p.delete }
 
     assert_difference('Membership.count') do 
@@ -66,7 +66,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    prods = Product.find_all_by_sku @saved_user.enrollment_infos.first.product_sku.split(',')
+    prods = Product.where sku: @saved_user.enrollment_infos.first.product_sku.split(',')
     prods.each do |p| 
       p.stock = 0 
       p.allow_backorder = false
@@ -84,7 +84,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    prods = Product.find_all_by_sku @saved_user.enrollment_infos.first.product_sku.split(',')
+    prods = Product.where sku: @saved_user.enrollment_infos.first.product_sku.split(',')
     prods.each do |p| 
       p.stock = 0 
       p.allow_backorder = false
@@ -220,7 +220,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
     setup_user
     @saved_user.bill_membership
     
-    visit user_save_the_sale_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id, :transaction_id => Transaction.last.id)
+    visit user_save_the_sale_path(partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id, transaction_id: Transaction.last.id)
     click_on 'Full save'
      
     assert page.has_content?("Full save done")
@@ -234,7 +234,7 @@ class SaveTheSaleTest < ActionController::IntegrationTest
   test "Change the user from a lifetime TOM to a another" do
     setup_user(false)
 
-    unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
+    unsaved_user = FactoryGirl.build(:user_with_cc, club_id: @club.id)
     @saved_user = create_user(unsaved_user, nil, @lifetime_terms_of_membership.name, true)
 
     assert_difference('Membership.count') do 

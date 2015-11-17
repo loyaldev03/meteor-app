@@ -1,6 +1,6 @@
 require 'test_helper'
  
-class UsersSearchTest < ActionController::IntegrationTest
+class UsersSearchTest < ActionDispatch::IntegrationTest
 
   transactions_table_empty_text = "No data available in table"
   operations_table_empty_text = "No data available in table"
@@ -86,9 +86,9 @@ class UsersSearchTest < ActionController::IntegrationTest
     2.times{ create_active_user(@terms_of_membership_with_gateway, :lapsed_user, nil, {}, { :created_by => @admin_agent }) }
     create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc, nil, {}, { :created_by => @admin_agent })
   
-    active_user = User.find_by_status 'active'
-    provisional_user = User.find_by_status 'provisional'
-    lapsed_user = User.find_by_status 'lapsed'
+    active_user = User.find_by status: 'active'
+    provisional_user = User.find_by status: 'provisional'
+    lapsed_user = User.find_by status: 'lapsed'
     duplicated_name_user = User.last
     duplicated_name_user.update_attribute(:last_name, "Elwood")
     duplicated_name_user.index.store duplicated_name_user
@@ -330,7 +330,7 @@ class UsersSearchTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card)
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
-    @saved_user = User.find_by_email unsaved_user.email
+    @saved_user = User.find_by email: unsaved_user.email
     
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -355,7 +355,7 @@ class UsersSearchTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card)
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
-    @saved_user = User.find_by_email unsaved_user.email
+    @saved_user = User.find_by email: unsaved_user.email
 
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -378,7 +378,7 @@ class UsersSearchTest < ActionController::IntegrationTest
     unsaved_user.type_of_phone_number = ''
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     create_user(unsaved_user,nil, nil, true)
-    @saved_user = User.find_by_email(unsaved_user.email)
+    @saved_user = User.find_by(email:unsaved_user.email)
     assert find_field('input_first_name').value == @saved_user.first_name
     @saved_user.reload
     assert_equal(@saved_user.type_of_phone_number, '')

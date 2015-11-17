@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  before_filter :authenticate_agent_from_token!
   before_filter :authenticate_agent!
   before_filter :validate_partner_presence
   before_action :configure_permitted_parameters, if: :devise_controller?
@@ -25,6 +26,15 @@ class ApplicationController < ActionController::Base
     end
 
   private
+
+    def authenticate_agent_from_token!
+      if params[:api_key]
+        agent = Agent.find_for_authentication(:authentication_token => params[:api_key])
+        if agent && Devise.secure_compare(agent.authentication_token, params[:api_key])
+          sign_in agent, store: false
+        end
+      end
+    end
 
     def my_authorize!(action, what, club_id = nil)
       raise CanCan::AccessDenied unless current_agent.can?(action, what, club_id)

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UserBlacklistTest < ActionController::IntegrationTest
+class UserBlacklistTest < ActionDispatch::IntegrationTest
 
   ############################################################
   # SETUP

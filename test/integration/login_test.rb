@@ -1,6 +1,6 @@
 require 'test_helper' 
  
-class LoginTest < ActionController::IntegrationTest
+class LoginTest < ActionDispatch::IntegrationTest
  
   setup do
   end

@@ -6,7 +6,7 @@ class Agent < ActiveRecord::Base
 
   devise :database_authenticatable, :lockable, :timeoutable,
          :recoverable, :rememberable, :trackable, :validatable, 
-         :encryptable, # :token_authenticatable, 
+         :encryptable, 
          :async
 
   ROLES = %W(admin api representative supervisor agency fulfillment_managment)

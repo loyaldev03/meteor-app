@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UsersCancelTest < ActionController::IntegrationTest
+class UsersCancelTest < ActionDispatch::IntegrationTest
 
   ############################################################
   # SETUP
@@ -93,7 +93,7 @@ class UsersCancelTest < ActionController::IntegrationTest
   test "Downgrade an user when soft recycled is limit - Same club" do
     setup_user false
     @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
-    @terms_of_membership_with_gateway.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => @terms_of_membership_with_gateway_to_downgrade.id, :installment_amount => 0.54)
+    @terms_of_membership_with_gateway.update_attributes(if_cannot_bill: "downgrade_tom", downgrade_tom_id: @terms_of_membership_with_gateway_to_downgrade.id, installment_amount: 0.54)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:enrollment_info)

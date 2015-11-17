@@ -1288,7 +1288,7 @@ class User < ActiveRecord::Base
   def desnormalize_additional_data
     if self.additional_data.present?
       self.additional_data.each do |key, value|
-        pref = UserAdditionalData.find_or_create_by_user_id_and_club_id_and_param(self.id, self.club_id, key)
+        pref = UserAdditionalData.where(user_id: self.id, club_id: self.club_id, param: key).first_or_create
         pref.value = value
         pref.save
       end

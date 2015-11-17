@@ -41,7 +41,7 @@
       <% else %>
         <%= 
           link_to user_sync_data_path, 
-            remote: true, 
+            remote: true,
             class: "btn btn-success",
             id: "show_remote_data",
             style: 'float: right;',
@@ -69,7 +69,7 @@
         </span>
         <% if @current_user.can_be_synced_to_remote? %>
           <span class='toggler-content'>
-            <%= form_for @current_user, url: user_update_sync_path, html: { class: 'form-inline', style: 'display: inline;' } do |f| %>
+            <%= form_for @current_user, url: user_update_sync_path, html: { class: 'form-inline', style: 'display: inline;', method: 'put' } do |f| %>
               <%= f.text_field :api_id, :class => 'text_field' %>
               <%= f.submit 'Update', class: 'btn-danger', confirm: 'Are you sure?' %>
             <% end %>

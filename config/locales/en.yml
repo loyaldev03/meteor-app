@@ -232,7 +232,7 @@ en:
         date: 'Date'
         description: 'Description'
         amount: 'Amount'
-        amount_help: "(Min %{minimun_amount})"
+        amount_help: "(Min  )"
         gw_trans: 'Gw trans'
         cc_related: 'CC Last 4 Digits'
         not_found: 'No transactions were found.'

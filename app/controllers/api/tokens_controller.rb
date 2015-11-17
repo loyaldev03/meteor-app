@@ -49,7 +49,7 @@ class Api::TokensController < ApplicationController
     end
 
     # http://rdoc.info/github/plataformatec/devise/master/Devise/Models/TokenAuthenticatable
-    @user.reset_authentication_token!
+    @user.restore_authentication_token!
 
     if not @user.valid_password?(password)
       logger.info("User #{email} failed signin, password \"#{password}\" is invalid")

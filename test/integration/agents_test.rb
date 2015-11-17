@@ -1,6 +1,6 @@
 require 'test_helper' 
  
-class AgentsTest < ActionController::IntegrationTest
+class AgentsTest < ActionDispatch::IntegrationTest
  
 
   def setup_environment
@@ -321,7 +321,7 @@ class AgentsTest < ActionController::IntegrationTest
    
     visit '/'
     click_link_or_button("Forgot your password?")
-    fill_in "agent[login]", :with => @admin_agent.email
+    fill_in "agent[email]", :with => @admin_agent.email
     click_link_or_button("Send me reset password instructions")
 
     page.has_content?("You will receive an email with instructions about how to reset your password in a few minutes.")
