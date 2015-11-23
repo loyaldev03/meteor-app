@@ -1,7 +1,7 @@
 <div class="control-group">
   <%= form_tag(terms_of_membership_test_communications_path, :id => "test_communication") do %>
     <%= label :user_id, "User ID to send communications", :class => 'help-inline' %>: 
-    <%= text_field_tag "user_id", nil, :class => 'text_field input-medium required', :id => "user_id"%>
+    <%= text_field_tag "user_id", nil, :class => 'text_field input-medium required', :id => "communication_user_id"%>
   <% end %>
 </div>
   <table id='communications_table' class="table table-bordered table-condensed tablesorter">

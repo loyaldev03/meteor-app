@@ -37,7 +37,7 @@ class EmailTemplate < ActiveRecord::Base
     when 'exact_target'
       ['customer_key']
     when 'mailchimp_mandrill'
-      ['template_name']
+      ['template_name', 'subaccount']
     when 'lyris'
       ['trigger_id', 'mlid', 'site_id']
     else
@@ -65,7 +65,7 @@ class EmailTemplate < ActiveRecord::Base
       "Emails sent when hard decline happens"
     when :soft_decline
       "Emails sent when soft decline happens"
-    when :memebrship_bill
+    when :membership_bill
       "Emails sent when successfully billing user's memberships."
     when :membership_renewal
       "Emails sent when successfully billing user's memberships. This communication is only send when the user is in active status."
