@@ -33,30 +33,16 @@ class EmailTemplate < ActiveRecord::Base
   def self.external_attributes_related_to_client(client)
     case client
     when "action_mailer"
-      []
+      {required: [], optional: []}
     when 'exact_target'
-      ['customer_key']
+      {required: ['customer_key'], optional: []}
+      []
     when 'mailchimp_mandrill'
-      ['template_name', 'subaccount']
+      {required: ['template_name'], optional: ['subaccount']}
     when 'lyris'
-      ['trigger_id', 'mlid', 'site_id']
+      {required: ['trigger_id', 'mlid', 'site_id'], optional: []}
     else
-      []
-    end
-  end
-
-  def self.required_external_attributes_related_to_client(client)
-    case client
-    when "action_mailer"
-      []
-    when 'exact_target'
-      ['customer_key']
-    when 'mailchimp_mandrill'
-      ['template_name']
-    when 'lyris'
-      ['trigger_id', 'mlid', 'site_id']
-    else
-      []
+      {required: [], optional: []}
     end
   end
 

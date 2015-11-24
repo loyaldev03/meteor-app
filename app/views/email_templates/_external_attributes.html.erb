@@ -1,19 +1,21 @@
 <% unless external_attributes.empty? %>
-	<h4>External Attributes
-	<%= render :partial => "shared/help", :locals => { 
-	  :title => t('activerecord.attributes.email_template.external_attributes'), 
-	  :content => t('activerecord.attributes.email_template.help_for_external_attributes') } %></h4>
+  <h4>External Attributes
+  <%= render :partial => "shared/help", :locals => { 
+    :title => t('activerecord.attributes.email_template.external_attributes'), 
+    :content => t('activerecord.attributes.email_template.help_for_external_attributes') } %></h4>
 
-	<% external_attributes.each do |attribute_name| %>
-	<div class="control-group">
-		<%= label_tag attribute_name, t("activerecord.attributes.email_template.external_attributes_params.#{attribute_name}"), :class => "control-label #{'required_asterisk' if EmailTemplate.required_external_attributes_related_to_client(email_template.client).include? attribute_name}" %>
-	  <div class="controls" id=<%="control_#{attribute_name}"%>>
-	    <%= text_field_tag attribute_name, '', :class => "text_field input-small #{'manual_validation' if EmailTemplate.required_external_attributes_related_to_client(email_template.client).include? attribute_name}", :value => (email_template.external_attributes[attribute_name.to_sym] unless email_template.new_record?) %>
-        <%= render :partial => "shared/help", :locals => { 
-	        :title => t("activerecord.attributes.email_template.external_attributes_params.#{attribute_name}"), 
-	        :content => t("activerecord.attributes.email_template.external_attributes_params.#{attribute_name}_help") } %>
-	    <div id="<%= attribute_name %>_error_message" style='display:inline-block;'></div>
-	  </div>
-	</div>
-	<% end %>
+  <% external_attributes.each do |type, attributes| %>
+    <% attributes.each do |attribute_name| %>
+      <div class="control-group">
+        <%= label_tag attribute_name, t("activerecord.attributes.email_template.external_attributes_params.#{attribute_name}"), :class => "control-label #{'required_asterisk' if type==:required}" %>
+        <div class="controls" id=<%="control_#{attribute_name}"%>>
+          <%= text_field_tag attribute_name, '', :class => "text_field input-small #{'manual_validation' if type==:required}", :value => (email_template.external_attributes[attribute_name.to_sym] unless email_template.new_record?) %>
+            <%= render :partial => "shared/help", :locals => { 
+              :title => t("activerecord.attributes.email_template.external_attributes_params.#{attribute_name}"), 
+              :content => t("activerecord.attributes.email_template.external_attributes_params.#{attribute_name}_help") } %>
+          <div id="<%= attribute_name %>_error_message" style='display:inline-block;'></div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
 <% end %>
