@@ -45,6 +45,21 @@ class EmailTemplate < ActiveRecord::Base
     end
   end
 
+  def self.required_external_attributes_related_to_client(client)
+    case client
+    when "action_mailer"
+      []
+    when 'exact_target'
+      ['customer_key']
+    when 'mailchimp_mandrill'
+      ['template_name']
+    when 'lyris'
+      ['trigger_id', 'mlid', 'site_id']
+    else
+      []
+    end
+  end
+
   def self.template_types_helper(type)
     case type
     when :cancellation
