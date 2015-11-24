@@ -1,9 +1,9 @@
   module SacMandrill
   class MemberModel < Struct.new(:user)
 
-    def send_email(template_name)
+    def send_email(template_name, subaccount)
       message = {"to" => [{ "email" => self.user.email }]}
-      message.merge!({ "global_merge_vars" => subscriber_variables })
+      message.merge!({ "global_merge_vars" => subscriber_variables, "subaccount" => subaccount })
       template_content = {}
       result = client.messages.send_template template_name, template_content, message
       result.first

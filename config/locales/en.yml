@@ -500,6 +500,8 @@ en:
           customer_key_help: 'Template ID on Exact Target side.'
           template_name: 'Template Name'
           template_name_help: "Template name configured on Mandrill."
+          subaccount: Subaccount Id
+          subaccount_help: "Id of the subaccount related to the template to be sent on Mandrill."
           trigger_id: 'Trigger ID'
           trigger_id_help: "Template's id on Lyris side."
           mlid: 'MLID'

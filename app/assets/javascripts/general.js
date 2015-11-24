@@ -1424,7 +1424,7 @@ function test_communications_functions() {
       });
       if(is_processing == false){
         button = $(this)
-        user_id = $("#user_id").val();
+        user_id = $("#communication_user_id").val();
         template_id = button.attr('name');
         button.attr('disabled', 'disabled');
         startAjaxLoader();
