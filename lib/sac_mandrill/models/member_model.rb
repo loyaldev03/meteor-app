@@ -3,7 +3,8 @@
 
     def send_email(template_name, subaccount)
       message = {"to" => [{ "email" => self.user.email }]}
-      message.merge!({ "global_merge_vars" => subscriber_variables, "subaccount" => subaccount })
+      message.merge!({ "global_merge_vars" => subscriber_variables })
+      message.merge!({ "subaccount" => subaccount }) unless subaccount.blank?
       template_content = {}
       result = client.messages.send_template template_name, template_content, message
       result.first
