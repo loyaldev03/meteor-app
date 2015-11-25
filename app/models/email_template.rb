@@ -36,7 +36,6 @@ class EmailTemplate < ActiveRecord::Base
       {required: [], optional: []}
     when 'exact_target'
       {required: ['customer_key'], optional: []}
-      []
     when 'mailchimp_mandrill'
       {required: ['template_name'], optional: ['subaccount']}
     when 'lyris'
