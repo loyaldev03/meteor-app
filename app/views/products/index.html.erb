@@ -24,6 +24,16 @@
   </table>
 </section>
 
+<br><br>
+<div>
+  <%= form_tag(bulk_update_products_path, method: 'put', multipart: true, id: 'bulk_update_form') do %>
+    <%= label :file, "Products csv file", :class => 'help-inline' %>: 
+    <%= file_field_tag 'file', accept: '.csv', id: 'bulk_update_file' %>
+    <%= submit_tag 'Process Bulk Update File', class: 'btn btn-success', id: 'bulk_update_submit' %>
+    <%= link_to "Download example file", '/examples/products_bulk_update_example.csv', class: 'btn' %>
+    <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.attributes.product.bulk_update_help_title'), :content => t('activerecord.attributes.product.bulk_update_help_content')} %>
+  <% end %>
+</div>
 <script>
   $(document).ready(product_index_functions(<%= Product.datatable_columns.size %>));
 </script>

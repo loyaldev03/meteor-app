@@ -100,7 +100,7 @@ class Fulfillment < ActiveRecord::Base
 
   def new_fulfillment(status = nil)
     f = Fulfillment.new 
-    f.status = status  unless status.nil?
+    f.status = status unless status.nil?
     f.product_sku = self.product_sku
     f.product_package = self.product_package
     f.user_id = self.user_id
@@ -111,14 +111,10 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def decrease_stock!
-    old_status = self.status
     if product.nil? 
-      {message: I18n.t('error_messages.product_empty'), code: Settings.error_codes.product_empty}
-    elsif not product.has_stock?
-      {message: I18n.t('error_messages.product_out_of_stock'), code: Settings.error_codes.product_out_of_stock}
+      {:message => I18n.t('error_messages.product_empty'), :code => Settings.error_codes.product_empty}
     else
       product.decrease_stock
-      {message: "Stock reduced with success", code: Settings.error_codes.success}
     end
   end
 
@@ -147,9 +143,9 @@ class Fulfillment < ActiveRecord::Base
     else
       answer = { code: Settings.error_codes.success }
     end
-    self.status = new_status
-    self.save
     if answer[:code] == Settings.error_codes.success        
+      self.status = new_status
+      self.save
       self.audit_status_transition(agent, old_status, reason, file)
     else
       answer

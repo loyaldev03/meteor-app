@@ -99,6 +99,8 @@ en:
     new_payment_gateway: "New Payment Gateway"
     replace_payment_gateway: "Replace Payment Gateway"
     new_domain: "New Domain"
+    mark_as_testing_account: "Mark as testing account"
+    unmark_as_testing_account: "Unmark as testing account"
   admin:
     agents:
       index:
@@ -498,6 +500,8 @@ en:
           customer_key_help: 'Template ID on Exact Target side.'
           template_name: 'Template Name'
           template_name_help: "Template name configured on Mandrill."
+          subaccount: Subaccount Id
+          subaccount_help: "Id of the subaccount related to the template to be sent on Mandrill."
           trigger_id: 'Trigger ID'
           trigger_id_help: "Template's id on Lyris side."
           mlid: 'MLID'
@@ -554,6 +558,8 @@ en:
         is_visible: 'Is Visible?'
         is_visible_label: 'Will product be visible?'
         is_visible_help: 'This option makes a product invisible in the fulfillment file manager.'
+        bulk_update_help_title: 'Products bulk Update'
+        bulk_update_help_content: "Allows to update the STOCK (numeric value) and ALLOW BACKORDER (options: 'yes' or 'no') values from several products using a csv file providing the SKU to identify each product to update. Each column shall be separated by comma and each row by a new line. The format of each row is SKU, STOCK and ALLOW BACKORDER (example: FLAG,100,yes)"
       payment_gateway_configuration:
         report_group: 'Report Group'
         report_group_help: 'The exact name of the report group set up in Litle that you want all orders to be added to.'

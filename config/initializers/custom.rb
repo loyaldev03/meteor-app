@@ -2,6 +2,7 @@ require 'auditory'
 require 'exception_notification'
 SacPlatform::Application.config.middleware.use ExceptionNotifier if ['production', 'staging', 'prototype'].include?(Rails.env)
 require 'axlsx'
+require 'csv'
 Dir["#{Rails.root}/lib/exceptions/*.rb"].each {|file| require file }
 
 # # We are commenting log writing due to https://www.pivotaltracker.com/story/show/68819072 since how logs are written is not pci compliant (Only for production).

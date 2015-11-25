@@ -109,6 +109,8 @@ class ApplicationController < ActionController::Base
             flash[:error] = "No user was selected."
             redirect_to clubs_path
             false
+          else
+            flash.now[:alert] = "This user is set as testing account." if @current_user.testing_account
           end
         end
       end

@@ -212,9 +212,10 @@ function domain_index_functions(column_count){
 }
 
 function product_index_functions(column_count){
+  $('.help').popover({offset: 10});
   $('#products_table').DataTable({
     "sPaginationType": "full_numbers",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -262,6 +263,18 @@ function product_index_functions(column_count){
         alert(global_ajax_error_messages(jqXHR));
       }
     })
+  });
+  $("#bulk_update_submit").click(function(event){
+    event.preventDefault();
+    if($("#bulk_update_file").prop('files').length == 0){
+      alert("No file provided for to bulk update products.");
+    }else{
+      if($("#bulk_update_file").prop('files')[0].size > 1002867){
+        alert("File exceeds maximum size limit.");
+      }else{
+        $("#bulk_update_form").submit();
+      }
+    }
   });
 }
 
@@ -1410,7 +1423,7 @@ function test_communications_functions() {
       });
       if(is_processing == false){
         button = $(this)
-        user_id = $("#user_id").val();
+        user_id = $("#communication_user_id").val();
         template_id = button.attr('name');
         button.attr('disabled', 'disabled');
         startAjaxLoader();

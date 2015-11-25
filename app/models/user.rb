@@ -669,9 +669,21 @@ class User < ActiveRecord::Base
     end
   end
 
+  def replenish_stock_on_enrollment_failure(skip_product_validation, product_sku)
+    unless skip_product_validation
+      Product.where(sku: product_sku.split(','), club_id: club.id).update_all "stock = stock + 1"
+    end
+  end
+
   def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, user_params = nil, skip_credit_card_validation = false, skip_product_validation = false, skip_user_validation = false)
     allow_cc_blank = (amount.to_f == 0.0 and cc_blank)
     club = tom.club
+
+    if not self.new_record? and recovery_check and not self.lapsed? 
+      return { :message => I18n.t('error_messages.user_already_active', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.user_already_active, :errors => { :status => "Already active." } }
+    elsif recovery_check and not self.new_record? and not self.can_recover?
+      return { :message => I18n.t('error_messages.cant_recover_user', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_user, :errors => {:reactivation_times => "Max reactivation times reached."} }
+    end
 
     unless skip_product_validation
       user_params[:product_sku].to_s.split(',').each do |sku|
@@ -679,21 +691,15 @@ class User < ActiveRecord::Base
         if product.nil?
           return { message: I18n.t('error_messages.product_does_not_exists'), code: Settings.error_codes.product_does_not_exists }
         else
-          if not product.has_stock?
-            return { message: I18n.t('error_messages.product_out_of_stock'), code: Settings.error_codes.product_out_of_stock }
-          end
+          result = product.decrease_stock
+          return result if result[:code] != Settings.error_codes.success
         end
       end
     end
 
-    if not self.new_record? and recovery_check and not self.lapsed? 
-      return { message: I18n.t('error_messages.user_already_active', cs_phone_number: club.cs_phone_number), code: Settings.error_codes.user_already_active, errors: { status: "Already active." } }
-    elsif recovery_check and not self.new_record? and not self.can_recover?
-      return { message: I18n.t('error_messages.cant_recover_user', cs_phone_number: club.cs_phone_number), code: Settings.error_codes.cant_recover_user, errors: {reactivation_times: "Max reactivation times reached."} }
-    end
-
     # CLEAN ME: => This validation is done at self.enroll
     if not skip_user_validation and not self.valid? 
+      replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
       return { message: I18n.t('error_messages.user_data_invalid'), code: Settings.error_codes.user_data_invalid, 
                errors: self.errors_merged(credit_card) }
     end
@@ -712,15 +718,12 @@ class User < ActiveRecord::Base
       answer = trans.process
       unless trans.success?
         operation_type = Settings.operation_types.error_on_enrollment_billing
-        if self.new_record?
-          logger.error "* * * * * * Failed transaction upon enrollment. Trans ID: #{trans.id}"
-        else
-          Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
-        end
+        Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
       # TODO: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
         trans.operation_type = operation_type
         trans.membership_id = nil
         trans.save
+        replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
         return answer
       end
       trans.update_attribute :operation_type, operation_type
@@ -759,6 +762,7 @@ class User < ActiveRecord::Base
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
+      replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
       Auditory.report_issue(error_message, e, { user: self.inspect, credit_card: credit_card.inspect, enrollment_info: enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       # TODO2: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
@@ -892,10 +896,6 @@ class User < ActiveRecord::Base
           f.user_id = self.id
           f.club_id = self.club_id
           f.save
-          answer = f.decrease_stock!
-          unless answer[:code] == Settings.error_codes.success
-            Auditory.report_issue(answer[:message], answer[:message], { user: self.inspect, credit_card: self.active_credit_card.inspect, enrollment_info: self.current_membership.enrollment_info.inspect })
-          end
         rescue Exception => e
           Auditory.report_issue(I18n.t("error_messages.fulfillments_decrease_stock_error"), e, { user: self.inspect, fulfillment: f, product: product})
         end

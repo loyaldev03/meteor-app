@@ -89,6 +89,7 @@ SacPlatform::Application.routes.draw do
         match '/reject' => 'users#reject', as: 'user_reject', :via => [:post]  
         match '/no_recurrent_billing' => 'users#no_recurrent_billing', as: 'user_no_recurrent_billing', :via => [:get, :post]  
         match '/manual_billing' => 'users#manual_billing', as: 'user_manual_billing', :via => [:get, :post]
+        put '/toggle_testing_account' => 'users#toggle_testing_account', as: 'user_toggle_testing_account'
         match '/' => 'users#show', as: 'show_user', :via => [:get, :post]
 
         post '/sync' => 'users#sync', as: 'user_sync'
@@ -112,7 +113,11 @@ SacPlatform::Application.routes.draw do
         get  '/memberships_content' => 'users#memberships_content', as: 'memberships_content'
       end
 
-      resources :products
+      resources :products do 
+        collection do
+          put 'bulk_update'
+        end
+      end
       resources :disposition_types, :except => [ :show, :destroy ]
 
       match '/fulfillments' => 'fulfillments#index', as: 'fulfillments_index', :via => [:post, :get]

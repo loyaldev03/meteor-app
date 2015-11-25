@@ -158,7 +158,7 @@ class EmailTemplatesController < ApplicationController
         @et.days = nil
       end
       attributes = Hash.new()
-      ea_keys = EmailTemplate.external_attributes_related_to_client(@et.client)
+      ea_keys = EmailTemplate.external_attributes_related_to_client(@et.client).values.flatten
       ea_keys.each do |attrib|
         attributes[attrib.to_sym] = post_data[attrib]
       end
