@@ -440,7 +440,7 @@ DEPENDENCIES
   byebug
   cancan
   capistrano (= 2.15.4)
-  capistrano-campfire
+  capistrano-campfire (= 0.2.0)
   capybara
   carmen-rails
   coffee-rails
