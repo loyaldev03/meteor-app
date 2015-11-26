@@ -87,7 +87,6 @@ class PartnersTest < ActionDispatch::IntegrationTest
     assert page.has_content?(saved_partner.name)
     assert page.has_content?('Back')
     assert page.has_content?('Edit')  
-    assert page.has_content?('Destroy')   
   end
 
   test "Should update partner" do
@@ -102,15 +101,4 @@ class PartnersTest < ActionDispatch::IntegrationTest
     assert page.has_content?("The partner #{saved_partner.prefix} - #{saved_partner.name} was successfully updated.")
   end
 
-  test "Should delete partner" do
-    saved_partner = FactoryGirl.create(:partner, prefix: 'WIEGANDTOY')
-    visit admin_partners_path
-    confirm_ok_js
-    within("#partners_table") do
-        click_link_or_button 'Destroy'
-    end
-    saved_partner.reload
-      assert page.has_content?('Partner WIEGANDTOY was successfully destroyed')
-      assert Partner.with_deleted.where(id: saved_partner.id).first
-  end
 end

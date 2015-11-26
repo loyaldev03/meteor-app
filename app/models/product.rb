@@ -1,6 +1,8 @@
 class Product < ActiveRecord::Base
   belongs_to :club
 
+  attr_accessible :stock, :allow_backorder
+
   validates :sku, presence: true, format: /\A[0-9a-zA-Z\-_]+\z/, length: { minimum: 2 }, uniqueness: { scope: [:club_id, :deleted_at] }
   validates :cost_center, format: /\A[a-zA-Z\-_]+\z/, length: { minimum: 2, maximum: 30 }, allow_nil: true
 
@@ -17,7 +19,7 @@ class Product < ActiveRecord::Base
   acts_as_paranoid
 
   def self.datatable_columns
-    ['id', 'name', 'sku', 'stock', 'allow_backorder' ]
+    ['id', 'name', 'sku', 'stock', 'allow_backorder']
   end
 
   def apply_upcase_to_sku
