@@ -423,7 +423,7 @@ class UsersController < ApplicationController
 
   def notes_content
     my_authorize! :list, UserNote, @current_club.id
-    @notes = @current_user.user_notes.joins([ :communication_type, :disposition_type ]).paginate(:page => params[:page], :per_page => 10, :order => "created_at DESC")
+    @notes = @current_user.user_notes.includes([ :communication_type, :disposition_type ]).paginate(page: params[:page], per_page: 10).order("created_at DESC")
     render :partial => 'users/notes', :locals => { :notes => @notes }
   end
 
