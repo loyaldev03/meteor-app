@@ -8,12 +8,11 @@
  * You're free to add application-wide styles to this file and they'll appear at the top of the
  * compiled file, but it's generally better to create a new file per style scope.
  *
+ *= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
  *= require_self
  *= require scaffolds
  *= require readable/readable
  *= require jquery-ui
- *= require dataTables/jquery.dataTables.bootstrap
- *= require dataTables/src/demo_table_jui
  *= require readable/override
 */
 
