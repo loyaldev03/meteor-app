@@ -203,7 +203,7 @@ GEM
       tilt
     hashie (3.4.2)
     hashr (0.0.22)
-    highline (1.6.19)
+    highline (1.6.21)
     htmlentities (4.3.1)
     http_parser.rb (0.5.3)
     httparty (0.13.7)
@@ -233,18 +233,18 @@ GEM
     metaclass (0.0.1)
     mime-types (1.25.1)
     mini_portile (0.6.2)
-    minitest (5.8.1)
+    minitest (5.8.3)
     mocha (0.14.0)
       metaclass (~> 0.0.1)
     multi_json (1.11.2)
     multi_xml (0.5.5)
     multipart-post (1.2.0)
     mysql2 (0.3.20)
-    net-scp (1.1.1)
+    net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
-    net-ssh (2.6.7)
+    net-ssh (3.0.1)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
     netrc (0.8.0)
@@ -439,7 +439,8 @@ DEPENDENCIES
   bureaucrat
   byebug
   cancan
-  capistrano-campfire (= 0.2.0)
+  capistrano (= 2.15.4)
+  capistrano-campfire
   capybara
   carmen-rails
   coffee-rails

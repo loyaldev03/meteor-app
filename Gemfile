@@ -83,6 +83,7 @@ group :development do
   gem 'redcarpet'
   gem 'ruby-prof'
   # -> deploy
+  gem 'capistrano', '2.15.4'
   gem 'rvm-capistrano'
   gem 'capistrano-campfire', '0.2.0'
   gem 'tinder'

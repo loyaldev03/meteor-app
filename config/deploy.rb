@@ -19,7 +19,7 @@ set :use_sudo, false
 
 set :branch, ENV['BRANCH'] if ENV['BRANCH']
 
-OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+# OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
 # campfire access: stoneacreadmins / xagax2011
 set :campfire_options, :account => 'stoneacreinc',
                        :room => 'Platform Room - General Discussion',
@@ -45,7 +45,7 @@ end
 
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
-  run "#{sudo} service #{application} stop && #{sudo} service #{application} start" 
+  run "#{sudo} service #{application} stop || #{sudo} service #{application} start" 
 end
 
 desc "Notify Campfire room"
@@ -124,10 +124,6 @@ namespace :deploy do
     run "chmod 666 #{release_path}/log/*.log"
   end
 
-  # desc "Compile assets"
-  # task :compile_assets, :roles => :web do 
-  #   run "cd #{current_path}; bundle exec rake assets:precompile"
-  # end  
 
   # taken from http://stackoverflow.com/questions/5735656
   task :tag do
@@ -169,7 +165,7 @@ namespace :foreman do
 
   desc "Restart the application services"
   task :restart, :roles => :web do
-    run "#{sudo} start #{application} || #{sudo} restart #{application}"
+    run "start #{application} || restart #{application}"
   end
 end
 
@@ -208,14 +204,13 @@ end
 
 # after "deploy:setup", "deploy:db:setup" unless fetch(:skip_db_setup, false)
 after "deploy:update_code", "link_config_files"
-#after "deploy:update_code", "bundle_install"
 after "deploy:update_code", "assets"
 after "deploy:update", "maintenance_mode:start" if fetch(:put_in_maintenance_mode, false)
 after "deploy:update", "deploy:migrate"
 after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
 after 'deploy:update', 'restart_delayed_jobs'
 after "deploy:update", "elasticsearch:reindex" if fetch(:elasticsearch_reindex, false)
-after 'deploy', 'notify_campfire'
+#after 'deploy', 'notify_campfire'
 after "deploy", "deploy:tag"
 
 
