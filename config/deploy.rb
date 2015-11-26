@@ -8,6 +8,7 @@ set :stages, %w(production prototype staging demo prototype_pantheon staging_pan
 set :default_stage, "prototype"
 default_run_options[:pty] = true
 require 'capistrano/ext/multistage'
+require 'bundler/capistrano'
 
 set :port, 30003
 set :keep_releases,       2
@@ -30,6 +31,7 @@ task :link_config_files do
   puts "  * Creating shared symlinks... "
   run "ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml"
   run "ln -nfs #{release_path}/doc #{release_path}/public/doc"
+  #run "ln -nfs #{shared_path}/bundler #{release_path}/vendor/bundler"
   run "ln -nfs #{shared_path}/mes_account_updater_files #{release_path}/mes_account_updater_files"
   run "ln -nfs #{shared_path}/assets #{release_path}/public/assets"
   run "mkdir #{release_path}/tmp/cache; #{sudo} chown www-data:www-data #{release_path}/tmp/cache" if rails_env == "production"
@@ -206,7 +208,7 @@ end
 
 # after "deploy:setup", "deploy:db:setup" unless fetch(:skip_db_setup, false)
 after "deploy:update_code", "link_config_files"
-after "deploy:update_code", "bundle_install"
+#after "deploy:update_code", "bundle_install"
 after "deploy:update_code", "assets"
 after "deploy:update", "maintenance_mode:start" if fetch(:put_in_maintenance_mode, false)
 after "deploy:update", "deploy:migrate"

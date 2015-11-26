@@ -90,9 +90,6 @@ group :development do
   gem 'daemons'
   gem 'foreman'
   gem 'quiet_assets'
-end
-
-group :prototype, :development do
   gem "bullet", '4.6.0'
 end
 

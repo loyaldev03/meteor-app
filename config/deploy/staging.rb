@@ -8,8 +8,9 @@ set :rails_env, "staging"
 
 server "staging.platform.xagax.com", :app, :web
 
-task :bundle_install do
-  puts "  **** bundle_install"
-  run "id"
-  run "cd #{release_path}; #{sudo} bundle install --without development test prototype"
-end
+set :rvm_type, :system 
+set :rvm_ruby_string, '1.9.3-p327@global' 
+require 'rvm/capistrano'
+set :rvm_bin_path, "/usr/local/rvm/bin"
+set :sudo, 'rvmsudo'
+
