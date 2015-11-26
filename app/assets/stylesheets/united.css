@@ -11,9 +11,7 @@
  *= require_self
  *= require scaffolds
  *= require united/united
- *= require jquery.ui.core
- *= require jquery.ui.theme
- *= require jquery.ui.datepicker
+ *= require jquery-ui
  *= require dataTables/jquery.dataTables.bootstrap
  *= require dataTables/src/demo_table_jui
  *= require united/override
