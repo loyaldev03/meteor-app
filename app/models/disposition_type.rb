@@ -4,7 +4,7 @@ class DispositionType < Enumeration
 
   attr_accessible :name
 
-  validates :name, presence: true, uniqueness: {scope: :club_id}
+  validates :name, uniqueness: {scope: :club_id}
 
   def to_s
     name
