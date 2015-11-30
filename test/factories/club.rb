@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :club do
-    sequence(:name) {|n| "club#{n}" }
+    sequence(:name) {|n| "club_#{Faker::Lorem.characters(10)}" }
     cs_phone_number "123 456 7891"
     time_zone { TZInfo::Timezone.all.sample.name }
     description "My description"
@@ -10,7 +10,7 @@ FactoryGirl.define do
   end
 
   factory :simple_club, class: Club do
-    sequence(:name) {|n| "simple_club#{n}" }
+    sequence(:name) {|n| "simple_club_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -22,7 +22,7 @@ FactoryGirl.define do
   end
 
   factory :simple_club_with_gateway, class: Club do
-    sequence(:name) {|n| "simple_club_with_gateway#{n}" }
+    sequence(:name) {|n| "simple_club_with_gateway_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -34,7 +34,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_litle_gateway, class: Club do
-    sequence(:name) {|n| "simple_club_with_litle_gateway#{n}" }
+    sequence(:name) {|n| "simple_club_with_litle_gateway_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -46,7 +46,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_authorize_net_gateway, class: Club do
-    sequence(:name) {|n| "simple_club_with_authorize_net_gateway#{n}" }
+    sequence(:name) {|n| "simple_club_with_authorize_net_gateway_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -57,7 +57,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_first_data_gateway, class: Club do
-    sequence(:name) {|n| "simple_club_with_first_data_gateway#{n}" }
+    sequence(:name) {|n| "simple_club_with_first_data_gateway_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -68,7 +68,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_stripe_gateway, class: Club do
-    sequence(:name) {|n| "simple_club_with_stripe_gateway#{n}" }
+    sequence(:name) {|n| "simple_club_with_stripe_gateway_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -79,7 +79,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_trust_commerce_gateway, class: Club do
-    sequence(:name) {|n| "simple_club_with_gateway#{n}" }
+    sequence(:name) {|n| "simple_club_with_gateway_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -92,7 +92,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_gateway_with_family, class: Club do
-    sequence(:name) {|n| "simple_club_with_gateway_with_family#{n}" }
+    sequence(:name) {|n| "simple_club_with_gateway_with_family_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -103,7 +103,7 @@ FactoryGirl.define do
   end  
 
   factory :club_with_api, class: Club do
-    sequence(:name) {|n| "club_with_api#{n}" }
+    sequence(:name) {|n| "club_with_api_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -118,7 +118,7 @@ FactoryGirl.define do
   end
 
   factory :club_with_wordpress_api, class: Club do
-    sequence(:name) {|n| "club_with_wordpress_api#{n}" }
+    sequence(:name) {|n| "club_with_wordpress_api_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -133,7 +133,7 @@ FactoryGirl.define do
   end
 
   factory :club_with_gateway, class: Club do
-    sequence(:name) {|n| "club_with_gateway#{n}" }
+    sequence(:name) {|n| "club_with_gateway_#{Faker::Lorem.characters(10)}" }
     time_zone { TZInfo::Timezone.all.sample.name }
     description "My description"
     cs_phone_number "123 456 7891"
@@ -144,7 +144,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_require_external_id, class: Club do
-    sequence(:name) {|n| "simple_club_with_require_external_id#{n}" }
+    sequence(:name) {|n| "simple_club_with_require_external_id_#{Faker::Lorem.characters(10)}" }
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true

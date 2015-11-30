@@ -170,33 +170,6 @@ class Admin::PartnersControllerTest < ActionController::TestCase
     assert_response :unauthorized
   end
 
-  test "Admin should destroy partner" do
-    sign_in @admin_user
-    assert_difference('Partner.count', -1) do
-      delete :destroy, id: @partner
-    end
-
-    assert_redirected_to admin_partners_path
-  end
-
-  test "Representative should not destroy partner" do
-    sign_in @representative_user
-    delete :destroy, id: @partner
-    assert_response :unauthorized
-  end
-
-  test "Supervisor should not destroy partner" do
-    sign_in @supervisor_user
-    delete :destroy, id: @partner
-    assert_response :unauthorized
-  end
-
-  test "fulfillment_manager should not destroy partner" do
-    sign_in @fulfillment_manager_user
-    delete :destroy, id: @partner
-    assert_response :unauthorized
-  end 
-
   #####################################################
   # CLUBS ROLES
   ##################################################### 
@@ -278,19 +251,6 @@ class Admin::PartnersControllerTest < ActionController::TestCase
       put :update, id: @partner.id, partner: { :prefix => @partner_prefix, :name => @partner.name, 
                                           :contract_uri => @partner.contract_uri, :website_url => @partner.website_url, 
                                           :description => @partner.description }
-      assert_response :unauthorized
-    end
-  end
-
-  test "agent with club roles should not destroy partner" do
-    sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
-    club_role = ClubRole.new :club_id => club.id
-    club_role.agent_id = @agent.id
-    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      club_role.role = role
-      club_role.save
-      delete :destroy, id: @partner
       assert_response :unauthorized
     end
   end

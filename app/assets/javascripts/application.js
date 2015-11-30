@@ -24,10 +24,8 @@
 //= require twitter/bootstrap/bootstrap-popover
 //= require twitter/bootstrap/bootstrap-dropdown
 //= require twitter/bootstrap/bootstrap-alert
-//= require bootstrap-modal
 //= require general
 
 //= require formwizard/jquery.form.js
-//= require formwizard/bbq.js
 //= require formwizard/jquery-ui-1.8.5.custom.min.js
 //= require formwizard/jquery.form.wizard.js

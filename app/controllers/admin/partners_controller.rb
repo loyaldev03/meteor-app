@@ -46,16 +46,16 @@ class Admin::PartnersController < ApplicationController
     end
   end
 
-  # DELETE /partners/1
-  def destroy
-    @partner = Partner.find(params[:id])
-    if @partner.destroy
-      redirect_to admin_partners_url, notice: "Partner #{@partner.prefix} was successfully destroyed"
-    else
-      flash[:error] = "Partner #{@partner.prefix} was not destroyed."
-      redirect_to admin_partners_url
-    end
-  end
+  # # DELETE /partners/1
+  # def destroy
+  #   @partner = Partner.find(params[:id])
+  #   if @partner.destroy
+  #     redirect_to admin_partners_url, notice: "Partner #{@partner.prefix} was successfully destroyed"
+  #   else
+  #     flash[:error] = "Partner #{@partner.prefix} was not destroyed."
+  #     redirect_to admin_partners_url
+  #   end
+  # end
 
   def dashboard
     @partner = @current_partner

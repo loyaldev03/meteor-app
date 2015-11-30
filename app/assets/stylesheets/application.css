@@ -223,6 +223,3 @@ div.dataTables_length label {
 .div-table .title{
   border-bottom: solid;
 }
-
-.input-prepend .add-on, .input-append .add-on { margin-top: -10px; }
-

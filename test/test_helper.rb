@@ -217,10 +217,10 @@ module ActionDispatch
     end
 
     def do_data_table_search(selector, value)
-      within(selector) do
-        find(:css,"input[type='text']").set("XXXXXXXXXXXXXXXXXXX")
+      within(selector) do 
+        find(:css,"input[type='search']").set("XXXXXXXXXXXXXXXXXXX")
         sleep(1)
-        find(:css,"input[type='text']").set(value)
+        find(:css,"input[type='search']").set(value)
       end
     end
 

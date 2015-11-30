@@ -14,7 +14,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     @partner = @club.partner
     Time.zone = @club.time_zone
 
-    @product = Product.find_by_sku 'KIT-CARD'
+    @product = Product.find_by sku: 'KIT-CARD', club_id: @club.id
 
     if create_new_user
       @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
@@ -358,7 +358,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @club.name, exact: true){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
 
@@ -434,8 +434,10 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   #   fulfillment = Fulfillment.find_by_product_sku(@product.sku)
   #   fulfillment.set_as_in_process
-  #   click_link_or_button("My Clubs")
-  #   within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    # click_link_or_button("My Clubs")
+    # within("#my_clubs_table") do 
+    #   within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    #   end
   #   page.has_content?("Fulfillments")
   #   within("#fulfillments_table")do
   #     check('all_times')
@@ -1003,7 +1005,9 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "see product type at Fulfillment report page" do
     setup_user
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table")do 
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -1159,7 +1163,9 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do 
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -1304,7 +1310,9 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert_equal(fulfillment.status,'not_processed')
       assert_equal(fulfillment.recurrent,false)
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do 
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -1479,11 +1487,10 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Pass product to Not Processed status without stock" do
     setup_user(false)
-    @product.update_attribute :stock , 0
-    @product.update_attribute :allow_backorder , false
+    @product.update_attributes stock: 0, allow_backorder: false
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{@product.sku}")
 
-    assert_difference("User.count",0)do
+    assert_difference("User.count",0) do
       create_user_throught_sloop(enrollment_info)
     end
     assert_equal @response.body, '{"message":"You are trying to move a member to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders","code":"'+Settings.error_codes.product_out_of_stock+'"}'

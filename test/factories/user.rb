@@ -42,7 +42,6 @@ FactoryGirl.define do
     status "none"
     country "US"
     club_cash_amount 0
-    #association :club, factory: :club_with_api
   end
 
   factory :user_with_cc, class: User do

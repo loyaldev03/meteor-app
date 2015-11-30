@@ -1,5 +1,5 @@
 class Partner < ActiveRecord::Base
-  has_many :domains, dependent: :destroy
+  has_many :domains, dependent: :delete_all
   has_many :clubs, dependent: :destroy
 
   attr_accessible :contract_uri, :deleted_at, :description, :name, :prefix, 
