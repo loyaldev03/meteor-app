@@ -9,7 +9,7 @@ set :rails_env, "staging"
 server "staging.platform.xagax.com", :app, :web
 
 set :rvm_type, :system 
-set :rvm_ruby_string, '1.9.3-p327@global' 
+set :rvm_ruby_string, '1.9.3-p327' 
 require 'rvm/capistrano'
 set :rvm_bin_path, "/usr/local/rvm/bin"
 set :sudo, 'rvmsudo'
