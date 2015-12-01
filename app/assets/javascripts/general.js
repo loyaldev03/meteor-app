@@ -231,6 +231,7 @@ function product_index_functions(column_count){
     var targetModal = '#myModal'+ $(this).data('target');
     $(targetModal + ' .modal-body').load($(this).attr('href'), function(e) {
       $(targetModal).modal('show');
+      $('.help').popover({offset: 10, trigger: 'hover', html: true });
     });
   });
   $('#products_table').on('click', '.modal-footer input[type="submit"]', function(){
