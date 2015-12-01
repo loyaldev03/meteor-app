@@ -1,4 +1,6 @@
 $(document).ready( function() {
+  $('.help').popover({offset: 10, trigger: 'hover', html: true });
+
   $('.confirm').click( function(event){
     var answer = confirm('Are you sure?');
     return answer 
@@ -117,7 +119,7 @@ function agent_index_functions(column_count){
 function partner_index_functions(column_count){
   $('#partners_table').DataTable({
     "sPaginationType": "full_numbers",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -198,7 +200,7 @@ function my_club_index_functions(column_count){
 function domain_index_functions(column_count){
   $('#domains_table').DataTable({
     "sPaginationType": "full_numbers",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -212,7 +214,6 @@ function domain_index_functions(column_count){
 }
 
 function product_index_functions(column_count){
-  $('.help').popover({offset: 10});
   $('#products_table').DataTable({
     "sPaginationType": "full_numbers",
     "sDom": '<"top"fp>rt<"bottom"il>',
@@ -294,15 +295,12 @@ function terms_of_memberships_table_index_functions(column_count) {
 }
 
 function new_partner_functions(){
-  $('.help').popover({offset: 10});
 }
 
 function new_domain_functions(){
-  $('.help').popover({offset: 10});
 }
 
 function new_product_functions(){
-  $('.help').popover({offset: 10});
 }
 
 function user_index_functions(){
@@ -404,7 +402,6 @@ function fetch_maketing_client_form(){
 };
 
 function clubs_form_functions(){
-  $('document').ready($('.help').popover({offset: 10}));
   $("#club_marketing_tool_client").change(function(){
     if($(this).val()!= ''){
       fetch_maketing_client_form(club_id, $(this).val());
@@ -470,7 +467,6 @@ function retrieve_information(){
 }
 
 function payment_gateway_configuration_functions(){
-  $('.help').popover({offset: 10});
 }
 
 function new_payment_gateway_configuration_functions(){
@@ -599,9 +595,6 @@ function new_user_functions(){
     }
   });  
 
-  $('#zip_help').popover({offset: 10});
-  $('.help').popover({offset: 10});
-  
   $('#user_country').on('change',  function(){
     country = $('#user_country').val();
     $.get(this.action, { country_code:country }, null, 'script'); 
@@ -664,8 +657,6 @@ function edit_user_functions(){
       }
     });
   });
-
-  $('.help').popover({offset: 10});
 
   $('#user_country').on('change',  function(){
     country = $('#user_country').val();
@@ -747,16 +738,14 @@ function operation_user_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "full_numbers",
-    "sDom": '<"top"flp>rt<"bottom"i>',
+    "sDom": '<"top"p>rt<"bottom"li>',
     "bServerSide": true,
     "aaSorting": [[ 1, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] }],
     "sAjaxSource": $('#operations_table').data('source'),
   });
 
-  $('#dataTableSelect').insertAfter('#operations_table_info')
-
-  $('.dataTables_filter').hide();
+  $('#operations_table_wrapper .top').prepend($("#dataTableSelect"));
   $(".dataselect").change( function () {
       oTable2.search( $(this).val() ).draw();
   });
@@ -768,7 +757,7 @@ function transactions_user_functions(column_count){
     "bProcessing": true,
     "bFilter": false,
     "sPaginationType": "full_numbers",
-  "sDom": '<"top"flp>rt<"bottom"i>',
+    "sDom": '<"top"fp>rt<"bottom"li>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5,6 ] }],
@@ -830,7 +819,7 @@ function club_cash_transactions_functions(column_count){
     "bJQueryUI": false,
     "bProcessing": true,
     "sPaginationType": "full_numbers",
-    "sDom": '<"top"flp>rt<"bottom"i>',
+    "sDom": '<"top"fp>rt<"bottom"li>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
@@ -847,7 +836,6 @@ function show_user_functions(){
       event.preventDefault(); 
   })
 
-  $('.help').popover();
   mark_as_sent_fulfillment("../fulfillments/");
   resend_fulfillment("../fulfillments/");
 
@@ -1324,7 +1312,6 @@ function admin_form_functions(){
 // TOM Wizard functions
 // Creates the wizard
 function new_tom_functions() {
-  $('.help').popover({offset: 10});
   tom_create_wizard();
 }
 
@@ -1374,8 +1361,6 @@ function switch_days() {
 }
 
 function email_templates_functions() {
-  $('.help').popover({offset: 10});
-
   $("#email_template_template_type").change(function() {
     switch_days();
   });

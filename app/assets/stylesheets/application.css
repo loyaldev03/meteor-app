@@ -67,14 +67,8 @@ label.error{
   text-align:left;
 }
 
-div.dataTables_length select {
-    float: right;
-}
-
 div.dataTables_filter label{
     text-align:left;
-    vertical-align:text-top;
-    width:270px;
 }
 
 div.dataTables_filter input {
@@ -191,25 +185,9 @@ div.dataTables_filter input {
 	text-align: center;
 }
 
-#partners_table_wrapper.dataTables_wrapper .dataTables_paginate,
-#agents_table_wrapper.dataTables_wrapper .dataTables_paginate,
-#my_clubs_table_wrapper.dataTables_wrapper .dataTables_paginate,
-#terms_of_memberships_table_wrapper.dataTables_wrapper .dataTables_paginate {
-  float: left;
-}
 
-#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_filter.dataTables_filter,
-#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_length,
-#club_cash_transactions_table_wrapper.dataTables_wrapper .dataTables_paginate {
-	width: 32%;
-}
-
-#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_filter label {
-	width: 290px;
-}
-
-div.dataTables_length label {
-	width: 170px;
+div.dataTables_filter {
+  float:left;
 }
 
 #members.tab-pane .pagination {

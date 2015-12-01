@@ -418,8 +418,8 @@ en:
         payment_is_expected: 'Payment is Expected'
         trial_period: 'Trial period'
         installment_period: 'Installment period'
-        initial_club_cash_amount: 'Initial Club Cash Amount'
-        club_cash_installment_amount: 'Club Cash Amount'
+        initial_club_cash_amount: 'Initial club cash amount'
+        club_cash_installment_amount: 'Club cash mount'
         skip_first_club_cash: 'Skip first club cash'
         needs_enrollment_approval: 'Needs Enrollment Approval'
         wizard:
@@ -460,9 +460,9 @@ en:
           step_2_button_next: 'Define Upgrades / Downgrades'
           step_2_edit_button_next: 'Edit Upgrades / Downgrades'
           club_cash_amount: 'Club Cash Amount'
-          initial_club_cash_amount: 'Initial Club Cash Amount'
+          initial_club_cash_amount: 'Initial club cash amount'
           initial_club_cash_amount_help: 'The amount of club cash that should be granted to a subscriber upon enrollment.'
-          club_cash_installment_amount: 'Club Cash Amount'
+          club_cash_installment_amount: 'Club cash amount'
           club_cash_installment_amount_help: 'Each time a successful membership billing takes place, grant this amount of club cash.'
           skip_first_club_cash: 'Skip adding club cash on first membership billing'
           # Step 3
