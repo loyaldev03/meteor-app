@@ -607,6 +607,7 @@ function new_user_functions(){
       url: "../subscription_plans/"+$(this).val()+"/resumed_information",
       success: function(data){
         $("#th_terms_of_memberships .help").attr("data-content", data);
+        $("#th_terms_of_memberships .help").data('popover').options['content'] = data;
       }
     });
   });
