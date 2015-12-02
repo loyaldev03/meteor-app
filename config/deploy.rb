@@ -10,7 +10,6 @@ default_run_options[:pty] = true
 require 'capistrano/ext/multistage'
 
 set :port, 30003
-set :keep_releases,       2
 set :term,                "linux"
 set :deploy_via, :remote_cache
 set :user, 'www-data'
