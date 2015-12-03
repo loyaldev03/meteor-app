@@ -7,7 +7,6 @@ if [ "$1" == "production" ]; then
   export PATH=$PATH:/usr/local/rvm/gems/ruby-2.2.0@sac-platform-rails4/bin:/usr/local/rvm/gems/ruby-2.2.0@sac-platform-rails4/bin:/usr/local/rvm/rubies/ruby-2.2.0/bin:/usr/local/rvm/bin:/usr/local/sbin:/usr/local/bin
   [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm" && rvm use 1.9.3-p194@sac-platform-rails4
 else
-  export PATH=$PATH:/usr/local/rvm/gems/ruby-2.2.0@global/bin:/usr/local/rvm/gems/ruby-2.2.0@global/bin:/usr/local/rvm/rubies/ruby-2.2.0/bin:/usr/local/rvm/bin:/usr/local/sbin:/usr/local/bin
   [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm" && rvm use ruby-2.2.0@global
 fi
 
