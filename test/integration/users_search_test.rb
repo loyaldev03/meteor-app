@@ -180,7 +180,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       sleep 1
       assert find_field('input_member_group_type').value == value
     end
-  # end
+  end
 
   test "View token in user record - Admin and Supervisor role" do
     setup_user(false)

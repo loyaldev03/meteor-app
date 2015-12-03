@@ -18,7 +18,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
         last_name: @user.last_name, address: @user.address, city: @user.city, gender: 'M',
         zip: @user.zip, state: @user.state, email: @user.email, type_of_phone_number: @user.type_of_phone_number,
         phone_country_code: @user.phone_country_code, phone_area_code: @user.phone_area_code,
-        type_of_phone_number: 'Home', phone_local_number: @user.phone_local_number, country: 'US', 
+        phone_local_number: @user.phone_local_number, country: 'US', 
         product_sku: Settings.kit_card_product }, 
       { number: credit_card.number, 
         expire_year: credit_card.expire_year, expire_month: credit_card.expire_month },
