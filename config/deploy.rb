@@ -45,7 +45,7 @@ end
 
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
-  run "#{sudo} service #{application} stop || #{sudo} service #{application} start" 
+  run "#{sudo} service #{application} restart" 
 end
 
 desc "Notify Campfire room"
@@ -210,7 +210,7 @@ after "deploy:update", "deploy:migrate"
 after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
 after 'deploy:update', 'restart_delayed_jobs'
 after "deploy:update", "elasticsearch:reindex" if fetch(:elasticsearch_reindex, false)
-#after 'deploy', 'notify_campfire'
+# after 'deploy', 'notify_campfire'
 after "deploy", "deploy:tag"
 
 
