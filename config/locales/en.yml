@@ -419,7 +419,7 @@ en:
         trial_period: 'Trial period'
         installment_period: 'Installment period'
         initial_club_cash_amount: 'Initial club cash amount'
-        club_cash_installment_amount: 'Club cash mount'
+        club_cash_installment_amount: 'Club cash amount'
         skip_first_club_cash: 'Skip first club cash'
         needs_enrollment_approval: 'Needs Enrollment Approval'
         wizard:

@@ -318,7 +318,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
     end 
     within("#div_description_feature") do   
       assert page.has_content? "#{I18n.t('activerecord.attributes.terms_of_membership.initial_club_cash_amount')}: #{@terms_of_membership_with_gateway.initial_club_cash_amount.to_s}"
-      assert page.has_content? "#{I18n.t('activerecord.attributes.terms_of_membership.club_cash_installment_amount')}: #{@terms_of_membership_with_gateway.initial_club_cash_amount.to_s}"
+      assert page.has_content? "#{I18n.t('activerecord.attributes.terms_of_membership.club_cash_installment_amount')}: #{@terms_of_membership_with_gateway.club_cash_installment_amount.to_s}"
       assert page.has_content? "#{I18n.t('activerecord.attributes.terms_of_membership.skip_first_club_cash')}: #{@terms_of_membership_with_gateway.skip_first_club_cash ? 'Yes' : 'No'}"
     end
   end
