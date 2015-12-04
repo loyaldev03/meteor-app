@@ -104,8 +104,6 @@ GEM
       slim (~> 1.3.6)
       terminal-table (~> 1.4)
     builder (3.2.2)
-    bullet (4.6.0)
-      uniform_notifier
     bureaucrat (0.10.2)
     byebug (6.0.2)
     cancan (1.6.10)
@@ -115,9 +113,6 @@ GEM
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
       net-ssh-gateway (>= 1.1.0)
-    capistrano-campfire (0.2.0)
-      capistrano
-      tinder
     capybara (2.1.0)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
@@ -400,7 +395,6 @@ GEM
       execjs (>= 0.3.0)
       json (>= 1.8.0)
     unicode_utils (1.4.0)
-    uniform_notifier (1.2.0)
     uuidtools (2.1.4)
     warden (1.2.3)
       rack (>= 1.0)
@@ -435,12 +429,10 @@ DEPENDENCIES
   axlsx (~> 2.0.1)
   bootstrap-will_paginate
   brakeman
-  bullet (= 4.6.0)
   bureaucrat
   byebug
   cancan
   capistrano (= 2.15.4)
-  capistrano-campfire (= 0.2.0)
   capybara
   carmen-rails
   coffee-rails

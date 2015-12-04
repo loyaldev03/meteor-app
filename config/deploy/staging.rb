@@ -10,7 +10,7 @@ set :keep_releases,       3
 server "staging.platform.xagax.com", :app, :web
 
 set :rvm_type, :system 
-set :rvm_ruby_string, '1.9.3-p327' 
+set :rvm_ruby_string, '2.2.0@global' 
 require 'rvm/capistrano'
 set :rvm_bin_path, "/usr/local/rvm/bin"
 set :sudo, 'rvmsudo'

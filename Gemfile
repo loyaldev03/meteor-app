@@ -85,13 +85,11 @@ group :development do
   # -> deploy
   gem 'capistrano', '2.15.4'
   gem 'rvm-capistrano',  require: false
-  gem 'capistrano-campfire', '0.2.0'
   gem 'tinder'
   #####
   gem 'daemons'
   gem 'foreman'
   gem 'quiet_assets'
-  gem "bullet", '4.6.0'
 end
 
 gem 'tire'

@@ -47,11 +47,6 @@ task :restart_delayed_jobs do
   run "#{sudo} service #{application} restart" 
 end
 
-desc "Notify Campfire room"
-task :notify_campfire do
-  campfire_room.speak "#{cplatform} #{application}: env #{rails_env}"
-end
-
 namespace :elasticsearch do
   desc "start elasticsearch"
   task :start, :roles => :app, :except => { :no_release => true } do 
@@ -215,7 +210,6 @@ after "deploy:update", "deploy:migrate"
 after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
 after 'deploy:update', 'restart_delayed_jobs'
 after "deploy:update", "elasticsearch:reindex" if fetch(:elasticsearch_reindex, false)
-# after 'deploy', 'notify_campfire'
 after 'deploy', 'customtasks:customcleanup'
 after "deploy", "deploy:tag"
 
