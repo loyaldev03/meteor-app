@@ -6,14 +6,14 @@ class Agent < ActiveRecord::Base
 
   devise :database_authenticatable, :lockable, :timeoutable,
          :recoverable, :rememberable, :trackable, :validatable, 
-         :encryptable, :token_authenticatable, :async
+         :encryptable, 
+         :async
 
   ROLES = %W(admin api representative supervisor agency fulfillment_managment)
 
   acts_as_paranoid
-  validates_as_paranoid
 
-  has_many :created_members, :class_name => 'Membership'
+  has_many :created_members, class_name: 'Membership'
   has_many :operations
   has_many :fulfillment_files
   has_many :terms_of_memberships
@@ -26,16 +26,9 @@ class Agent < ActiveRecord::Base
   attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login, :first_name, 
     :last_name, :roles, :club_roles_attributes
 
-  validates_uniqueness_of_without_deleted :username
-  validates :username, :presence => true, :length => { :maximum => 20, :too_long => 'Pick a shorter username' }
-
-  before_save :ensure_authentication_token
-
-  def self.find_for_database_authentication(warden_conditions)
-    conditions = warden_conditions.dup
-    login = conditions.delete(:login)
-    where(conditions).where(["lower(username) = :value OR lower(email) = :value", { :value => login.strip.downcase }]).first
-  end
+  validates :username, presence: true, 
+                       length: { maximum: 20, too_long: 'Pick a shorter username' },
+                       uniqueness: { scope: :deleted_at }
 
   def self.datatable_columns
     [ 'id', 'email', 'username', 'created_at' ]
@@ -43,8 +36,8 @@ class Agent < ActiveRecord::Base
 
   has_many :club_roles
   has_many :clubs, 
-    through: :club_roles,
-    uniq: true
+    through: :club_roles
+   # uniq: true # TODO add uniqueness validation
 
   def which_is_the_role_for_this_club?(club_id)
     self.club_roles.where(club_id: club_id).first
@@ -145,47 +138,15 @@ class Agent < ActiveRecord::Base
   def can_agent_by_role_delete_club_role(club_role)
     self.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, self.clubs_related_id_list("admin")).count == 1
   end
-    
-  protected
 
-   # Attempt to find a user by it's email. If a record is found, send new
-   # password instructions to it. If not user is found, returns a new user
-   # with an email not found error.
-   def self.send_reset_password_instructions(attributes={})
-     recoverable = find_recoverable_or_initialize_with_errors(reset_password_keys, attributes, :not_found)
-     recoverable.send_reset_password_instructions if recoverable.persisted?
-     recoverable
-   end 
 
-   def self.find_recoverable_or_initialize_with_errors(required_attributes, attributes, error=:invalid)
-     (case_insensitive_keys || []).each { |k| attributes[k].try(:downcase!) }
-
-     attributes = attributes.slice(*required_attributes)
-     attributes.delete_if { |key, value| value.blank? }
-
-     if attributes.size == required_attributes.size
-       if attributes.has_key?(:login)
-          login = attributes[:login]
-          record = find_record(login)
-       else  
-         record = where(attributes).first
-       end  
-     end  
-
-     unless record
-       record = new
-
-       required_attributes.each do |key|
-         value = attributes[key]
-         record.send("#{key}=", value)
-         record.errors.add(key, value.present? ? error : :blank)
-       end  
-     end  
-     record
-   end
-
-   def self.find_record(login)
-      where(["username = :value OR email = :value", { :value => login }]).first
-   end
+    def self.find_for_database_authentication(warden_conditions)
+      conditions = warden_conditions.dup
+      if login = conditions.delete(:login)
+        where(conditions.to_h).where(["lower(username) = :value OR lower(email) = :value", { value: login.downcase }]).first
+      else
+        where(conditions.to_h).first
+      end
+    end
 
 end

@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
+  before_filter :authenticate_agent_from_token!
   before_filter :authenticate_agent!
   before_filter :validate_partner_presence
+  before_action :configure_permitted_parameters, if: :devise_controller?
   protect_from_forgery
 
   def after_sign_in_path_for(resource)
@@ -16,7 +18,23 @@ class ApplicationController < ActionController::Base
     render :file => "#{Rails.root}/public/401", :status => 401, :layout => false, :formats => [:html]
   end
 
+  protected
+
+    def configure_permitted_parameters
+      devise_parameter_sanitizer.for(:sign_in) { |u| u.permit(:login, :username, :email, :password, :remember_me) }
+      devise_parameter_sanitizer.for(:account_update) { |u| u.permit(:username, :email, :password, :password_confirmation, :current_password) }
+    end
+
   private
+
+    def authenticate_agent_from_token!
+      if params[:api_key]
+        agent = Agent.find_for_authentication(:authentication_token => params[:api_key])
+        if agent && Devise.secure_compare(agent.authentication_token, params[:api_key])
+          sign_in agent, store: false
+        end
+      end
+    end
 
     def my_authorize!(action, what, club_id = nil)
       raise CanCan::AccessDenied unless current_agent.can?(action, what, club_id)
@@ -49,7 +67,7 @@ class ApplicationController < ActionController::Base
           redirect_to admin_partners_path
           false
         elsif not params[:partner_prefix].nil?
-          @current_partner = Partner.find_by_prefix(params[:partner_prefix])
+          @current_partner = Partner.find_by(prefix: params[:partner_prefix])
           if @current_partner.nil?
             flash[:error] = "No partner was selected."
             redirect_to admin_partners_path
@@ -66,7 +84,7 @@ class ApplicationController < ActionController::Base
           redirect_to clubs_path
           false
         else
-          @current_club = @current_partner.clubs.find_by_name(params[:club_prefix])
+          @current_club = @current_partner.clubs.find_by(name: params[:club_prefix])
           if @current_club.nil?
             flash[:error] = "No club was selected."
             redirect_to clubs_path
@@ -86,7 +104,7 @@ class ApplicationController < ActionController::Base
           redirect_to clubs_path
           false
         else
-          @current_user = User.find_by_id_and_club_id(params[:user_prefix], @current_club.id)
+          @current_user = User.find_by(id: params[:user_prefix], club_id: @current_club.id)
           if @current_user.nil?
             flash[:error] = "No user was selected."
             redirect_to clubs_path

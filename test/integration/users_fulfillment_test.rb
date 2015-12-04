@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UsersFulfillmentTest < ActionController::IntegrationTest
+class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   ############################################################
   # SETUP
@@ -14,7 +14,7 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     @partner = @club.partner
     Time.zone = @club.time_zone
 
-    @product = Product.find_by_sku 'KIT-CARD'
+    @product = Product.find_by sku: 'KIT-CARD', club_id: @club.id
 
     if create_new_user
       @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
@@ -293,7 +293,11 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     fulfillment = Fulfillment.last
 
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table")do 
+      within("tr", text: @saved_user.club.name) do
+        click_on 'Fulfillments'
+      end
+    end
     page.has_content?("Fulfillments")
 
     within("#fulfillments_table")do
@@ -320,7 +324,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     setup_user(false)
 
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table")do 
+      within("tr", text: @club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
 
     within("#fulfillments_table")do
@@ -351,7 +357,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     fulfillment.set_as_in_process
 
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do
+      within("tr", text: @club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
 
     within("#fulfillments_table")do
@@ -392,7 +400,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
       fulfillment.set_as_in_process
     end
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do
+      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
     fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
     within("#fulfillments_table")do
@@ -424,8 +434,10 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
 
   #   fulfillment = Fulfillment.find_by_product_sku(@product.sku)
   #   fulfillment.set_as_in_process
-  #   click_link_or_button("My Clubs")
-  #   within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    # click_link_or_button("My Clubs")
+    # within("#my_clubs_table") do 
+    #   within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    #   end
   #   page.has_content?("Fulfillments")
   #   within("#fulfillments_table")do
   #     check('all_times')
@@ -470,7 +482,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
     fulfillment.set_as_in_process
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do
+      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -514,7 +528,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     product.save
 
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do
+      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -546,7 +562,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     product.save
 
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do
+      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -565,17 +583,17 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     end
     visit products_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#products_table") do 
-      within("tr", :text => product.name) do 
-        click_link_or_button 'Edit'
-      end
-    end   
+      within("tr", :text => product.name, exact: true){click_link_or_button 'Edit'}
+    end
 
     page.has_content?('Edit Product')
     fill_in 'product[stock]', :with => '10'
     click_link_or_button('Update Product')
 
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do
+      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -679,7 +697,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     @saved_user.set_wrong_address(@admin_agent, 'admin')
 
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do
+      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -704,7 +724,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     @saved_user.set_wrong_address(@admin_agent, 'admin')
     @fulfillment.reload
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do
+      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -965,7 +987,7 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     visit clubs_path(@partner.prefix)
 
     within("#clubs_table")do
-      click_link_or_button 'Products'
+      within('tr', text: unsaved_club.name, exact: true){ click_link_or_button 'Products' }
     end
 
     product_one = Product.first
@@ -983,14 +1005,16 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
   test "see product type at Fulfillment report page" do
     setup_user
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table")do 
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
       assert page.has_content?('Kit-card')
       assert page.has_content?('Sloops')
     end
-    end
+  end
 
   test "kit fulfillment without stock (allow backorder as true)." do
     setup_user(false)
@@ -1001,7 +1025,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     @saved_user = User.find_by_email(@user.email)
 
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table")do
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button 'Fulfillments' }
+    end
     page.has_content?("Fulfillments")
 
     fulfillment = Fulfillment.find_by_product_sku(@product.sku)
@@ -1027,14 +1053,16 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
-    @saved_user = User.find_by_email(@user.email)
+    @saved_user = User.find_by(email: @user.email)
 
     fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 
             'not_processed', Date.today, Date.today, @club.id])
     fulfillment = fulfillments.first
     
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table")do 
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    end
     page.has_content?("Fulfillments")
 
     fulfillment = Fulfillment.find_by_product_sku(@product.sku)
@@ -1078,7 +1106,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     fulfillment = fulfillments.first
     
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table")do
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    end
     page.has_content?("Fulfillments")
 
     fulfillment = Fulfillment.find_by_product_sku(@product.sku)
@@ -1133,7 +1163,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do 
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -1174,8 +1206,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
-    click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    
+    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -1202,8 +1235,8 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     fulfillment_other.set_as_in_process
     @saved_user.set_wrong_address(@admin_agent, 'reason')
 
-    click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -1277,7 +1310,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
       assert_equal(fulfillment.status,'not_processed')
       assert_equal(fulfillment.recurrent,false)
     click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    within("#my_clubs_table") do 
+      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+    end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -1324,8 +1359,9 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
     assert_equal((I18n.l(fulfillment.renewable_at, :format => :only_date)),(I18n.l(fulfillment.assigned_at + 1.year, :format => :only_date)))
     assert_equal(fulfillment.status,'not_processed')
     assert_equal(fulfillment.recurrent,true)
-    click_link_or_button("My Clubs")
-    within("#my_clubs_table"){click_link_or_button("Fulfillments")}
+    
+    visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
@@ -1437,11 +1473,11 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
 
     within("#clubs_table")do
       click_link_or_button 'Products'
-  end
+    end
 
-  within("#products_table")do
-    assert page.has_content?((product.stock-1).to_s)
-  end
+    within("#products_table")do
+      assert page.has_content?((product.stock-1).to_s)
+    end
     search_fulfillments(false, nil, nil, nil, 'sloops')
     within("#report_results"){
       assert page.has_content?(@saved_user.id.to_s)
@@ -1451,11 +1487,10 @@ class UsersFulfillmentTest < ActionController::IntegrationTest
 
   test "Pass product to Not Processed status without stock" do
     setup_user(false)
-    @product.update_attribute :stock , 0
-    @product.update_attribute :allow_backorder , false
+    @product.update_attributes stock: 0, allow_backorder: false
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{@product.sku}")
 
-    assert_difference("User.count",0)do
+    assert_difference("User.count",0) do
       create_user_throught_sloop(enrollment_info)
     end
     assert_equal @response.body, '{"message":"You are trying to move a member to a fulfillment queue for a product that has no stock. Add stock or set to allow backorders","code":"'+Settings.error_codes.product_out_of_stock+'"}'
@@ -2483,8 +2518,8 @@ test "Update the status of all the fulfillments - In process using individual ch
     FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club2.id, :created_at => Time.zone.now+2.days)
 
     visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    fulfillment_file = FulfillmentFile.find_all_by_club_id(@club.id)
-    fulfillment_file2 = FulfillmentFile.find_all_by_club_id(@club2.id)
+    fulfillment_file = FulfillmentFile.where(club_id: @club.id)
+    fulfillment_file2 = FulfillmentFile.where(club_id: @club2.id)
     within("#fulfillment_files_table")do
       assert page.has_content?( I18n.l(fulfillment_file.first.created_at.to_date) )     
       assert page.has_content?( I18n.l(fulfillment_file.last.created_at.to_date) )

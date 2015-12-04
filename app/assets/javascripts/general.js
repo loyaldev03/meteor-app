@@ -1,17 +1,19 @@
 $(document).ready( function() {
+  $('.help').popover({offset: 10, trigger: 'hover', html: true });
+
   $('.confirm').click( function(event){
     var answer = confirm('Are you sure?');
     return answer 
   });
 
-  $('.datatable').dataTable({
+  $('.datatable').DataTable({
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-    "sPaginationType": "bootstrap"
+    "sPaginationType": "full_numbers"
   });
 
-  $('.datatable_only_sorting').dataTable({
+  $('.datatable_only_sorting').DataTable({
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
     "bLengthChange": false,
     "bFilter": false,
     "bSort": true,
@@ -100,11 +102,11 @@ function endAjaxLoader(){
 };
 
 function agent_index_functions(column_count){
-  $('#agents_table').dataTable({
+  $('#agents_table').DataTable({
     "bJQueryUI": false,
     "bProcessing": true,
-    "sPaginationType": "bootstrap",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
@@ -115,9 +117,9 @@ function agent_index_functions(column_count){
 }
 
 function partner_index_functions(column_count){
-  $('#partners_table').dataTable({
-    "sPaginationType": "bootstrap",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+  $('#partners_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -130,8 +132,8 @@ function partner_index_functions(column_count){
 }
 
 function club_index_functions(column_count){
-  $('#clubs_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#clubs_table').DataTable({
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -149,8 +151,8 @@ function club_index_functions(column_count){
 }
 
 function delay_jobs_index_functions(column_count){
-  $('#delayed_jobs_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#delayed_jobs_table').DataTable({
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -166,8 +168,8 @@ function delay_jobs_index_functions(column_count){
 }
 
 function disposition_types_index_functions(column_count){
-  $('#disposition_types_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#disposition_types_table').DataTable({
+    "sPaginationType": "full_numbers",
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -180,8 +182,8 @@ function disposition_types_index_functions(column_count){
 }
 
 function my_club_index_functions(column_count){
-  $('#my_clubs_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#my_clubs_table').DataTable({
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -196,9 +198,9 @@ function my_club_index_functions(column_count){
   });
 }
 function domain_index_functions(column_count){
-  $('#domains_table').dataTable({
-    "sPaginationType": "bootstrap",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+  $('#domains_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -212,10 +214,9 @@ function domain_index_functions(column_count){
 }
 
 function product_index_functions(column_count){
-  $('.help').popover({offset: 10});
-  $('#products_table').dataTable({
-    "sPaginationType": "bootstrap",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+  $('#products_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -225,20 +226,21 @@ function product_index_functions(column_count){
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
     "sAjaxSource": $('#products_table').data('source'),
   });
-  $('a[data-toggle="custom-remote-modal"]').live("click", function(event){
+  $('#products_table').on("click",'a[data-toggle="custom-remote-modal"]', function(event){
     event.preventDefault();
     var targetModal = '#myModal'+ $(this).data('target');
     $(targetModal + ' .modal-body').load($(this).attr('href'), function(e) {
       $(targetModal).modal('show');
+      $('.help').popover({offset: 10, trigger: 'hover', html: true });
     });
   });
-  $('.modal-footer input').live("click", function(event){
+  $('#products_table').on('click', '.modal-footer input[type="submit"]', function(){
     $('#edit_product_'+$(this).data('target')).submit();
   });
-  $('.modal-body form').live('submit', function(event){
-    var productId = $(this).data('target');
-    startAjaxLoader();
+  $('#products_table').on('submit', '.modal-body form', function(event){
     event.preventDefault();
+    startAjaxLoader();
+    var productId = $(this).data('target');
     $.ajax({
       type: 'put',
       url: $(this).attr('action'),
@@ -246,7 +248,7 @@ function product_index_functions(column_count){
       success: function(data){
         endAjaxLoader();
         if(data.success == true){
-          $("#products_table").DataTable().fnReloadAjax();
+          $("#products_table").DataTable().ajax.reload();
           $('#myModal'+productId).modal('hide');
           flash_message("Product ID "+productId+" was updated successfully.", false)
         }else{
@@ -279,8 +281,8 @@ function product_index_functions(column_count){
 }
 
 function terms_of_memberships_table_index_functions(column_count) {
-  $('#terms_of_memberships_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#terms_of_memberships_table').DataTable({
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -294,15 +296,12 @@ function terms_of_memberships_table_index_functions(column_count) {
 }
 
 function new_partner_functions(){
-  $('.help').popover({offset: 10});
 }
 
 function new_domain_functions(){
-  $('.help').popover({offset: 10});
 }
 
 function new_product_functions(){
-  $('.help').popover({offset: 10});
 }
 
 function user_index_functions(){
@@ -404,7 +403,6 @@ function fetch_maketing_client_form(){
 };
 
 function clubs_form_functions(){
-  $('document').ready($('.help').popover({offset: 10}));
   $("#club_marketing_tool_client").change(function(){
     if($(this).val()!= ''){
       fetch_maketing_client_form(club_id, $(this).val());
@@ -470,7 +468,6 @@ function retrieve_information(){
 }
 
 function payment_gateway_configuration_functions(){
-  $('.help').popover({offset: 10});
 }
 
 function new_payment_gateway_configuration_functions(){
@@ -519,13 +516,13 @@ function new_payment_gateway_configuration_functions(){
 function new_user_functions(){
   $('#error_explanation').hide();
   $(".datepicker").datepicker({ constrainInput: true, 
-                                maxDate: 0, 
+                                maxDate: 0,
                                 dateFormat: "yy-mm-dd", 
-                                showOn: "both", 
+                                showOn: "both",
                                 buttonImage: "/icon-calendar.png", 
                                 changeMonth: true,
                                 changeYear: true,
-                                yearRange: '1900',
+                                yearRange: 'c-100:c',
                                 buttonImageOnly: true});
   $('#new_user').submit( function(event) {
     startAjaxLoader();
@@ -582,7 +579,7 @@ function new_user_functions(){
   });
   today = new Date()
   $('#setter_cc_blank').click(function(){
-    if ($('#setter_cc_blank').attr('checked')) {
+    if ($('#setter_cc_blank').prop('checked')) {
       $('#user_credit_card_number').val('0000000000');
       $('#user_credit_card_expire_month').val(today.getMonth() + 1);
       $('#user_credit_card_expire_year').val(today.getFullYear());
@@ -599,9 +596,6 @@ function new_user_functions(){
     }
   });  
 
-  $('#zip_help').popover({offset: 10});
-  $('.help').popover({offset: 10});
-  
   $('#user_country').on('change',  function(){
     country = $('#user_country').val();
     $.get(this.action, { country_code:country }, null, 'script'); 
@@ -613,6 +607,7 @@ function new_user_functions(){
       url: "../subscription_plans/"+$(this).val()+"/resumed_information",
       success: function(data){
         $("#th_terms_of_memberships .help").attr("data-content", data);
+        $("#th_terms_of_memberships .help").data('popover').options['content'] = data;
       }
     });
   });
@@ -627,7 +622,7 @@ function edit_user_functions(){
                                 buttonImage: "/icon-calendar.png", 
                                 changeMonth: true,
                                 changeYear: true,
-                                yearRange: '1900',
+                                yearRange: 'c-100:c',
                                 buttonImageOnly: true});    
 
   $('form').submit( function(event) {
@@ -664,8 +659,6 @@ function edit_user_functions(){
       }
     });
   });
-
-  $('.help').popover({offset: 10});
 
   $('#user_country').on('change',  function(){
     country = $('#user_country').val();
@@ -742,33 +735,31 @@ function sync_status_user_functions(column_count){
 }
 
 function operation_user_functions(column_count){
-  oTable2 = $('#operations_table').dataTable({
+  oTable2 = $('#operations_table').DataTable({
     "oLanguage": {"sSearch": "Filtered by:"},
     "bJQueryUI": false,
     "bProcessing": true,
-    "sPaginationType": "bootstrap",
-  "sDom": '<"top"flp>rt<"bottom"i>',
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"p>rt<"bottom"li>',
     "bServerSide": true,
     "aaSorting": [[ 1, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] }],
     "sAjaxSource": $('#operations_table').data('source'),
   });
 
-  $('#dataTableSelect').insertAfter('#operations_table_info')
-
-  $('.dataTables_filter').hide();
+  $('#operations_table_wrapper .top').prepend($("#dataTableSelect"));
   $(".dataselect").change( function () {
-      oTable2.fnFilter( $(this).val() );
+      oTable2.search( $(this).val() ).draw();
   });
 };
 
 function transactions_user_functions(column_count){
-  $('#transactions_table').dataTable({
+  $('#transactions_table').DataTable({
     "bJQueryUI": false,
     "bProcessing": true,
     "bFilter": false,
-    "sPaginationType": "bootstrap",
-  "sDom": '<"top"flp>rt<"bottom"i>',
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"li>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1,2,3,4,5,6 ] }],
@@ -777,11 +768,11 @@ function transactions_user_functions(column_count){
 }
 
 function memberships_user_functions(column_count){
-  $('#memberships_table').dataTable({
+  $('#memberships_table').DataTable({
     "bJQueryUI": false,
     "bProcessing": true,
     "bFilter": false,
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
   "sDom": '<"top"flp>rt<"bottom"i>',
     "bServerSide": true,
     "bLengthChange": false,
@@ -792,8 +783,8 @@ function memberships_user_functions(column_count){
 }
 
 function fulfillment_files_functions() {
-  $('#fulfillment_files_table').dataTable({
-    "sPaginationType": "bootstrap",
+  $('#fulfillment_files_table').DataTable({
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
@@ -811,7 +802,7 @@ function fulfillment_files_functions() {
   });
   $(".dataTables_paginate").css({ float: "left" });
 
-  $("#mark_as_sent").live("click", function(event){
+  $("#fulfillment_files_table").on('click', '#mark_as_sent', function(event){
     if($(this).attr('disabled') == 'disabled'){
       event.preventDefault();
     }else{
@@ -825,12 +816,12 @@ function fulfillment_files_functions() {
 }  
 
 function club_cash_transactions_functions(column_count){
-  $('#club_cash_transactions_table').dataTable({
+  $('#club_cash_transactions_table').DataTable({
     "oLanguage": {"sSearch": "Filtered by:"},
     "bJQueryUI": false,
     "bProcessing": true,
-    "sPaginationType": "bootstrap",
-    "sDom": '<"top"flp>rt<"bottom"i>',
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"li>',
     "bServerSide": true,
     "aaSorting": [[ 0, "desc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
@@ -847,7 +838,6 @@ function show_user_functions(){
       event.preventDefault(); 
   })
 
-  $('.help').popover();
   mark_as_sent_fulfillment("../fulfillments/");
   resend_fulfillment("../fulfillments/");
 
@@ -951,7 +941,7 @@ function chargeback_user_functions(){
                                 buttonImage: "/icon-calendar.png", 
                                 changeMonth: true,
                                 changeYear: true,
-                                yearRange: '1900',
+                                yearRange: 'c-100:c',
                                 buttonImageOnly: true});
 }
 
@@ -1174,7 +1164,7 @@ function recover_user_functions(){
 function admin_form_functions(){
   var count = 0;
 
-  $('#add_new_club_role').live("click", function(event){
+  $('#club_role_table').on('click', '#add_new_club_role', function(event){
     var role_list = roles.split(",");
     var club_list = clubs.split(";");
     event.preventDefault();
@@ -1205,7 +1195,7 @@ function admin_form_functions(){
     });
   });
 
-  $("*[id^='agent_roles']").live("click", function(){
+  $("#div_agent_roles").on('click', "*[id^='agent_roles']", function(){
     $("#clear_global_role").show();
   });
 
@@ -1217,12 +1207,11 @@ function admin_form_functions(){
     });
   });
 
-  $("*[id$='_club_id']:not[:last]").live("change", function() {
+  $("#club_role_table").on('change', "*[id$='_club_id']:not(:last)", function() {
     var name = $(this).attr("name");
     var lastRole = $(this).data('lastValue');
     var newRole = $(this).val();
     var success = true;
-
     $("*[id$='_club_id']").each( function(){
       if(newRole == $(this).val() && name != $(this).attr("name")){ 
         success = false;
@@ -1237,14 +1226,14 @@ function admin_form_functions(){
     }
   });
 
-  $("#new_club_role_delete").live("click", function(){
+  $('#club_role_table').on('click', '#new_club_role_delete', function(){
     if (confirm("Are you sure you want to delete this club role?")) {
       $("#club_role_table tr[id='tr_new_club_rol_["+$(this).attr('name')+"]']").remove();
       club_list = clubs.split(";");
     }
   });
 
-  $("#club_role_edit").live("click", function(event){
+  $('#club_role_table').on('click', '#club_role_edit', function(event){
     event.preventDefault();
     var role_list = roles.split(",");
     club_role_id = $(this).attr('name');
@@ -1260,7 +1249,7 @@ function admin_form_functions(){
     $("#club_role_table tr td[id='td_club_role_buttons_"+club_role_id+"']").prepend("<input type='button' id='club_role_update' name='"+club_role_id+"' class='btn-primary btn-mini' value='Update'></td>");
   });   
 
-  $("#club_role_update").live("click", function(event){
+  $('#club_role_table').on('click', '#club_role_update', function(event){
     event.preventDefault();
     if (confirm("Are you sure you want to update this club role?")) {
       var new_role = $("#select_club_role_"+$(this).attr('name')).val();
@@ -1286,7 +1275,7 @@ function admin_form_functions(){
     } 
   });
 
-  $("#club_role_delete").live("click", function(event){
+  $('#club_role_table').on('click', '#club_role_delete', function(event){
     event.preventDefault();
     if (confirm("Are you sure you want to delete this club role?")) {
       array = $(this).attr('name').split(";");
@@ -1325,7 +1314,6 @@ function admin_form_functions(){
 // TOM Wizard functions
 // Creates the wizard
 function new_tom_functions() {
-  $('.help').popover({offset: 10});
   tom_create_wizard();
 }
 
@@ -1375,8 +1363,6 @@ function switch_days() {
 }
 
 function email_templates_functions() {
-  $('.help').popover({offset: 10});
-
   $("#email_template_template_type").change(function() {
     switch_days();
   });
@@ -1397,11 +1383,11 @@ function email_templates_functions() {
 }
 
 function email_templates_table_index_functions(column_count) {
-  $('#email_templates_table').dataTable({
+  $('#email_templates_table').DataTable({
     "bJQueryUI": false,
     "bProcessing": true,
     "bFilter": true,
-    "sPaginationType": "bootstrap",
+    "sPaginationType": "full_numbers",
     "sDom": '<"top"lf>rt<"bottom"pi>',
     "bServerSide": true,
     "bLengthChange": false,
@@ -1414,7 +1400,7 @@ function email_templates_table_index_functions(column_count) {
 
 function test_communications_functions() {
   $('#test_communication').submit(function(event){ event.preventDefault() });
-  $("#communications_table a").live("click", function(event){
+  $("#communications_table").on('click', 'a', function(event){
     if($("#test_communication").valid()){
       event.preventDefault();
       is_processing = false;

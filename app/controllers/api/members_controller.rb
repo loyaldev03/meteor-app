@@ -590,7 +590,7 @@ class Api::MembersController < ApplicationController
     new_tom = TermsOfMembership.find(params[:terms_of_membership_id])
     my_authorize! :api_change, TermsOfMembership, new_tom.club_id
 
-    user = User.find(:first, :conditions => ["club_id = ? AND ( id = ? OR email = ? )", new_tom.club_id, params[:id_or_email], params[:id_or_email]])
+    user = User.find_by("club_id = ? AND ( id = ? OR email = ? )", new_tom.club_id, params[:id_or_email], params[:id_or_email])
     raise ActiveRecord::RecordNotFound if user.nil?
     prorated = params[:prorated].nil? ? true : params[:prorated].to_s.to_bool
 
@@ -673,8 +673,8 @@ class Api::MembersController < ApplicationController
                    :banner_url => club.non_member_banner_url ,:code => Settings.error_codes.success }
       else 
         user = User.new email: params[:email]
-        if EmailValidator.new(user).validate(user).nil?
-          user = User.find_by_club_id_and_email(club.id, params[:email])
+        if EmailValidator.new.validate(user).nil?
+          user = User.find_by(club_id: club.id, email: params[:email])
           if user
             answer = { :message => "Email address belongs to an already created member.", :landing_url => club.member_landing_url, 
                      :banner_url => club.member_banner_url, :member_id => user.id, :code => Settings.error_codes.success }

@@ -26,7 +26,7 @@ class Api::ProductsController < ApplicationController
   #
   def get_stock
     my_authorize! :manage_product_api, Product, params[:club_id]
-    product = Product.find_by_sku_and_club_id(params[:sku],params[:club_id])
+    product = Product.find_by(sku: params[:sku], club_id: params[:club_id])
     if product.nil?
       render json: { code: Settings.error_codes.not_found, message: 'Product not found' }
     else
@@ -67,7 +67,7 @@ class Api::ProductsController < ApplicationController
     if skus.count == 0 or params[:club_id].blank?
       response = { code: Settings.error_codes.wrong_data, message: 'Please check params, There seems to be some missing.' }
     else
-      products = Product.find_all_by_sku_and_club_id(skus, params[:club_id])
+      products = Product.where(sku: skus, club_id: params[:club_id])
       product_list = []
       products.each{ |product| product_list << { sku: product.sku, stock: product.stock, allow_backorder: product.allow_backorder } }
       skus_found = products.each.collect &:sku

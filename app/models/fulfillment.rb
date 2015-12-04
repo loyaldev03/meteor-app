@@ -21,24 +21,24 @@ class Fulfillment < ActiveRecord::Base
   KIT_CARD_HEADER = ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
                 'ADDRESS','CITY','STATE','ZIP','Product','Charter Member Status' ]
 
-  scope :where_bad_address, lambda { where("status in ('bad_address','returned')") }
-  scope :where_in_process, lambda { where("status = 'in_process'") }
-  scope :where_not_processed, lambda { where("status = 'not_processed'") }
-  scope :where_to_set_bad_address, lambda { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
-  scope :where_cancellable, lambda { where("status IN ('not_processed','in_process','out_of_stock','bad_address')") }
-  scope :type_others, lambda { where(["product_sku NOT IN (?)", Settings.kit_card_product])}
+  scope :where_bad_address, -> { where("status in ('bad_address','returned')") }
+  scope :where_in_process, -> { where("status = 'in_process'") }
+  scope :where_not_processed, -> { where("status = 'not_processed'") }
+  scope :where_to_set_bad_address, -> { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
+  scope :where_cancellable, -> { where("status IN ('not_processed','in_process','out_of_stock','bad_address')") }
+  scope :type_others, -> { where(["product_sku NOT IN (?)", Settings.kit_card_product])}
 
-  scope :not_renewed, lambda { where("renewed = false") }
+  scope :not_renewed, -> { where("renewed = false") }
 
-  scope :to_be_renewed, lambda { joins(:user => :club).readonly(false).where([ 
+  scope :to_be_renewed, -> { joins(user: :club).readonly(false).where([ 
     " date(renewable_at) <= ? AND fulfillments.status NOT IN ('canceled', 'in_process') 
       AND recurrent = true AND renewed = false AND clubs.billing_enable = true 
       AND users.status = 'active' AND users.recycled_times = 0",  
     Time.zone.now.to_date]) }
 
-  delegate :club, :to => :user
+  delegate :club, to: :user
 
-  state_machine :status, :initial => :not_processed do
+  state_machine :status, initial: :not_processed do
 
     event :set_as_not_processed do
       transition all => :not_processed
@@ -127,21 +127,21 @@ class Fulfillment < ActiveRecord::Base
   def update_status(agent, new_status, reason, file = nil)
     old_status = self.status
     if renewed?
-      return {:message => I18n.t("error_messages.fulfillment_is_renwed") , :code => Settings.error_codes.fulfillment_error }
+      return {message: I18n.t("error_messages.fulfillment_is_renwed") , code: Settings.error_codes.fulfillment_error }
     elsif new_status.blank?
-      return {:message => I18n.t("error_messages.fulfillment_new_status_blank") , :code => Settings.error_codes.fulfillment_error }
+      return {message: I18n.t("error_messages.fulfillment_new_status_blank") , code: Settings.error_codes.fulfillment_error }
     elsif old_status == new_status
-      return {:message => I18n.t("error_messages.fulfillment_new_status_equal_to_old", :fulfillment_sku => self.product_sku) , :code => Settings.error_codes.fulfillment_error }
+      return {message: I18n.t("error_messages.fulfillment_new_status_equal_to_old", fulfillment_sku: self.product_sku) , code: Settings.error_codes.fulfillment_error }
     elsif new_status == 'bad_address' or new_status == 'returned'
       if reason.blank?
-        return {:message => I18n.t("error_messages.fulfillment_reason_blank"), :code => Settings.error_codes.fulfillment_reason_blank}
+        return {message: I18n.t("error_messages.fulfillment_reason_blank"), code: Settings.error_codes.fulfillment_reason_blank}
       else
-        answer = ( user.wrong_address.nil? ? user.set_wrong_address(agent, reason, false) : {:code => Settings.error_codes.success, :message => "Member already set as wrong address."} )
+        answer = ( user.wrong_address.nil? ? user.set_wrong_address(agent, reason, false) : {code: Settings.error_codes.success, message: "Member already set as wrong address."} )
       end
     elsif new_status == 'not_processed'
       answer = decrease_stock!
     else
-      answer = { :code => Settings.error_codes.success }
+      answer = { code: Settings.error_codes.success }
     end
     if answer[:code] == Settings.error_codes.success        
       self.status = new_status
@@ -160,11 +160,11 @@ class Fulfillment < ActiveRecord::Base
       message = "Changed status on File ##{file} Fulfillment ##{self.id} #{self.product_sku} from #{old_status} to #{self.status}" + (reason.blank? ? "" : " - Reason: #{reason}")
     end
     Auditory.audit(agent, self, message, user, Settings.operation_types["from_#{old_status}_to_#{self.status}"])
-    return { :message => message, :code => Settings.error_codes.success }
+    return { message: message, code: Settings.error_codes.success }
   rescue Exception => e
     message = I18n.t('error_messages.fulfillment_error')
     Auditory.audit(agent, self, message, user, Settings.error_codes.fulfillment_error )
-    return { :message => message, :code => Settings.error_codes.fulfillment_error }
+    return { message: message, code: Settings.error_codes.fulfillment_error }
   end
 
   # def resend(agent)
@@ -193,8 +193,8 @@ class Fulfillment < ActiveRecord::Base
     end
     user = self.user
     if fulfillment_file.kit_kard_type?
-      [ user.id, user.first_name, user.last_name, (I18n.l user.member_since_date, :format => :only_date_short),
-              (I18n.l self.renewable_at, :format => :only_date_short if self.renewable_at), user.address, user.city,
+      [ user.id, user.first_name, user.last_name, (I18n.l user.member_since_date, format: :only_date_short),
+              (I18n.l self.renewable_at, format: :only_date_short if self.renewable_at), user.address, user.city,
               user.state,"=\"#{user.zip}\"", self.product_sku, ('C' if user.member_group_type_id) ]
     else
       [ self.tracking_code, self.product.cost_center, user.full_name, user.address, user.city,
@@ -204,7 +204,7 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def product
-    @product ||= Product.find_by_sku_and_club_id(self.product_sku, self.user.club_id)
+    @product ||= Product.find_by(sku: self.product_sku, club_id: self.user.club_id)
   end
 
   private

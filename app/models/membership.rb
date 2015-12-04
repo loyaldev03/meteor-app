@@ -1,7 +1,7 @@
 class Membership < ActiveRecord::Base
   belongs_to :terms_of_membership
   belongs_to :user
-  belongs_to :created_by, :class_name => 'Agent', :foreign_key => 'created_by_id'
+  belongs_to :created_by, class_name: 'Agent', foreign_key: 'created_by_id'
   has_one :enrollment_info
   has_many :transactions
 
@@ -15,6 +15,6 @@ class Membership < ActiveRecord::Base
   end
 
   def cancel_because_of_membership_change
-    self.update_attributes :cancel_date => Time.zone.now, :status => 'lapsed'
+    self.update_attributes cancel_date: Time.zone.now, status: 'lapsed'
   end
 end

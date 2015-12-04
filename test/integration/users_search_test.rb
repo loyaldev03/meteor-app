@@ -1,6 +1,6 @@
 require 'test_helper'
  
-class UsersSearchTest < ActionController::IntegrationTest
+class UsersSearchTest < ActionDispatch::IntegrationTest
 
   transactions_table_empty_text = "No data available in table"
   operations_table_empty_text = "No data available in table"
@@ -18,6 +18,8 @@ class UsersSearchTest < ActionController::IntegrationTest
   end
 
   def setup_user(create_new_user = true)
+    unstubs_elasticsearch_index
+
     @default_state = "Alabama" # when we select options we do it by option text not by value ?
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
@@ -85,10 +87,10 @@ class UsersSearchTest < ActionController::IntegrationTest
     2.times{ create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc, nil, {}, { :created_by => @admin_agent }) }
     2.times{ create_active_user(@terms_of_membership_with_gateway, :lapsed_user, nil, {}, { :created_by => @admin_agent }) }
     create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc, nil, {}, { :created_by => @admin_agent })
-  
-    active_user = User.find_by_status 'active'
-    provisional_user = User.find_by_status 'provisional'
-    lapsed_user = User.find_by_status 'lapsed'
+    
+    active_user = User.find_by status: 'active'
+    provisional_user = User.find_by status: 'provisional'
+    lapsed_user = User.find_by status: 'lapsed'
     duplicated_name_user = User.last
     duplicated_name_user.update_attribute(:last_name, "Elwood")
     duplicated_name_user.index.store duplicated_name_user
@@ -133,14 +135,15 @@ class UsersSearchTest < ActionController::IntegrationTest
     setup_search
     cc_last_digits = 8965
     @search_user.active_credit_card.update_attribute :last_digits, cc_last_digits
-    @search_user.asyn_elasticsearch_index_without_delay
-    sleep 1
+    @search_user.index.store @search_user
+
     within("#payment_details")do
       fill_in "user[cc_last_digits]", :with => cc_last_digits.to_s
     end
     within('#index_search_form') do 
       click_on 'Search'
     end
+
     within("#users")do
       find("tr", :text => @search_user.full_name)
     end
@@ -181,6 +184,7 @@ class UsersSearchTest < ActionController::IntegrationTest
 
   test "View token in user record - Admin and Supervisor role" do
     setup_user(false)
+    stubs_elasticsearch_index
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
@@ -201,6 +205,7 @@ class UsersSearchTest < ActionController::IntegrationTest
 
   test "View token in user record - Representative rol" do
     setup_user(false)
+    stubs_elasticsearch_index
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
@@ -243,7 +248,6 @@ class UsersSearchTest < ActionController::IntegrationTest
       assert page.has_content?("4")      
       assert page.has_content?("Next")
     end
-
     within("#users")do
       begin 
         assert assert page.has_no_content?(User.where("club_id = ?", @club.id).order("id DESC").last.full_name)
@@ -330,7 +334,7 @@ class UsersSearchTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card)
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
-    @saved_user = User.find_by_email unsaved_user.email
+    @saved_user = User.find_by email: unsaved_user.email
     
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -355,7 +359,7 @@ class UsersSearchTest < ActionController::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card)
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
-    @saved_user = User.find_by_email unsaved_user.email
+    @saved_user = User.find_by email: unsaved_user.email
 
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -369,19 +373,6 @@ class UsersSearchTest < ActionController::IntegrationTest
     within("#table_membership_information") do  
       within("#td_mi_status") { assert page.has_content?('lapsed') }
     end
-  end
-
-  test "create user without type of phone number" do
-    setup_user(false)
-
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    unsaved_user.type_of_phone_number = ''
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    create_user(unsaved_user,nil, nil, true)
-    @saved_user = User.find_by_email(unsaved_user.email)
-    assert find_field('input_first_name').value == @saved_user.first_name
-    @saved_user.reload
-    assert_equal(@saved_user.type_of_phone_number, '')
   end
 
   test "canceled date will be abble to be cancelled once set." do

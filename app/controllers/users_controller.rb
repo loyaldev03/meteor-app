@@ -62,7 +62,7 @@ class UsersController < ApplicationController
       flash[:error] = "User ID not provided."
       redirect_to root_path
     else
-      user = User.find_by_id(params[:user_id])
+      user = User.find_by(id: params[:user_id])
       if user 
         redirect_to show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
       else
@@ -89,7 +89,7 @@ class UsersController < ApplicationController
 
   def edit  
     @user = @current_user
-    @member_group_types = MemberGroupType.find_all_by_club_id(@current_club)
+    @member_group_types = MemberGroupType.where(club_id: @current_club)
     @country = Carmen::Country.coded(@user.country)
     @months = 1..12
     @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
@@ -97,7 +97,7 @@ class UsersController < ApplicationController
 
   def save_the_sale
     if request.post?
-      if TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id).nil?
+      if TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id).nil?
         flash[:error] = "Subscription plan not found"
         redirect_to show_user_path
       else
@@ -114,7 +114,7 @@ class UsersController < ApplicationController
 
   def recover
     if request.post?
-      tom = TermsOfMembership.find_by_id_and_club_id(params[:terms_of_membership_id], @current_club.id)
+      tom = TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id)
       if tom.nil?
         flash[:error] = "Subscription plan not found"
       else
@@ -134,7 +134,7 @@ class UsersController < ApplicationController
   end
 
   def refund
-    @transaction = Transaction.find_by_id_and_user_id params[:transaction_id], @current_user.id
+    @transaction = Transaction.find_by(id: params[:transaction_id], user_id: @current_user.id)
     if @transaction.nil?
       flash[:error] = "Transaction not found."
       redirect_to show_user_path
@@ -423,7 +423,7 @@ class UsersController < ApplicationController
 
   def notes_content
     my_authorize! :list, UserNote, @current_club.id
-    @notes = @current_user.user_notes.includes([ :communication_type, :disposition_type ]).paginate(:page => params[:page], :per_page => 10, :order => "created_at DESC")
+    @notes = @current_user.user_notes.includes([ :communication_type, :disposition_type ]).paginate(page: params[:page], per_page: 10).order("created_at DESC")
     render :partial => 'users/notes', :locals => { :notes => @notes }
   end
 

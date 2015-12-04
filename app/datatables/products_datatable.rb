@@ -2,7 +2,7 @@ class ProductsDatatable < Datatable
 private
 
   def total_records
-    Product.find_all_by_club_id(@current_club.id).count
+    Product.where(club_id: @current_club.id).count
   end
 
   def total_entries
@@ -44,7 +44,7 @@ private
   end
 
   def edit_modal(product)
-    "<div id='myModal#{product.id}' class='well modal hide' style='border: none;'>
+    "<div id='myModal#{product.id}' class='well modal hide' style='border: none; width:750px; margin-left:-375px'>
       <div class='modal-header'>
         <a href='#' class='close' data-dismiss='modal'>&times;</a>
         <h3>Edit Product ID #{product.id} - #{product.name}</h3>

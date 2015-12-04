@@ -1,45 +1,46 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.16'
+gem 'rails', '4.2.3'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'mysql2', '0.3.11'
+gem 'mysql2', '~> 0.3.18'
 gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
 
-gem 'acts_as_list', '0.2.0'
+gem 'acts_as_list', "0.7.2"
 gem 'delayed_job_active_record'
-gem "delayed_job_web"
+gem "delayed_job_web" # FIXME it is not working in rails 4 
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
 
+gem 'json', '1.8.3'
+
 gem 'turnout'
-gem 'exact_target_sdk', github: 'stoneacre/exact_target_sdk'
+gem 'exact_target_sdk', github: 'daws/exact_target_sdk'
 gem 'gibbon'
 gem 'mandrill-api'
 
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
-
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  gem 'therubyracer', :platform => :ruby
-
-  gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
-  gem 'jquery-ui-rails', '1.1.0'
-  gem 'uglifier', '>= 1.0.3'
+  gem 'sass-rails'
+  gem 'coffee-rails'
+  gem 'uglifier'
 end
+
+
+gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
+gem 'jquery-ui-rails'
 
 gem 'carmen-rails'
 gem 'country_code_select', '~> 1.0.0' 
 gem 'i18n-country-translations'
-gem 'devise', '2.0.4'
-gem 'devise-async', :branch => 'devise_2_1'
+gem 'devise'
+gem 'devise-async'
+gem 'devise-encryptable'
 gem 'settingslogic', '2.0.8'
 gem 'wirble'
 gem 'bootstrap-will_paginate'
@@ -52,11 +53,11 @@ gem 'cancan'
 gem 'easy_roles'
 gem "axlsx", "~> 2.0.1"
 
-gem 'twitter-bootstrap-rails', '2.0.6'
+gem 'twitter-bootstrap-rails', '2.2.7'
 
-gem 'jquery-rails', '2.0.3'
+gem 'jquery-rails'
 
-gem 'acts_as_paranoid'
+gem "paranoia", "~> 2.0"
 
 #gem "airbrake"
 gem "zendesk_api"
@@ -75,35 +76,28 @@ gem 'oboe'
 
 # To use debugger
 group :development do
-  gem 'debugger'
   gem "rails-erd"
   gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
   gem "yard"  , :git => 'git://github.com/stoneacre/yard.git'
   gem 'yard-rest'
   gem 'redcarpet'
-  gem "bullet", '4.6.0'
   gem 'ruby-prof'
   # -> deploy
-  gem 'rvm-capistrano'
+  gem 'capistrano', '2.15.4'
+  gem 'rvm-capistrano',  require: false
   gem 'capistrano-campfire', '0.2.0'
-  gem 'tinder', '1.9.2'
+  gem 'tinder'
   #####
   gem 'daemons'
   gem 'foreman'
   gem 'quiet_assets'
-end
-
-group :prototype do
   gem "bullet", '4.6.0'
-  
 end
 
 gem 'tire'
 gem 'progress_bar'
 
-
 group :test do
-  gem 'turn'
   gem 'factory_girl_rails'
   gem 'faker'
   gem 'mocha', require: false
@@ -111,11 +105,15 @@ group :test do
   gem 'selenium-webdriver', '>=2.45.0'
   gem 'brakeman'
   gem 'simplecov'
-  gem 'database_cleaner'
   gem "timecop"
+  gem 'connection_pool'
 end
 
-gem 'activemerchant', '1.42.4'
+group :test, :development do
+  gem 'byebug'
+end
+
+gem 'activemerchant'
 gem 'LitleOnline', '8.16.0'
 
 # TODO => remove the following requires after tokenization is implemented
@@ -123,5 +121,6 @@ gem 'LitleOnline', '8.16.0'
 gem 'encryptor'
 ###################
 
-gem 'bureaucrat', :github => 'vsizov/bureaucrat'
+gem 'bureaucrat'
 
+gem 'protected_attributes' # TODO: remove this gem after upgrading

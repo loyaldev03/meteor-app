@@ -3,7 +3,7 @@ class DomainsDatatable < Datatable
 private
 
   def total_records
-    Domain.find_all_by_partner_id(@current_partner.id).count
+    Domain.where(partner_id: @current_partner.id).count
   end
 
   def total_entries

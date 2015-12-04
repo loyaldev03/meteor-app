@@ -8,8 +8,7 @@ module TasksHelpers
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
 
-    base = User.includes(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND users.club_id IN (select id from clubs where billing_enable = true) AND users.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now.to_date).limit(4000)
-
+    base = User.joins(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND users.club_id IN (select id from clubs where billing_enable = true) AND users.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now.to_date).limit(4000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:billing rake task, processing #{base.length} users"
     base.to_enum.with_index.each do |user,index| 
       tz = Time.zone.now
@@ -67,7 +66,7 @@ module TasksHelpers
 
   # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
-    base = User.includes(:club).where("date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member' AND club_cash_enable = true", Time.zone.now.to_date).limit(2000)
+    base = User.joins(:club).where("date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member' AND club_cash_enable = true", Time.zone.now.to_date).limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{base.length} users"
     base.to_enum.with_index.each do |user,index|
       tz = Time.zone.now
@@ -88,8 +87,8 @@ module TasksHelpers
   # Method used from rake task and also from tests!
   def self.cancel_all_member_up_today
     enabled_clubs = Club.where(billing_enable: true).pluck(:id)
-    base = User.includes(:current_membership).where("club_id IN (?) AND date(memberships.cancel_date) <= ? AND memberships.status != ? ", enabled_clubs, Time.zone.now.to_date, 'lapsed')
-    base_for_manual_payment = User.includes(:current_membership).where("club_id IN (?) AND manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", enabled_clubs, Time.zone.now.to_date, 'lapsed')
+    base = User.joins(:current_membership).where("club_id IN (?) AND date(memberships.cancel_date) <= ? AND memberships.status != ? ", enabled_clubs, Time.zone.now.to_date, 'lapsed')
+    base_for_manual_payment = User.joins(:current_membership).where("club_id IN (?) AND manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", enabled_clubs, Time.zone.now.to_date, 'lapsed')
    
     [base, base_for_manual_payment].each do |list|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:cancel_all_member_up_today rake task, processing #{base.length} users"
@@ -310,7 +309,7 @@ module TasksHelpers
   def self.process_fulfillments_up_today
     index = 0
     Fulfillment.to_be_renewed.find_in_batches do |group|
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_fulfillments_up_today rake task, processing #{group.count} fulfillments"
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_fulfillments_up_today rake task, processing #{group.size} fulfillments"
       group.each do |fulfillment| 
         begin
           index = index+1

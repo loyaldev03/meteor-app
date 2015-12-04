@@ -58,7 +58,7 @@ private
   end
   
   def modal(operation)
-    "<div id='myModal" + operation.id.to_s + "' class='well modal hide' style='border: none;'>
+    "<div id='myModal#{operation.id.to_s}' class='modal hide fade' tabindex='-1'role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
       <div class='modal-header'>
         <a href='#' class='close' data-dismiss='modal'>&times</a>
         <h3>Note</h3>

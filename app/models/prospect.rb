@@ -35,7 +35,7 @@ class Prospect < ActiveRecord::Base
   def marketing_tool_sync
     marketing_tool_sync_without_dj
   end
-  handle_asynchronously :marketing_tool_sync, :queue => :exact_target_sync
+  handle_asynchronously :marketing_tool_sync, queue: :exact_target_sync
 
   def skip_sync!
      @skip_sync = true

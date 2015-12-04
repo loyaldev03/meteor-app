@@ -11,7 +11,7 @@ class MerchantESolutionsTransaction < Transaction
   # AM::Store::Answer => #<ActiveMerchant::Billing::Response:0x0000000718c228 @params={"transaction_id"=>"1e9be6d0b4303619897d20524de49372", "error_code"=>"000", "auth_response_text"=>"Card Data Stored"}, @message="This transaction has been approved", @success=true, @test=true, @authorization="1e9be6d0b4303619897d20524de49372", @fraud_review=nil, @avs_result={"code"=>nil, "message"=>nil, "street_match"=>nil, "postal_match"=>nil}, @cvv_result={"code"=>nil, "message"=>nil}>
   def self.store!(am_credit_card, pgc)
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
-    login_data = { :login => pgc.login, :password => pgc.password, :merchant_key => pgc.merchant_key }
+    login_data = { login: pgc.login, password: pgc.password, merchant_key: pgc.merchant_key }
     gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(login_data)
     answer = gateway.store(am_credit_card)
     logger.error "AM::Store::Answer => " + answer.inspect
@@ -20,7 +20,7 @@ class MerchantESolutionsTransaction < Transaction
   end
 
   def new_chargeback!(sale_transaction, args)
-    trans = MerchantESolutionsTransaction.find_by_response args.to_json
+    trans = MerchantESolutionsTransaction.find_by(response: args.to_json)
     if trans.nil?
       if args[:adjudication_date].last == '+'
         chargeback_amount = args[:transaction_amount].to_f
@@ -50,10 +50,10 @@ class MerchantESolutionsTransaction < Transaction
   end
 
   def fill_transaction_type_for_credit(sale_transaction)
-    if sale_transaction.amount.to_f == amount.abs
+    if sale_transaction.amount.to_f == amount.abs.to_f
       self.transaction_type = "refund"
       self.refund_response_transaction_id = sale_transaction.response_transaction_id
-    elsif sale_transaction.amount.to_f > amount.abs
+    elsif sale_transaction.amount.to_f > amount.abs.to_f
       self.transaction_type = "credit"
     end
   end    
@@ -78,7 +78,7 @@ class MerchantESolutionsTransaction < Transaction
     end
 
     def load_gateway(recurrent = false)
-      @login_data = { :login => login, :password => password, :merchant_key => merchant_key }
+      @login_data = { login: login, password: password, merchant_key: merchant_key }
       @gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(@login_data)
       @options[:customer] = user_id 
       @options[:moto_ecommerce_ind] = 2 if recurrent

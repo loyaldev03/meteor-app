@@ -1,6 +1,6 @@
   require 'test_helper'
  
-class UserProfileEditTest < ActionController::IntegrationTest
+class UserProfileEditTest < ActionDispatch::IntegrationTest
 
 
   ############################################################
@@ -32,7 +32,7 @@ class UserProfileEditTest < ActionController::IntegrationTest
 
       @terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-      @saved_user = User.find_by_email(unsaved_user.email)
+      @saved_user = User.find_by(email: unsaved_user.email)
     end
 
     sign_in_as(@admin_agent)
@@ -159,7 +159,6 @@ class UserProfileEditTest < ActionController::IntegrationTest
     assert find_field('input_first_name').value == @saved_user.first_name
   end
 
-
   test "set undeliverable address" do
     setup_user
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -220,7 +219,6 @@ class UserProfileEditTest < ActionController::IntegrationTest
     }
     confirm_ok_js
     within("#credit_cards"){ click_link_or_button 'Activate' }
-    
     within('.nav-tabs'){ click_on 'Credit Cards'}
     within("#credit_cards") {
       within(".ligthgreen") {
@@ -510,9 +508,9 @@ class UserProfileEditTest < ActionController::IntegrationTest
     within("#credit_cards"){ assert page.has_no_selector?("#destroy") }
   end
 
-  # Do not allow to remove credit card from users that are Blacklisted
-  # Do not see Destroy button at Credit Card tab
-  # Credit card 7913 added and activated.
+  # # Do not allow to remove credit card from users that are Blacklisted
+  # # Do not see Destroy button at Credit Card tab
+  # # Credit card 7913 added and activated.
   test "Delete credit card only when user is lapsed and is not blacklisted (and credit card is not the last one)" do
     setup_user
     second_credit_card = FactoryGirl.create(:credit_card_american_express , :user_id => @saved_user.id, :active => false)
@@ -604,8 +602,8 @@ class UserProfileEditTest < ActionController::IntegrationTest
       FactoryGirl.create(:transaction, user_id: @saved_user.id, transaction_type: "sale", response_result: index, response_transaction_id: index, gateway: "mes")
       sleep 0.25
     end
-    first_transaction = Transaction.find_by_response_result 0
-    last_transaction = Transaction.find_by_response_result 11
+    first_transaction = Transaction.find_by response_result: 0
+    last_transaction = Transaction.find_by response_result: 11
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table")do 
@@ -639,7 +637,7 @@ class UserProfileEditTest < ActionController::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => 0.0)
     @terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    new_user = User.find_by_email(unsaved_user.email)
+    new_user = User.find_by(email: unsaved_user.email)
 
     add_credit_card(new_user, credit_card)
     assert page.has_content?("There was an error with your credit card information. Please call member services at: #{@club.cs_phone_number}.")

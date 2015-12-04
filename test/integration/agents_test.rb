@@ -1,6 +1,6 @@
 require 'test_helper' 
  
-class AgentsTest < ActionController::IntegrationTest
+class AgentsTest < ActionDispatch::IntegrationTest
  
 
   def setup_environment
@@ -75,7 +75,6 @@ class AgentsTest < ActionController::IntegrationTest
     end
   end
 
-
   test "create empty agent" do
     setup_environment
     visit admin_agents_path
@@ -113,7 +112,7 @@ class AgentsTest < ActionController::IntegrationTest
     assert_difference('Agent.count', 0) do
       click_link_or_button 'Create Agent'
     end
-    assert page.has_content?(I18n.t('activerecord.errors.messages.taken'))
+    assert page.has_content?('has already been taken')
   end
 
   test "view agent" do
@@ -220,8 +219,7 @@ class AgentsTest < ActionController::IntegrationTest
     fill_in 'agent[password_confirmation]', :with => 'pass'
 
     click_link_or_button 'Create Agent'
-
-    assert page.has_content?("doesn't match confirmation")
+    assert page.has_content?("doesn't match Password")
   end 
 
   test "should display agents in order" do
@@ -321,7 +319,7 @@ class AgentsTest < ActionController::IntegrationTest
    
     visit '/'
     click_link_or_button("Forgot your password?")
-    fill_in "agent[login]", :with => @admin_agent.email
+    fill_in "agent[email]", :with => @admin_agent.email
     click_link_or_button("Send me reset password instructions")
 
     page.has_content?("You will receive an email with instructions about how to reset your password in a few minutes.")
@@ -556,5 +554,4 @@ class AgentsTest < ActionController::IntegrationTest
     setup_environment
     create_agent_try_to_recover_it(true)
   end
-
 end

@@ -13,8 +13,8 @@ class Club < ActiveRecord::Base
   has_many :products
   has_many :club_roles
   has_many :agents,
-    through: :club_roles,
-    uniq: true
+    through: :club_roles
+#    uniq: true # TODO add uniqueness validation
   has_many :fulfillment_files
   has_many :disposition_types
 
@@ -25,7 +25,7 @@ class Club < ActiveRecord::Base
   attr_accessible :description, :name, :logo, :drupal_domain_id, :theme, :requires_external_id,
     :api_type, :api_username, :api_password, :time_zone, :pardot_email, :pardot_password, :pardot_user_key,
     :cs_phone_number, :family_memberships_allowed, :club_cash_enable, :member_banner_url, :non_member_banner_url,
-    :member_landing_url, :non_member_landing_url, :payment_gateway_errors_email
+    :member_landing_url, :non_member_landing_url, :payment_gateway_errors_email, :marketing_tool_client, :marketing_tool_attributes
 
   acts_as_paranoid
 
@@ -34,19 +34,19 @@ class Club < ActiveRecord::Base
   after_create :add_default_member_groups, :add_default_product, :add_default_disposition_type
   after_update :resync_with_merketing_tool_process
 
-  validates :partner_id, :cs_phone_number, :presence => true
-  validates :name, :presence => true, :uniqueness => true
+  validates :partner_id, :cs_phone_number, presence: true
+  validates :name, presence: true, uniqueness: true
   validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url,
-            :format =>  /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
+            format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validate :payment_gateway_errors_email_is_well_formated
 
   
   scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' AND (marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes not like '%\"et_business_unit\":\"\"%') AND (marketing_tool_attributes like '%et_prospect_list%'AND marketing_tool_attributes not like '%\"et_prospect_list\":\"\"%') AND (marketing_tool_attributes like '%et_members_list%' AND marketing_tool_attributes not like '%\"et_members_list\":\"\"%') AND (marketing_tool_attributes like '%et_username%' AND marketing_tool_attributes not like '%\"et_username\":\"\"%') AND ( marketing_tool_attributes like '%et_password%' AND marketing_tool_attributes not like '%\"et_password\":\"\"%') AND (marketing_tool_attributes like '%et_endpoint%' AND marketing_tool_attributes not like '%\"et_endpoint\":\"\"%')") }
   scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' AND (marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes not like '%\"mailchimp_api_key\":\"\"%') AND (marketing_tool_attributes like '%mailchimp_list_id%'AND marketing_tool_attributes not like '%\"mailchimp_list_id\":\"\"%')") }
  
-  has_attached_file :logo, :path => ":rails_root/public/system/:attachment/:id/:style/:filename", 
-                           :url => "/system/:attachment/:id/:style/:filename",
-                           :styles => { :header => "120x40", :thumb => "100x100#", :small  => "150x150>" }
+  has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename", 
+                           url: "/system/:attachment/:id/:style/:filename",
+                           styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
 
   DEFAULT_PRODUCT = ['KIT-CARD']
 
@@ -161,10 +161,10 @@ class Club < ActiveRecord::Base
     if subscribers_count > Settings.maximum_number_of_subscribers_to_automatically_resync
       Auditory.report_club_changed_marketing_client(self, subscribers_count)
     end
-    self.users.update_all(:need_sync_to_marketing_client => 1, :marketing_client_synced_status => "not_synced", :marketing_client_last_synced_at => nil, :marketing_client_last_sync_error => nil, :marketing_client_last_sync_error_at => nil, :marketing_client_id => nil)
-    self.prospects.update_all(:need_sync_to_marketing_client => 1)
+    self.users.update_all(need_sync_to_marketing_client: 1, marketing_client_synced_status: "not_sinced", marketing_client_last_synced_at: nil, marketing_client_last_sync_error: nil, marketing_client_last_sync_error_at: nil, marketing_client_id: nil)
+    self.prospects.update_all(need_sync_to_marketing_client: 1)
   end
-  handle_asynchronously :resync_users_and_prospects, :queue => :generic_queue
+  handle_asynchronously :resync_users_and_prospects, queue: :generic_queue
 
   private
     def add_default_member_groups

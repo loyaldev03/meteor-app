@@ -9,8 +9,9 @@ set :keep_releases,       3
 
 server "prototype.platform.xagax.com", :app, :web
 
-task :bundle_install do
-  puts "  **** bundle_install"
-  run "id"
-  run "cd #{release_path}; #{sudo} bundle install --without development test staging"
-end
+set :rvm_type, :system 
+set :rvm_ruby_string, '2.2.0@global' 
+require 'rvm/capistrano'
+set :rvm_bin_path, "/usr/local/rvm/bin"
+set :sudo, 'rvmsudo'
+

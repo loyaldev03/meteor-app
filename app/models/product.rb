@@ -1,14 +1,16 @@
 class Product < ActiveRecord::Base
   belongs_to :club
 
-  validates :sku, :presence => true, :format => /^[0-9a-zA-Z\-_]+$/, :length => { :minimum => 2 }, :uniqueness => { scope: [:club_id, :deleted_at] }
-  validates :cost_center, :format => /^[a-zA-Z\-_]+$/, :length => { :minimum => 2, :maximum => 30 }, :allow_nil => true
+  attr_accessible :stock, :allow_backorder
 
-  validates :package, :format => /^[a-zA-Z\-_]+$/, :length => { :maximum => 19 }
-  validates :stock, :numericality => { :only_integer => true, :less_than => 1999999 }, :allow_backorder => true
+  validates :sku, presence: true, format: /\A[0-9a-zA-Z\-_]+\z/, length: { minimum: 2 }, uniqueness: { scope: [:club_id, :deleted_at] }
+  validates :cost_center, format: /\A[a-zA-Z\-_]+\z/, length: { minimum: 2, maximum: 30 }, allow_nil: true
 
-  scope :with_stock, where('(allow_backorder = true) OR (allow_backorder = false and stock > 0)')
-  scope :not_kit_card, where('sku != "KIT-CARD" ')
+  validates :package, format: /\A[a-zA-Z\-_]+\z/, length: { maximum: 19 }
+  validates :stock, numericality: { only_integer: true, less_than: 1999999 }, allow_backorder: true
+
+  scope :with_stock, -> { where('(allow_backorder = true) OR (allow_backorder = false and stock > 0)') }
+  scope :not_kit_card, -> { where('sku != "KIT-CARD" ') }
 
   before_save :apply_upcase_to_sku
   before_update :validate_sku_update
@@ -17,7 +19,7 @@ class Product < ActiveRecord::Base
   acts_as_paranoid
 
   def self.datatable_columns
-    ['id', 'name', 'sku', 'stock', 'allow_backorder' ]
+    ['id', 'name', 'sku', 'stock', 'allow_backorder']
   end
 
   def apply_upcase_to_sku
@@ -69,7 +71,7 @@ class Product < ActiveRecord::Base
   def self.generate_xls(clubs_id = nil)
     header = ['Name', 'Sku']
     status_list = Fulfillment.state_machines[:status].states.map(&:name)
-    status_list.each{|x| header << x}
+    status_list.each {|x| header << x}
 
     package = Axlsx::Package.new
     club_list = Club.where(billing_enable: true)
@@ -93,7 +95,7 @@ class Product < ActiveRecord::Base
     temp = Tempfile.new("posts.xlsx") 
     
     product_xls.serialize temp.path
-    Notifier.product_list(temp).deliver!
+    Notifier.product_list(temp).deliver_now!
     
     temp.close 
     temp.unlink

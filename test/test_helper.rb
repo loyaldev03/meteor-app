@@ -7,18 +7,14 @@ require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require 'capybara/rails'
 require 'capybara/dsl'
-require 'database_cleaner'
 require 'mocha/setup'
 require "timeout"
 require 'tasks/tasks_helpers'
 #require 'capybara-screenshot'
 
-DatabaseCleaner.strategy = :truncation
 # require 'capybara-webkit'
 
-require 'turn/autorun'
-
-Turn.config.format = :outline
+Devise.stretches = 1
 
 ## do you use firefox??
 Capybara.current_driver = :selenium
@@ -34,6 +30,17 @@ Capybara.current_driver = :selenium
 # Capybara.current_driver = :chrome
 ## end chrome configuration
 # Capybara.default_wait_time = 10
+
+class ActiveRecord::Base
+  mattr_accessor :shared_connection
+  @@shared_connection = nil
+
+  def self.connection
+    @@shared_connection || ConnectionPool::Wrapper.new(:size => 1) { retrieve_connection }
+  end
+end
+
+ActiveRecord::Base.shared_connection = ActiveRecord::Base.connection
 
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
@@ -176,32 +183,30 @@ class ActionController::TestCase
   end
 end
 
-module ActionController
+module ActionDispatch
   class IntegrationTest
     include Capybara::DSL
 
-    self.use_transactional_fixtures = false # DOES WORK! Damn it!
+    self.use_transactional_fixtures = true
 
-    setup do
+    def setup
       stubs_elasticsearch_index
-      DatabaseCleaner.start
-      FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by_email("batch@xagax.com")
+      FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by(email: "batch@xagax.com")
       page.driver.browser.manage.window.resize_to(1024,720)
     end
 
-    teardown do
+    def teardown
       sleep 5
       Capybara.reset_sessions!  
-      DatabaseCleaner.clean
     end
 
     def sign_in_as(user)
       visit '/'
       within("#new_agent") do
-        fill_in 'agent_login', :with => user.email
+        fill_in 'agent_email', :with => user.email
         fill_in 'agent_password', :with => user.password
       end
-      click_link_or_button('Sign in')
+      click_link_or_button('Log in')
     end
 
     def wait_until
@@ -212,10 +217,10 @@ module ActionController
     end
 
     def do_data_table_search(selector, value)
-      within(selector) do
-        find(:css,"input[type='text']").set("XXXXXXXXXXXXXXXXXXX")
+      within(selector) do 
+        find(:css,"input[type='search']").set("XXXXXXXXXXXXXXXXXXX")
         sleep(1)
-        find(:css,"input[type='text']").set(value)
+        find(:css,"input[type='search']").set(value)
       end
     end
 
@@ -477,7 +482,7 @@ module ActionController
         end
         
         within('.nav-tabs'){ click_on 'Operations'}
-        within("#operations_table") do 
+        within("#operations_table") do
           assert page.has_content?("Communication 'Test refund' sent")
           assert page.has_content?("Refund success $#{final_amount}")
         end
@@ -533,10 +538,9 @@ module ActionController
       assert_difference('Fulfillment.count',0) do 
         old_membership = user.current_membership
         next_retry_bill_date_old = user.next_retry_bill_date
-        visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name, :user_prefix => user.id)
-
+        visit show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
         click_on 'Save the sale'    
-        select(new_terms_of_membership.name, :from => 'terms_of_membership_id')
+        select(new_terms_of_membership.name, from: 'terms_of_membership_id')
         confirm_ok_js
         click_on 'Save the sale'
         if validate
@@ -554,7 +558,7 @@ module ActionController
     end
 
     def recover_user(user,new_tom, validate = true)
-      visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name, :user_prefix => user.id)
+      visit show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
       wait_until{ assert find_field('input_first_name').value == user.first_name }
       click_link_or_button "Recover"
       select(new_tom.name, :from => 'terms_of_membership_id')
@@ -569,7 +573,7 @@ module ActionController
     end
 
     def set_as_undeliverable_user(user, reason = 'Undeliverable', validate = true)
-      visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => user.id)
+      visit show_user_path(partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: user.id)
       click_link_or_button "Set undeliverable"
       within("#undeliverable_table"){
         fill_in reason, :with => reason
@@ -591,7 +595,7 @@ module ActionController
     end
 
     def search_fulfillments(all_times = false, initial_date = nil, end_date = nil, status = nil, type = nil, package = nil)
-      visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+      visit fulfillments_index_path(partner_prefix: @partner.prefix, club_prefix: @club.name)
       within("#fulfillments_table")do
         check "all_times" if all_times
 
@@ -765,6 +769,3 @@ module Airbrake
   end
 end
 
-
- # use_transactional_fixtures = false    # DOES NOT WORK!
-   # … think this should be renamed and should definitely get some documentation love.

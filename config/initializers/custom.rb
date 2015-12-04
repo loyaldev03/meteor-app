@@ -1,13 +1,11 @@
 require 'auditory'
 require 'exception_notification'
 SacPlatform::Application.config.middleware.use ExceptionNotifier if ['production', 'staging', 'prototype'].include?(Rails.env)
-require 'lyris_service'
 require 'axlsx'
 require 'csv'
 Dir["#{Rails.root}/lib/exceptions/*.rb"].each {|file| require file }
 
 # # We are commenting log writing due to https://www.pivotaltracker.com/story/show/68819072 since how logs are written is not pci compliant (Only for production).
-
 if Rails.env.staging? or Rails.env.prototype?
 	ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device = File.open("#{Rails.root}/log/active_merchant.log", "a+")
 	ActiveMerchant::Billing::MerchantESolutionsGateway.wiredump_device.sync = true
@@ -22,7 +20,6 @@ if Rails.env.staging? or Rails.env.prototype?
   ActiveMerchant::Billing::TrustCommerceGateway.wiredump_device.sync = true
 end
 
-
 class String
   def to_bool
     return true if self == true || self =~ (/(true|t|yes|y|1)$/i)
@@ -32,12 +29,6 @@ class String
   end
 end
 
-require 'bureaucrat'
-require 'bureaucrat/quickfields'
-require 'bureaucrat/form'
-
-
-Tire.configure do
-  url    'https://test:test@67662be96db05a10000.qbox.io'
-  # logger STDERR
-end
+# require 'bureaucrat'
+# require 'bureaucrat/quickfields'
+# require 'bureaucrat/form'

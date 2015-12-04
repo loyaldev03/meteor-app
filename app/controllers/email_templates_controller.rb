@@ -113,12 +113,12 @@ class EmailTemplatesController < ApplicationController
   def test_communications
     if request.post? 
       begin
-        template = EmailTemplate.find_by_id (params[:email_template_id]) 
+        template = EmailTemplate.find(params[:email_template_id])
         if template.nil?
           response = { code: Settings.error_codes.not_found, message: "Template not found."}
         else
 	        my_authorize! :test_communications, EmailTemplate, template.terms_of_membership.club_id
-	        user = User.find_by_id params[:user_id]
+	        user = User.find_by(id: params[:user_id])
 	        response = if user.nil?
 	          { code: Settings.error_codes.not_found, message: "Member not found."}
 	        elsif user.club_id != template.terms_of_membership.club_id

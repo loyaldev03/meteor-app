@@ -5,13 +5,14 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
   has_many :transactions
 
   acts_as_paranoid
-  validates_as_paranoid
 
-  validates :login, :presence => true
-  validates :merchant_key, :presence => true, if: Proc.new{ |pgc| pgc.litle? }
-  validates :password, :presence => true
-  validates :gateway, :presence => true, uniqueness_without_deleted: { scope: [ :club_id ], :message => "already created. There is a payment gateway already configured for this gateway." } 
-  validates :club, :presence => true
+  validates :login, presence: true
+  validates :merchant_key, presence: true, if: Proc.new { |pgc| pgc.litle? }
+  validates :password, presence: true
+  validates :gateway, presence: true, 
+                      uniqueness: { scope: [ :club_id ], message: "already created. There is a payment gateway already configured for this gateway." }
+  
+  validates :club, presence: true
 
   before_create :only_one_is_allowed
   
@@ -41,7 +42,7 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
 
   def only_one_is_allowed
     if club and self.club.payment_gateway_configurations.count > 0 
-      errors.add :base, :error => "There is already one payment gateway configuration active on that club #{club_id}"
+      errors.add :base, error: "There is already one payment gateway configuration active on that club #{club_id}"
       false
     end
   end

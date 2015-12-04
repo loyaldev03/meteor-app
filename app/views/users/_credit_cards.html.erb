@@ -36,7 +36,7 @@
         <% end %>
         <%= t('activerecord.attributes.credit_card.active') if cc.active %>
         <% if cc.can_be_activated? %>
-          <%= form_for @cc, :as => :credit_card, :url => credit_card_activate_path(:credit_card_id => cc.id) do |f| %>
+          <%= form_for cc, :as => :credit_card, :url => credit_card_activate_path(:credit_card_id => cc.id), method: :post do |f| %>
             <%= submit_tag 'Activate', :name => 'activate', :class=> "btn btn-warning confirm", :id => "activate_credit_card_button" ,:disabled => (cannot? :activate, CreditCard, @current_club.id) %>
           <% end %>
         <% end %>

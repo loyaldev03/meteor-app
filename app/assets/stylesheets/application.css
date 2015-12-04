@@ -8,15 +8,12 @@
  * You're free to add application-wide styles to this file and they'll appear at the top of the
  * compiled file, but it's generally better to create a new file per style scope.
  *
+ *= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
  *= require_self
- *= require scaffolds
  *= require bootstrap_and_overrides
- *= require jquery.ui.core
- *= require jquery.ui.theme
- *= require jquery.ui.datepicker
+ *= require scaffolds
+ *= require jquery-ui
  *= require table_sorter_style
- *= require dataTables/jquery.dataTables.bootstrap
- *= require dataTables/src/demo_table_jui
  */
 
 
@@ -50,7 +47,7 @@ form .clearfix:before, form .clearfix:after {
 }
 
 
-.help {position: relative}​ /*Without this the popover won't work.*/
+.help {position: relative;}​ /*Without this the popover won't work.*/
 
 .comment {height:auto; 
         display:inline-block; 
@@ -70,14 +67,8 @@ label.error{
   text-align:left;
 }
 
-div.dataTables_length select {
-    float: right;
-}
-
 div.dataTables_filter label{
     text-align:left;
-    vertical-align:text-top;
-    width:270px;
 }
 
 div.dataTables_filter input {
@@ -194,25 +185,9 @@ div.dataTables_filter input {
 	text-align: center;
 }
 
-#partners_table_wrapper.dataTables_wrapper .dataTables_paginate,
-#agents_table_wrapper.dataTables_wrapper .dataTables_paginate,
-#my_clubs_table_wrapper.dataTables_wrapper .dataTables_paginate,
-#terms_of_memberships_table_wrapper.dataTables_wrapper .dataTables_paginate {
-  float: left;
-}
 
-#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_filter.dataTables_filter,
-#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_length,
-#club_cash_transactions_table_wrapper.dataTables_wrapper .dataTables_paginate {
-	width: 32%;
-}
-
-#club_cash_transactions_table_wrapper.dataTables_wrapper #club_cash_transactions_table_filter label {
-	width: 290px;
-}
-
-div.dataTables_length label {
-	width: 170px;
+div.dataTables_filter {
+  float:left;
 }
 
 #members.tab-pane .pagination {
@@ -226,6 +201,3 @@ div.dataTables_length label {
 .div-table .title{
   border-bottom: solid;
 }
-
-.input-prepend .add-on, .input-append .add-on { margin-top: -10px; }
-

@@ -2,19 +2,19 @@ module MesAccountUpdater
   CHARGEBACKS_TO_NOT_PROCESS = [ 'Duplicate Processing' ]
 
   def self.process_chargebacks
-    PaymentGatewayConfiguration.joins(:club).where(clubs: {billing_enable: true}).find_all_by_gateway('mes').each do |gateway|
+    PaymentGatewayConfiguration.joins(:club).where(clubs: {billing_enable: true}).where(gateway: 'mes').each do |gateway|
       MesAccountUpdater.process_chargebacks_for_gateway gateway
     end
   end
 
   def self.account_updater_process_answers
-    PaymentGatewayConfiguration.find_all_by_gateway('mes').each do |gateway|
+    PaymentGatewayConfiguration.where(gateway: 'mes').each do |gateway|
       MesAccountUpdater.account_updater_process_answers_for_gateway gateway unless gateway.aus_login.blank?
     end
   end
   
   def self.account_updater_send_file_to_process
-    PaymentGatewayConfiguration.find_all_by_gateway('mes').each do |gateway|
+    PaymentGatewayConfiguration.where(gateway: 'mes').each do |gateway|
       MesAccountUpdater.account_updater_send_file_to_process_for_gateway gateway unless gateway.aus_login.blank?
     end
   end
@@ -234,8 +234,8 @@ module MesAccountUpdater
           :reason_code => columns[16], :cb_ref_number => columns[17]
         }
         next if MesAccountUpdater::CHARGEBACKS_TO_NOT_PROCESS.include?(args[:reason]) or args[:adjudication_date].blank?
-        transaction_chargebacked = Transaction.find_by_payment_gateway_configuration_id_and_response_transaction_id gateway.id, args[:trident_transaction_id]
-        user = User.find_by_id_and_club_id(args[:client_reference_number], gateway.club_id)
+        transaction_chargebacked = Transaction.find_by(payment_gateway_configuration_id: gateway.id, response_transaction_id: args[:trident_transaction_id])
+        user = User.find_by(id: args[:client_reference_number], club_id: gateway.club_id)
         begin
           if transaction_chargebacked.nil?
             raise "Chargeback ##{args[:control_number]} could not be processed. user or transaction_chargebacked are null! #{line}"

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UsersRecoveryTest < ActionController::IntegrationTest
+class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
   ############################################################
   # SETUP
@@ -22,7 +22,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
       unsaved_user = FactoryGirl.build(:user_with_api)
       create_user_by_sloop(@admin_agent, unsaved_user, nil, nil, @terms_of_membership_with_gateway)
       
-      @saved_user = User.find_by_email(unsaved_user.email)
+      @saved_user = User.find_by(email: unsaved_user.email)
 
       if cancel
         cancel_date = Time.zone.now + 1.days
@@ -110,7 +110,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
 
   test "Recover an user using CS which was enrolled with a product sku that does not have stock" do
     setup_user(true, true)
-    prods = Product.find_all_by_sku @saved_user.enrollment_infos.first.product_sku.split(',')
+    prods = Product.where(sku: @saved_user.enrollment_infos.first.product_sku.split(','))
     prods.each do |p| 
       p.stock =  0
       p.allow_backorder = false
@@ -184,7 +184,7 @@ class UsersRecoveryTest < ActionController::IntegrationTest
 
     recover_user(@saved_user,@terms_of_membership_with_gateway)
     assert find_field('input_first_name').value == @saved_user.first_name
-    assert page.has_content?("Member recovered successfully $0.0 on TOM(1) -#{@saved_user.current_membership.terms_of_membership.name}-")
+    assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@saved_user.current_membership.terms_of_membership.id}) -#{@saved_user.current_membership.terms_of_membership.name}-")
 
     assert_equal(@saved_user.current_membership.terms_of_membership_id, actual_tom.terms_of_membership_id)
     validate_user_recovery(@saved_user, @terms_of_membership_with_gateway)
