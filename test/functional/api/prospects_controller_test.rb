@@ -48,47 +48,51 @@ class Api::ProspectsControllerTest < ActionController::TestCase
   end
 
   test "admin should create a prospect" do
-  	sign_in @admin_user
-  	@user = FactoryGirl.build :user_with_api
+    sign_in @admin_user
+    @user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
-  	assert_difference('Prospect.count') do
-      do_post
-      assert_response :success
+    assert_difference('Operation.count') do
+      assert_difference('Prospect.count') do
+        do_post
+        assert_response :success
+      end
     end
     assert_equal(Prospect.first.club_id, @terms_of_membership.club_id)
   end
 
   test "api user should create a prospect" do
-  	sign_in @api_user
-  	@user = FactoryGirl.build :user_with_api
+    sign_in @api_user
+    @user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
-  	assert_difference('Prospect.count') do
-      response = do_post
-      prospect = Prospect.find JSON.parse(response.body)["prospect_id"]
-      assert_response :success
-      assert_equal prospect.source, @enrollment_info.source
+    assert_difference('Operation.count') do
+      assert_difference('Prospect.count') do
+        response = do_post
+        prospect = Prospect.find JSON.parse(response.body)["prospect_id"]
+        assert_response :success
+        assert_equal prospect.source, @enrollment_info.source
+      end
     end
   end
 
   test "supervisor should not create a prospect" do
-  	sign_in @supervisor_user
-  	@user = FactoryGirl.build :user_with_api
+    sign_in @supervisor_user
+    @user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
-  	assert_difference('Prospect.count',0) do
+    assert_difference('Prospect.count',0) do
       do_post
       assert_response :unauthorized 
-    end	
+    end 
   end
 
   test "representative should not create a prospect" do
-  	sign_in @representative_user
-  	@user = FactoryGirl.build :user_with_api
+    sign_in @representative_user
+    @user = FactoryGirl.build :user_with_api
     @enrollment_info = FactoryGirl.build :enrollment_info
     @current_club = @terms_of_membership.club
-  	assert_difference('Prospect.count',0) do
+    assert_difference('Prospect.count',0) do
       do_post
       assert_response :unauthorized 
     end

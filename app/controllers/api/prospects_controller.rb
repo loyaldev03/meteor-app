@@ -64,12 +64,13 @@ class Api::ProspectsController < ApplicationController
     else
       tom = TermsOfMembership.find(params[:prospect][:terms_of_membership_id])
       my_authorize! :manage_prospects_api, Prospect, tom.club_id
-    	response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
-    	standarize_params(params[:prospect])
+      response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
+      standarize_params(params[:prospect])
       prospect = Prospect.new(params[:prospect])
       prospect.club_id = tom.club_id
-    	if prospect.save
-    	  response[:message] = "Prospect was successfuly saved."
+      if prospect.save
+        Auditory.audit(current_agent, prospect, "User visits checkout page.", nil, Settings.operation_types.checkout_page_visit)
+        response[:message] = "Prospect was successfuly saved."
         response[:code] = Settings.error_codes.success
         response[:prospect_id] = prospect.id
       end   

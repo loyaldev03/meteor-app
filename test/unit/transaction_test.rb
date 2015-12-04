@@ -50,7 +50,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "Enrollment with approval" do
     @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     active_merchant_stubs
-    assert_difference('Operation.count',1) do
+    assert_difference('Operation.count',2) do
       assert_no_difference('Fulfillment.count') do
         answer = User.enroll(@tom_approval, @current_agent, 23, 
           { first_name: @user.first_name,
@@ -72,7 +72,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enrollment without approval" do
     active_merchant_stubs
-    assert_difference('Operation.count',2) do   #Enroll and club cash operations.
+    assert_difference('Operation.count',3) do   #EnrollBilling, club cash and EnrollmentInfo operations.
       assert_difference('Fulfillment.count') do
         user = enroll_user(@terms_of_membership)
         assert_not_nil user.next_retry_bill_date, "NBD should not be nil"
@@ -445,7 +445,7 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership.save
 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       active_user = create_active_user(@terms_of_membership)
       active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
       amount = @terms_of_membership.installment_amount
@@ -468,7 +468,7 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership.save
 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 4) do
       active_user = create_active_user(@terms_of_membership)
       active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
       amount = @terms_of_membership.installment_amount

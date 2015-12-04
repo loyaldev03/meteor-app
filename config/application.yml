@@ -109,6 +109,8 @@ defaults: &defaults
     tom_upgrade: 246
     user_manually_synced_to_mailchimp: 247
     update_terms_of_membership: 248
+    checkout_page_visit: 249
+    enrollment: 250
     #communication
     active_email: 300     
     prebill_email: 301    

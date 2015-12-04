@@ -257,7 +257,7 @@ class User < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    send_fulfillment unless skip_send_fulfillment
+    SendFulfillmentJob.perform_later(self.id) unless skip_send_fulfillment
     
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -742,6 +742,7 @@ class User < ActiveRecord::Base
 
       enrollment_info.membership = membership
       enrollment_info.save
+      Auditory.audit(agent, enrollment_info, "New Enrollment information record created.", self, Settings.operation_types.enrollment)
       
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
@@ -847,6 +848,9 @@ class User < ActiveRecord::Base
       self.save
       enrollment_info.membership = new_membership
       enrollment_info.save
+      
+      Auditory.audit(agent, enrollment_info, "New Enrollment information record created.", self, Settings.operation_types.enrollment)
+
       if trans
         trans.membership_id = self.current_membership.id
         trans.terms_of_membership_id = tom.id
@@ -878,29 +882,6 @@ class User < ActiveRecord::Base
 
   def send_pre_bill
     Communication.deliver!( self.manual_payment ? :manual_payment_prebill : :prebill, self) if membership_billing_enabled?
-  end
-
-  def send_fulfillment
-    # we always send fulfillment to new members or members that do not have 
-    # opened fulfillments (meaning that previous fulfillments expired).
-    if self.fulfillments.where_not_processed.empty?
-      fulfillments = fulfillments_products_to_send
-      fulfillments.each do |sku|
-        begin
-          product = Product.find_by(sku: sku, club_id: self.club_id)
-          f = Fulfillment.new product_sku: sku
-          unless product.nil?
-            f.product_package = product.package
-            f.recurrent = product.recurrent 
-          end
-          f.user_id = self.id
-          f.club_id = self.club_id
-          f.save
-        rescue Exception => e
-          Auditory.report_issue(I18n.t("error_messages.fulfillments_decrease_stock_error"), e, { user: self.inspect, fulfillment: f, product: product})
-        end
-      end
-    end
   end
 
   def sync?
@@ -1460,10 +1441,6 @@ class User < ActiveRecord::Base
       if check_upgradable
         schedule_renewal
       end
-    end
-
-    def fulfillments_products_to_send
-      self.current_membership.enrollment_info.product_sku ? self.current_membership.enrollment_info.product_sku.split(',') : []
     end
 
     def record_date

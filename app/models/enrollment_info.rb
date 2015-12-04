@@ -43,5 +43,5 @@ class EnrollmentInfo < ActiveRecord::Base
       self.prospect_id = params[:prospect_id]
       self.joint = params[:joint]
     end
-  end 
+  end
 end
