@@ -6,6 +6,7 @@ set :repository, 'git@github.com:stoneacre/sac-platform.git'
 set :database_name, 'sac_production'
 set :rails_env, "production"
 set :user, 'deploy'
+set :keep_releases,       5
 
 server "50.116.20.46", :app, :web
 

@@ -5,6 +5,7 @@ set :deploy_to, "/var/www/#{application}"
 set :repository, 'git@github.com:stoneacre/sac-platform.git'
 set :database_name, 'sac_platform_prototype'
 set :rails_env, "prototype"
+set :keep_releases,       3
 
 server "prototype.platform.xagax.com", :app, :web
 

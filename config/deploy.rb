@@ -11,7 +11,6 @@ require 'capistrano/ext/multistage'
 require 'bundler/capistrano'
 
 set :port, 30003
-set :keep_releases,       2
 set :term,                "linux"
 set :deploy_via, :remote_cache
 set :user, 'www-data'
@@ -146,6 +145,12 @@ namespace :server_stats do
   end
 end
 
+namespace :customtasks do
+  task :customcleanup, :except => {:no_release => true} do
+    run "ls -1dt #{releases_path}/* | tail -n +#{keep_releases + 1} | #{sudo} xargs rm -rf"
+  end
+end
+
 # taken from https://gist.github.com/1027117
 namespace :foreman do
   desc "Export the Procfile to Ubuntu's upstart scripts"
@@ -211,7 +216,7 @@ after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode
 after 'deploy:update', 'restart_delayed_jobs'
 after "deploy:update", "elasticsearch:reindex" if fetch(:elasticsearch_reindex, false)
 # after 'deploy', 'notify_campfire'
+after 'deploy', 'customtasks:customcleanup'
 after "deploy", "deploy:tag"
-
 
 
