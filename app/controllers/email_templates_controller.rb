@@ -117,21 +117,21 @@ class EmailTemplatesController < ApplicationController
         if template.nil?
           response = { code: Settings.error_codes.not_found, message: "Template not found."}
         else
-	        my_authorize! :test_communications, EmailTemplate, template.terms_of_membership.club_id
-	        user = User.find_by(id: params[:user_id])
-	        response = if user.nil?
-	          { code: Settings.error_codes.not_found, message: "Member not found."}
-	        elsif user.club_id != template.terms_of_membership.club_id
-	          { code: Settings.error_codes.wrong_data, message: "Member does not belong to same club as the Template."}
-	        elsif params[:terms_of_membership_id].to_i != template.terms_of_membership_id
-	          { code: Settings.error_codes.wrong_data, message: "Subscription plan is not the same as the template." }
-	        else
-	          Communication.test_deliver!(template, user)
-	        end
+          my_authorize! :test_communications, EmailTemplate, template.terms_of_membership.club_id
+          user = User.find(params[:user_id])
+          response = if user.club_id != template.terms_of_membership.club_id
+            { code: Settings.error_codes.wrong_data, message: "Member does not belong to same club as the Template."}
+          elsif params[:terms_of_membership_id].to_i != template.terms_of_membership_id
+            { code: Settings.error_codes.wrong_data, message: "Subscription plan is not the same as the template." }
+          else
+            Communication.test_deliver!(template, user)
+          end
         end
         render json: response
       rescue CanCan::AccessDenied => e
         raise e
+      rescue ActiveRecord::RecordNotFound
+        render json: { code: Settings.error_codes.not_found, message: "Member not found."}
       rescue Exception => e
         Auditory.report_issue("EmailTemplate::test_communication", e, { :user => user.inspect, :template => template.inspect })
         render json: { code: Settings.error_codes.unrecoverable_error, message: e.to_s}

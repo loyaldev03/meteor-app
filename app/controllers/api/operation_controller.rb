@@ -1,5 +1,5 @@
 class Api::OperationController < ApplicationController
-  skip_before_filter :verify_authenticity_token # TODO: is this method working on production? Because I had to add this in order to access this API method
+  skip_before_filter :verify_authenticity_token
 
 
   ##

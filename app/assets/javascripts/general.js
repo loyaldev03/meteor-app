@@ -295,15 +295,6 @@ function terms_of_memberships_table_index_functions(column_count) {
   });
 }
 
-function new_partner_functions(){
-}
-
-function new_domain_functions(){
-}
-
-function new_product_functions(){
-}
-
 function user_index_functions(){
   $('#user_id').keyup(function(event) {
     if (this.value.match(/[^0-9]/g)) {

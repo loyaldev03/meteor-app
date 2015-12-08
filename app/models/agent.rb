@@ -35,9 +35,7 @@ class Agent < ActiveRecord::Base
   end
 
   has_many :club_roles
-  has_many :clubs, 
-    through: :club_roles
-   # uniq: true # TODO add uniqueness validation
+  has_many :clubs, -> {uniq}, through: :club_roles
 
   def which_is_the_role_for_this_club?(club_id)
     self.club_roles.where(club_id: club_id).first
@@ -140,13 +138,13 @@ class Agent < ActiveRecord::Base
   end
 
 
-    def self.find_for_database_authentication(warden_conditions)
-      conditions = warden_conditions.dup
-      if login = conditions.delete(:login)
-        where(conditions.to_h).where(["lower(username) = :value OR lower(email) = :value", { value: login.downcase }]).first
-      else
-        where(conditions.to_h).first
-      end
+  def self.find_for_database_authentication(warden_conditions)
+    conditions = warden_conditions.dup
+    if login = conditions.delete(:login)
+      where(conditions.to_h).where(["lower(username) = :value OR lower(email) = :value", { value: login.downcase }]).first
+    else
+      where(conditions.to_h).first
     end
+  end
 
 end

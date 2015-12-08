@@ -101,7 +101,7 @@ class ClubsController < ApplicationController
   def check_domain_belongs_to_partner(drupal_domain_id)
     valid = true
     unless drupal_domain_id.blank?
-      domain = Domain.find_by(id: drupal_domain_id)
+      domain = Domain.find(drupal_domain_id)
       if domain.partner_id == @current_partner.id
         unless @current_agent.has_global_role? and domain.club 
           clubs_id = @current_agent.clubs.where("partner_id = ? and club_roles.role = 'admin'", @current_partner.id).collect(&:id)
@@ -112,6 +112,8 @@ class ClubsController < ApplicationController
       end
     end
     valid
+  rescue ActiveRecord::RecordNotFound
+    false
   end
 
   private 

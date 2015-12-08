@@ -212,11 +212,11 @@ class Transaction < ActiveRecord::Base
   end
 
   def self.refund(amount, sale_transaction_id, agent=nil, update_refunded_amount = true, operation_type_to_set = Settings.operation_types.credit)
-    sale_transaction = Transaction.lock(true).find(sale_transaction_id)
-    if not sale_transaction.has_same_pgc_as_current?
-      { code: Settings.error_codes.transaction_gateway_differs_from_current, message: I18n.t("error_messages.transaction_gateway_differs_from_current") }
-    else
-      Transaction.transaction do
+    Transaction.transaction do
+      sale_transaction = Transaction.lock(true).find(sale_transaction_id)
+      if not sale_transaction.has_same_pgc_as_current?
+        { code: Settings.error_codes.transaction_gateway_differs_from_current, message: I18n.t("error_messages.transaction_gateway_differs_from_current") }
+      else
         amount = amount.to_f
         if amount <= 0.0
           return { message: I18n.t('error_messages.credit_amount_invalid'), code: Settings.error_codes.credit_amount_invalid }

@@ -62,14 +62,12 @@ class UsersController < ApplicationController
       flash[:error] = "User ID not provided."
       redirect_to root_path
     else
-      user = User.find_by(id: params[:user_id])
-      if user 
-        redirect_to show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
-      else
-        flash[:error] = "User not found."
-        redirect_to root_path
-      end
+      user = User.find(params[:user_id])
+      redirect_to show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
     end
+  rescue ActiveRecord::RecordNotFound
+    flash[:error] = "User not found."
+    redirect_to root_path
   end
 
   def show
