@@ -81,7 +81,7 @@ class PartnersTest < ActionDispatch::IntegrationTest
     saved_partner = FactoryGirl.create(:partner)
     visit admin_partners_path
     within("#partners_table") do
-        click_link_or_button 'Dashboard'
+      within('tr', text: saved_partner.name, exact: true){ click_link_or_button 'Dashboard' }
     end
     assert page.has_content?(saved_partner.prefix)
     assert page.has_content?(saved_partner.name)
@@ -93,7 +93,7 @@ class PartnersTest < ActionDispatch::IntegrationTest
     saved_partner = FactoryGirl.create(:partner)
     visit admin_partners_path
     within("#partners_table") do
-        click_link_or_button 'Edit'
+      within('tr', text: saved_partner.name, exact: true){ click_link_or_button 'Edit' }
     end
     fill_in 'partner[name]', with: 'My new name'
     click_link_or_button 'Update Partner'

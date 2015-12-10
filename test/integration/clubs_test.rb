@@ -189,7 +189,9 @@ class ClubTest < ActionDispatch::IntegrationTest
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id)
     @club.payment_gateway_configurations.first.update_attribute(:club_id,nil)
     visit my_clubs_path
-    click_link_or_button 'users'
+    within("#my_clubs_table") do
+      within("tr", text: @club.name, exact: true){ click_link_or_button 'Users' }
+    end
     assert page.has_no_content?("We're sorry, but something went wrong.")
   end
 
