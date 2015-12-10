@@ -132,7 +132,7 @@ class Product < ActiveRecord::Base
         sheet.add_row new_row
       end
     end
-    results_file = File.open("tmp/bulk_update_results#{Time.current}.xlsx", 'w')
+    results_file = File.open("tmp/files/bulk_update_results#{Time.current}.xlsx", 'w')
     package.serialize results_file.path
     results_file.close
     Product.delay.send_bulk_update_results(agent_email, results_file.path)

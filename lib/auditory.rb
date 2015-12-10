@@ -42,7 +42,7 @@ class Auditory
       ticket = Auditory.create_ticket(comment.truncate(10000), error)
 
       begin
-        file_url = "/tmp/error_description_#{Time.zone.now.to_i}.txt"
+        file_url = "/tmp/files/error_description_#{Time.zone.now.to_i}.txt"
         temp = File.open(file_url, 'w+')
         temp.write comment
         temp.close

@@ -64,7 +64,7 @@ class ProductsController < ApplicationController
   def bulk_update
     if params[:file]
       if ['text/csv','application/vnd.ms-excel'].include? params[:file].content_type
-        temporary_file = File.open("tmp/bulk_update_#{Time.current}.csv", "w")
+        temporary_file = File.open("tmp/files/bulk_update_#{Time.current}.csv", "w")
         temporary_file.write params[:file].open.read
         temporary_file.close
         Product.delay.bulk_update(@current_club.id, current_agent.email, temporary_file.path)
