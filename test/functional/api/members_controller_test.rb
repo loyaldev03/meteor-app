@@ -162,6 +162,34 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
 
+  def validate_credit_card_updated_only_year(active_credit_card, token, number, amount_years)
+    @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
+    @credit_card.expire_month = active_credit_card.expire_month
+    @credit_card.expire_year = (Date.today + amount_years.year).year
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    assert_equal(@user.active_credit_card.token, token)
+    assert_equal(@user.active_credit_card.expire_month, @credit_card.expire_month)
+  end
+
+  def validate_credit_card_updated_only_month(active_credit_card, token, number, amount_months)
+    @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
+    @credit_card.expire_month = (Time.zone.now + amount_months.months).month # January is the first month.
+    @credit_card.expire_year = active_credit_card.expire_year
+    assert_difference('Operation.count',2) do
+      assert_difference('CreditCard.count',0) do
+        generate_put_message
+      end
+    end
+    assert_response :success
+    assert_equal(@user.active_credit_card.token, token)
+    assert_equal(@user.active_credit_card.expire_year, @credit_card.expire_year)
+  end
+
   # Store the membership id at enrollment_infos table when enrolling a new user
   # Admin should enroll/create user with preferences
   # Billing membership by Provisional amount
@@ -180,7 +208,7 @@ class Api::MembersControllerTest < ActionController::TestCase
             assert_difference('UserPreference.count',@preferences.size) do 
               assert_difference('User.count') do
                 Delayed::Worker.delay_jobs = true
-                assert_difference('DelayedJob.count',6)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x3, :assign_club_cash_without_delay
+                assert_difference('DelayedJob.count',7)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x3, :assign_club_cash_without_delay, :send_fulfillment
                   generate_post_message
                   assert_response :success
                 end
@@ -199,6 +227,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(saved_user.club_cash_amount, @terms_of_membership.initial_club_cash_amount)
     transaction = Transaction.last
     assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
+    fulfillment = saved_user.fulfillments.first
+    assert_equal fulfillment.full_name, "#{saved_user.last_name}, #{saved_user.first_name}, (#{saved_user.state})"
+    assert_equal fulfillment.full_address, "#{saved_user.address}, #{saved_user.city}, #{saved_user.zip}"
+    assert_equal fulfillment.full_phone_number, "#{saved_user.phone_country_code}, #{saved_user.phone_area_code}, #{saved_user.phone_local_number}"
   end
 
  test "Admin should enroll/create user with preferences when needs approval" do
@@ -597,20 +629,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])    
   end
 
-  def validate_credit_card_updated_only_year(active_credit_card, token, number, amount_years)
-    @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
-    @credit_card.expire_month = active_credit_card.expire_month
-    @credit_card.expire_year = (Date.today + amount_years.year).year
-    assert_difference('Operation.count',2) do
-      assert_difference('CreditCard.count',0) do
-        generate_put_message
-      end
-    end
-    assert_response :success
-    assert_equal(@user.active_credit_card.token, token)
-    assert_equal(@user.active_credit_card.expire_month, @credit_card.expire_month)
-  end
-
   # Multiple same credit cards with different expiration date
   test "Should update credit card only year" do
     sign_in @admin_user
@@ -625,20 +643,6 @@ class Api::MembersControllerTest < ActionController::TestCase
     validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 5)
     validate_credit_card_updated_only_year(active_credit_card, token, "5589/5489/3908/0095", 6)
     validate_credit_card_updated_only_year(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 7)
-  end
-
-  def validate_credit_card_updated_only_month(active_credit_card, token, number, amount_months)
-    @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
-    @credit_card.expire_month = (Time.zone.now + amount_months.months).month # January is the first month.
-    @credit_card.expire_year = active_credit_card.expire_year
-    assert_difference('Operation.count',2) do
-      assert_difference('CreditCard.count',0) do
-        generate_put_message
-      end
-    end
-    assert_response :success
-    assert_equal(@user.active_credit_card.token, token)
-    assert_equal(@user.active_credit_card.expire_year, @credit_card.expire_year)
   end
 
   # Multiple same credit cards with different expiration date
@@ -951,7 +955,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
 
     active_merchant_stubs_store(@credit_card.number)
-    assert_difference('Operation.count',2) do
+    assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count',1) do
         generate_post_message
         assert_response :success

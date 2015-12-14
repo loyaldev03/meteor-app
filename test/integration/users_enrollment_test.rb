@@ -902,8 +902,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     assert find_field('input_first_name').value == @saved_user.first_name
     within('.nav-tabs'){ click_on 'Communications' }
     within("#communications") do
-      assert page.has_content?("Test birthday")
-      assert page.has_content?("birthday")
+      find("tr", text: "Test birthday")
       assert_equal(Communication.last.template_type, 'birthday')
     end
 

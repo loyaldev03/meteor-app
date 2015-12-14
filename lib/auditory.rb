@@ -14,6 +14,8 @@ class Auditory
     if user
       o.user_id = user.id
       o.club_id = user.club_id
+    elsif object.instance_of? Prospect
+      o.club_id = object.club_id
     end
     o.save!
   rescue Exception => e

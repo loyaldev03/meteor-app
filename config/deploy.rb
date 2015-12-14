@@ -44,7 +44,8 @@ end
 
 desc "Restart delayed jobs"
 task :restart_delayed_jobs do
-  run "#{sudo} service #{application} restart" 
+  run "#{sudo} service #{application} stop" 
+  run "#{sudo} service #{application} start" 
 end
 
 namespace :elasticsearch do

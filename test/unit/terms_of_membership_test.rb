@@ -86,7 +86,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     end
     #Third billing, it should upgrade 
     Timecop.travel(user.next_retry_bill_date) do
-      assert_difference("Operation.count", 6) do
+      assert_difference("Operation.count", 7) do
         TasksHelpers.bill_all_members_up_today
       end
       user.reload
@@ -132,7 +132,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     end
     #Third billing, it should upgrade 
     Timecop.travel(user.next_retry_bill_date) do
-      assert_difference("Operation.count", 4) do
+      assert_difference("Operation.count", 5) do
         user.manual_billing(@terms_of_membership_with_upgrade.installment_amount, 'cash')
       end
       user.reload
