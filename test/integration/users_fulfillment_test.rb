@@ -995,8 +995,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#products_table")do
       assert page.has_content?(product_one.sku)
       assert page.has_content?(product_two.name)
-      assert page.has_content?(product_one.stock.to_s)
-      assert page.has_content?('Yes')
     end
     assert_equal(product_one.recurrent, true)
     assert_equal(product_two.recurrent, true)
