@@ -218,7 +218,7 @@ class Fulfillment < ActiveRecord::Base
       self.full_name = "#{self.user.last_name}, #{self.user.first_name}, (#{self.user.state})"
       self.full_address = [self.user.address, self.user.city, self.user.zip].join(", ")
       full_phone_number_value = [self.user.phone_country_code, self.user.phone_area_code, self.user.phone_local_number].join(", ")
-      self.full_phone_number = full_phone_number_value if full_phone_number_value.gsub(', ','').length > 3
+      self.full_phone_number = full_phone_number_value if full_phone_number_value.length > 5
     end
 
 end

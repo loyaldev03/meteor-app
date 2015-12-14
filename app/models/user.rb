@@ -742,7 +742,6 @@ class User < ActiveRecord::Base
 
       enrollment_info.membership = membership
       enrollment_info.save
-      Auditory.audit(agent, enrollment_info, "New Enrollment information record created.", self, Settings.operation_types.enrollment)
       
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
@@ -849,8 +848,6 @@ class User < ActiveRecord::Base
       enrollment_info.membership = new_membership
       enrollment_info.save
       
-      Auditory.audit(agent, enrollment_info, "New Enrollment information record created.", self, Settings.operation_types.enrollment)
-
       if trans
         trans.membership_id = self.current_membership.id
         trans.terms_of_membership_id = tom.id

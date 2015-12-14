@@ -13,6 +13,8 @@ class EnrollmentInfo < ActiveRecord::Base
 
   scope :current, -> { order("created_at DESC").limit(1) }
 
+  after_create :audit_enrollment
+
   CS_MEGA_CHANNEL = 'other'
   CS_CAMPAIGN_MEDIUM = 'phone'
   CS_CAMPAIGN_DESCRIPTION = 'CS Join'
@@ -44,4 +46,9 @@ class EnrollmentInfo < ActiveRecord::Base
       self.joint = params[:joint]
     end
   end
+
+  private
+    def audit_enrollment
+      Auditory.audit(self.user.current_membership.created_by, self, "New Enrollment information record created.", self.user, Settings.operation_types.enrollment)
+    end
 end
