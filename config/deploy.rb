@@ -34,6 +34,7 @@ task :link_config_files do
   run "ln -nfs #{shared_path}/mes_account_updater_files #{release_path}/mes_account_updater_files"
   run "ln -nfs #{shared_path}/assets #{release_path}/public/assets"
   run "mkdir #{release_path}/tmp/cache; #{sudo} chown www-data:www-data #{release_path}/tmp/cache" if rails_env == "production"
+  run "mkdir #{release_path}/tmp/files; #{sudo} chown www-data:www-data #{release_path}/tmp/files"
   run "if [ -e #{release_path}/rake_task_runner ]; then chmod +x #{release_path}/rake_task_runner; fi"
 end
 
