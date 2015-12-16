@@ -158,9 +158,6 @@ class User < ActiveRecord::Base
                         :provisional, :do => 'schedule_first_membership(true, true, true, true)' # save the sale
     after_transition applied:                         :provisional, do: 'schedule_first_membership(false)'
     ###### <<<<<<========
-    ###### Reactivation handling =====>>>>
-    after_transition lapsed:                         [:applied, :provisional], do: :increment_reactivations
-    ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
                         :lapsed, :do => [:cancellation, 'nillify_club_cash', 'after_marketing_tool_sync']
@@ -226,11 +223,6 @@ class User < ActiveRecord::Base
   end
   handle_asynchronously :send_recover_needs_approval_email_dj, queue: :email_queue, priority: 20
 
-  # Increment reactivation times upon recovering a member. (From lapsed to provisional or applied)
-  def increment_reactivations
-    increment!(:reactivation_times, 1)
-  end
-
   def additional_data_form
     "Form#{club_id}".constantize rescue nil
   end
@@ -243,7 +235,6 @@ class User < ActiveRecord::Base
   end
 
   def set_user_as_rejected
-    decrement!(:reactivation_times, 1) if reactivation_times > 0 # we increment when it gets applied. If we reject the member we have to get back
     self.current_membership.update_attribute(:cancel_date, Time.zone.now)
   end
 
@@ -381,8 +372,7 @@ class User < ActiveRecord::Base
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
-    # TODO: Add logic to recover some one max 3 times in 5 years
-    self.lapsed? and reactivation_times < Settings.max_reactivations and not self.blacklisted
+    self.lapsed? and not self.blacklisted
   end
 
   def is_chargeback?
@@ -682,7 +672,7 @@ class User < ActiveRecord::Base
     if not self.new_record? and recovery_check and not self.lapsed? 
       return { :message => I18n.t('error_messages.user_already_active', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.user_already_active, :errors => { :status => "Already active." } }
     elsif recovery_check and not self.new_record? and not self.can_recover?
-      return { :message => I18n.t('error_messages.cant_recover_user', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_user, :errors => {:reactivation_times => "Max reactivation times reached."} }
+      return { :message => I18n.t('error_messages.cant_recover_user', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_user }
     end
 
     unless skip_product_validation

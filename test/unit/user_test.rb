@@ -110,16 +110,6 @@ class UserTest < ActiveSupport::TestCase
     assert answer[:code] == Settings.error_codes.user_already_active, answer[:message]
   end
 
-  test "Lapsed user with reactivation_times = 5 cant be recovered" do
-    user = create_active_user(@terms_of_membership_with_gateway)
-    user.set_as_canceled!
-    user.update_attribute( :reactivation_times, 5 )
-    tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-
-    answer = user.recover(tom_dup)
-    assert answer[:code] == Settings.error_codes.cant_recover_user, answer[:message]
-  end
-
   test "Lapsed user can be recovered" do
     assert_difference('Fulfillment.count',Club::DEFAULT_PRODUCT.count) do
       user = create_active_user(@terms_of_membership_with_gateway, :lapsed_user)
@@ -127,7 +117,6 @@ class UserTest < ActiveSupport::TestCase
       answer = user.recover(@terms_of_membership_with_gateway, nil, {product_sku: Club::DEFAULT_PRODUCT.join(',')})
       assert answer[:code] == Settings.error_codes.success, answer[:message]
       assert_equal 'provisional', user.status, "Status was not updated."
-      assert_equal 1, user.reactivation_times, "Reactivation_times was not updated."
       assert_equal user.current_membership.parent_membership_id, nil
     end
   end
@@ -146,23 +135,7 @@ class UserTest < ActiveSupport::TestCase
     user.reload
     assert answer[:code] == Settings.error_codes.success, answer[:message]
     assert_equal 'applied', user.status
-    assert_equal 1, user.reactivation_times
   end
-
-  test "Recovered user in applied status is rejected. Reactivation times should stay at 0." do
-    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    user = create_active_user(@tom_approval, :lapsed_user)
-    answer = user.recover(@tom_approval)
-    user.reload
-    assert answer[:code] == Settings.error_codes.success, answer[:message]
-    assert_equal 'applied', user.status
-    assert_equal 1, user.reactivation_times
-    user.set_as_canceled
-    user.reload
-    assert_equal 'lapsed', user.status
-    assert_equal 0, user.reactivation_times
-  end
-
 
   test "Should not let create an user with a wrong format zip" do
     ['12345-1234', '12345'].each {|zip| zip
@@ -173,17 +146,6 @@ class UserTest < ActiveSupport::TestCase
       user = FactoryGirl.build(:user, zip: zip, club: @terms_of_membership_with_gateway.club)
       assert !user.save, "User cant be save #{user.errors.inspect}"
     }        
-  end
-
-  #Check cancel email
-  test "If user is rejected, when recovering it should increment reactivation_times" do
-    user = create_active_user(@terms_of_membership_with_gateway, :applied_user)
-    user.set_as_canceled!
-    answer = user.recover(@terms_of_membership_with_gateway)
-    user.reload
-    assert answer[:code] == Settings.error_codes.success, answer[:message]
-    assert_equal 'provisional', user.status
-    assert_equal 1, user.reactivation_times
   end
 
   test "Should reset club_cash when user is canceled" do
@@ -231,7 +193,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "if lapsed user is blacklisted, it should not be canceled again" do
-    user = create_active_user(@terms_of_membership_with_gateway, :lapsed_user, nil, { reactivation_times: 5 })
+    user = create_active_user(@terms_of_membership_with_gateway, :lapsed_user, nil)
     cancel_date = user.cancel_date
     assert_difference('Operation.count', 1) do
       user.blacklist(nil, "Test")

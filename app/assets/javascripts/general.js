@@ -956,6 +956,7 @@ function fulfillments_not_processed_function(){
       alert("Select a fulfillment to apply status.");
     } else{
       $('.fulfillment_selected:checked').each(function(index){
+      var box = $(this); 
       $.ajax({
         type: 'PUT',
         url: $(this).data('url'),
@@ -963,11 +964,13 @@ function fulfillments_not_processed_function(){
         dataType: 'json',
         success: function(data) {
           if (data.code == "000"){
-            $("[name='fulfillment_selected["+data.id+"]']").parent().children().hide();
-            $("[name='fulfillment_selected["+data.id+"]']").parent().append("<div class='alert-info alert'>"+data.message+"</div>")
+            box.attr("checked", false)
+            $("#div_fulfillment_selected_"+data.id).parent().children().hide();
+            $("#div_fulfillment_selected_"+data.id).parent().append("<div class='alert-info alert'>"+data.message+"</div>")
           }else{
             alert(data.message);
-            $("[name='fulfillment_selected["+data.id+"]']").parent().append("<div class='error-info error'>"+data.message+"</div>")
+            $("#div_fulfillment_selected_"+data.id+" div").remove();
+            $("#div_fulfillment_selected_"+data.id).append("<div class='error-info alert'>"+data.message+"</div>")
           };
         },
       });  

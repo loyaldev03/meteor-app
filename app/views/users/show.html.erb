@@ -254,10 +254,6 @@
             <td id="td_mi_created_by"> <%= @current_membership.created_by.try(:username) %> </td>
           </tr>
           <tr>
-            <th><%= t('activerecord.attributes.user.recovery_times') %>:</th>
-            <td id="td_mi_reactivation_times"><%= @current_user.reactivation_times %></td>  
-          </tr>
-          <tr>
             <th><%= t('activerecord.attributes.user.recycled_times') %>:</th>
             <td id="td_mi_recycled_times">
               <%= @current_user.recycled_times %>

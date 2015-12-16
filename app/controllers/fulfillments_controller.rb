@@ -44,11 +44,29 @@ class FulfillmentsController < ApplicationController
     fulfillment = Fulfillment.find(params[:id])
     my_authorize! :update_status, Fulfillment, fulfillment.club_id
     file = (params[:file].blank? ? nil : params[:file])
+
     render json: fulfillment.update_status(@current_agent, params[:new_status], params[:reason], file).merge(:id => params[:id])
   rescue ActiveRecord::RecordNotFound => e
     render json: { :message => "Could not found the fulfillment.", :code => Settings.error_codes.not_found, :id => params[:id] }
   rescue CanCan::AccessDenied
     render json: { :message => "You are not allowed to change status on this fulfillment.", :code => Settings.error_codes.not_authorized, :id => params[:id] }
+  end
+
+  def manual_review
+    if ['not_processed', 'canceled', 'do_not_honor'].include? params[:new_status]  
+      fulfillment = Fulfillment.find(params[:id])
+      my_authorize! :manual_review, Fulfillment, fulfillment.club_id
+      answer = fulfillment.update_status(@current_agent, params[:new_status])
+      
+      message = answer[:code] == Settings.error_codes.success ? { notice: answer[:message] } : { alert: answer[:message] }
+      redirect_to show_user_path(user_prefix: fulfillment.user_id), message
+    else  
+      flash[:error] = "You are not allowed to update to that status."
+      redirect_to my_clubs_path
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    flash[:error] = "Could not found the fulfillment."
+    redirect_to my_clubs_path
   end
 
   # def resend
@@ -134,5 +152,4 @@ class FulfillmentsController < ApplicationController
   ensure
     redirect_to list_fulfillment_files_path
   end
-
 end

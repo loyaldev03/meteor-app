@@ -97,9 +97,6 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
     within("#td_mi_status") do
       assert page.has_content?('lapsed')
     end
-    within("#td_mi_reactivation_times") do
-      assert page.has_content?("0")
-    end
   end
 
   test "blacklist user with more CC" do

@@ -223,7 +223,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
     assert_equal(fulfillment.renewable_at, fulfillment.assigned_at + 1.year)
     assert_equal(fulfillment.status, 'not_processed')
-    
+      
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
     within(".nav-tabs") do
@@ -318,6 +318,84 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     stock = @product.stock
     @product.reload
     assert_equal(@product.stock,stock-1)
+  end
+
+  test "Enroll an user with product in the list and set as cancel that fulfillment from profile." do
+    setup_user(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    create_user_throught_sloop(enrollment_info)
+    @saved_user = User.find_by_email(@user.email)
+
+    fulfillment = Fulfillment.last
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    assert find_field('input_first_name').value == @saved_user.first_name
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
+      assert page.has_content?(I18n.l fulfillment.renewable_at, :format => :only_date)
+      assert page.has_content?(@product.sku)
+      assert page.has_content?('not_processed')
+      confirm_ok_js
+      click_link_or_button('Cancel')
+    end
+    assert find_field('input_first_name').value == @saved_user.first_name
+    assert page.has_content? "Changed status on Fulfillment ##{fulfillment.id} #{@product.sku} from not_processed to canceled"
+  end
+
+  test "Enroll an user with product in the list and set as do_not_honor that fulfillment from profile." do
+    setup_user(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    create_user_throught_sloop(enrollment_info)
+    @saved_user = User.find_by_email(@user.email)
+
+    fulfillment = Fulfillment.last
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    assert find_field('input_first_name').value == @saved_user.first_name
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
+      assert page.has_content?(I18n.l fulfillment.renewable_at, :format => :only_date)
+      assert page.has_content?(@product.sku)
+      assert page.has_content?('not_processed')
+      confirm_ok_js
+      click_link_or_button('Do not honor')
+    end
+    assert find_field('input_first_name').value == @saved_user.first_name
+    assert page.has_content? "Changed status on Fulfillment ##{fulfillment.id} #{@product.sku} from not_processed to do_not_honor"
+  end
+
+  test "Only show cancel or do not honor buttons within user's profile if product is in not_process." do
+    setup_user(false)
+    @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    create_user_throught_sloop(enrollment_info)
+    @saved_user = User.find_by_email(@user.email)
+
+    Fulfillment.state_machines[:status].states.map(&:name).each do |status|
+      Fulfillment.update_all status: status
+      visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+      assert find_field('input_first_name').value == @saved_user.first_name
+      within(".nav-tabs") do
+        click_on("Fulfillments")
+      end
+      within("#fulfillments")do
+        assert page.has_content?(@product.sku)
+        if ['not_processed', 'manual_review_required'].include? status
+          assert page.has_selector?('Set as not processed') if status == 'manual_review_required'
+          assert page.has_selector? 'Cancel'
+          assert page.has_selector? 'Do not honor'
+        else
+          assert page.has_no_selector? 'Cancel'
+          assert page.has_no_selector? 'Do not honor'
+        end
+      end
+    end
   end
 
   test "display default data on fulfillments index" do

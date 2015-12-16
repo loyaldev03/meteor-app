@@ -46,6 +46,7 @@ class Ability
     cannot :manage, EmailTemplate
     cannot :chargeback, Transaction
     cannot :toggle_testing_account, User
+    cannot :manual_review, Fulfillment
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
 
@@ -116,6 +117,7 @@ class Ability
       can :list, ClubCashTransaction
       can :list, Communication
       can :list, Fulfillment
+      can :manual_review, Fulfillment
     when 'supervisor' then
       can :manage, User
       cannot :api_profile, User
@@ -139,6 +141,7 @@ class Ability
       can :list, Membership
       can :list, Communication
       can :list, Fulfillment
+      can :manual_review, Fulfillment
     when 'api' then
       can :api_enroll, User
       can :api_update, User

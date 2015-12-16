@@ -566,9 +566,7 @@ module ActionDispatch
       click_on "Recover"
       if validate
         wait_until{ assert find_field('input_first_name').value == user.first_name }
-        within("#td_mi_reactivation_times")do
-          wait_until{ assert page.has_content?("1")}
-        end
+        assert page.has_content? 'Member recovered successfully'
       end
     end
 
@@ -720,12 +718,8 @@ module ActionDispatch
         
         assert page.has_content?(user.terms_of_membership.name)
         
-        within("#td_mi_reactivation_times") { assert page.has_content?("#{user.reactivation_times}") }
-        
         assert page.has_content?(user.current_membership.created_by.username)
 
-        within("#td_mi_reactivation_times") { assert page.has_content?("#{user.reactivation_times}") }
-        
         within("#td_mi_recycled_times") { assert page.has_content?("#{user.recycled_times}") }
         
         assert page.has_no_selector?("#td_mi_external_id")
