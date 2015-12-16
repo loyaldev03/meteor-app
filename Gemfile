@@ -72,8 +72,6 @@ gem "zendesk_api"
 # Use unicorn as the app server
 # gem 'unicorn'
 
-gem 'oboe'
-
 # To use debugger
 group :development do
   gem "rails-erd"
