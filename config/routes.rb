@@ -132,6 +132,7 @@ SacPlatform::Application.routes.draw do
 
       scope '/fulfillment/:id' do
         put '/update_status' => 'fulfillments#update_status', as: 'update_fulfillment_status'
+        put '/manual_review' => 'fulfillments#manual_review', as: 'manual_review_fulfillment'
       end
     end
 

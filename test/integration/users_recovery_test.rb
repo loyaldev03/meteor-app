@@ -77,9 +77,6 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     within("#td_mi_join_date") do
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
     end
-    within("#td_mi_reactivation_times") do
-      assert page.has_content?("1")
-    end
 
     within(".nav-tabs") do
       click_on("Operations")
@@ -134,26 +131,6 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     page.has_content? "Member recovered successfully $0.0 on TOM(2) -#{@saved_user.current_membership.terms_of_membership.name}-"
 
     validate_user_recovery(@saved_user, @new_terms_of_membership_with_gateway)
-  end
-
-  test "recovery an user 3 times" do
-    setup_user
-    3.times do
-      if @saved_user.current_membership.terms_of_membership.name == "another_tom"
-        tom = @terms_of_membership_with_gateway
-      else
-        tom = @new_terms_of_membership_with_gateway
-      end
-      recover_user(@saved_user, tom)
-      wait_until{ assert find_field('input_first_name').value == @saved_user.first_name }
-      if page.has_no_content?("Cant recover user. Max reactivations reached")
-        cancel_user(@saved_user,Time.zone.now + 1.day)        
-      end
-    end
-    assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
-    within("#td_mi_reactivation_times") do
-      assert page.has_content?("3")
-    end
   end
 
   test "Recover an user by Monthly membership" do

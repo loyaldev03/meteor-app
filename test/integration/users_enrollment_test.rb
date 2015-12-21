@@ -693,7 +693,6 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     
     @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_approval.name,false)
-    reactivation_times = @saved_user.reactivation_times
     membership = @saved_user.current_membership
 
     validate_view_user_base(@saved_user,'applied')
@@ -703,12 +702,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     page.has_content?("user approved")
     @saved_user.reload
 
-    assert_equal reactivation_times, @saved_user.reactivation_times #did not changed
-
     within("#td_mi_status"){ assert page.has_content?('provisional') }
     within("#td_mi_join_date"){ assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date)) }
     within("#td_mi_next_retry_bill_date"){ assert page.has_content?(I18n.l(Time.zone.now+@terms_of_membership_with_approval.provisional_days.days, :format => :only_date) ) }
-    within("#td_mi_reactivation_times"){ assert page.has_content?("0")}
     within(".nav-tabs"){ click_on("Memberships") }
     within("#memberships_table")do
       assert page.has_content?(membership.id.to_s)
@@ -726,10 +722,6 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     click_on "Recover"
 
     assert find_field('input_first_name').value == unsaved_user.first_name
-
-    within("#td_mi_reactivation_times")do
-      assert page.has_content?("1")
-    end
   end
 
   test "Recover user from sloop with the same credit card" do
@@ -739,7 +731,6 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     active_merchant_stubs_store(credit_card.number)    
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_approval.name,false)
-    reactivation_times = @saved_user.reactivation_times
     membership = @saved_user.current_membership
 
     @saved_user.reload
@@ -761,10 +752,6 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
-
-    within("#td_mi_reactivation_times") do
-      assert page.has_content?("1")
-    end
   end
 
   test "Reject user" do

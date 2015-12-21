@@ -43,6 +43,9 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_not_processed do
       transition all => :not_processed
     end
+    event :manual_review_required do
+      transition all => :manual_review_required
+    end
     event :set_as_in_process do
       transition all => :in_process
     end
@@ -64,8 +67,13 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_canceled do
       transition all => :canceled
     end
+    event :set_as_do_not_honor do
+      transition all => :do_not_honor
+    end
     #First status. fulfillment is waiting to be processed. Stock will be decreased by one.
     state :not_processed
+    #This status will be set automatically when assigning the fulfillment to the user if the user is suspected to be a gamer.
+    state :manual_review_required
     #This status will be automatically set after the new fulfillment list is downloaded.
     state :in_process
     #Used due to some type of error
@@ -78,8 +86,10 @@ class Fulfillment < ActiveRecord::Base
     state :out_of_stock 
     #Will be similar than Bad address
     state :returned
-    #when member gets lapsed status, all not_processed / in_process / out_of_stock / bad_address fulfillments gets this status.
+    #When member gets lapsed status, all not_processed / in_process / out_of_stock / bad_address fulfillments gets this status.
     state :canceled
+    #This status is used to mark fulfillments created by gamers with the only purpose of taking advantage of our sloop system. Fulfillments in this status are treated as it were 'canceled'.
+    state :do_not_honor
     #if delivery fail this status is set and wrong address on member file should be filled with the reason. If the member
     #is set as undeliverable every fulfillment in 'not_processed','in_process','out_of_stock' and 'returned' will also be
     #set as 'bad_address' 
@@ -119,12 +129,12 @@ class Fulfillment < ActiveRecord::Base
   end
 
   def replenish_stock
-    if status_changed? and status == 'canceled'
+    if status_changed? and ['canceled', 'do_not_honor'].include? status
       product.replenish_stock
     end
   end
 
-  def update_status(agent, new_status, reason, file = nil)
+  def update_status(agent, new_status, reason = nil, file = nil)
     old_status = self.status
     if renewed?
       return {message: I18n.t("error_messages.fulfillment_is_renwed") , code: Settings.error_codes.fulfillment_error }
@@ -132,17 +142,26 @@ class Fulfillment < ActiveRecord::Base
       return {message: I18n.t("error_messages.fulfillment_new_status_blank") , code: Settings.error_codes.fulfillment_error }
     elsif old_status == new_status
       return {message: I18n.t("error_messages.fulfillment_new_status_equal_to_old", fulfillment_sku: self.product_sku) , code: Settings.error_codes.fulfillment_error }
+    end
+
+    if not ['not_processed', 'manual_review_required'].include? new_status and ['canceled', 'do_not_honor'].include? old_status
+      return {message: I18n.t("error_messages.fulfillment_cannot_be_recovered") , code: Settings.error_codes.fulfillment_error }
+    elsif (old_status == 'manual_review_required' and not ['canceled', 'do_not_honor', 'not_processed'].include? new_status) or (new_status == 'manual_review_required' and not ['canceled', 'do_not_honor', 'not_processed'].include? old_status)
+      return {message: I18n.t("error_messages.fulfillment_invalid_transition") , code: Settings.error_codes.fulfillment_error }
+    elsif new_status == 'do_not_honor' and not ['not_processed', 'manual_review_required'].include? old_status
+      return {message: I18n.t("error_messages.fulfillment_invalid_transition") , code: Settings.error_codes.fulfillment_error }
     elsif new_status == 'bad_address' or new_status == 'returned'
       if reason.blank?
         return {message: I18n.t("error_messages.fulfillment_reason_blank"), code: Settings.error_codes.fulfillment_reason_blank}
       else
         answer = ( user.wrong_address.nil? ? user.set_wrong_address(agent, reason, false) : {code: Settings.error_codes.success, message: "Member already set as wrong address."} )
       end
-    elsif new_status == 'not_processed'
+    elsif ['not_processed', 'manual_review_required'].include? new_status and not ['not_processed', 'manual_review_required'].include? old_status
       answer = decrease_stock!
     else
       answer = { code: Settings.error_codes.success }
     end
+    
     if answer[:code] == Settings.error_codes.success        
       self.status = new_status
       self.save
