@@ -191,30 +191,30 @@ defaults: &defaults
     from_bad_address_to_do_not_honor: 464
     from_manual_review_required_to_do_not_honor: 465
     from_do_not_honor_to_not_processed: 466
-    from_do_not_honor_to_in_process: 468
-    from_do_not_honor_to_on_hold: 469
-    from_do_not_honor_to_sent: 470
-    from_do_not_honor_to_out_of_stock: 471
-    from_do_not_honor_to_returned: 472
-    from_do_not_honor_to_canceled: 473
-    from_do_not_honor_to_bad_address: 474
-    from_do_not_honor_to_manual_review_required: 475
-    from_not_processed_to_manual_review_required: 476
-    from_in_process_to_manual_review_required: 477
-    from_on_hold_to_manual_review_required: 478
-    from_sent_to_manual_review_required: 479
-    from_out_of_stock_to_manual_review_required: 480
-    from_returned_to_manual_review_required: 481
-    from_canceled_to_manual_review_required: 482
-    from_bad_address_to_manual_review_required: 483
-    from_manual_review_required_to_not_processed: 485
-    from_manual_review_required_to_in_process: 486
-    from_manual_review_required_to_on_hold: 487
-    from_manual_review_required_to_sent: 488
-    from_manual_review_required_to_out_of_stock: 489
-    from_manual_review_required_to_returned: 490
-    from_manual_review_required_to_canceled: 491
-    from_manual_review_required_to_bad_address: 492
+    from_do_not_honor_to_in_process: 467
+    from_do_not_honor_to_on_hold: 468
+    from_do_not_honor_to_sent: 469
+    from_do_not_honor_to_out_of_stock: 470
+    from_do_not_honor_to_returned: 471
+    from_do_not_honor_to_canceled: 472
+    from_do_not_honor_to_bad_address: 473
+    from_do_not_honor_to_manual_review_required: 474
+    from_not_processed_to_manual_review_required: 475
+    from_in_process_to_manual_review_required: 476
+    from_on_hold_to_manual_review_required: 477
+    from_sent_to_manual_review_required: 478
+    from_out_of_stock_to_manual_review_required: 479
+    from_returned_to_manual_review_required: 480
+    from_canceled_to_manual_review_required: 481
+    from_bad_address_to_manual_review_required: 482
+    from_manual_review_required_to_not_processed: 483
+    from_manual_review_required_to_in_process: 484
+    from_manual_review_required_to_on_hold: 485
+    from_manual_review_required_to_sent: 486
+    from_manual_review_required_to_out_of_stock: 487
+    from_manual_review_required_to_returned: 488
+    from_manual_review_required_to_canceled: 499
+    from_manual_review_required_to_bad_address: 490
     #vip
     vip_event_registration: 900
     vip_event_cancelation: 901 
