@@ -189,6 +189,7 @@ defaults: &defaults
     from_returned_to_do_not_honor: 462
     from_canceled_to_do_not_honor: 463
     from_bad_address_to_do_not_honor: 464
+    from_manual_review_required_to_do_not_honor: 465
     from_do_not_honor_to_not_processed: 466
     from_do_not_honor_to_in_process: 468
     from_do_not_honor_to_on_hold: 469
@@ -214,7 +215,6 @@ defaults: &defaults
     from_manual_review_required_to_returned: 490
     from_manual_review_required_to_canceled: 491
     from_manual_review_required_to_bad_address: 492
-    from_manual_review_required_to_do_not_honor: 465
     #vip
     vip_event_registration: 900
     vip_event_cancelation: 901 
