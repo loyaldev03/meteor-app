@@ -25,7 +25,7 @@ class Fulfillment < ActiveRecord::Base
   scope :where_in_process, -> { where("status = 'in_process'") }
   scope :where_not_processed, -> { where("status = 'not_processed'") }
   scope :where_to_set_bad_address, -> { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
-  scope :where_cancellable, -> { where("status IN ('not_processed','in_process','out_of_stock','bad_address')") }
+  scope :where_cancellable, -> { where("status IN ('not_processed','in_process','out_of_stock','bad_address', 'manual_review_required')") }
   scope :type_others, -> { where(["product_sku NOT IN (?)", Settings.kit_card_product])}
 
   scope :not_renewed, -> { where("renewed = false") }
