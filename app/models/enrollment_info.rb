@@ -33,7 +33,7 @@ class EnrollmentInfo < ActiveRecord::Base
       self.referral_host = params[:referral_host]
       self.referral_parameters = params[:referral_parameters]
       self.referral_path = params[:referral_path]
-      self.visitor_id = params[:user_id]
+      self.visitor_id = params[:visitor_id]
       self.landing_url = params[:landing_url].downcase if params[:landing_url]
       self.preferences = params[:preferences]
       self.cookie_value = params[:cookie_value]
