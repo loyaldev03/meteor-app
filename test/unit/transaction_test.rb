@@ -72,7 +72,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enrollment without approval" do
     active_merchant_stubs
-    assert_difference('Operation.count',3) do   #EnrollBilling, club cash and EnrollmentInfo operations.
+    assert_difference('Operation.count',4) do   #EnrollBilling, club cash and EnrollmentInfo operations, fulfillment_creation
       assert_difference('Fulfillment.count') do
         user = enroll_user(@terms_of_membership)
         assert_not_nil user.next_retry_bill_date, "NBD should not be nil"

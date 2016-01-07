@@ -134,6 +134,9 @@ SacPlatform::Application.routes.draw do
         put '/update_status' => 'fulfillments#update_status', as: 'update_fulfillment_status'
         put '/manual_review' => 'fulfillments#manual_review', as: 'manual_review_fulfillment'
       end
+
+      get '/suspected_fulfillments' => 'fulfillments#suspected_fulfillments', as: 'suspected_fulfillments'
+      get '/suspected_fulfillment/:id' => 'fulfillments#suspected_fulfillment_information', as: 'suspected_fulfillment_information'
     end
 
     resources :domains

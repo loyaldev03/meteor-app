@@ -1,5 +1,6 @@
 class FulfillmentsController < ApplicationController
   before_filter :validate_club_presence
+  layout '', only: [:suspected_fulfillment_information]
 
   def index
     my_authorize! :report, Fulfillment, @current_club.id
@@ -152,4 +153,20 @@ class FulfillmentsController < ApplicationController
   ensure
     redirect_to list_fulfillment_files_path
   end
+
+  def suspected_fulfillments
+    params[:initial_date] ||= (Time.current - 7.days).to_date
+    params[:end_date] ||= (Time.current).to_date
+    @suspected_fulfillment_data = Fulfillment.where("status = ? AND club_id = ? AND date(assigned_at) BETWEEN ? and ?", 
+                    'manual_review_required', current_club.id, params[:initial_date], params[:end_date]).
+                    order('created_at DESC').group_by{ |f| f.created_at.to_date }
+  end
+
+  def suspected_fulfillment_information
+    fulfillment = Fulfillment.find_by(id: params[:id], club_id: current_club.id)
+    evidences = fulfillment.suspected_fulfillment_evidences.paginate(page: params[:page], per_page: 20).order("created_at DESC") if fulfillment
+    render :partial => 'suspected_fulfillment_information', locals: { fulfillment: fulfillment, evidences: evidences }
+  end
 end
+
+

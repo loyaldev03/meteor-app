@@ -955,7 +955,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryGirl.build :enrollment_info
 
     active_merchant_stubs_store(@credit_card.number)
-    assert_difference('Operation.count',3) do
+    assert_difference('Operation.count',4) do
       assert_difference('CreditCard.count',1) do
         generate_post_message
         assert_response :success

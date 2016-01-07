@@ -1,0 +1,44 @@
+<div class="row-fluid">
+  <div class="span12 row-fluid">
+  <%= form_tag(suspected_fulfillments_path, method: :get, id: 'suspected_fulfillments_form') do |f| %>
+    <div class="span6">
+      <%= label :initial_date, t('initial_date'), :class => 'help-inline' %>
+      <%= text_field_tag :initial_date, params[:initial_date], { :class => 'datepicker input-small', :readonly => 'readonly' } %>
+      <%= label :end_date, t('end_date'), :class => 'help-inline' %>
+      <%= text_field_tag :end_date, params[:end_date], { :class => 'datepicker input-small', :readonly => 'readonly' } %>
+      <%= submit_tag(t('search'), class: 'btn btn-primary', id: 'suspected_fulfillments_form_submit_button')%>
+    </div> 
+    <% if @suspected_fulfillment_data.any? %>
+      <div class="span5 alert alert-info"><h4> <%= @suspected_fulfillment_data.values.flatten.count %> suspected fulfillments found </h4></div>
+    <% else %>
+      <div class="span5 alert"><h4> No suspected fulfillments were found. </h4></div>
+    <% end %>
+    </div> 
+  <% end %>
+</div>
+
+  <div id="suspected_fulfillment_data" class="row-fluid">
+    <div id='suspected_list' class='span'>
+      <% if @suspected_fulfillment_data.any? %>
+        <table id='suspected_list_table' class='table'>
+          <thead>
+            <tr class="ligthgrey"><th> User by date </th></tr>
+          </thead>
+          <tbody>
+              <% @suspected_fulfillment_data.each do |date, fulfillments| %>
+                  <tr> <td class="ligthgrey"> <b> <%= date %> </b> </td> </tr>
+                  <% fulfillments.each do |fulfillment| %>
+                    <tr><td data-href="<%= suspected_fulfillment_information_path(partner_prefix: @current_partner.prefix, club_prefix: @current_club.name, id: fulfillment.id)%>"> <%= fulfillment.user_id %> </td></tr>
+                  <%end%>
+              <% end %>
+          <tbody>
+        </table>
+      <% end %>
+    </div>
+    <div id='evidences_information' class='span'>
+    </div>
+  </div>
+
+<script>
+  $(document).ready( suspected_fulfillments_functions() );
+</script>

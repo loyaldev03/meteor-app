@@ -5,6 +5,9 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   protect_from_forgery
 
+  helper_method :current_user
+  helper_method :current_club
+
   def after_sign_in_path_for(resource)
     return session[:agent_return_to] if session[:agent_return_to]
     sign_in_url = url_for(:action => 'new', :controller => 'sessions', :only_path => false, :protocol => 'http')    
@@ -20,6 +23,10 @@ class ApplicationController < ActionController::Base
 
   def current_user
     @current_user
+  end
+
+  def current_club
+    @current_club
   end
 
   protected

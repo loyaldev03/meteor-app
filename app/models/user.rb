@@ -421,6 +421,10 @@ class User < ActiveRecord::Base
     false
   end
 
+  def fulfillments_products_to_send
+    current_membership.enrollment_info.product_sku ? current_membership.enrollment_info.product_sku.split(',') : []
+  end
+  
   ###############################################
 
   def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil)

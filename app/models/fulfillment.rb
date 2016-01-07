@@ -12,6 +12,7 @@ class Fulfillment < ActiveRecord::Base
   belongs_to :user
   belongs_to :club
   has_and_belongs_to_many :fulfillment_files
+  has_many :suspected_fulfillment_evidences
 
   before_create :set_default_values
   after_update :replenish_stock
@@ -43,7 +44,7 @@ class Fulfillment < ActiveRecord::Base
     event :set_as_not_processed do
       transition all => :not_processed
     end
-    event :manual_review_required do
+    event :set_as_manual_review_required do
       transition all => :manual_review_required
     end
     event :set_as_in_process do
@@ -234,6 +235,7 @@ class Fulfillment < ActiveRecord::Base
         self.renewable_at = self.assigned_at + 1.year 
       end
       self.tracking_code = self.product_package.to_s + self.user.id.to_s
+      self.email = self.user.email
       self.full_name = "#{self.user.last_name}, #{self.user.first_name}, (#{self.user.state})"
       self.full_address = [self.user.address, self.user.city, self.user.zip].join(", ")
       full_phone_number_value = [self.user.phone_country_code, self.user.phone_area_code, self.user.phone_local_number].join(", ")

@@ -215,6 +215,8 @@ defaults: &defaults
     from_manual_review_required_to_returned: 488
     from_manual_review_required_to_canceled: 489
     from_manual_review_required_to_bad_address: 490
+    fulfillment_created_as_not_processed: 491
+    fulfillment_created_as_manual_review_required: 492
     #vip
     vip_event_registration: 900
     vip_event_cancelation: 901 

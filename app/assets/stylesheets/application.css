@@ -201,3 +201,49 @@ div.dataTables_filter {
 .div-table .title{
   border-bottom: solid;
 }
+
+#suspected_list {
+  height: 400px;
+  overflow-y: auto;
+  width: 9%;
+}
+
+#suspected_list th,
+#suspected_list td {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+#evidences_information {
+  float: right;
+  width: 89%;
+  margin-left: 10px;
+}
+
+#suspected_list td:not(.ligthgrey) {
+  cursor: pointer;
+}
+
+#suspected_list tbody td, 
+#suspected_list thead th{
+  text-align: center;
+}
+
+table.suspected_fulfillment_evidences tbody,
+table.suspected_fulfillment_evidences thead { display: block; }
+table.suspected_fulfillment_evidences tbody {
+    height: 200px;
+    overflow-y: auto;
+}
+table.suspected_fulfillment_evidences tbody td,
+table.suspected_fulfillment tbody td {
+  word-wrap: break-word;
+  font-size: 10px !important;
+}
+
+table.suspected_fulfillment thead th,
+table.suspected_fulfillment tbody td,
+table.suspected_fulfillment_evidences thead th,
+table.suspected_fulfillment_evidences tbody td {
+  text-align: center;
+}

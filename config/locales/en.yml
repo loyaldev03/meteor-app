@@ -46,6 +46,7 @@ en:
   lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
   days: "days"
   allow_blank_credit_card: "Allow blank credit card?"
+  status: 'Status'
   menu: 
     admin_menu: 'Admin Menu'
     logout: 'Logout'
@@ -185,6 +186,7 @@ en:
       subscription_plans: 'Subscription Plans'
       payment_gateway_configuration: 'Payment Gateway Configuration'
       terms_of_membership: 'Subscription Plan'
+      suspected_fulfillments: 'Suspected Fulfillments'
     gateway:
       mes: 'Merchant e Solutions'
       litle: Litle
@@ -523,6 +525,25 @@ en:
         new_status: 'New status'
         product_type: 'Product type'
         renewed: 'Renewed'
+        created_at: 'Created'
+        email: 'Email'
+        full_name: 'Full name'
+        full_address: 'Address'
+        phone_number: 'Phone'
+        user_id: User
+        status: 'Status'
+        status_options:
+          not_processed: 'Not processed' 
+          manual_review_required: 'Manual review'
+          in_process: 'In process'
+          on_hold: 'On hold'
+          sent: 'Sent'
+          out_of_stock: 'Out of stock'
+          returned: 'Returned'
+          canceled: 'Canceled'
+          do_not_honor: 'Do not honor'
+          bad_address: 'Bad address'
+    state :
       fulfillment_files:
         id: 'ID'
         created_at: 'Created at'
