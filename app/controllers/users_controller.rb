@@ -178,6 +178,11 @@ class UsersController < ApplicationController
   def toggle_testing_account
     @current_user.toggle :testing_account
     if @current_user.save
+      if @current_user.testing_account
+        @current_user.fulfillments.where_cancellable.each do |fulfillment| 
+          fulfillment.update_status(current_agent, 'canceled', "Member set as testing account")
+        end
+      end
       flash[:notice] = "User is no longer set as testing account." unless @current_user.testing_account
     else
       flash[:error] = "User could not be updated"
