@@ -213,7 +213,7 @@ defaults: &defaults
     from_manual_review_required_to_sent: 486
     from_manual_review_required_to_out_of_stock: 487
     from_manual_review_required_to_returned: 488
-    from_manual_review_required_to_canceled: 499
+    from_manual_review_required_to_canceled: 489
     from_manual_review_required_to_bad_address: 490
     #vip
     vip_event_registration: 900
