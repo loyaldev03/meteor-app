@@ -753,6 +753,7 @@ class User < ActiveRecord::Base
       logger.error e.inspect
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
       replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
+      trans.update_attribute(:operation_type, Settings.error_on_enrollment_billing) if trans and not trans.success
       Auditory.report_issue(error_message, e, { user: self.inspect, credit_card: credit_card.inspect, enrollment_info: enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       # TODO2: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
