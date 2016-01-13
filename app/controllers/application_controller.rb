@@ -18,6 +18,10 @@ class ApplicationController < ActionController::Base
     render :file => "#{Rails.root}/public/401", :status => 401, :layout => false, :formats => [:html]
   end
 
+  def current_user
+    @current_user
+  end
+
   protected
 
     def configure_permitted_parameters
