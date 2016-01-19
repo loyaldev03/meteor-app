@@ -1317,6 +1317,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enroll with Authorize net" do
     club_with_authorize_net
+    active_merchant_stubs_auth_net
     enroll_user(@authorize_net_terms_of_membership, 23, false, @credit_card_authorize_net)
   end
 
@@ -1355,6 +1356,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Auth.net
   test "Try billing an user's membership when he was previously SD for credit_card_expired for Auth.net" do 
+    active_merchant_stubs_auth_net
     @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
     @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
     @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net, :token => "tzNduuh2DRQT7FXUILDl3Q==")
@@ -1389,6 +1391,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for Auth.net" do 
+    active_merchant_stubs_auth_net
     @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
     @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
     @authorize_net_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id, :name =>"second_one")
