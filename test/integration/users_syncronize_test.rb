@@ -427,7 +427,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     within(".nav-tabs"){ page.has_no_selector?("#sync_status") }
-    end
     assert_equal @saved_user.api_id, nil
   end
 end
