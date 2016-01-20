@@ -282,9 +282,10 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
-    
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_user = User.last
+
+    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
+    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    # @saved_user = User.last
 
     @saved_user.update_attribute(:updated_at, Time.zone.now-1)
     @saved_user.update_attribute(:last_synced_at, Time.zone.now)
@@ -301,8 +302,9 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_user = User.last
+    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
+    # @saved_user = User.last
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     sleep 5
@@ -347,14 +349,13 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_user = User.find_by(email: unsaved_user.email)
+    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
+    # @saved_user = User.find_by(email: unsaved_user.email)
     @saved_user.update_attribute(:last_sync_error_at, Time.zone.now)
     @saved_user.update_attribute(:sync_status, "with_error")
-
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    sleep 5
-
+    
     within(".nav-tabs"){ click_on("Sync Status") }
     within("#span_mi_sync_status"){ page.has_content?('Sync Error') }
     within("#sync_status")do
@@ -384,8 +385,9 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_user = User.find_by(email: unsaved_user.email)
+    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
+    # @saved_user = User.find_by(email: unsaved_user.email)
     @saved_user.set_as_canceled!
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
@@ -401,10 +403,10 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
-    @saved_user = User.find_by(email: unsaved_user.email)
-
-    visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
+    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_approval.name)
+    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
+    # @saved_user = User.find_by(email: unsaved_user.email)
+    # visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == unsaved_user.first_name
     
     within(".nav-tabs"){ click_on("Sync Status") }
@@ -418,15 +420,13 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
-    @saved_user = User.find_by(email: unsaved_user.email)
+    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_approval.name)
+    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
+    # @saved_user = User.find_by(email: unsaved_user.email)
     @saved_user.set_as_canceled
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    sleep 5
-
-    within(".nav-tabs") do
-      page.has_no_selector?("#sync_status")
+    within(".nav-tabs"){ page.has_no_selector?("#sync_status") }
     end
     assert_equal @saved_user.api_id, nil
   end
