@@ -7,9 +7,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   ############################################################
 
   setup do
-  end
-
- def setup_environment 
     Drupal.enable_integration!
     Drupal.test_mode!
     # Pardot.enable_integration! ==> NoMethodError: undefined method `enable_integration!' for Pardot:Module
@@ -28,8 +25,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     @partner = @club.partner
     @partner.update_attribute(:prefix,"partner_uno")
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
-    sign_in_as(@admin_agent)
-   end
+    sign_in_as(@admin_agent)  
+  end
 
   def update_api_id(user, api_id, validate = true)
    visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name,   :user_prefix => @saved_user.id)
@@ -51,7 +48,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
       within("#operations_table") do
          assert page.has_content?("User's api_id changed from nil to \"#{api_id}\"")
       end
-
       within(".nav-tabs") do
         click_on("Sync Status")
       end
@@ -67,7 +63,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   ############################################################
 
   test "Do not allow use the same api_id" do
-    setup_environment
     unsaved_user=FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     @saved_user = create_user(unsaved_user, credit_card)
@@ -88,7 +83,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Allow enter api_id empty" do
-    setup_environment
     unsaved_user=FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     @saved_user = create_user(unsaved_user, credit_card)
@@ -109,7 +103,7 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
 
   # generate stubs related to conn in order to set as nill the api_id
   # test "Allow enter api_id empty when Cancel a member" do
-  #   setup_environment
+  #   
   #   unsaved_member=FactoryGirl.build(:active_member, :club_id => @club.id)
   #   credit_card = FactoryGirl.build(:credit_card_master_card)
   #   @saved_member = create_member(unsaved_member, credit_card)
@@ -119,14 +113,12 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   # end
 
   test "Syncronize a club - club has a good drupal domain" do
-    setup_environment 
   	assert_not_equal(@club.api_username, nil)
   	assert_not_equal(@club.api_password, nil)
   	assert_not_equal(@club.drupal_domain_id, nil)
   end
 
   test "Club with invalid 'drupal domain' ( that is, a domain where there is no drupal installed)" do
-  	setup_environment 
     @club.update_attribute(:drupal_domain_id, 999);
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
@@ -149,7 +141,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Club without 'drupal domain'" do
-    setup_environment 
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club_without_api.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
@@ -161,7 +152,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Sync Status tab" do
-    setup_environment 
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     @saved_user = create_user(unsaved_user, credit_card)
@@ -192,7 +182,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Update user's api_id (Remote ID)" do
-    setup_environment
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     @saved_user = create_user(unsaved_user, credit_card)
@@ -226,7 +215,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Update user's api_id (Remote ID) with invalid information" do
-    setup_environment
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     @saved_user = create_user(unsaved_user, credit_card)
@@ -247,7 +235,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Unset user's api_id (Remote ID)" do
-    setup_environment
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     @saved_user = create_user(unsaved_user, credit_card)
@@ -278,14 +265,13 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Create an user with Synced Status" do
-    setup_environment
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
-    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
-    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    # @saved_user = User.last
+    # @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
+    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_user = User.last
 
     @saved_user.update_attribute(:updated_at, Time.zone.now-1)
     @saved_user.update_attribute(:last_synced_at, Time.zone.now)
@@ -297,17 +283,13 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Create an user with Not Synced status" do
-    setup_environment
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
-    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
-    # @saved_user = User.last
-
+    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_user = User.last
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    sleep 5
 
     within(".nav-tabs") do
       page.has_selector?("#sync_status_tab")
@@ -317,7 +299,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Create an user with Sync Error status" do
-    setup_environment
     User.any_instance.stubs(:last_sync_error).returns("Error on users#sync: #{$!}")
 
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
@@ -330,7 +311,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     @saved_user.update_attribute(:sync_status, "with_error")
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    sleep 5
 
     within(".nav-tabs") do
       page.has_selector?("#sync_status")
@@ -340,7 +320,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Platform will create Drupal account by Drupal API" do
-    setup_environment
     response = '{"uid":"291","name":"test20121029","mail":"test20121029@mailinator.com","theme":"","signature":"","signature_format":"full_html","created":"1351570554","access":"0","login":"0","status":"1","timezone":null,"language":"","picture":null,"init":"test20121029@mailinator.com","data":{"htmlmail_plaintext":0},"roles":{"2":"authenticated user"},"field_profile_address":{"und":[{"value":"reibel","format":null,"safe_value":"reibel"}]},"field_profile_cc_month":{"und":[{"value":"12"}]},"field_profile_cc_number":{"und":[{"value":"XXXX-XXXX-XXXX-8250","format":null,"safe_value":"XXXX-XXXX-XXXX-8250"}]},"field_profile_cc_year":{"und":[{"value":"2012"}]},"field_profile_city":{"und":[{"value":"concepcion","format":null,"safe_value":"concepcion"}]},"field_profile_dob":{"und":[{"value":"1991-10-22T00:00:00","timezone":"UTC","timezone_db":"UTC","date_type":"date"}]},"field_profile_firstname":{"und":[{"value":"name","format":null,"safe_value":"name"}]},"field_profile_gender":{"und":[{"value":"M"}]},"field_profile_lastname":{"und":[{"value":"test","format":null,"safe_value":"test"}]},"field_profile_middle_initial":[],"field_profile_nickname":[],"field_profile_salutation":[],"field_profile_suffix":[],"field_profile_token":[],"field_profile_zip":{"und":[{"value":"12345","format":null,"safe_value":"12345"}]},"field_profile_country":{"und":[{"value":"US","format":null,"safe_value":"US"}]},"field_profile_phone_area_code":{"und":[{"value":"123"}]},"field_profile_phone_country_code":{"und":[{"value":"123"}]},"field_profile_phone_local_number":{"und":[{"value":"1234","format":null,"safe_value":"1234"}]},"field_profile_stateprovince":{"und":[{"value":"KY","format":null,"safe_value":"KY"}]},"field_phoenix_member_id":[],"field_phoenix_member_vid":[],"field_profile_phone_type":{"und":[{"value":"home","format":null,"safe_value":"home"}]},"field_phoenix_pref_example_color":[],"field_phoenix_pref_example_team":[],"rdf_mapping":{"rdftype":["sioc:UserAccount"],"name":{"predicates":["foaf:name"]},"homepage":{"predicates":["foaf:page"],"type":"rel"}}}'
     Drupal::Member.any_instance.stubs(:get).returns(response)
     User.any_instance.stubs(:last_sync_error).returns("Error on users#sync: #{$!}")
@@ -349,9 +328,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
-    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
-    # @saved_user = User.find_by(email: unsaved_user.email)
+    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_user = User.find_by(email: unsaved_user.email)
     @saved_user.update_attribute(:last_sync_error_at, Time.zone.now)
     @saved_user.update_attribute(:sync_status, "with_error")
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
@@ -380,33 +358,27 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Should not let agent to update api_id when user is lapsed" do
-    setup_environment
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
 
-    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
-    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
-    # @saved_user = User.find_by(email: unsaved_user.email)
+    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
+    @saved_user = User.find_by(email: unsaved_user.email)
     @saved_user.set_as_canceled!
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    sleep 5
-    
     within(".nav-tabs"){ page.has_no_selector?("#sync_status") }
   end
 
   test "Should not let agent to update api_id when user is applied" do
-    setup_environment
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     
-    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_approval.name)
-    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
-    # @saved_user = User.find_by(email: unsaved_user.email)
-    # visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
+    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
+    @saved_user = User.find_by(email: unsaved_user.email)
+    visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == unsaved_user.first_name
     
     within(".nav-tabs"){ click_on("Sync Status") }
@@ -414,15 +386,13 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   end
 
   test "Remove drupal account when Cancel an user" do
-    setup_environment
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     
-    @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_approval.name)
-    # create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
-    # @saved_user = User.find_by(email: unsaved_user.email)
+    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
+    @saved_user = User.find_by(email: unsaved_user.email)
     @saved_user.set_as_canceled
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)

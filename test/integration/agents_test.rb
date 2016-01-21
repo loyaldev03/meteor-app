@@ -176,8 +176,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
     visit admin_agents_path
     do_data_table_search("#agents_table_filter", confirmed_agent.email)
     within("#agents_table") do 
-      sleep 5      
-      assert page.has_content?(confirmed_agent.email)
+      wait_until{ assert page.has_content?(confirmed_agent.email) }
       within("tr", :text => confirmed_agent.email) do 
         click_link_or_button 'Edit'
       end
