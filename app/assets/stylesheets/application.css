@@ -205,7 +205,7 @@ div.dataTables_filter {
 #suspected_list {
   height: 400px;
   overflow-y: auto;
-  width: 9%;
+  width: 10%;
 }
 
 #suspected_list th,
@@ -216,7 +216,7 @@ div.dataTables_filter {
 
 #evidences_information {
   float: right;
-  width: 89%;
+  width: 88%;
   margin-left: 10px;
 }
 
@@ -227,23 +227,22 @@ div.dataTables_filter {
 #suspected_list tbody td, 
 #suspected_list thead th{
   text-align: center;
+  font-size: 10px !important;
 }
 
-table.suspected_fulfillment_evidences tbody,
-table.suspected_fulfillment_evidences thead { display: block; }
-table.suspected_fulfillment_evidences tbody {
-    height: 200px;
-    overflow-y: auto;
-}
-table.suspected_fulfillment_evidences tbody td,
 table.suspected_fulfillment tbody td {
   word-wrap: break-word;
   font-size: 10px !important;
 }
 
 table.suspected_fulfillment thead th,
-table.suspected_fulfillment tbody td,
-table.suspected_fulfillment_evidences thead th,
-table.suspected_fulfillment_evidences tbody td {
+table.suspected_fulfillment tbody td {
   text-align: center;
+}
+
+table.evidences tbody,
+table.evidences thead { display: block; }
+table.evidences tbody {
+    height: 200px;
+    overflow-y: auto;
 }

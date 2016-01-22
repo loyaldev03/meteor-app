@@ -1472,7 +1472,7 @@ function suspected_fulfillment_information_functions(){
   colWidth = $('.suspected_fulfillment tbody td').map(function() {
     return $(this).width();
   }).get();
-  $('table.suspected_fulfillment_evidences tbody tr').each(function(index,row) {
+  $('table.evidences tbody tr').each(function(index,row) {
     $(row).find('td').each(function(index2,column){
       if($(column).width() > colWidth[index2]){
         colWidth[index2] = $(column).width()
@@ -1483,22 +1483,18 @@ function suspected_fulfillment_information_functions(){
     $(row).find('td').each(function(index2,column){
       $(column).width(colWidth[index2]);
       $(column).css('max-width', colWidth[index2]);
-      $(column).css('word-wrap', 'break-word');
     });
   });
-  $('table.suspected_fulfillment_evidences tbody tr').each(function(index,row) {
-    $(row).find('td').each(function(index2,column){
-      $(column).width(colWidth[index2]);
-      $(column).css('max-width', colWidth[index2]);
-      $(column).css('word-wrap', 'break-word');
-    });
-  });
-  $('table.suspected_fulfillment_evidences thead tr').each(function(index,row) {
+  $('table.evidences thead tr').each(function(index,row) {
     $(row).find('th').each(function(index2,column){
       $(column).width(colWidth[index2]);
       $(column).css('max-width', colWidth[index2]);
-      $(column).css('word-wrap', 'break-word');
     });
   });
-
+  $('table.evidences tbody tr').each(function(index,row) {
+    $(row).find('td').each(function(index2,column){
+      $(column).width(colWidth[index2]);
+      $(column).css('max-width', colWidth[index2]);
+    });
+  });
 }

@@ -1,6 +1,5 @@
 class FulfillmentsController < ApplicationController
   before_filter :validate_club_presence
-  layout '', only: [:suspected_fulfillment_information]
 
   def index
     my_authorize! :report, Fulfillment, @current_club.id
