@@ -296,16 +296,14 @@ function terms_of_memberships_table_index_functions(column_count) {
 }
 
 function user_index_functions(){
-  $('#index_search_form #user_id').keyup(function(event) {
-    if (this.value.match(/[^0-9]/g)) {
+  $("#index_search_form").on({
+    keyup: function(){
+      this.value = this.value.replace(/[^0-9]/g, '');
+    },
+    change: function(){
       this.value = this.value.replace(/[^0-9]/g, '');
     }
-  });
-  $('#user_cc_last_digits').keyup(function(event) {
-    if (this.value.match(/[^0-9]/g)) {
-      this.value = this.value.replace(/[^0-9\*]/g, '');
-    }
-  });
+  }, '#user_id, #user_cc_last_digits');
 
   $('#index_search_form').submit(function (event){
     var atLeastOneFilled = false;
