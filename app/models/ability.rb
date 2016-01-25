@@ -117,7 +117,6 @@ class Ability
       can :list, ClubCashTransaction
       can :list, Communication
       can :list, Fulfillment
-      can :manual_review, Fulfillment
     when 'supervisor' then
       can :manage, User
       cannot :api_profile, User

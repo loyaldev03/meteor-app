@@ -23,7 +23,7 @@ private
         (link_to(I18n.t('activerecord.model.products'), @url_helpers.products_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Product,club.id ).to_s+
         (link_to(I18n.t('activerecord.model.fulfillments'), @url_helpers.fulfillments_index_path(@current_partner.prefix, club.name), :class => 'btn btn-mini')if @current_agent.can? :read, Fulfillment,club.id ).to_s+
         (link_to(I18n.t('activerecord.model.fulfillment_files'), @url_helpers.list_fulfillment_files_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :report, Fulfillment, club.id).to_s+
-        (link_to(I18n.t('activerecord.model.suspected_fulfillments'), @url_helpers.suspected_fulfillments_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :read, Fulfillment, club.id).to_s+
+        (link_to(I18n.t('activerecord.model.suspected_fulfillments'), @url_helpers.suspected_fulfillments_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :manual_review, Fulfillment, club.id).to_s+
         (link_to(I18n.t('activerecord.model.disposition_types'), @url_helpers.disposition_types_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :read, DispositionType, club.id).to_s+
         (link_to(I18n.t(:destroy), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :method => :delete,
                         :confirm => I18n.t("are_you_sure"),
