@@ -203,7 +203,7 @@ div.dataTables_filter {
 }
 
 #suspected_list {
-  height: 400px;
+  height: 30vw;
   overflow-y: auto;
   width: 10%;
 }
@@ -243,6 +243,6 @@ table.suspected_fulfillment tbody td {
 table.evidences tbody,
 table.evidences thead { display: block; }
 table.evidences tbody {
-    height: 200px;
+    height: 15vw;
     overflow-y: auto;
 }
