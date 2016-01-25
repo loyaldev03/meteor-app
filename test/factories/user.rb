@@ -14,9 +14,9 @@ FactoryGirl.define do
     state "AL"
     sequence(:email) {|n| "user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
-    phone_country_code 123
-    phone_area_code 123
-    phone_local_number 1234
+    phone_country_code { rand(999-100) }
+    phone_area_code { rand(999-100) }
+    phone_local_number { rand(9999-1000) }
     bill_date { DateTime.now }
     birth_date { DateTime.now }
     gender "M"

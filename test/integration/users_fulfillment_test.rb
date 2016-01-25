@@ -348,9 +348,22 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Enroll an user with product in the list and set as do_not_honor that fulfillment from profile." do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku, enrollment_amount: 0.0)
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    within(".nav-tabs") do
+      click_on("Fulfillments")
+    end
+    within("#fulfillments")do
+      assert page.has_content?('not_processed')
+      assert page.has_no_content?('manual_review_required')
+      assert page.has_no_selector?('Do not honor')
+    end
+
+    unsaved_user = FactoryGirl.build(:active_user, first_name: @saved_user.first_name, last_name: @saved_user.last_name, state: @saved_user.last_name)
+    create_user_by_sloop(@admin_agent, unsaved_user, nil, enrollment_info, @terms_of_membership_with_gateway, true, true)
+    @saved_user = User.find_by_email(unsaved_user.email)
 
     fulfillment = Fulfillment.last
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -362,12 +375,13 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
       assert page.has_content?(I18n.l fulfillment.renewable_at, :format => :only_date)
       assert page.has_content?(@product.sku)
-      assert page.has_content?('not_processed')
+      assert page.has_no_content?('not_processed')
+      assert page.has_content?('manual_review_required')
       confirm_ok_js
       click_link_or_button('Do not honor')
     end
     assert find_field('input_first_name').value == @saved_user.first_name
-    assert page.has_content? "Changed status on Fulfillment ##{fulfillment.id} #{@product.sku} from not_processed to do_not_honor"
+    assert page.has_content? "Changed status on Fulfillment ##{fulfillment.id} #{@product.sku} from manual_review_required to do_not_honor"
   end
 
   test "Only show cancel or do not honor buttons within user's profile if product is in not_process." do
@@ -1302,12 +1316,13 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "not_processed and in_process fulfillments should be updated to bad_address when set_wrong_address" do
     setup_user(false)
     product_other = FactoryGirl.create(:product, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},KIT-CARD")
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},#{Settings.kit_card_product}")
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
-    fulfillment_card = Fulfillment.find_by_product_sku(@product.sku)
-    fulfillment_other = Fulfillment.find_by_product_sku(product_other.sku)
+    fulfillment_card = Fulfillment.find_by(product_sku: Settings.kit_card_product)
+    fulfillment_card.set_as_not_processed
+    fulfillment_other = Fulfillment.find_by(product_sku: product_other.sku)
     fulfillment_other.set_as_in_process
     @saved_user.set_wrong_address(@admin_agent, 'reason')
 
@@ -1337,12 +1352,11 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "kit-card renewed fulfillments should not set as bad_address and also should not be shown in report result." do
     setup_user(false)
-    product_other = FactoryGirl.create(:product, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},#{Settings.kit_card_product}")
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{Settings.kit_card_product}")
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
-    fulfillment_card = Fulfillment.find_by_product_sku(product_other.sku)
+    fulfillment_card = Fulfillment.find_by(product_sku: Settings.kit_card_product)
     fulfillment_card.update_attribute(:renewed, true)
 
     @saved_user.set_wrong_address(@admin_agent,'reason')
@@ -1358,13 +1372,12 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     end
     click_link_or_button('Report')
     within("#report_results")do
-      assert page.has_content?('bad_address') 
-      assert page.has_content?(Settings.kit_card_product)
+      assert page.has_no_content?(Settings.kit_card_product)
     end
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_type_SLOOPS')
+      choose('radio_product_type_KIT-CARD')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -2695,5 +2708,5 @@ test "Update the status of all the fulfillments - In process using individual ch
       assert page.has_content? "Bracelet3"
       assert page.has_content? "Bracelet4"
     end
-  end
+  end 
 end

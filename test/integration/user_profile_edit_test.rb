@@ -588,15 +588,17 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     assert page.has_content?("Full save done")
     
     within(".nav-tabs"){ click_on("Operations") }
+    select "50", :from => "operations_table_length"
     within("#operations_table")do
       assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-")
+      assert page.has_content?("Assigned fulfillment upon enrollment.")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
       assert page.has_content?("Refund success $#{final_amount.to_f}")
       assert page.has_content?("Full save done")
     end
   end 
 
- test "Sorting transaction table" do
+  test "Sorting transaction table" do
     setup_user
     12.times do |index| 
       FactoryGirl.create(:transaction, user_id: @saved_user.id, transaction_type: "sale", response_result: index, response_transaction_id: index, gateway: "mes")

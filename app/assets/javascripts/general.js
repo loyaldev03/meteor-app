@@ -1427,3 +1427,74 @@ function test_communications_functions() {
     }
   });
 }
+
+function suspected_fulfillments_functions(){
+  $("#suspected_fulfillments_form_submit_button").click(function(event){
+    event.preventDefault();
+    if( (new Date($("#end_date").val()) >= new Date($("#initial_date").val())) == true) { 
+      $("#suspected_fulfillments_form").submit();
+    }else{
+      alert('Invalid range of dates.');
+    }
+  });
+
+  $('#suspected_list td[data-href]').click(function(event){
+    event.preventDefault();
+    startAjaxLoader()
+    $('#suspected_list tr').removeClass("info");
+    $(this).parent().addClass("info");
+    $('#evidences_information').show();
+    $('#evidences_information').load($(this).data('href'), function(){
+      endAjaxLoader();
+    });
+  });
+    $(".datepicker").datepicker({ constrainInput: true,
+                                maxDate: 0,
+                                dateFormat: "yy-mm-dd", 
+                                showOn: "both",
+                                buttonImage: "/icon-calendar.png", 
+                                changeMonth: true,
+                                changeYear: true,
+                                yearRange: 'c-100:c',
+                                buttonImageOnly: true});
+}
+
+function suspected_fulfillment_information_functions(){
+  $('.pagination').on('click', 'a', function(event){
+    event.preventDefault();
+    if($(this).prop('href').indexOf('#') == -1 ){
+      $('#evidences_information').load($(this).prop('href'));
+    };
+  });
+
+  //resize columns to have them aligned
+  var colWidth;
+  colWidth = $('.suspected_fulfillment tbody td').map(function() {
+    return $(this).width();
+  }).get();
+  $('table.evidences tbody tr').each(function(index,row) {
+    $(row).find('td').each(function(index2,column){
+      if($(column).width() > colWidth[index2]){
+        colWidth[index2] = $(column).width()
+      }
+    });
+  });
+  $('table.suspected_fulfillment tbody tr').each(function(index,row) {
+    $(row).find('td').each(function(index2,column){
+      $(column).width(colWidth[index2]);
+      $(column).css('max-width', colWidth[index2]);
+    });
+  });
+  $('table.evidences thead tr').each(function(index,row) {
+    $(row).find('th').each(function(index2,column){
+      $(column).width(colWidth[index2]);
+      $(column).css('max-width', colWidth[index2]);
+    });
+  });
+  $('table.evidences tbody tr').each(function(index,row) {
+    $(row).find('td').each(function(index2,column){
+      $(column).width(colWidth[index2]);
+      $(column).css('max-width', colWidth[index2]);
+    });
+  });
+}

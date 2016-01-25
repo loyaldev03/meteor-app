@@ -29,7 +29,9 @@
             <% end %>
             <% if (fulfillment.not_processed? or fulfillment.manual_review_required?) %>
               <%= link_to(t('cancel'), manual_review_fulfillment_path(id: fulfillment.id, new_status: 'canceled'), method: :put, :data => {:confirm => 'Are you sure?'}, :class => 'btn btn-mini btn-danger')%>
-              <%= link_to t('do_not_honor'), manual_review_fulfillment_path(id: fulfillment.id, new_status: 'do_not_honor'), method: :put, :data => {:confirm => 'Are you sure?'}, :class => 'btn btn-mini btn-warning'%>
+              <% if fulfillment.manual_review_required? %>
+                <%= link_to t('do_not_honor'), manual_review_fulfillment_path(id: fulfillment.id, new_status: 'do_not_honor'), method: :put, :data => {:confirm => 'Are you sure?'}, :class => 'btn btn-mini btn-warning'%>
+              <% end %>
             <% end %>
           <% end %>
         </td>
