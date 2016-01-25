@@ -296,7 +296,7 @@ function terms_of_memberships_table_index_functions(column_count) {
 }
 
 function user_index_functions(){
-  $('#user_id').keyup(function(event) {
+  $('#index_search_form #user_id').keyup(function(event) {
     if (this.value.match(/[^0-9]/g)) {
       this.value = this.value.replace(/[^0-9]/g, '');
     }
@@ -309,7 +309,7 @@ function user_index_functions(){
 
   $('#index_search_form').submit(function (event){
     var atLeastOneFilled = false;
-    $('form :text, form select').each( function(){
+    $('#index_search_form :text, form select').each( function(){
       if($(this).val() != "")
         atLeastOneFilled = true;
     });
