@@ -154,6 +154,7 @@ class FulfillmentsController < ApplicationController
   end
 
   def suspected_fulfillments
+    my_authorize! :manual_review, Fulfillment, @current_club.id
     params[:initial_date] ||= (Time.current - 7.days).to_date
     params[:end_date] ||= (Time.current).to_date
     @suspected_fulfillment_data = Fulfillment.where("status = ? AND club_id = ? AND date(assigned_at) BETWEEN ? and ?", 
