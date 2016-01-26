@@ -1060,7 +1060,7 @@ test "Agency role - Recover an user" do
       end
       assert page.has_content?("Users")
       assert page.has_no_content?("Products")
-      assert page.has_no_content?("Fulfillments")
+      assert page.has_content?("Suspected Fulfillments")
     end
   end
 end
