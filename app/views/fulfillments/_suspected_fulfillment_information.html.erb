@@ -41,15 +41,15 @@
     </tr>
   </thead>
   <tbody>
-    <% evidences.collect(&:matched_fulfillment).each do |matched_fulfillment| %>
+    <% evidences.each do |evidence| %>
       <tr>
-        <td><%= I18n.l(matched_fulfillment.created_at,:format => :default) %></td>
-        <td><%= link_to matched_fulfillment.user_id, show_user_path(club_prefix: current_club.name, user_prefix: matched_fulfillment.user_id), target:'_blank' %></td>
-        <td><%= matched_fulfillment.email %></td>
-        <td><%= matched_fulfillment.full_name %></td>
-        <td><%= matched_fulfillment.full_address %></td>
-        <td><%= matched_fulfillment.full_phone_number %></td>
-        <td><%= I18n.t("activerecord.attributes.fulfillment.status_options.#{matched_fulfillment.status}") %></td>
+        <td><%= I18n.l(evidence.matched_fulfillment.created_at,:format => :default) %> (<%= evidence.match_age %>)</td>
+        <td><%= link_to evidence.matched_fulfillment.user_id, show_user_path(club_prefix: current_club.name, user_prefix: evidence.matched_fulfillment.user_id), target:'_blank' %></td>
+        <td><%= evidence.matched_fulfillment.email %></td>
+        <td><%= evidence.matched_fulfillment.full_name %></td>
+        <td><%= evidence.matched_fulfillment.full_address %></td>
+        <td><%= evidence.matched_fulfillment.full_phone_number %></td>
+        <td><%= I18n.t("activerecord.attributes.fulfillment.status_options.#{evidence.matched_fulfillment.status}") %></td>
       </tr>
     <% end %>
   </tbody>

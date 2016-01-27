@@ -164,7 +164,7 @@ class FulfillmentsController < ApplicationController
 
   def suspected_fulfillment_information
     fulfillment = Fulfillment.find_by(id: params[:id], club_id: current_club.id)
-    evidences = fulfillment.suspected_fulfillment_evidences.paginate(page: params[:page], per_page: 20).order("created_at DESC") if fulfillment
+    evidences = fulfillment.suspected_fulfillment_evidences.order("match_age ASC").paginate(page: params[:page], per_page: 20) if fulfillment
     render :partial => 'suspected_fulfillment_information', locals: { fulfillment: fulfillment, evidences: evidences }
   end
 end
