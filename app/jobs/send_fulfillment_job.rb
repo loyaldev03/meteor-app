@@ -14,29 +14,29 @@ class SendFulfillmentJob < ActiveJob::Base
 
   def proceed_with_gamer_analysis(fulfillment)
     suspected_of_gamer = false
-    matched_fulfillments = Fulfillment.where(club_id: fulfillment.club_id, email: fulfillment.email).where.not(id: fulfillment.id)
+    matched_fulfillments = Fulfillment.where("club_id = ? AND assigned_at > ? AND email = ? AND NOT id = ?", fulfillment.club_id, 1.year.ago, fulfillment.email, fulfillment.id)
     matched_fulfillments.each do |matched_fulfillment|
       evidence = SuspectedFulfillmentEvidence.where(fulfillment_id: fulfillment.id, matched_fulfillment_id: matched_fulfillment.id).first_or_create
       evidence.update_attribute :email_match, true
       suspected_of_gamer = true
     end
 
-    matched_fulfillments = Fulfillment.where(club_id: fulfillment.club_id, full_address: fulfillment.full_address).where.not(id: fulfillment.id)
+    matched_fulfillments = Fulfillment.where("club_id = ? AND assigned_at > ? AND full_address = ? AND NOT id = ?", fulfillment.club_id, 1.year.ago, fulfillment.full_address, fulfillment.id)
     matched_fulfillments.each do |matched_fulfillment|
       evidence = SuspectedFulfillmentEvidence.where(fulfillment_id: fulfillment.id, matched_fulfillment_id: matched_fulfillment.id).first_or_create
-      evidence.update_attribute :full_address_match, true 
+      evidence.update_attribute :full_address_match, true
       suspected_of_gamer = true
     end
 
-    matched_fulfillments = Fulfillment.where(club_id: fulfillment.club_id, full_name: fulfillment.full_name).where.not(id: fulfillment.id)
+    matched_fulfillments = Fulfillment.where("club_id = ? AND assigned_at > ? AND full_name = ? AND NOT id = ? ", fulfillment.club_id, 1.year.ago, fulfillment.full_name, fulfillment.id)
     matched_fulfillments.each do |matched_fulfillment|
       evidence = SuspectedFulfillmentEvidence.where(fulfillment_id: fulfillment.id, matched_fulfillment_id: matched_fulfillment.id).first_or_create
       evidence.update_attribute :full_name_match, true 
       suspected_of_gamer = true
     end
 
-    matched_fulfillments = Fulfillment.where(club_id: fulfillment.club_id, full_phone_number: fulfillment.full_phone_number).where.not(id: fulfillment.id, full_phone_number: nil)
-    matched_fulfillments.each do |matched_fulfillment|
+    matched_fulfillments = Fulfillment.where("club_id = ? AND assigned_at > ? AND full_phone_number = ? AND NOT id = ? AND full_phone_number IS NOT NULL", fulfillment.club_id, 1.year.ago, fulfillment.full_phone_number, fulfillment.id)
+      matched_fulfillments.each do |matched_fulfillment|
       evidence = SuspectedFulfillmentEvidence.where(fulfillment_id: fulfillment.id, matched_fulfillment_id: matched_fulfillment.id).first_or_create
       evidence.update_attribute :full_phone_number_match, true
       suspected_of_gamer = true
