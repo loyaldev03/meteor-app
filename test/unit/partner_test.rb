@@ -43,4 +43,10 @@ class PartnerTest < ActiveSupport::TestCase
     assert_not_nil partner_admin.errors
   end
 
+  test "Should not let you save partner with prefix with more than 40 characters" do
+    partner = FactoryGirl.build(:partner, :prefix => Faker::Lorem.characters(41))
+    assert !partner.valid?
+    assert_not_nil partner.errors
+  end
+
 end

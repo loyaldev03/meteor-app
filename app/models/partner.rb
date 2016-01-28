@@ -11,7 +11,8 @@ class Partner < ActiveRecord::Base
   validates :name , presence: true, name_is_not_admin: true, format: /\A[a-zA-Z ]+\z/,
                     uniqueness: { scope: :deleted_at }
   validates :prefix, presence: true, prefix_is_not_admin: true, format: /\A[a-zA-Z ]+\z/,
-                    uniqueness: { scope: :deleted_at }
+                    uniqueness: { scope: :deleted_at }, 
+                    length: { maximum: 40, too_long: 'Pick a shorter prefix' }
 
   def self.datatable_columns
     ['id', 'prefix', 'name', 'contract_uri', 'website_url' ]
