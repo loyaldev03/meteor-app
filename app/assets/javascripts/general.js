@@ -402,9 +402,6 @@ function clubs_form_functions(){
 
 function retrieve_information(){
   var skus = [];
-  if ($('#kit_card_product_sku').is(':checked')) {
-    skus.push("KIT-CARD");
-  }
   if ($('#product_sku option:selected').text().length > 0) {
     skus.push($('#product_sku option:selected').text());
   }
@@ -977,18 +974,18 @@ function fulfillments_not_processed_function(){
   });     
 }
 
-function set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product) {
-  var radio_product_type = $('[name=radio_product_type]:checked');
-  if (radio_product_type.val() == settings_kit_card_product || radio_product_type.val() == settings_others_product) {
-    $('#product_type').val(radio_product_type.val());
-  }else if (radio_product_type.val() == "SLOOPS_others") {
-    $('#product_type').val($('#input_product_type').val());
+function set_product_filter_at_fulfillments_index(settings_others_product) {
+  var radio_product_filter = $('[name=radio_product_filter]:checked');
+  if (radio_product_filter.val() == 'all') {
+    $('#product_filter').val(radio_product_filter.val());
+  }else if (radio_product_filter.val() == "sku") {
+    $('#product_filter').val($('#input_product_filter').val());
   }else{
-    $('#product_type').val($('#input_product_package').val());
+    $('#product_filter').val($('#input_product_package').val());
   }
 }
 
-function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_kit_card_product, settings_others_product){
+function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_others_product){
   $("#report_results").tablesorter({
     headers: { 
       0: { sorter: false }, 
@@ -1031,7 +1028,7 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
       $('<input>').attr({ type: 'hidden', name: fuls[x].name, value: fuls[x].value }).appendTo($('#fulfillment_report_form'));
     }
     if (fuls.length != 0) {
-      set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product)
+      set_product_filter_at_fulfillments_index(settings_others_product)
       $('#fulfillment_report_form').attr("action", create_xls_file_url);
       $('#fulfillment_report_form').submit();
     } else {
@@ -1039,18 +1036,18 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
     }
   });  
 
-  $('#input_product_type').click(function() {
-    $('#radio_product_type_'+settings_others_product+'_others').attr('checked', true);
+  $('#input_product_filter').click(function() {
+    $('#radio_product_filter_sku').prop('checked', true);
     $("#input_product_package").val("");
   });
 
   $('#input_product_package').click(function() {
-    $('#radio_product_type_'+settings_others_product+'_package').attr('checked', true);
-    $("#input_product_type").val("");
+    $('#radio_product_filter_package').prop('checked', true);
+    $("#input_product_filter").val("");
   });
 
   $("#make_report").click(function() {
-    set_product_type_at_fulfillments_index(settings_kit_card_product, settings_others_product);
+    set_product_filter_at_fulfillments_index(settings_others_product);
     $('#fulfillment_report_form').attr("action", make_report_url);
   });    
 

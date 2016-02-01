@@ -14,11 +14,11 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     @partner = @club.partner
     Time.zone = @club.time_zone
 
-    @product = Product.find_by sku: 'KIT-CARD', club_id: @club.id
+    @product = Product.find_by sku: Settings.others_product, club_id: @club.id
 
     if create_new_user
       @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
-      @fulfillment = FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'kit-card', :club_id => @club.id)
+      @fulfillment = FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)
     end
 
     sign_in_as(@admin_agent)
@@ -31,8 +31,8 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     @saved_user = User.last
   end
 
-  def generate_fulfillment_files(all_times = true, fulfillments = nil ,initial_date = nil, end_date = nil, status = 'not_processed', type = nil, validate = true)
-    search_fulfillments(all_times,initial_date,end_date,'not_processed', type)
+  def generate_fulfillment_files(all_times = true, fulfillments = nil ,initial_date = nil, end_date = nil, status = 'not_processed', validate = true)
+    search_fulfillments(all_times,initial_date,end_date,'not_processed')
     within("#report_results")do
       assert page.has_selector?("#create_xls_file")
       if fulfillments.nil?
@@ -303,7 +303,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_type_SLOOPS')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
 
@@ -461,7 +461,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.find_field('all_times')    
       check('all_times')
       select('in_process', :from => 'status')
-      choose('radio_product_type_SLOOPS')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
 
@@ -482,7 +482,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "fulfillment record at Processing" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT-CARD')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => Settings.others_product)
 
     create_user_throught_sloop(enrollment_info)
     
@@ -496,22 +496,22 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
-    fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
+    fulfillment = Fulfillment.find_by_product_sku(Settings.others_product)
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process') 
     end
-    update_status_on_fulfillments([fulfillment], "bad_address", false, 'KIT-CARD', true)
+    update_status_on_fulfillments([fulfillment], "bad_address", false, true)
   end
   
 
@@ -534,7 +534,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #   within("#fulfillments_table")do
   #     check('all_times')
   #     select('in_process', :from => 'status')
-  #     choose('radio_product_type_SLOOPS')
+  #     choose('radio_product_filter_all')
   #   end
   #   click_link_or_button('Report')
   #   within("#report_results")do
@@ -566,12 +566,12 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "set as wrong address fulfillment at in_process status" do
     setup_user(false)
 
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT-CARD')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => Settings.others_product)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
 
-    fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
+    fulfillment = Fulfillment.find_by_product_sku(Settings.others_product)
     fulfillment.set_as_in_process
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
@@ -581,18 +581,18 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process') 
     end
-    update_status_on_fulfillments([fulfillment], "bad_address", false, 'KIT-CARD', true)
+    update_status_on_fulfillments([fulfillment], "bad_address", false, true)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -601,19 +601,19 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     end
     within("#fulfillments")do
       assert page.has_content?(I18n.l @saved_user.join_date, :format => :only_date)
-      assert page.has_content?('KIT-CARD')
+      assert page.has_content?(Settings.others_product)
       assert page.has_content?('bad_address')
     end
   end
 
   test "display fulfillment record at out_of_stock status" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT-CARD')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => Settings.others_product)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
 
-    fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
+    fulfillment = Fulfillment.find_by_product_sku(Settings.others_product)
     fulfillment.set_as_out_of_stock
     product = fulfillment.product
     product.stock = 0
@@ -627,13 +627,13 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('out_of_stock', :from => 'status')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('out_of_stock') 
@@ -642,12 +642,12 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "add stock and check fulfillment record with out_of_stock status" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT-CARD')
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => Settings.others_product)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
 
-    fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
+    fulfillment = Fulfillment.find_by_product_sku(Settings.others_product)
     fulfillment.set_as_out_of_stock
     product = fulfillment.product
     product.stock = 0
@@ -661,14 +661,13 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('out_of_stock', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('out_of_stock') 
@@ -690,14 +689,13 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('out_of_stock', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?("#{fulfillment.user.id}")
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('out_of_stock') 
@@ -747,7 +745,8 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "renewal as bad_address and set renewed" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'KIT-CARD')
+    recurrent_product = FactoryGirl.create(:product_with_recurrent, club_id: @club.id)
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => recurrent_product.sku)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -755,7 +754,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     @saved_user.update_attribute(:recycled_times,0)
     @saved_user.current_membership.update_attribute(:join_date,Time.zone.now-1.year)
 
-    fulfillment = Fulfillment.find_by_product_sku('KIT-CARD')
+    fulfillment = Fulfillment.find_by_product_sku(recurrent_product.sku)
     fulfillment.set_as_in_process
     fulfillment.user.set_wrong_address(@admin_agent,'spam')
     fulfillment.reload
@@ -769,7 +768,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments")do
       assert page.has_content?(I18n.l @saved_user.join_date + 1.year, :format => :only_date)
       assert page.has_content?(I18n.l @saved_user.join_date + 2.year, :format => :only_date)
-      assert page.has_content?('KIT-CARD')
+      assert page.has_content?(recurrent_product.sku)
       assert page.has_content?('bad_address')
     end
     fulfillment.reload
@@ -784,7 +783,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "fulfillment status bad_address" do
     setup_user
-
     @fulfillment.set_as_in_process
     @saved_user.set_wrong_address(@admin_agent, 'admin')
 
@@ -796,6 +794,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     @fulfillment.reload
@@ -823,6 +822,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     
@@ -1055,43 +1055,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #   assert_equal(@fulfillment_renewable.renewed, true )
   # end
 
-  test "add a new club" do
-    admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-
-    @partner = FactoryGirl.create(:partner)
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)    
-    sign_in_as(admin_agent)
-
-    visit clubs_path(@partner.prefix)
-    click_link_or_button 'New Club'
-    fill_in 'club[name]', :with => unsaved_club.name
-    fill_in 'club[description]', :with => unsaved_club.description
-    fill_in 'club[api_username]', :with => unsaved_club.api_username
-    fill_in 'club[api_password]', :with => unsaved_club.api_password
-    fill_in 'club[cs_phone_number]', :with => unsaved_club.cs_phone_number
-    attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
-    check('club[requires_external_id]')
-    select('application', :from => 'club[theme]')
-    assert_difference('Product.count',1) do
-      click_link_or_button 'Create Club'
-    end
-    assert page.has_content?("The club #{unsaved_club.name} was successfully created")
-    visit clubs_path(@partner.prefix)
-
-    within("#clubs_table")do
-      within('tr', text: unsaved_club.name, exact: true){ click_link_or_button 'Products' }
-    end
-
-    product_one = Product.first
-    product_two = Product.last
-    within("#products_table")do
-      assert page.has_content?(product_one.sku)
-      assert page.has_content?(product_two.name)
-    end
-    assert_equal(product_one.recurrent, true)
-    assert_equal(product_two.recurrent, true)
-  end
-
   test "see product type at Fulfillment report page" do
     setup_user
     click_link_or_button("My Clubs")
@@ -1101,14 +1064,13 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
       check('all_times')
-      assert page.has_content?('Kit-card')
-      assert page.has_content?('Sloops')
+      assert page.has_content?('All')
     end
   end
 
-  test "kit fulfillment without stock (allow backorder as true)." do
+  test "fulfillment without stock (allow backorder as true)." do
     setup_user(false)
-    @product.update_attribute(:stock,0)
+    @product.update_attributes(stock: 0, allow_backorder: true)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
@@ -1125,7 +1087,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1159,18 +1121,18 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     within("#fulfillments_table")do
       select('not_processed', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
+      choose('radio_product_filter_all')
     end
  
-    csv_string = generate_xls_file(fulfillments, Settings.kit_card_product, @saved_user.club, true)
-    ["Member Number","Member First Name","Member Last Name","Member Since Date","Member Expiration Date","ADDRESS","CITY","ZIP","Product","Charter Member Status","#{@saved_user.id}","#{@saved_user.first_name}","#{@saved_user.last_name}","#{(I18n.l @saved_user.member_since_date, :format => :only_date_short)}","#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)}","#{@saved_user.address}","#{@saved_user.city}","#{@saved_user.zip}"].each do |field|
+    csv_string = generate_xls_file(fulfillments, Settings.others_product, @saved_user.club, true)
+    ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service'].each do |field|
       csv_string.inspect.to_s.include? field
     end
 
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
+      choose('radio_product_filter_all')
     end
     click_link_or_button 'Report'
     within("#report_results")do
@@ -1181,7 +1143,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
         assert page.has_content?(fulfillment.tracking_code)
         assert page.has_content?('in_process') 
     end
-    #TODO: mark fulfillment file as sent.
   end 
 
   test "change status of fulfillment CARD from not_processed to sent" do
@@ -1207,7 +1168,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       select('not_processed', :from => 'status')
     end
 
-    csv_string = generate_xls_file(fulfillments, Settings.kit_card_product, @saved_user.club, true)
+    csv_string = generate_xls_file(fulfillments, Settings.others_product, @saved_user.club, true)
     ["Member Number","Member First Name","Member Last Name","Member Since Date","Member Expiration Date","ADDRESS","CITY","ZIP","Product","Charter Member Status","#{@saved_user.id}","#{@saved_user.first_name}","#{@saved_user.last_name}","#{(I18n.l @saved_user.member_since_date, :format => :only_date_short)}","#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)}","#{@saved_user.address}","#{@saved_user.city}","#{@saved_user.zip}","CARD"].each do |field|
       csv_string.inspect.to_s.include? field
     end
@@ -1215,6 +1176,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
+      choose('radio_product_filter_all')
     end
 
     click_link_or_button 'Report'
@@ -1250,7 +1212,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?('sent')
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do 
@@ -1260,19 +1221,18 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('sent', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?('sent')
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
   end
 
   # TODO: improve this test. We should mark as sent fulfillments in the end.
-  test "do not show fulfillment CARD with status = sent actions when user is lapsed." do
+  test "do not show fulfillment with status = sent actions when user is lapsed." do
     setup_user(false)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
 
@@ -1294,7 +1254,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?('sent')
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
     
     visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -1303,27 +1262,24 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('sent', :from => 'status')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?(fulfillment.product_sku)
       assert page.has_content?('sent')
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
-      assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
   end
 
   test "not_processed and in_process fulfillments should be updated to bad_address when set_wrong_address" do
     setup_user(false)
-    product_other = FactoryGirl.create(:product, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product_other.sku},#{Settings.kit_card_product}")
+    enrollment_info = FactoryGirl.build(:enrollment_info)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
-    fulfillment_card = Fulfillment.find_by(product_sku: Settings.kit_card_product)
-    fulfillment_card.set_as_not_processed
-    fulfillment_other = Fulfillment.find_by(product_sku: product_other.sku)
-    fulfillment_other.set_as_in_process
+    fulfillment = Fulfillment.find_by(product_sku: Settings.others_product)
+    fulfillment.set_as_not_processed
     @saved_user.set_wrong_address(@admin_agent, 'reason')
 
     visit fulfillments_index_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -1332,31 +1288,38 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?('bad_address')
-      assert page.has_content?('KIT-CARD')
+      assert page.has_content?(Settings.others_product)
     end
+    
+    @saved_user.address = "random address"
+    @saved_user.save
+    fulfillment.set_as_in_process
+    @saved_user.set_wrong_address(@admin_agent, 'reason')
+    
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
-      choose('radio_product_type_SLOOPS')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
       assert page.has_content?('bad_address')
-      assert page.has_content?(product_other.sku)
+      assert page.has_content?(Settings.others_product)
     end
   end
 
-  test "kit-card renewed fulfillments should not set as bad_address and also should not be shown in report result." do
+  test "renewed fulfillments should not set as bad_address and also should not be shown in report result." do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{Settings.kit_card_product}")
+    enrollment_info = FactoryGirl.build(:enrollment_info)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
-    fulfillment_card = Fulfillment.find_by(product_sku: Settings.kit_card_product)
+    fulfillment_card = Fulfillment.find_by(product_sku: Settings.others_product)
     fulfillment_card.update_attribute(:renewed, true)
 
     @saved_user.set_wrong_address(@admin_agent,'reason')
@@ -1368,20 +1331,20 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
-      assert page.has_no_content?(Settings.kit_card_product)
+      assert page.has_no_content?(Settings.others_product)
     end
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_type_KIT-CARD')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
-      assert page.has_no_content?(Settings.kit_card_product)
+      assert page.has_no_content?(Settings.others_product)
     end
     assert_equal 'not_processed', fulfillment_card.status
  end
@@ -1406,7 +1369,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_type_SLOOPS')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1416,7 +1379,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
     end
     fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 
-            'not_processed', Date.today, Date.today, @club.id]).type_others
+            'not_processed', Date.today, Date.today, @club.id])
 
     csv_string = generate_xls_file(fulfillments, "SLOOP", @saved_user.club, true )
     ["PackageId","Costcenter","Companyname","Address","City","State","Zip","Endorsement","Packagetype","Divconf","Bill Transportation","Weight","UPS Service\n#{fulfillment.tracking_code}","#{fulfillment.product_sku}","#{@saved_user.full_name}","#{@saved_user.address}","#{@saved_user.city}","#{@saved_user.state}","#{@saved_user.zip}","Return Service Requested","Irregulars","Y","Shipper","MID"].each do |field|
@@ -1455,7 +1418,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_type_SLOOPS')
+      choose('radio_product_filter_all')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1466,7 +1429,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
     fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 
-            'not_processed', Date.today, Date.today, @club.id]).type_others
+            'not_processed', Date.today, Date.today, @club.id])
 
     csv_string = generate_xls_file(fulfillments, "SLOOP", @saved_user.club, true )
     ["PackageId","Costcenter","Companyname","Address","City","State","Zip","Endorsement","Packagetype","Divconf","Bill Transportation","Weight","UPS Service\n#{fulfillment.tracking_code}","#{fulfillment.product_sku}","#{@saved_user.full_name}","#{@saved_user.address}","#{@saved_user.city}","#{@saved_user.state}","#{@saved_user.zip}","Return Service Requested","Irregulars","Y","Shipper","MID"].each do |field|
@@ -1490,7 +1453,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Generate CSV with fulfillment at in_process status." do
     setup_user(false)
     product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1510,14 +1473,14 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
 
-    fulfillments = Fulfillment.joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ?', 'in_process', @club.id).type_others
+    fulfillments = Fulfillment.joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ?', 'in_process', @club.id)
     csv_string = generate_xls_file(fulfillments, "SLOOP", @saved_user.club )
     ["PackageId","Costcenter","Companyname","Address","City","State","Zip","Endorsement","Packagetype","Divconf","Bill Transportation","Weight","UPS Service\n#{fulfillment.tracking_code}","#{fulfillment.product_sku}","#{@saved_user.full_name}","#{@saved_user.address}","#{@saved_user.city}","#{@saved_user.state}","#{@saved_user.zip}","Return Service Requested","Irregulars","Y","Shipper","MID"].each do |field|
       csv_string.inspect.to_s.include? field
     end
   end
   
-  test "Create a report fulfillment selecting CARD at product type - Chapter user status" do
+  test "Create a report fulfillment - Chapter user status" do
     setup_user(false)
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{@product.sku}")
 
@@ -1538,22 +1501,22 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
+      choose('radio_product_filter_all')
     end
 
     click_link_or_button 'Report'
-    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? AND fulfillments.product_sku IN (?)', 
-            'in_process', Date.today, Date.today, @club.id, Settings.kit_card_product])
+    fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 'in_process', Date.today, Date.today, @club.id])
 
-    csv_string = generate_xls_file(fulfillments, Settings.kit_card_product, @saved_user.club, true)
-    ["Member Number","Member First Name","Member Last Name","Member Since Date","Member Expiration Date","ADDRESS","CITY","ZIP","Product","Charter Member Status","#{@saved_user.id}","#{@saved_user.first_name}","#{@saved_user.last_name}","#{(I18n.l @saved_user.member_since_date, :format => :only_date_short)}","#{(I18n.l fulfillment.renewable_at, :format => :only_date_short if fulfillment.renewable_at)}","#{@saved_user.address}","#{@saved_user.city}","#{@saved_user.zip}"].each do |field|
+    csv_string = generate_xls_file(fulfillments, Settings.others_product, @saved_user.club, true)
+    ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service', fulfillment.tracking_code.to_s, fulfillment.product.cost_center.to_s, fulfillment.user.full_name, fulfillment.user.address, fulfillment.user.city, fulfillment.user.state, fulfillment.user.zip.to_s, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper', fulfillment.product.weight.to_s, 'MID'].each do |field|
       csv_string.inspect.to_s.include? field
     end
   end
     
   test "Pass product to Not Processed status with stock" do
     setup_user(false)
-    product = FactoryGirl.create(:product, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    product = Product.find_by(club_id: @club.id, sku: Settings.others_product)
+    enrollment_info = FactoryGirl.build(:enrollment_info)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1567,7 +1530,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#products_table")do
       assert page.has_content?((product.stock-1).to_s)
     end
-    search_fulfillments(false, nil, nil, nil, 'sloops')
+    search_fulfillments(false, nil, nil, nil, 'not_processed')
     within("#report_results"){
       assert page.has_content?(@saved_user.id.to_s)
       assert page.has_content?(@saved_user.full_name)
@@ -1592,7 +1555,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     search_fulfillments(true)
     within("#report_results")do
@@ -1622,7 +1585,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     @saved_user.fulfillments.each &:set_as_in_process
 
@@ -1654,7 +1617,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     @saved_user.fulfillments.each &:set_as_on_hold
 
@@ -1686,7 +1649,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     @saved_user.fulfillments.each &:set_as_sent
 
@@ -1718,7 +1681,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     @saved_user.fulfillments.each &:set_as_out_of_stock
 
@@ -1750,7 +1713,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     @saved_user.fulfillments.each &:set_as_returned
 
@@ -1782,7 +1745,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     @saved_user.fulfillments.each &:set_as_bad_address
 
@@ -1813,7 +1776,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_in_process
 
     search_fulfillments(false,nil,nil,'in_process')
@@ -1852,7 +1815,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     search_fulfillments(false,nil,nil,'not_processed')
     update_status_on_fulfillments(@saved_user.fulfillments, 'in_process', true)
@@ -1890,7 +1853,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_on_hold
 
     search_fulfillments(false,nil,nil,'on_hold')
@@ -1923,13 +1886,13 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     update_status_on_fulfillments(@saved_user.fulfillments, 'out_of_stock', true)
   end
 
-test "Update the status of all the fulfillments - Sent selecting the All results checkbox" do
+  test "Update the status of all the fulfillments - Sent selecting the All results checkbox" do
     setup_user(false)
     active_merchant_stubs
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_sent
 
     search_fulfillments(false,nil,nil,'sent')
@@ -1968,7 +1931,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_out_of_stock
 
     search_fulfillments(false,nil,nil,'out_of_stock')
@@ -2007,7 +1970,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_returned
 
     search_fulfillments(false,nil,nil,'returned')
@@ -2046,7 +2009,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_bad_address
 
     search_fulfillments(false,nil,nil,'bad_address')
@@ -2085,7 +2048,7 @@ test "Update the status of all the fulfillments - Sent selecting the All results
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     fulfillments = @saved_user.fulfillments
     search_fulfillments(false,nil,nil,'not_processed')
@@ -2121,7 +2084,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_in_process
 
     fulfillments = @saved_user.fulfillments
@@ -2158,7 +2121,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_on_hold
 
     fulfillments = @saved_user.fulfillments
@@ -2195,7 +2158,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_sent
 
     fulfillments = @saved_user.fulfillments
@@ -2232,7 +2195,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_out_of_stock
 
     fulfillments = @saved_user.fulfillments
@@ -2269,7 +2232,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_returned
 
     fulfillments = @saved_user.fulfillments
@@ -2306,7 +2269,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_bad_address
 
     fulfillments = @saved_user.fulfillments
@@ -2347,8 +2310,8 @@ test "Update the status of all the fulfillments - In process using individual ch
     search_fulfillments(false,nil,nil,'not_processed')
 
     alert_ok_js
-    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', false, 'KIT-CARD', false)
-    within("#report_results"){ assert page.has_content?("Nothing to change on KIT-CARD fulfillment.") }
+    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', false, false)
+    within("#report_results"){ assert page.has_content?("Nothing to change on #{Settings.others_product} fulfillment.") }
   end
   
   test "Error message if changing from one status to 'blank' status" do
@@ -2370,20 +2333,6 @@ test "Update the status of all the fulfillments - In process using individual ch
     within("#report_results"){ assert page.has_content?("New status is blank. Please, select a new status to be applied.") }
   end
 
-  test "Search fulfillments with Initial Date > End Date" do
-    setup_user(false)
-    active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
-    create_user_throught_sloop(enrollment_info)
-
-    fulfillments = @saved_user.fulfillments
-    search_fulfillments(false,nil,nil,'not_processed')
-
-    alert_ok_js
-    update_status_on_fulfillments(@saved_user.fulfillments, 'not_processed', false, 'KIT-CARD', false)
-    within("#report_results"){ assert page.has_content?("Nothing to change on KIT-CARD fulfillment.") }
-  end
-
   # Create a fulfillment file with all times and with kit-card product
   # See "Create XLS file" button - All time checkbox
   test "Create file at 'all time' checkbox" do
@@ -2392,7 +2341,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     fulfillments = []
     fulfillments << @saved_user.fulfillments.first
     fulfillments << @saved_user.fulfillments.last
@@ -2408,7 +2357,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     fulfillments = []
     fulfillments << @saved_user.fulfillments.first
     fulfillments << @saved_user.fulfillments.last
@@ -2419,29 +2368,29 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Create a fulfillment file with all times and with sloop product" do
     setup_user(false)
     active_merchant_stubs
-    product = FactoryGirl.create(:product, :club_id => @club.id)
+    product = Product.last
     enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
     create_user_throught_sloop(enrollment_info)
     fulfillments = []
     fulfillments << @saved_user.fulfillments.first
     
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
-    generate_fulfillment_files(true, fulfillments,nil, nil, nil, 'sloops')
+    generate_fulfillment_files(true, fulfillments,nil, nil, nil)
   end
 
   test "Create a fulfillment file with initial-end dates and with sloop product" do
     setup_user(false)
     active_merchant_stubs
-    product = FactoryGirl.create(:product, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    product = Product.last
+    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     fulfillments = []
     fulfillments << @saved_user.fulfillments.first
 
-    generate_fulfillment_files(false, fulfillments, nil, nil, nil, 'sloops')
+    generate_fulfillment_files(false, fulfillments, nil, nil, nil)
   end
 
   test "Create a fulfillment file with initial-end dates and with sloop product 2" do
@@ -2450,21 +2399,21 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     all_fulfillments = @saved_user.fulfillments
     fulfillments = []
     fulfillments << @saved_user.fulfillments.first
-    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', nil, false)
+    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', false)
 
     fulfillments = []
     fulfillments << @saved_user.fulfillments[1]
     fulfillments << @saved_user.fulfillments[2]
-    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', nil, false)
+    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', false)
 
     fulfillments = []
     fulfillments << @saved_user.fulfillments[3]
     fulfillments << @saved_user.fulfillments[4]
-    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', nil, false)
+    generate_fulfillment_files(false, fulfillments, nil, nil, 'not_processed', false)
 
     visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     
@@ -2490,8 +2439,8 @@ test "Update the status of all the fulfillments - In process using individual ch
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
-    generate_fulfillment_files(false, @saved_user.fulfillments, nil, nil, 'not_processed', nil, false)
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
+    generate_fulfillment_files(false, @saved_user.fulfillments, nil, nil, 'not_processed', false)
     
     visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
 
@@ -2508,14 +2457,14 @@ test "Update the status of all the fulfillments - In process using individual ch
 
     file = FulfillmentFile.last
     assert_equal file.status, "sent"
-  end  
+  end
 
   test "Agents can not change fulfillment status from User Profile" do
     setup_user(false)
     active_merchant_stubs
     enrollment_info = FactoryGirl.build(:enrollment_info)
     create_user_throught_sloop(enrollment_info)
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -2527,7 +2476,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Mark an user as 'wrong address' - Admin Role - not_processed status" do
     setup_user(true)
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
 
     set_as_undeliverable_user(@saved_user,'reason')
 
@@ -2543,7 +2492,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Mark an user as 'wrong address' - In Process status" do
     setup_user(true)
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_in_process
 
     set_as_undeliverable_user(@saved_user,'reason')
@@ -2560,7 +2509,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Mark an user as 'wrong address' - Out of stock status" do
     setup_user(true)
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_out_of_stock
 
     set_as_undeliverable_user(@saved_user,'reason')
@@ -2577,7 +2526,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Mark an user as 'wrong address' - Returned status" do
     setup_user(true)
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)}
     @saved_user.fulfillments.each &:set_as_returned
 
     set_as_undeliverable_user(@saved_user,'reason')
@@ -2627,7 +2576,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Change fulfillment status from Returned to Not Processed when removing undeliverable" do
     setup_user(true)
-    FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)
+    FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)
     @saved_user.fulfillments.each{ |x| x.update_status(nil,"returned","testing") }
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     
@@ -2653,7 +2602,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Change fulfillment status from bad_addres to Not Processed when removing undeliverable" do
     setup_user(true)
-    FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD', :club_id => @club.id)
+    FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product, :club_id => @club.id)
     @saved_user.fulfillments.each{ |x| x.update_status(nil,"bad_address","testing") }
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     
@@ -2708,5 +2657,5 @@ test "Update the status of all the fulfillments - In process using individual ch
       assert page.has_content? "Bracelet3"
       assert page.has_content? "Bracelet4"
     end
-  end 
+  end
 end

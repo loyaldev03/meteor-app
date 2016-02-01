@@ -8,7 +8,6 @@ defaults: &defaults
   email_to_send_product_list: 'platformadmins@xagax.com'
   email_to_use_on_action_mailer_as_recipient: platformadmins@xagax.com
   others_product: "SLOOPS"
-  kit_card_product: 'KIT-CARD'
   lyris_service:
     domain: 'www.elabs10.com'
     url: '/API/mailing_list.html'
@@ -186,12 +185,10 @@ defaults: &defaults
     operation_not_saved: '9900'
   fulfillment_products:
     all: All
-    kit_card: Kit - Card
     sloop: Sloop
   wrong_address:
     undeliverable_all: 'All'
     undeliverable_sloop: 'Sloop'
-    undeliverable_kit_card: 'Kit - Card'
   wrong_phone_number:
       unreachable: 'Unreachable'
       wrong_phone_number: 'Wrong phone'

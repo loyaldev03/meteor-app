@@ -10,7 +10,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:club, :partner_id => @partner.id)
-    @product = FactoryGirl.create(:product, :club_id => @club.id)
+    @product = @club.products.last
   end
 
   def update_status_on_fulfillment_where_i_do_not_manage(profile)
@@ -18,7 +18,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
     @other_club = FactoryGirl.create(:simple_club_with_gateway)
     @terms_of_membership_with_gateway_other_club = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @other_club.id)
     @other_club_saved_user = create_active_user(@terms_of_membership_with_gateway_other_club, :active_user, nil, {}, { :created_by => @admin_user })
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @other_club_saved_user.id, :product_sku => 'KIT-CARD', :club_id => @other_club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @other_club_saved_user.id, :product_sku => Settings.others_product, :club_id => @other_club.id)}
 
     # setup my user and login as club role fulfillment manager
     @my_club = FactoryGirl.create(:simple_club_with_gateway)
@@ -31,7 +31,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
     club_role.save    
 
     @my_club_saved_user = create_active_user(@terms_of_membership_with_gateway_my_club, :active_user, nil, {}, { :created_by => @agent_club_role })
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @my_club_saved_user.id, :product_sku => 'KIT-CARD', :club_id => @my_club.id)}
+    3.times{FactoryGirl.create(:fulfillment, :user_id => @my_club_saved_user.id, :product_sku => Settings.others_product, :club_id => @my_club.id)}
 
     sign_in @agent_club_role
 
@@ -87,7 +87,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
 
     get :generate_xls, initial_date: I18n.l(Time.zone.now, :format=>:only_date),
         end_date: I18n.l(Time.zone.now, :format=>:only_date), status: "not_processed",
-        radio_product_type:"KIT-CARD", product_type:"KIT-CARD", 
+        radio_product_filter: Settings.others_product, product_filter: "all", 
         fulfillment_selected: { "#{first_fulfillment.id}"=>"#{first_fulfillment.id}", "#{second_fulfillment.id}"=>"#{second_fulfillment.id}"},
         partner_prefix: @partner.prefix, club_prefix: @club.name
 
@@ -189,7 +189,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
     ['admin','fulfillment_managment','agency'].each do |role|
       @agent.club_roles.first.update_attribute :role, role
       second_club = FactoryGirl.create(:simple_club_with_gateway)
-      second_product = FactoryGirl.create(:product, :club_id => second_club.id)
+      second_product = FactoryGirl.create(:product, :club_id => second_club.id, sku: 'OTHERS')
       first_user = FactoryGirl.create(:user, :club_id => @club.id)
       second_user = FactoryGirl.create(:user, :club_id => second_club.id)
 
@@ -206,8 +206,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
 
       get :generate_xls, initial_date: I18n.l(Time.zone.now, :format=>:only_date),
           end_date: I18n.l(Time.zone.now, :format=>:only_date), status: "not_processed",
-          radio_product_type:"KIT-CARD", product_type:"KIT-CARD", 
-          fulfillment_selected: { "#{first_fulfillment.id}"=>"#{first_fulfillment.id}", "#{second_fulfillment.id}"=>"#{second_fulfillment.id}"},
+          product_filter: 'all', fulfillment_selected: { "#{first_fulfillment.id}"=>"#{first_fulfillment.id}", "#{second_fulfillment.id}"=>"#{second_fulfillment.id}"},
           partner_prefix: @partner.prefix, club_prefix: @club.name
 
       fulfillments = FulfillmentFile.last.fulfillments

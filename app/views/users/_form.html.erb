@@ -242,16 +242,10 @@
           <table class="hidden_table_border">
             <tr class = "control-group">
               <th>
-                <%= f.label :kit_card_product_sku, t('activerecord.attributes.enrollment_info.kit_card_product_sku') %>
-              </th>
-              <td> 
-                <%= check_box_tag :kit_card_product_sku %>
-              </td>  
-              <th>
                 <%= f.label :product_sku, t('activerecord.attributes.enrollment_info.product_sku') %>
               </th>
               <td> 
-                <%= select_tag :product_sku, options_from_collection_for_select(@current_club.products.with_stock.not_kit_card, "id", "sku"),  :include_blank => true %>
+                <%= select_tag :product_sku, options_from_collection_for_select(@current_club.products.with_stock, "id", "sku"),  :include_blank => true %>
               </td>  
             </tr>
           </table>

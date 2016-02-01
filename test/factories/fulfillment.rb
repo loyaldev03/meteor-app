@@ -1,7 +1,7 @@
 FactoryGirl.define do
 
   factory :fulfillment do
-    product_sku "kit-card"
+    product_sku Settings.others_product
     assigned_at DateTime.now
     status 'not_processed'
   end

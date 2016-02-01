@@ -7,6 +7,7 @@ FactoryGirl.define do
     billing_enable true
     family_memberships_allowed false
     association :partner
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end
 
   factory :simple_club, class: Club do
@@ -19,6 +20,7 @@ FactoryGirl.define do
     api_password { Faker::Internet.user_name }
     family_memberships_allowed false
     association :partner
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end
 
   factory :simple_club_with_gateway, class: Club do
@@ -31,6 +33,7 @@ FactoryGirl.define do
     association :partner
     marketing_tool_client :action_mailer
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
   factory :simple_club_with_litle_gateway, class: Club do
@@ -43,6 +46,7 @@ FactoryGirl.define do
     association :partner
     marketing_tool_client :action_mailer
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:litle_payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
   factory :simple_club_with_authorize_net_gateway, class: Club do
@@ -54,6 +58,7 @@ FactoryGirl.define do
     family_memberships_allowed false
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:authorize_net_payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
   factory :simple_club_with_first_data_gateway, class: Club do
@@ -65,6 +70,7 @@ FactoryGirl.define do
     family_memberships_allowed false
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:first_data_payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
   factory :simple_club_with_stripe_gateway, class: Club do
@@ -76,6 +82,7 @@ FactoryGirl.define do
     family_memberships_allowed false
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:stripe_payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
   factory :simple_club_with_trust_commerce_gateway, class: Club do
@@ -89,6 +96,7 @@ FactoryGirl.define do
 
     marketing_tool_client :action_mailer
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:trust_commerce_payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
   factory :simple_club_with_gateway_with_family, class: Club do
@@ -100,6 +108,7 @@ FactoryGirl.define do
     time_zone { TZInfo::Timezone.all.sample.name }
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     association :partner
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
   factory :club_with_api, class: Club do
@@ -113,8 +122,9 @@ FactoryGirl.define do
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
     family_memberships_allowed false
-    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end
 
   factory :club_with_wordpress_api, class: Club do
@@ -128,8 +138,9 @@ FactoryGirl.define do
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
     family_memberships_allowed false
-    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end
 
   factory :club_with_gateway, class: Club do
@@ -139,8 +150,9 @@ FactoryGirl.define do
     cs_phone_number "123 456 7891"
     billing_enable true
     family_memberships_allowed false
-    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
   factory :simple_club_with_require_external_id, class: Club do
@@ -153,7 +165,8 @@ FactoryGirl.define do
     api_password { Faker::Internet.user_name }
     requires_external_id true
     family_memberships_allowed false
-    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end
 end

@@ -160,7 +160,6 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   # TESTS
   # ##########################################################
 
-  #Create an user selecting only a kit-card
   test "create user" do
   	setup_user(false)
 
@@ -174,9 +173,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
     within(".nav-tabs"){ click_on 'Fulfillments' }
-    within("#fulfillments") { assert page.has_content?('KIT-CARD') }
+    within("#fulfillments") { assert page.has_content?(created_user.fulfillments.first.product_sku) }
     assert_equal(Fulfillment.count, 1)
-    assert_equal created_user.fulfillments.last.product_sku, 'KIT-CARD'
+    assert_equal created_user.fulfillments.last.product_sku, created_user.product_to_send.sku
   end
 
   # Reject new enrollments if billing is disable
@@ -1167,30 +1166,12 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "Create an user selecting only a product" do
-    setup_user(false)
-    product = FactoryGirl.create(:product, :club_id => @club.id,)
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    created_user = create_user(unsaved_user,nil,nil,false,[product.sku])
-
-    validate_view_user_base(created_user)
-    within(".nav-tabs"){ click_on 'Operations' }
-    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
-    within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.user.has_no_preferences_saved')) }
-    within(".nav-tabs"){ click_on 'Transactions' }
-    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
-    within(".nav-tabs"){ click_on 'Fulfillments' }
-    within("#fulfillments") { assert page.has_content?(product.sku) }
-    assert_equal(Fulfillment.count, 1)
-    assert_equal created_user.fulfillments.last.product_sku, product.sku
-  end
-
   test "Create an user without selecting any " do
     setup_user(false)
-    product = FactoryGirl.create(:product, :club_id => @club.id, :name => 'PRODUCT_RANDOM')
+    product = FactoryGirl.create(:product, :club_id => @club.id, sku: 'PRODUCT_RANDOM')
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    created_user = create_user(unsaved_user,nil,nil,false,[''])
-
+    created_user = create_user(unsaved_user,nil,nil,false,'')
+    
     validate_view_user_base(created_user)
     within(".nav-tabs"){ click_on 'Operations' }
     within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
@@ -1198,23 +1179,5 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     within(".nav-tabs"){ click_on 'Transactions' }
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
     assert_equal(Fulfillment.count, 0)
-  end
-
-  test "Create an user selecting kit-card and product" do
-    setup_user(false)
-    product = FactoryGirl.create(:product, :club_id => @club.id)
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    created_user = create_user(unsaved_user,nil,nil,false,[product.sku,'KIT-CARD'])
-
-    validate_view_user_base(created_user)
-    within(".nav-tabs"){ click_on 'Operations' }
-    within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
-    within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.user.has_no_preferences_saved')) }
-    within(".nav-tabs"){ click_on 'Transactions' }
-    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
-    within(".nav-tabs"){ click_on 'Fulfillments' }
-    within("#fulfillments") { assert page.has_content?(product.sku) }
-    within("#fulfillments") { assert page.has_content?('KIT-CARD') }
-    assert_equal(Fulfillment.count, 2)
   end
 end

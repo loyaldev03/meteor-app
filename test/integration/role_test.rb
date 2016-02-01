@@ -235,7 +235,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "Mark an user as 'wrong address' - Supervisor Role" do
     setup_supervisor
     setup_user(@agent)
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'KIT-CARD')}
+    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product)}
 
     set_as_undeliverable_user(@saved_user,'reason')
 

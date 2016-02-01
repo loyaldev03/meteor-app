@@ -179,6 +179,7 @@ en:
               club_payment_gateway_configuration: 'Payment Gateway Configuration is not configured within the club'
     model:
       users: 'Users'
+      product: ' Product'
       products: 'Products'
       fulfillments: 'Fulfillments'
       fulfillment_files: 'Fulfillment Files'
@@ -342,7 +343,6 @@ en:
         billing_is_not_expected: 'Billing is not expected.'
         birth_date: 'Birth date'
       enrollment_info:
-        kit_card_product_sku: KIT-CARD
         product_sku: Product
       membership:
         id: 'ID'

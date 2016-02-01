@@ -37,11 +37,9 @@ class ProductTest < ActiveSupport::TestCase
   test "Should not allow to update SKU if there are fulfillments related to it" do
     club = FactoryGirl.create(:club)
     user = FactoryGirl.create(:user, club_id: club.id )
-    product = FactoryGirl.create(:product, club_id: club.id)
-    product.sku = "new_sku"
-    assert product.save
+    product = club.products.last
     FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id)
-    product.sku = "new_sku2"
+    product.sku = "new_sku"
     assert !product.save
     assert product.errors.messages[:sku].include? "Cannot change this sku. There are fulfillments related to it."
   end
@@ -49,7 +47,7 @@ class ProductTest < ActiveSupport::TestCase
   test "Should not allow to delete product if there are fulfillments related to it" do
     club = FactoryGirl.create(:club)
     user = FactoryGirl.create(:user, club_id: club.id )
-    product = FactoryGirl.create(:product, club_id: club.id)
+    product = club.products.last
     FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id)
     assert !product.destroy
   end

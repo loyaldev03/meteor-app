@@ -56,21 +56,21 @@ class SendFulfillmentJob < ActiveJob::Base
     # opened fulfillments (meaning that previous fulfillments expired).
     user = User.find user_id
     if user.fulfillments.where_not_processed.empty?
-      product_skus = user.fulfillments_products_to_send
-      product_skus.each do |sku|
-        begin
-          product = Product.find_by(sku: sku, club_id: user.club_id)
-          fulfillment = Fulfillment.new product_sku: sku
-          fulfillment.product_package = product.package
-          fulfillment.recurrent = product.recurrent 
-          fulfillment.user_id = user.id
-          fulfillment.club_id = user.club_id
-          fulfillment.save!
-          proceed_with_gamer_analysis(fulfillment)
-        rescue ActiveRecord::RecordInvalid => e
-          Auditory.report_issue("Send Fulfillment", e, { user: user.inspect, fulfillment: fulfillment, product: product})
-        end
+      begin
+        product = user.product_to_send
+        fulfillment = Fulfillment.new product_sku: product.sku
+        fulfillment.product_package = product.package
+        fulfillment.recurrent = product.recurrent 
+        fulfillment.user_id = user.id
+        fulfillment.club_id = user.club_id
+        fulfillment.save!
+        proceed_with_gamer_analysis(fulfillment)
+      rescue ActiveRecord::RecordInvalid => e
+        Auditory.report_issue("Send Fulfillment", e, { user: user.inspect, fulfillment: fulfillment, product: product})
       end
+    else
+      message = "The user has already a not processed fulfillment and we cannot assign the requested fulfillment. Contact a Fulfillment Manager to decide what to do."
+      Auditory.report_issue("Send Fulfillment", message, { user: user.inspect, products: user.product_to_send.inspect })
     end
   end
 end

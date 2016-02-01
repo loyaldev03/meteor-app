@@ -19,7 +19,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
         zip: @user.zip, state: @user.state, email: @user.email, type_of_phone_number: @user.type_of_phone_number,
         phone_country_code: @user.phone_country_code, phone_area_code: @user.phone_area_code,
         phone_local_number: @user.phone_local_number, country: 'US', 
-        product_sku: Settings.kit_card_product }, 
+        product_sku: Settings.others_product }, 
       { number: credit_card.number, 
         expire_year: credit_card.expire_year, expire_month: credit_card.expire_month },
       cc_blank)

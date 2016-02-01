@@ -248,7 +248,7 @@ class User < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    SendFulfillmentJob.perform_later(self.id) unless skip_send_fulfillment
+    SendFulfillmentJob.perform_later(self.id) if not skip_send_fulfillment and product_to_send
     
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -421,8 +421,8 @@ class User < ActiveRecord::Base
     false
   end
 
-  def fulfillments_products_to_send
-    current_membership.enrollment_info.product_sku ? current_membership.enrollment_info.product_sku.split(',') : []
+  def product_to_send
+    current_membership.enrollment_info.product
   end
   
   ###############################################
@@ -665,7 +665,7 @@ class User < ActiveRecord::Base
 
   def replenish_stock_on_enrollment_failure(skip_product_validation, product_sku)
     unless skip_product_validation
-      Product.where(sku: product_sku.split(','), club_id: club.id).update_all "stock = stock + 1"
+      Product.where(sku: product_sku, club_id: club.id).update_all "stock = stock + 1"
     end
   end
 
@@ -679,15 +679,14 @@ class User < ActiveRecord::Base
       return { :message => I18n.t('error_messages.cant_recover_user', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_user }
     end
 
-    unless skip_product_validation
-      user_params[:product_sku].to_s.split(',').each do |sku|
-        product = Product.find_by(club_id: club.id, sku: sku)
-        if product.nil?
-          return { message: I18n.t('error_messages.product_does_not_exists'), code: Settings.error_codes.product_does_not_exists }
-        else
-          result = product.decrease_stock
-          return result if result[:code] != Settings.error_codes.success
-        end
+    product = nil
+    if not skip_product_validation and not user_params[:product_sku].blank?
+      product = Product.find_by(club_id: club.id, sku: user_params[:product_sku])
+      if product.nil?
+        return { message: I18n.t('error_messages.product_does_not_exists'), code: Settings.error_codes.product_does_not_exists }
+      else
+        result = product.decrease_stock
+        return result if result[:code] != Settings.error_codes.success
       end
     end
 
@@ -735,6 +734,7 @@ class User < ActiveRecord::Base
       self.save! validate: !skip_user_validation
 
       enrollment_info.membership = membership
+      enrollment_info.product = product if product
       enrollment_info.save
       
       if trans

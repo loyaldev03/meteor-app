@@ -2,6 +2,7 @@ class EnrollmentInfo < ActiveRecord::Base
   belongs_to :user
   belongs_to :membership
   belongs_to :prospect
+  belongs_to :product
 
   serialize :preferences, JSON
 
@@ -23,7 +24,6 @@ class EnrollmentInfo < ActiveRecord::Base
   #
   def update_enrollment_info_by_hash(params)
     unless params.nil?
-      self.product_sku = params[:product_sku].upcase if params[:product_sku] 
       self.product_description = params[:product_description]
       self.mega_channel = params[:mega_channel].downcase if params[:mega_channel]
       self.marketing_code = params[:marketing_code].downcase if params[:marketing_code]
