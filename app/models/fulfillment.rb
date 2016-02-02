@@ -11,6 +11,8 @@ class Fulfillment < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :club
+  belongs_to :product
+
   has_and_belongs_to_many :fulfillment_files
   has_many :suspected_fulfillment_evidences
 
@@ -111,6 +113,7 @@ class Fulfillment < ActiveRecord::Base
     f.user_id = self.user_id
     f.recurrent = true
     f.club_id = self.club_id
+    f.product_id = self.product_id
     f.save
     f.decrease_stock! if status.nil?
   end
@@ -209,10 +212,6 @@ class Fulfillment < ActiveRecord::Base
     [ self.tracking_code, self.product.cost_center, user.full_name, user.address, user.city,
       user.state, user.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
       self.product.weight, 'MID']
-  end
-
-  def product
-    @product ||= Product.find_by(sku: self.product_sku, club_id: self.user.club_id)
   end
 
   private

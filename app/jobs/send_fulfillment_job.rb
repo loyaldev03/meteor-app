@@ -63,14 +63,15 @@ class SendFulfillmentJob < ActiveJob::Base
         fulfillment.recurrent = product.recurrent 
         fulfillment.user_id = user.id
         fulfillment.club_id = user.club_id
+        fulfillment.product = product
         fulfillment.save!
         proceed_with_gamer_analysis(fulfillment)
       rescue ActiveRecord::RecordInvalid => e
-        Auditory.report_issue("Send Fulfillment", e, { user: user.inspect, fulfillment: fulfillment, product: product})
+        Auditory.report_issue("Send Fulfillment", e, { user: user.id, product: user.product_to_send.sku })
       end
     else
       message = "The user has already a not processed fulfillment and we cannot assign the requested fulfillment. Contact a Fulfillment Manager to decide what to do."
-      Auditory.report_issue("Send Fulfillment", message, { user: user.inspect, products: user.product_to_send.inspect })
+      Auditory.report_issue("Send Fulfillment", message, { user: user.id, product: user.product_to_send.sku })
     end
   end
 end

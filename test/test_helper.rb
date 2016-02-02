@@ -625,7 +625,7 @@ module ActionDispatch
         select status, :from => "status" unless status.nil?
         unless type.nil?
           if type == 'sloops'
-            find(:css, "#radio_product_filter_all[value='all']").set(true)
+            find(:css, "#radio_product_filter_[value='']").set(true)
           else
             fill_in "input_product_filter", :with => type
           end

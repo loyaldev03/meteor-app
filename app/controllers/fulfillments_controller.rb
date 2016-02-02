@@ -6,7 +6,7 @@ class FulfillmentsController < ApplicationController
     if request.post?
       @status = params[:status]
       if params[:all_times] == '1'     
-        if params[:radio_product_filter] == 'all'
+        if params[:radio_product_filter].blank?
           @fulfillments = Fulfillment.includes(:user).joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ?', params[:status], @current_club.id).not_renewed
         elsif params[:radio_product_filter] == 'package'
           products = Product.where(club_id: @current_club.id, package: params[:product_filter]).pluck(:sku)
@@ -15,7 +15,7 @@ class FulfillmentsController < ApplicationController
           @fulfillments = Fulfillment.includes(:user).joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ? and product_sku = ? ', params[:status], @current_club.id, params[:product_filter]).not_renewed
         end
       else
-        if params[:radio_product_filter] == 'all'
+        if params[:radio_product_filter].blank?
           @fulfillments = Fulfillment.includes(:user).joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? ', 
             params[:status], params[:initial_date], params[:end_date], @current_club.id]).not_renewed
         elsif params[:radio_product_filter] == 'package'
@@ -92,7 +92,7 @@ class FulfillmentsController < ApplicationController
     else
       ff.initial_date, ff.end_date, ff.all_times = params[:initial_date], params[:end_date], false
     end
-    ff.product = params[:product_filter] == 'all' ? Settings.others_product : params[:product_filter]
+    ff.product = params[:product_filter].blank? ? Settings.others_product : params[:product_filter]
     if not params[:fulfillment_selected].nil?
       begin
         FulfillmentFile.transaction do 

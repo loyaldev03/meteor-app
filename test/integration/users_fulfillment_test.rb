@@ -303,7 +303,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
 
@@ -461,7 +461,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.find_field('all_times')    
       check('all_times')
       select('in_process', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
 
@@ -500,7 +500,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -534,7 +534,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #   within("#fulfillments_table")do
   #     check('all_times')
   #     select('in_process', :from => 'status')
-  #     choose('radio_product_filter_all')
+  #     choose('radio_product_filter_')
   #   end
   #   click_link_or_button('Report')
   #   within("#report_results")do
@@ -581,7 +581,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -627,7 +627,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('out_of_stock', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -661,7 +661,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('out_of_stock', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -689,7 +689,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('out_of_stock', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -794,7 +794,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     @fulfillment.reload
@@ -822,7 +822,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     
@@ -1087,7 +1087,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1121,7 +1121,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     within("#fulfillments_table")do
       select('not_processed', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
  
     csv_string = generate_xls_file(fulfillments, Settings.others_product, @saved_user.club, true)
@@ -1132,7 +1132,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button 'Report'
     within("#report_results")do
@@ -1176,7 +1176,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
 
     click_link_or_button 'Report'
@@ -1221,7 +1221,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('sent', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1262,7 +1262,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('sent', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1288,7 +1288,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1304,7 +1304,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1331,7 +1331,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('bad_address', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1340,7 +1340,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1369,7 +1369,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1418,7 +1418,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('not_processed', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
     click_link_or_button('Report')
     within("#report_results")do
@@ -1501,7 +1501,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments_table")do
       check('all_times')
       select('in_process', :from => 'status')
-      choose('radio_product_filter_all')
+      choose('radio_product_filter_')
     end
 
     click_link_or_button 'Report'

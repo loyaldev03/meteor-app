@@ -1,5 +1,6 @@
 class Product < ActiveRecord::Base
   belongs_to :club
+  has_many :fulfillments
 
   attr_accessible :stock, :allow_backorder
 
@@ -13,7 +14,7 @@ class Product < ActiveRecord::Base
 
   before_save :apply_upcase_to_sku
   before_update :validate_sku_update
-  before_destroy :any_fulfillment_related?
+  before_destroy :no_fulfillment_related?
 
   acts_as_paranoid
 
@@ -25,12 +26,12 @@ class Product < ActiveRecord::Base
     self.sku = self.sku.upcase
   end
 
-  def any_fulfillment_related?
-    Fulfillment.where(club_id: self.club_id, product_sku: self.sku).limit(1).empty?
+  def no_fulfillment_related?
+    fulfillments.first.nil?
   end
 
   def validate_sku_update
-    if sku_changed? and Fulfillment.where(club_id: self.club_id, product_sku: self.sku_was).limit(1).any?
+    if sku_changed? and not no_fulfillment_related?
       errors.add :sku, "Cannot change this sku. There are fulfillments related to it."
       false
     end
@@ -80,7 +81,7 @@ class Product < ActiveRecord::Base
         sheet.add_row header
         club.products.each do |product|
           row = [ product.name, product.sku ]
-          fulfillments_data = Fulfillment.where(product_sku: product.sku, club_id: club.id).group(:status).count
+          fulfillments_data = product.fulfillments.group(:status).count
           status_list.each {|status| row << (fulfillments_data[status.to_s] || 0) }
           sheet.add_row row
         end

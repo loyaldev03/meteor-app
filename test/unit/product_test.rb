@@ -38,7 +38,7 @@ class ProductTest < ActiveSupport::TestCase
     club = FactoryGirl.create(:club)
     user = FactoryGirl.create(:user, club_id: club.id )
     product = club.products.last
-    FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id)
+    FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id, product_id: product.id)
     product.sku = "new_sku"
     assert !product.save
     assert product.errors.messages[:sku].include? "Cannot change this sku. There are fulfillments related to it."
@@ -48,7 +48,7 @@ class ProductTest < ActiveSupport::TestCase
     club = FactoryGirl.create(:club)
     user = FactoryGirl.create(:user, club_id: club.id )
     product = club.products.last
-    FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id)
+    FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id, product_id: product.id)
     assert !product.destroy
   end
 end

@@ -32,7 +32,7 @@
           <%= fulfillment_selectable_statuses(:status, params[:status]) %>
         </td>
         <td width="240px">
-          <%= radio_button_tag 'radio_product_filter', 'all', ('all' == params[:product_filter] || params[:product_filter].blank?) %>
+          <%= radio_button_tag 'radio_product_filter', '', params[:product_filter].blank? %>
           <%= label_tag 'All', nil, :class => 'help-inline' %>
           <br>
           <%= radio_button_tag 'radio_product_filter', 'sku', params[:radio_product_filter] == 'sku' %>
