@@ -25,8 +25,9 @@
                 <table class="hidden_table_border">
                   <tr>
                     <td><%= t('activerecord.attributes.user.id') %></td>
-                    <td>  <%= text_field :user, :id, :class => 'test_field',   
-                                     :value => (params[:user][:id] if params[:user])%>
+                    <td><%= text_field :user, :id, :type => 'number', max: '9999999999999', min: '1',
+                                         :class => 'test_field',
+                                         :value => (params[:user][:id] if params[:user])%>
                     </td>
                   </tr>
                   <tr>
@@ -102,8 +103,9 @@
                 <table class="hidden_table_border">
                   <tr>
                     <td><%= t('activerecord.attributes.credit_card.last_digits') %></td>
-                    <td><%= text_field :user, :cc_last_digits, :class => 'test_field',
-                                     :value => (params[:user][:cc_last_digits] if params[:user]), :maxlength => 4 %> </td>
+                    <td><%= text_field :user, :cc_last_digits, :type => 'number', :max => '9999', 
+                                       :min => '0', :class => 'test_field',
+                                       :value => (params[:user][:cc_last_digits] if params[:user])%> </td>
                   </tr>
                   <tr>
                     <td><%= t('activerecord.attributes.user.status') %></td>
