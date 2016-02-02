@@ -7,6 +7,11 @@ FactoryGirl.define do
     stock 10
     weight 5
 
+    factory :random_product do
+      sequence(:sku) {|n| Settings.others_product+"#{n}" }
+      sequence(:name) {|n| (Settings.others_product+"#{n}").capitalize }
+    end
+
     factory :product_without_stock_and_not_recurrent do
       sequence(:sku) {|n| Settings.others_product+"#{n}" }
       sequence(:name) {|n| (Settings.others_product+"#{n}").capitalize }

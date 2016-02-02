@@ -52,7 +52,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    product = Product.find_by sku: @saved_user.enrollment_infos.first.product_sku
+    product = @saved_user.enrollment_infos.first.product
     product.delete
 
     assert_difference('Membership.count') do 
@@ -66,7 +66,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    product = Product.find_by sku: @saved_user.enrollment_infos.first.product_sku
+    product = @saved_user.enrollment_infos.first.product
     product.stock = 0 
     product.allow_backorder = false
     product.save
@@ -82,7 +82,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    product = Product.find_by sku: @saved_user.enrollment_infos.first.product_sku
+    product = @saved_user.enrollment_infos.first.product
     product.stock = 0 
     product.allow_backorder = false
     product.save
