@@ -704,26 +704,26 @@ class User < ActiveRecord::Base
     membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent)
     self.current_membership = membership
 
-    operation_type = check_enrollment_operation
-    if amount.to_f != 0.0      
-      trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
-      trans.transaction_type = "sale"
-      trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
-      answer = trans.process
-      unless trans.success?
-        operation_type = Settings.operation_types.error_on_enrollment_billing
-        Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
-      # TODO: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
-        trans.operation_type = operation_type
-        trans.membership_id = nil
-        trans.save
-        replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
-        return answer
-      end
-      trans.update_attribute :operation_type, operation_type
-    end
-    
     begin
+      operation_type = check_enrollment_operation
+      if amount.to_f != 0.0      
+        trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
+        trans.transaction_type = "sale"
+        trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
+        answer = trans.process
+        unless trans.success?
+          operation_type = Settings.operation_types.error_on_enrollment_billing
+          Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
+        # TODO: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
+          trans.operation_type = operation_type
+          trans.membership_id = nil
+          trans.save
+          replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
+          return answer
+        end
+        trans.update_attribute :operation_type, operation_type
+      end
+    
       if self.new_record?
         self.credit_cards << credit_card
       elsif not skip_credit_card_validation
@@ -757,6 +757,7 @@ class User < ActiveRecord::Base
       logger.error e.inspect
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
       replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
+      trans.update_attribute(:operation_type, Settings.operation_types.error_on_enrollment_billing) if trans and not trans.success
       Auditory.report_issue(error_message, e, { user: self.inspect, credit_card: credit_card.inspect, enrollment_info: enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       # TODO2: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
