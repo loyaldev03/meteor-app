@@ -274,7 +274,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request.
   #
   # @example_response
-  #   {"code":"000","member":{"first_name":"Megan","last_name":"Brenann","email":"alice@brennan.com","address":"SomeSt","city":"Dresden","state":"AL","zip":"12345","birth_date":"1989-09-03","phone_country_code":1,"phone_area_code":123,"phone_local_number":1123,"type_of_phone_number":"other","gender":"","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T13:03:07-05:00","external_id":null,"blacklisted":false,"member_group_type":"VIP","preferences":{"example_color":"blue","example_team":"example"}},"credit_card":{"last_4_digits":"8431","expire_month":2,"expire_year":2014},"current_membership":{"status":"lapsed","join_date":"2013-01-15T13:03:19-05:00","cancel_date":"2013-04-10T20:00:00-04:00"}}
+  #   {"code":"000","member":{"first_name":"Megan","last_name":"Brenann","email":"alice@brennan.com","address":"SomeSt","city":"Dresden","state":"AL","zip":"12345","birth_date":"1989-09-03","phone_country_code":1,"phone_area_code":123,"phone_local_number":1123,"type_of_phone_number":"other","gender":"","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T13:03:07-05:00","external_id":null,"blacklisted":false,"member_group_type":"VIP","preferences":{"example_color":"blue","example_team":"example"}},"credit_card":{"last_4_digits":"8431","expire_month":2,"expire_year":2014},"current_membership":{"status":"lapsed","join_date":"2013-01-15T13:03:19-05:00","cancel_date":"2013-04-10T20:00:00-04:00","terms_of_membership_id":338}}
   # @example_response_description Example response to a valid request
   #
   def show
