@@ -110,6 +110,11 @@ class Api::MembersControllerTest < ActionController::TestCase
                                         :format => :json} )
   end
 
+  def get_show(user_id)
+    post( :show, { id: user_id, :format => :json } )
+
+  end
+
   def generate_put_club_cash(user_id, amount, expire_date = nil)
     data = { id: user_id, amount: amount, format: :json }
     data.merge!({expire_date: expire_date}) if expire_date
@@ -2390,5 +2395,21 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_not_nil @saved_user.operations.where("description like ?", "%Moved next bill date due to Tom change. Already spend #{days_in_provisional} days in previous membership.%").last
     nbd_should_have_set = nbd.in_time_zone(@saved_user.club.time_zone) - days_in_provisional.days
     assert_equal @saved_user.next_retry_bill_date.in_time_zone(@saved_user.club.time_zone).to_date, nbd_should_have_set.to_date, "Dates: #{@saved_user.next_retry_bill_date}. Nbd: #{nbd}. nbd_should_have_set: #{nbd_should_have_set}" 
+  end
+
+  test "Admin should get user's information" do
+    sign_in @admin_user
+
+    @credit_card = FactoryGirl.build :credit_card
+    @user = FactoryGirl.build :user_with_api
+    @enrollment_info = FactoryGirl.build :enrollment_info
+    @current_club = @terms_of_membership.club
+    @current_agent = @admin_user
+    active_merchant_stubs
+    generate_post_message
+
+    saved_user = User.find_by email: @user.email
+    get_show(saved_user.id)
+    assert_response :success
   end
 end
