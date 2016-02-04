@@ -11,7 +11,7 @@ class Api::MembersController < ApplicationController
   # @action POST
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action. 
-  # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). It must have the following information:
+  # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored with the membership). It must have the following information:
   #   <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. </li>
   #     <li><strong>last_name</strong> The last name of the member that is enrolling. </li>
@@ -124,7 +124,7 @@ class Api::MembersController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored as enrollment_info). 
+  # @required [Hash] member Information related to the member that is sumbitting the enroll. It also contains information related to the enrollment (this will be stored with the membership). 
   #   <ul>
   #     <li><strong>first_name</strong> The first name of the member that is enrolling. [optional] </li>
   #     <li><strong>last_name</strong> The last name of the member that is enrolling. [optional] </li>

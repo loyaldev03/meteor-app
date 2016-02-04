@@ -23,7 +23,7 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     if create_new_user
       unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
       credit_card = FactoryGirl.build(:credit_card_master_card)
-      enrollment_info = FactoryGirl.build(:enrollment_info)
+      enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
       @saved_user = User.find_by_email unsaved_user.email
     end
@@ -96,7 +96,7 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     @terms_of_membership_with_gateway.update_attributes(if_cannot_bill: "downgrade_tom", downgrade_tom_id: @terms_of_membership_with_gateway_to_downgrade.id, installment_amount: 0.54)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by_email unsaved_user.email
     @saved_user.update_attribute(:recycled_times, 4)

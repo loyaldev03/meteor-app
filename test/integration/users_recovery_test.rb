@@ -181,7 +181,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.active_credit_card.blacklisted, true
 
     credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, @saved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway, false)
     @saved_user.reload
 
@@ -196,7 +196,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     setup_user
    
     credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     assert_difference("CreditCard.count",0) do
       create_user_by_sloop(@admin_agent, @saved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway, false)
     end
@@ -227,7 +227,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "lapsed"
 
     credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     assert_difference("CreditCard.count",0) do
       create_user_by_sloop(@admin_agent, @saved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway, false)
     end
@@ -292,7 +292,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     @terms_of_membership_with_gateway.provisional_days = 0
     @terms_of_membership_with_gateway.installment_amount = 0.0
     @terms_of_membership_with_gateway.save
-    enrollment_info = FactoryGirl.build :complete_enrollment_info_with_cero_amount, :product_sku => Settings.others_product
+    enrollment_info = FactoryGirl.build :membership_with_enrollment_info_without_enrollment_amount
     unsaved_user = FactoryGirl.build(:user_with_api)
     
     assert_difference('User.count') do

@@ -25,7 +25,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     
     unsaved_user = FactoryGirl.build(:user_with_api)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
 
     if approval
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)

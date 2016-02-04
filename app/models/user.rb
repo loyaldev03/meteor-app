@@ -11,7 +11,6 @@ class User < ActiveRecord::Base
   has_many :communications, ->{ order("created_at DESC") }
   has_many :fulfillments
   has_many :club_cash_transactions
-  has_many :enrollment_infos, ->{ order("created_at DESC") }
   has_many :user_preferences
   has_many :user_additional_data
   has_many :memberships, ->{ order("created_at DESC") }
@@ -248,7 +247,7 @@ class User < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    SendFulfillmentJob.perform_later(self.id) if not skip_send_fulfillment and current_membership.enrollment_info.product_id
+    SendFulfillmentJob.perform_later(self.id) if not skip_send_fulfillment and current_membership.product_id
     
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -422,7 +421,7 @@ class User < ActiveRecord::Base
   end
 
   def product_to_send
-    current_membership.enrollment_info.product
+    current_membership.product
   end
   
   ###############################################
@@ -437,10 +436,11 @@ class User < ActiveRecord::Base
         else
           previous_membership = current_membership
           response = if prorated
-            prorated_enroll(new_tom, agent, credit_card_params, self.current_membership.enrollment_info)
+            prorated_enroll(new_tom, agent, credit_card_params, self.current_membership)
           else 
-            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership.enrollment_info, true, true, true)
+            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership, true, true, true)
           end
+
           if response[:code] == Settings.error_codes.success
             Auditory.audit(agent, new_tom, operation_message, self, operation_type)
             Membership.find(previous_membership.id).cancel_because_of_membership_change
@@ -478,12 +478,12 @@ class User < ActiveRecord::Base
 
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom, agent = nil, options = {})
-    enrollment_info_params = options.merge({
-      mega_channel: EnrollmentInfo::CS_MEGA_CHANNEL,
-      campaign_medium: EnrollmentInfo::CS_CAMPAIGN_MEDIUM,
-      campaign_description: EnrollmentInfo::CS_CAMPAIGN_DESCRIPTION
+    membership_params = options.merge({
+      mega_channel: Membership::CS_MEGA_CHANNEL,
+      campaign_medium: Membership::CS_CAMPAIGN_MEDIUM,
+      campaign_description: Membership::CS_CAMPAIGN_DESCRIPTION
     })
-    enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, enrollment_info_params, true, false)
+    enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, membership_params, true, false)
   end
 
   def has_problems_to_bill?
@@ -695,14 +695,12 @@ class User < ActiveRecord::Base
                errors: self.errors_merged(credit_card) }
     end
 
-    enrollment_info = EnrollmentInfo.new enrollment_amount: amount, terms_of_membership_id: tom.id
-    enrollment_info.update_enrollment_info_by_hash user_params
-
-    membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent)
+    membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent, enrollment_amount: amount)
+    membership.update_membership_info_by_hash user_params
     self.current_membership = membership
 
     begin
-      operation_type = check_enrollment_operation
+      operation_type = check_enrollment_operation(tom)
       if amount.to_f != 0.0      
         trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
@@ -719,20 +717,19 @@ class User < ActiveRecord::Base
           return answer
         end
       end
-    
+          
       if self.new_record?
         self.credit_cards << credit_card
       elsif not skip_credit_card_validation
         validate_if_credit_card_already_exist(tom, credit_card, false, cc_blank, agent)
         credit_card = active_credit_card
       end
-      self.enrollment_infos << enrollment_info
-      self.memberships << membership
-      self.save! validate: !skip_user_validation
 
-      enrollment_info.membership = membership
-      enrollment_info.product = product
-      enrollment_info.save
+      self.save! validate: !skip_user_validation
+      self.memberships << membership
+      membership.product = product
+      membership.save
+      Auditory.audit(agent, membership, "New Membership record created.", self, Settings.operation_types.enrollment)
       
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
@@ -745,7 +742,7 @@ class User < ActiveRecord::Base
         credit_card.accepted_on_billing
       end
       self.reload
-      message = set_status_on_enrollment!(agent, trans, amount, enrollment_info, operation_type)
+      message = set_status_on_enrollment!(agent, trans, amount, membership, operation_type)
 
       response = { message: message, code: Settings.error_codes.success, member_id: self.id, autologin_url: self.full_autologin_url.to_s, status: self.status }
       response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) unless self.is_not_drupal?
@@ -755,7 +752,7 @@ class User < ActiveRecord::Base
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
       replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
       trans.update_attribute(:operation_type, Settings.operation_types.error_on_enrollment_billing) if trans and not trans.success
-      Auditory.report_issue(error_message, e, { user: self.inspect, credit_card: credit_card.inspect, enrollment_info: enrollment_info.inspect })
+      Auditory.report_issue(error_message, e, { user: self.inspect, credit_card: credit_card.inspect, membership: membership.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       # TODO2: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
       Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing) unless self.new_record?
@@ -831,14 +828,13 @@ class User < ActiveRecord::Base
     end
     
     begin
-      enrollment_info = EnrollmentInfo.new terms_of_membership_id: tom.id
-      enrollment_info.update_enrollment_info_by_hash user_params
-      self.enrollment_infos << enrollment_info
+      membership = Membership.new(terms_of_membership_id: tom.id)
+      membership.update_membership_info_by_hash user_params
+      self.current_membership = membership
       self.memberships << new_membership
       self.current_membership = new_membership
       self.save
-      enrollment_info.membership = new_membership
-      enrollment_info.save
+      Auditory.audit(agent, membership, "New Membership record created.", self, Settings.operation_types.enrollment)
       
       if trans
         trans.membership_id = self.current_membership.id
@@ -846,7 +842,7 @@ class User < ActiveRecord::Base
         trans.save
       end
       credit_card.accepted_on_billing
-      message = set_status_on_enrollment!(agent, trans, 0.0, enrollment_info, operation_type)
+      message = set_status_on_enrollment!(agent, trans, 0.0, membership, operation_type)
       
       if trans
         proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, club_cash_to_deduct, sale_transaction)
@@ -862,7 +858,7 @@ class User < ActiveRecord::Base
       response
     rescue Exception => e
       logger.error e.inspect
-      Auditory.report_issue("User:prorated_enroll -- user turned invalid while enrolling", e, { user: self.inspect, credit_card: credit_card.inspect, enrollment_info: enrollment_info.inspect })
+      Auditory.report_issue("User:prorated_enroll -- user turned invalid while enrolling", e, { user: self.inspect, credit_card: credit_card.inspect, membership: membership.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       Auditory.audit(agent, self, "User:prorated_enroll", self, Settings.operation_types.error_on_prorated_enroll)
       { message: I18n.t('error_messages.user_not_saved', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.member_not_saved }
@@ -1338,7 +1334,7 @@ class User < ActiveRecord::Base
       true
     end
 
-    def check_enrollment_operation
+    def check_enrollment_operation(terms_of_membership)
       if terms_of_membership.needs_enrollment_approval?
         if self.lapsed?
           Settings.operation_types.recovery_needs_approval

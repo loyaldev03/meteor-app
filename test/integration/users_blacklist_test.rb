@@ -75,7 +75,7 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
     blacklisted_credit_card_number = "4012301230123010"
 
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     active_merchant_stubs_store(credit_card.number)    
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)

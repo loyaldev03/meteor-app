@@ -141,7 +141,7 @@ class ClubTest < ActionDispatch::IntegrationTest
     
     unsaved_blacklisted_user =  FactoryGirl.build(:active_user, club_id: @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_blacklisted_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @blacklisted_user = User.find_by(email: unsaved_blacklisted_user.email)
     @blacklisted_user.blacklist(@admin_agent,"Testing")

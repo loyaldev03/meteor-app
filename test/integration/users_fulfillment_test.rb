@@ -178,7 +178,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "enroll an user with product not available but it on the list at CS and recurrent false" do
     setup_user(false)
     @product = FactoryGirl.create(:product_without_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     assert_difference('Product.find(@product.id).stock',-1) do
       create_user_throught_sloop(enrollment_info)
@@ -210,7 +210,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "enroll an user with product not available but it on the list at CS and recurrent true" do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     assert_difference('Product.find(@product.id).stock',-1) do
       create_user_throught_sloop(enrollment_info)
@@ -242,7 +242,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "enroll an user with product out of stock and recurrent" do
     setup_user(false)
     @product = FactoryGirl.create(:product_without_stock_and_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
     assert_nil User.find_by_email(@user.email)
@@ -251,7 +251,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "enroll an user with product out of stock and not recurrent" do
     setup_user(false)
     @product = FactoryGirl.create(:product_without_stock_and_not_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
     assert_nil User.find_by_email(@user.email)
@@ -259,7 +259,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "enroll an user with product not in the list" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => 'product not in the list')
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => 'product not in the list')
 
     create_user_throught_sloop(enrollment_info)
     assert_nil User.find_by_email(@user.email)
@@ -267,7 +267,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "enroll an user with blank product_sku" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => '')
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => '')
     assert_difference('Fulfillment.count',0){
       create_user_throught_sloop(enrollment_info)
     }
@@ -286,7 +286,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Enroll an user with recurrent product and it on the list" do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
 
@@ -323,7 +323,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Enroll an user with product in the list and set as cancel that fulfillment from profile." do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
 
@@ -348,7 +348,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Enroll an user with product in the list and set as do_not_honor that fulfillment from profile." do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku, enrollment_amount: 0.0)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku, enrollment_amount: 0.0)
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -387,7 +387,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Only show cancel or do not honor buttons within user's profile if product is in not_process." do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
 
@@ -432,7 +432,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "fulfillment record at in_process + check stock" do
     setup_user(false)
     @product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
     initial_stock = @product.stock
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -482,7 +482,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "fulfillment record at Processing" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => Settings.others_product)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => Settings.others_product)
 
     create_user_throught_sloop(enrollment_info)
     
@@ -519,7 +519,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   # test "mark sent fulfillment at in_process status" do
   #   setup_user(false)
   #   product = FactoryGirl.create(:product, :club_id => @club.id, :recurrent => true)
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+  #   enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
   #   create_user_throught_sloop(enrollment_info)
   #   @saved_user = User.find_by_email(@user.email)
@@ -566,7 +566,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "set as wrong address fulfillment at in_process status" do
     setup_user(false)
 
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => Settings.others_product)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => Settings.others_product)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -608,7 +608,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "display fulfillment record at out_of_stock status" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => Settings.others_product)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => Settings.others_product)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -642,7 +642,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "add stock and check fulfillment record with out_of_stock status" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => Settings.others_product)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => Settings.others_product)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -706,7 +706,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   # test "renewal as out_of_stock and set renewed when product does not have stock" do
   #   setup_user(false)
   #   product = FactoryGirl.create(:product, :recurrent => true, :club_id => @club.id )
-  #   enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+  #   enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => product.sku)
 
   #   create_user_throught_sloop(enrollment_info)
   #   @saved_user = User.find_by_email(@user.email)
@@ -746,7 +746,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "renewal as bad_address and set renewed" do
     setup_user(false)
     recurrent_product = FactoryGirl.create(:product_with_recurrent, club_id: @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => recurrent_product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => recurrent_product.sku)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1071,7 +1071,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "fulfillment without stock (allow backorder as true)." do
     setup_user(false)
     @product.update_attributes(stock: 0, allow_backorder: true)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1102,7 +1102,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Create a report fulfillment selecting KIT at product type." do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by(email: @user.email)
@@ -1147,7 +1147,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "change status of fulfillment CARD from not_processed to sent" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1192,7 +1192,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "do not show fulfillment KIT with status = sent actions when user is lapsed." do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
     fulfillment = Fulfillment.last
@@ -1234,7 +1234,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   # TODO: improve this test. We should mark as sent fulfillments in the end.
   test "do not show fulfillment with status = sent actions when user is lapsed." do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => @product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => @product.sku)
 
     create_user_throught_sloop(enrollment_info)
     fulfillment = Fulfillment.last
@@ -1274,7 +1274,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "not_processed and in_process fulfillments should be updated to bad_address when set_wrong_address" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1315,7 +1315,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "renewed fulfillments should not set as bad_address and also should not be shown in report result." do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1352,7 +1352,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "fulfillment record at not_processed status - recurrent = false" do
     setup_user(false)
     product = FactoryGirl.create(:product_without_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => "#{product.sku}")
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1402,7 +1402,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "fulfillment record at not_processed status - recurrent = true" do
     setup_user(false)
     product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => "#{product.sku}")
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1453,7 +1453,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Generate CSV with fulfillment at in_process status." do
     setup_user(false)
     product = FactoryGirl.create(:product_with_recurrent, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => product.sku)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1482,7 +1482,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   
   test "Create a report fulfillment - Chapter user status" do
     setup_user(false)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{@product.sku}")
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => "#{@product.sku}")
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1516,7 +1516,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Pass product to Not Processed status with stock" do
     setup_user(false)
     product = Product.find_by(club_id: @club.id, sku: Settings.others_product)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
 
     create_user_throught_sloop(enrollment_info)
     @saved_user = User.find_by_email(@user.email)
@@ -1540,7 +1540,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Pass product to Not Processed status without stock" do
     setup_user(false)
     @product.update_attributes stock: 0, allow_backorder: false
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{@product.sku}")
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => "#{@product.sku}")
 
     assert_difference("User.count",0) do
       create_user_throught_sloop(enrollment_info)
@@ -1552,7 +1552,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Search fulfillment at Not Processed status by 'all times' checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1582,7 +1582,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Search fulfillment at 'In Process' status by 'all times' checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1614,7 +1614,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Search fulfillment at 'On Hold' status by 'all times' checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1646,7 +1646,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Search fulfillment at 'Sent' status by 'all times' checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1678,7 +1678,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Search fulfillment at 'Out of Stock' status by 'all times' checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1710,7 +1710,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Search fulfillment at 'Returned' status by 'all times' checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1742,7 +1742,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Search fulfillment at 'Bad address' status by 'all times' checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1773,7 +1773,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Update the status of all the fulfillments - In Process selecting the All results checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1812,7 +1812,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Update the status of all the fulfillments - Not processed selecting the All results checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1850,7 +1850,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Update the status of all the fulfillments - On Hold selecting the All results checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1889,7 +1889,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Update the status of all the fulfillments - Sent selecting the All results checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1928,7 +1928,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Update the status of all the fulfillments - Out of Stock selecting the All results checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -1967,7 +1967,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Update the status of all the fulfillments - Returned selecting the All results checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2006,7 +2006,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Update the status of all the fulfillments - Bad address selecting the All results checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     3.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2045,7 +2045,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   test "Update the status of the fulfillments - Not processed using individual checkboxes" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2081,7 +2081,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 test "Update the status of all the fulfillments - In process using individual checkboxes" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2118,7 +2118,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Update the status of all the fulfillments - On hold using individual checkboxes" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2155,7 +2155,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Update the status of all the fulfillments - Sent using individual checkboxes" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2192,7 +2192,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Update the status of all the fulfillments - Out of Stock using individual checkboxes" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2229,7 +2229,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Update the status of all the fulfillments - Returned using individual checkboxes" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2266,7 +2266,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Update the status of all the fulfillments - Bad address using individual checkboxes" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2303,7 +2303,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Error message if changing from one status to same status" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     fulfillments = @saved_user.fulfillments
@@ -2317,7 +2317,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Error message if changing from one status to 'blank' status" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     fulfillments = @saved_user.fulfillments
@@ -2338,7 +2338,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Create file at 'all time' checkbox" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2354,7 +2354,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Create file at Date range" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2369,7 +2369,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     setup_user(false)
     active_merchant_stubs
     product = Product.last
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => "#{product.sku}")
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => "#{product.sku}")
     create_user_throught_sloop(enrollment_info)
     fulfillments = []
     fulfillments << @saved_user.fulfillments.first
@@ -2383,7 +2383,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     setup_user(false)
     active_merchant_stubs
     product = Product.last
-    enrollment_info = FactoryGirl.build(:enrollment_info, :product_sku => product.sku)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :product_sku => product.sku)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2396,7 +2396,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Create a fulfillment file with initial-end dates and with sloop product 2" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2436,7 +2436,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Check fulfillment file at sent status" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2462,7 +2462,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Agents can not change fulfillment status from User Profile" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
     5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
 
@@ -2547,7 +2547,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     @club2 = FactoryGirl.create(:simple_club_with_gateway)
 
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     FactoryGirl.create(:fulfillment_file, :agent_id => @admin_agent.id, :club_id => @club.id, :created_at => Time.zone.now-2.days )
@@ -2629,7 +2629,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   test "Search Fulfillments by package" do
     setup_user(false)
     active_merchant_stubs
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
     product1 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAG", :sku => "Bracelet1")

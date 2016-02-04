@@ -23,7 +23,7 @@ class Api::MembersControllerTest < ActionController::TestCase
  
     @unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     @credit_card = FactoryGirl.build(:credit_card_master_card)
-    @enrollment_info = FactoryGirl.build(:enrollment_info)
+    @enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
   end
 
 
@@ -131,12 +131,12 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryGirl.build :credit_card
     @second_credit_card = FactoryGirl.build :credit_card_master_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     @terms_of_membership = yearly ? @tom_yearly : @tom_monthly
     if blank_credit_card
-      @enrollment_info = FactoryGirl.build :enrollment_info, :enrollment_amount => 0.0
+      @enrollment_info = FactoryGirl.build :membership_with_enrollment_info, :enrollment_amount => 0.0
       @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
       generate_post_message({}, {setter: { cc_blank: true }})
     else
@@ -202,33 +202,28 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
     assert_difference('Membership.count')do
       assert_difference('ClubCashTransaction.count')do
-        assert_difference('EnrollmentInfo.count')do
-          assert_difference('Transaction.count')do
-            assert_difference('UserPreference.count',@preferences.size) do 
-              assert_difference('User.count') do
-                Delayed::Worker.delay_jobs = true
-                assert_difference('DelayedJob.count',7)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x3, :assign_club_cash_without_delay, :send_fulfillment
-                  generate_post_message
-                  assert_response :success
-                end
-                Delayed::Worker.delay_jobs = false
-                Delayed::Job.all.each{ |x| x.invoke_job }
+        assert_difference('Transaction.count')do
+          assert_difference('UserPreference.count',@preferences.size) do 
+            assert_difference('User.count') do
+              Delayed::Worker.delay_jobs = true
+              assert_difference('DelayedJob.count',7)do # :desnormalize_preferences_without_delay, :desnormalize_additional_data_without_delay, :asyn_solr_index_without_delay x3, :assign_club_cash_without_delay, :send_fulfillment
+                generate_post_message
+                assert_response :success
               end
+              Delayed::Worker.delay_jobs = false
+              Delayed::Job.all.each{ |x| x.invoke_job }
             end
           end
         end
       end
     end
     saved_user = User.find_by(email: @user.email)
-    membership = Membership.last
-    enrollment_info = EnrollmentInfo.last
-    assert_equal(enrollment_info.membership_id, membership.id)
     assert_equal(saved_user.club_cash_amount, @terms_of_membership.initial_club_cash_amount)
     transaction = Transaction.last
     assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
@@ -243,31 +238,25 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership.update_attribute :needs_enrollment_approval, true
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
     assert_difference('Membership.count')do
-      assert_difference('EnrollmentInfo.count')do
-        assert_difference('Transaction.count')do
-          assert_difference('UserPreference.count',@preferences.size) do 
-            assert_difference('User.count') do
-              Delayed::Worker.delay_jobs = true
-              assert_difference('DelayedJob.count',6) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
-                generate_post_message
-                assert_response :success
-              end
-              Delayed::Worker.delay_jobs = false
-              Delayed::Job.all.each{ |x| x.invoke_job }
+      assert_difference('Transaction.count')do
+        assert_difference('UserPreference.count',@preferences.size) do 
+          assert_difference('User.count') do
+            Delayed::Worker.delay_jobs = true
+            assert_difference('DelayedJob.count',6) do # :send_active_needs_approval_email_dj_without_delay, :marketing_tool_sync_without_delay, :marketing_tool_sync_without_delay, :desnormalize_additional_data_without_delay, :desnormalize_preferences_without_delay
+              generate_post_message
+              assert_response :success
             end
+            Delayed::Worker.delay_jobs = false
+            Delayed::Job.all.each{ |x| x.invoke_job }
           end
         end
       end
     end
-    saved_user = User.find_by(email: @user.email)
-    membership = Membership.last
-    enrollment_info = EnrollmentInfo.last
-    assert_equal(enrollment_info.membership_id, membership.id)
   end
 
   test "Admin should enroll/create user within club related to drupal" do
@@ -276,21 +265,19 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
     assert_difference('Membership.count')do
-      assert_difference('EnrollmentInfo.count')do
-        assert_difference('Transaction.count')do
-          assert_difference('UserPreference.count',@preferences.size) do 
-            assert_difference('User.count') do
-              Delayed::Worker.delay_jobs = true
-              generate_post_message
-              assert_response :success
-              Delayed::Worker.delay_jobs = false
-              Delayed::Job.all.each{ |x| x.invoke_job }
-            end
+      assert_difference('Transaction.count')do
+        assert_difference('UserPreference.count',@preferences.size) do 
+          assert_difference('User.count') do
+            Delayed::Worker.delay_jobs = true
+            generate_post_message
+            assert_response :success
+            Delayed::Worker.delay_jobs = false
+            Delayed::Job.all.each{ |x| x.invoke_job }
           end
         end
       end
@@ -304,34 +291,30 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
     assert_difference('Membership.count') do
-      assert_difference('EnrollmentInfo.count') do
-        assert_difference('Transaction.count') do
-          assert_difference('UserPreference.count',@preferences.size) do 
-            Delayed::Worker.delay_jobs = true
-            assert_difference('User.count') do
-              generate_post_message
-              assert_response :success
-            end
-            Delayed::Worker.delay_jobs = false
-            Delayed::Job.all.each{ |x| x.invoke_job }
+      assert_difference('Transaction.count') do
+        assert_difference('UserPreference.count',@preferences.size) do 
+          Delayed::Worker.delay_jobs = true
+          assert_difference('User.count') do
+            generate_post_message
+            assert_response :success
           end
+          Delayed::Worker.delay_jobs = false
+          Delayed::Job.all.each{ |x| x.invoke_job }
         end
       end
     end
     email_used = @user.email
     @user = FactoryGirl.build :user_with_api, :email => email_used
     assert_difference('Membership.count',0) do
-      assert_difference('EnrollmentInfo.count',0) do
-        assert_difference('Transaction.count',0) do
-          assert_difference('User.count',0) do
-            generate_post_message
-            assert_response :success
-          end
+      assert_difference('Transaction.count',0) do
+        assert_difference('User.count',0) do
+          generate_post_message
+          assert_response :success
         end
       end
     end
@@ -341,12 +324,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "When no param is provided on creation, it should tell us so" do
     sign_in @admin_user
     assert_difference('Membership.count',0) do
-      assert_difference('EnrollmentInfo.count',0) do
-        assert_difference('Transaction.count',0) do
-          assert_difference('User.count',0) do
-            post( :create )
-            assert_response :success
-          end
+      assert_difference('Transaction.count',0) do
+        assert_difference('User.count',0) do
+          post( :create )
+          assert_response :success
         end
       end
     end
@@ -357,18 +338,16 @@ class Api::MembersControllerTest < ActionController::TestCase
   #   sign_in @admin_user
   #   @credit_card = FactoryGirl.build :credit_card
   #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :enrollment_info
+  #   @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
   #   @current_club = @terms_of_membership.club
   #   @current_agent = @admin_user
   #   active_merchant_stubs
   #   assert_difference('Membership.count') do
-  #     assert_difference('EnrollmentInfo.count') do
-  #       assert_difference('Transaction.count') do
-  #         assert_difference('MemberPreference.count',@preferences.size) do 
-  #           assert_difference('Member.count') do
-  #             generate_post_message
-  #             assert_response :success
-  #           end
+  #     assert_difference('Transaction.count') do
+  #       assert_difference('MemberPreference.count',@preferences.size) do 
+  #         assert_difference('Member.count') do
+  #           generate_post_message
+  #           assert_response :success
   #         end
   #       end
   #     end
@@ -377,12 +356,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   #   @member = FactoryGirl.build :member_with_api, :email => email_used
   #   active_merchant_stubs_store(@credit_card, "900", "This transaction has been approved with stub", false)
   #   assert_difference('Membership.count',0) do
-  #     assert_difference('EnrollmentInfo.count',0) do
-  #       assert_difference('Transaction.count',0) do
-  #         assert_difference('Member.count',0) do
-  #           generate_post_message
-  #           assert_response :success
-  #         end
+  #     assert_difference('Transaction.count',0) do
+  #       assert_difference('Member.count',0) do
+  #         generate_post_message
+  #         assert_response :success
   #       end
   #     end
   #   end
@@ -394,19 +371,17 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_club.update_attribute :billing_enable, false
     @current_agent = @admin_user
     active_merchant_stubs
     assert_difference('Membership.count', 0)do
-      assert_difference('EnrollmentInfo.count', 0)do
-        assert_difference('Transaction.count', 0)do
-          assert_difference('UserPreference.count', 0) do 
-            assert_difference('User.count', 0) do
-              generate_post_message
-              assert_response :success
-            end
+      assert_difference('Transaction.count', 0)do
+        assert_difference('UserPreference.count', 0) do 
+          assert_difference('User.count', 0) do
+            generate_post_message
+            assert_response :success
           end
         end
       end
@@ -418,7 +393,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @representative_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -433,7 +408,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @fulfillment_manager_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -448,7 +423,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @supervisor_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -462,7 +437,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @api_user
     @credit_card = FactoryGirl.build :credit_card    
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     generate_post_message
     assert_response :success
   end
@@ -471,7 +446,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @agency_agent
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -486,7 +461,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @fulfillment_managment_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -500,12 +475,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
     assert_difference('Membership.count',0) do
-      assert_difference('EnrollmentInfo.count',0) do
-        assert_difference('Transaction.count',0) do
-          assert_difference('User.count',0) do
-            put( :update, { id: @user.id } )
-            assert_response :success
-          end
+      assert_difference('Transaction.count',0) do
+        assert_difference('User.count',0) do
+          put( :update, { id: @user.id } )
+          assert_response :success
         end
       end
     end
@@ -564,7 +537,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
     @credit_card = active_credit_card
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     generate_put_message
     assert_response :success
   end
@@ -576,7 +549,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
     @credit_card = active_credit_card
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     generate_put_message
     assert_response :success
   end
@@ -588,7 +561,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
     @credit_card = active_credit_card
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     generate_put_message
     assert_response :success
   end
@@ -597,7 +570,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @agency_agent
     @credit_card = FactoryGirl.build :credit_card    
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     generate_put_message
     assert_response :unauthorized
   end
@@ -610,7 +583,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
     @credit_card = active_credit_card
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     generate_put_message
     assert_response :success
   end 
@@ -957,7 +930,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     
     @user = FactoryGirl.build(:user_with_api)
     @credit_card = FactoryGirl.build :credit_card_master_card
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
 
     active_merchant_stubs_store(@credit_card.number)
     assert_difference('Operation.count',4) do
@@ -979,7 +952,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     @user = FactoryGirl.build(:user_with_api, :email => @former_user.email)
     @credit_card = FactoryGirl.build :credit_card_american_express
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
 
     active_merchant_stubs_store(@credit_card.number)
 
@@ -1028,7 +1001,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
     
     @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @former_user.id
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
 
     @user = FactoryGirl.build(:user_with_api, :email => "new_email@email.com")
     @credit_card = FactoryGirl.build :credit_card_master_card
@@ -1054,7 +1027,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
     
     @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @former_user.id
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
 
     @user = FactoryGirl.build(:user_with_api, :email => "new_email@email.com")
     @credit_card = FactoryGirl.build :credit_card_master_card
@@ -1080,7 +1053,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
     
     @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @former_user.id
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
 
     @user = FactoryGirl.build(:user_with_api, :email => "new_email@email.com")
     @credit_card = FactoryGirl.build :credit_card_master_card
@@ -1200,18 +1173,16 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs_purchase(@credit_card.number, "34234", "decline stubbed", false) 
     assert_difference('Membership.count', 0) do
-      assert_difference('EnrollmentInfo.count', 0)do
-        assert_difference('Transaction.count')do
-          assert_difference('UserPreference.count', 0) do 
-            assert_difference('User.count', 0) do
-              generate_post_message
-              assert_response :success
-            end
+      assert_difference('Transaction.count')do
+        assert_difference('UserPreference.count', 0) do 
+          assert_difference('User.count', 0) do
+            generate_post_message
+            assert_response :success
           end
         end
       end
@@ -1225,18 +1196,16 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed", false)
     assert_difference('Membership.count', 0) do
-      assert_difference('EnrollmentInfo.count', 0)do
-        assert_difference('Transaction.count',0)do
-          assert_difference('UserPreference.count',0) do 
-            assert_difference('User.count',0) do
-              generate_post_message
-              assert_response :success
-            end
+      assert_difference('Transaction.count',0)do
+        assert_difference('UserPreference.count',0) do 
+          assert_difference('User.count',0) do
+            generate_post_message
+            assert_response :success
           end
         end
       end
@@ -1758,17 +1727,15 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
     @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info, :enrollment_amount => 0.0
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info, :enrollment_amount => 0.0
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
     assert_difference('Membership.count')do
-      assert_difference('EnrollmentInfo.count')do
-        assert_difference('UserPreference.count',@preferences.size) do 
-          assert_difference('User.count') do
-            generate_post_message({}, {setter: { cc_blank: true }})
-            assert_response :success
-          end
+      assert_difference('UserPreference.count',@preferences.size) do 
+        assert_difference('User.count') do
+          generate_post_message({}, {setter: { cc_blank: true }})
+          assert_response :success
         end
       end
     end
@@ -1834,22 +1801,20 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
     assert_difference('Membership.count') do
-      assert_difference('EnrollmentInfo.count') do
-        assert_difference('Transaction.count') do
-          assert_difference('UserPreference.count',@preferences.size) do 
-            Delayed::Worker.delay_jobs = true
-            assert_difference('User.count') do
-              generate_post_message
-              assert_response :success
-            end
-            Delayed::Worker.delay_jobs = false
-            Delayed::Job.all.each{ |x| x.invoke_job }
+      assert_difference('Transaction.count') do
+        assert_difference('UserPreference.count',@preferences.size) do 
+          Delayed::Worker.delay_jobs = true
+          assert_difference('User.count') do
+            generate_post_message
+            assert_response :success
           end
+          Delayed::Worker.delay_jobs = false
+          Delayed::Job.all.each{ |x| x.invoke_job }
         end
       end
     end
@@ -1858,12 +1823,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.expire_month = (Time.zone.now - 1.day).year
     @user = FactoryGirl.build :user_with_api, :email => email_used
     assert_difference('Membership.count',0) do
-      assert_difference('EnrollmentInfo.count',0) do
-        assert_difference('Transaction.count',0) do
-          assert_difference('User.count',0) do
-            generate_post_message
-            assert_response :success
-          end
+      assert_difference('Transaction.count',0) do
+        assert_difference('User.count',0) do
+          generate_post_message
+          assert_response :success
         end
       end
     end

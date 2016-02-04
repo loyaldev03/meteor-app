@@ -325,7 +325,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with SD is re-scheduled" do 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 3) do
+    assert_difference('Operation.count', 2) do
       assert_difference('Transaction.count') do
         active_user = create_active_user(@terms_of_membership)
         active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
@@ -333,8 +333,8 @@ class TransactionTest < ActiveSupport::TestCase
         answer = active_user.bill_membership
         active_user.reload
         assert !active_user.lapsed?, "user cant be lapsed"
-        assert_equal active_user.next_retry_bill_date.to_date, @sd_strategy.days.days.from_now.to_date, "next_retry_bill_date should #{@sd_strategy.days.days.from_now}"
-        assert_equal active_user.bill_date, nbd, "bill_date should not be touched #{nbd}"
+        assert_equal active_user.next_retry_bill_date.to_date.to_s, @sd_strategy.days.days.from_now.to_date.to_s, "next_retry_bill_date should #{@sd_strategy.days.days.from_now}"
+        assert_equal active_user.bill_date.to_s, nbd.to_s, "bill_date should not be touched #{nbd}"
         assert_equal active_user.recycled_times, 1, "recycled_times should be 1"
         assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_soft_decline, transaction_type: 'sale')
       end
@@ -401,7 +401,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with SD reaches the recycle limit, and HD cancels user." do 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 6) do
+    assert_difference('Operation.count', 5) do
       assert_difference('Communication.count', 2) do
         active_user = create_active_user(@terms_of_membership)
         active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
@@ -445,7 +445,7 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership.save
 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 5) do
+    assert_difference('Operation.count', 4) do
       active_user = create_active_user(@terms_of_membership)
       active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
       amount = @terms_of_membership.installment_amount
@@ -468,7 +468,7 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership.save
 
     active_merchant_stubs_store
-    assert_difference('Operation.count', 5) do
+    assert_difference('Operation.count', 4) do
       active_user = create_active_user(@terms_of_membership)
       active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
       amount = @terms_of_membership.installment_amount

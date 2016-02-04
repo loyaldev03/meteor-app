@@ -123,7 +123,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
 
   test "See HD for 'Soft recycle limit'" do
     setup_user
-    EnrollmentInfo.last.update_attribute(:enrollment_amount, 0.0)
+    @saved_user.current_membership.update_attribute(:enrollment_amount, 0.0)
     @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
     @hd_strategy = FactoryGirl.create(:hard_decline_strategy) 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
@@ -549,7 +549,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     
   #  unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
   #  credit_card = FactoryGirl.build(:credit_card_master_card)
-  #  enrollment_info = FactoryGirl.build(:enrollment_info)
+  #  enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
   #  create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
   #  @saved_user= User.find_by_email(unsaved_user.email)
   #  visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
@@ -565,7 +565,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   #   @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
   #   unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
   #   credit_card = FactoryGirl.build(:credit_card_master_card)
-  #  enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => false)
+  #  enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :enrollment_amount => false)
   #  create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
   #  @saved_user= User.find_by_email(unsaved_user.email)
   #  visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
