@@ -52,8 +52,8 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    prods = Product.where sku: @saved_user.enrollment_infos.first.product_sku.split(',')
-    prods.each {|p| p.delete }
+    product = @saved_user.enrollment_infos.first.product
+    product.delete
 
     assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
@@ -66,12 +66,10 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    prods = Product.where sku: @saved_user.enrollment_infos.first.product_sku.split(',')
-    prods.each do |p| 
-      p.stock = 0 
-      p.allow_backorder = false
-      p.save
-    end
+    product = @saved_user.enrollment_infos.first.product
+    product.stock = 0 
+    product.allow_backorder = false
+    product.save
 
     assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do
@@ -84,12 +82,10 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    prods = Product.where sku: @saved_user.enrollment_infos.first.product_sku.split(',')
-    prods.each do |p| 
-      p.stock = 0 
-      p.allow_backorder = false
-      p.save
-    end
+    product = @saved_user.enrollment_infos.first.product
+    product.stock = 0 
+    product.allow_backorder = false
+    product.save
 
     assert_difference('Membership.count') do 
       assert_difference('EnrollmentInfo.count') do

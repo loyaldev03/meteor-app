@@ -11,23 +11,19 @@ class Fulfillment < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :club
+  belongs_to :product
+
   has_and_belongs_to_many :fulfillment_files
   has_many :suspected_fulfillment_evidences
 
   before_create :set_default_values
   after_update :replenish_stock
 
-  SLOOPS_HEADER = ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 
-              'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service']
-  KIT_CARD_HEADER = ['Member Number','Member First Name','Member Last Name','Member Since Date','Member Expiration Date',
-                'ADDRESS','CITY','STATE','ZIP','Product','Charter Member Status' ]
-
   scope :where_bad_address, -> { where("status in ('bad_address','returned')") }
   scope :where_in_process, -> { where("status = 'in_process'") }
   scope :where_not_processed, -> { where("status = 'not_processed'") }
   scope :where_to_set_bad_address, -> { where("status IN ('not_processed','in_process','out_of_stock','returned')") }
   scope :where_cancellable, -> { where("status IN ('not_processed','in_process','out_of_stock','bad_address', 'manual_review_required')") }
-  scope :type_others, -> { where(["product_sku NOT IN (?)", Settings.kit_card_product])}
 
   scope :not_renewed, -> { where("renewed = false") }
 
@@ -117,6 +113,7 @@ class Fulfillment < ActiveRecord::Base
     f.user_id = self.user_id
     f.recurrent = true
     f.club_id = self.club_id
+    f.product_id = self.product_id
     f.save
     f.decrease_stock! if status.nil?
   end
@@ -212,19 +209,9 @@ class Fulfillment < ActiveRecord::Base
       Fulfillment.find(self.id).update_status(fulfillment_file.agent_id, "in_process", "Fulfillment file generated", fulfillment_file.id) unless self.in_process? or self.renewed?
     end
     user = self.user
-    if fulfillment_file.kit_kard_type?
-      [ user.id, user.first_name, user.last_name, (I18n.l user.member_since_date, format: :only_date_short),
-              (I18n.l self.renewable_at, format: :only_date_short if self.renewable_at), user.address, user.city,
-              user.state,"=\"#{user.zip}\"", self.product_sku, ('C' if user.member_group_type_id) ]
-    else
-      [ self.tracking_code, self.product.cost_center, user.full_name, user.address, user.city,
-            user.state, user.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
-            self.product.weight, 'MID']
-    end
-  end
-
-  def product
-    @product ||= Product.find_by(sku: self.product_sku, club_id: self.user.club_id)
+    [ self.tracking_code, self.product.cost_center, user.full_name, user.address, user.city,
+      user.state, user.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
+      self.product.weight, 'MID']
   end
 
   private

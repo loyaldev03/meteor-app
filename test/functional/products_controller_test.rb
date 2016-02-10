@@ -86,7 +86,7 @@ class ProductsControllerTest < ActionController::TestCase
 
   test "Admin should create product" do
     sign_in @admin_user
-    product = FactoryGirl.build(:product)
+    product = FactoryGirl.build(:product_with_recurrent)
     assert_difference('Product.count',1) do
       post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: product.name,
                      recurrent: product.recurrent, package: product.package, sku: product.sku, stock: product.stock, weight: product.weight }
@@ -120,7 +120,7 @@ class ProductsControllerTest < ActionController::TestCase
 
   test "Agency user should create product" do
     sign_in @agency_user
-    product = FactoryGirl.build(:product)
+    product = FactoryGirl.build(:product_with_recurrent)
     assert_difference('Product.count',1) do
       post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, product: { name: product.name,
                      recurrent: product.recurrent, package: product.package, sku: product.sku, stock: product.stock, weight: product.weight }
@@ -304,7 +304,7 @@ class ProductsControllerTest < ActionController::TestCase
     @club_admin.save
     sign_in(@club_admin)
     @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @product = FactoryGirl.build(:product)
+    @product = FactoryGirl.build(:product_with_recurrent)
     @product.club_id = @other_club.id
     @product.save
     get :edit, id: @product, partner_prefix: @partner.prefix, club_prefix: @other_club.name

@@ -9,9 +9,9 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   def setup_products 
-    @product_with_stock = FactoryGirl.create(:product, club_id: @terms_of_membership_with_gateway.club.id)
-    @product_without_stock = FactoryGirl.create(:product_without_stock_and_not_recurrent, club_id: @terms_of_membership_with_gateway.club.id)
-    @product_recurrent = FactoryGirl.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id)
+    @product_with_stock = FactoryGirl.create(:product, club_id: @terms_of_membership_with_gateway.club.id, sku: 'PRODUCT' )
+    @product_without_stock = FactoryGirl.create(:product_without_stock_and_not_recurrent, club_id: @terms_of_membership_with_gateway.club.id, sku: 'NOSTOCK')
+    @product_recurrent = FactoryGirl.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id, sku: 'NORECURRENT')
   end
 
   def enroll_user(user,tom, amount=23, cc_blank=false, cc_card = nil)
@@ -22,7 +22,7 @@ class FulfillmentTest < ActiveSupport::TestCase
         zip: user.zip, state: user.state, email: user.email, type_of_phone_number: user.type_of_phone_number,
         phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code,
         phone_local_number: user.phone_local_number, country: 'US', 
-        product_sku: Settings.kit_card_product }, 
+        product_sku: Settings.others_product }, 
       { number: credit_card.number, 
         expire_year: credit_card.expire_year, expire_month: credit_card.expire_month },
       cc_blank)

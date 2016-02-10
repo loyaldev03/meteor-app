@@ -31,7 +31,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level. </li>
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" [optional] </li>
   #     <li><strong>prospect_id</strong> Id of the prospect the enrollment info is related to. [optional] </li>
-  #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet") [optional]</li>
+  #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. [optional]</li>
   #     <li><strong>product_description</strong> Description of the selected product. [optional]</li>
   #     <li><strong>mega_channel</strong> [optional] </li>
   #     <li><strong>marketing_code</strong> multi-team [optional] </li>

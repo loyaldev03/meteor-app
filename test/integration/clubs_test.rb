@@ -118,33 +118,6 @@ class ClubTest < ActionDispatch::IntegrationTest
     assert Club.with_deleted.where(id: saved_club.id).first
   end
 
-  test "should create default product when creating club" do
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
-    visit clubs_path(@partner.prefix)
-    click_link_or_button 'New Club'
-    fill_in 'club[name]', with: unsaved_club.name
-    fill_in 'club[description]', with: unsaved_club.description
-    fill_in 'club[api_username]', with: unsaved_club.api_username
-    fill_in 'club[api_password]', with: unsaved_club.api_password
-    fill_in 'club[cs_phone_number]', with: unsaved_club.cs_phone_number
-    attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
-    check('club[requires_external_id]')
-    select('application', from: 'club[theme]')
-    assert_difference('Club.count') do
-      click_link_or_button 'Create Club'
-    end
-    assert page.has_content?("The club #{unsaved_club.name} was successfully created")
-    click_link_or_button 'Back'
-    within("#clubs_table") do
-      click_link_or_button 'Products'
-    end
-    within("#products_table") do
-      Club::DEFAULT_PRODUCT.each do |sku|
-        assert page.has_content?(sku)
-      end
-    end
-  end
-
   test "should see all clubs as admin on my clubs section" do
     5.times{ FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id) }
     within(".navbar"){ click_link_or_button("My Clubs") }

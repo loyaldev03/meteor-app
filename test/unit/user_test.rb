@@ -111,10 +111,10 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Lapsed user can be recovered" do
-    assert_difference('Fulfillment.count',Club::DEFAULT_PRODUCT.count) do
+    assert_difference('Fulfillment.count', 1) do
       user = create_active_user(@terms_of_membership_with_gateway, :lapsed_user)
       old_membership_id = user.current_membership_id 
-      answer = user.recover(@terms_of_membership_with_gateway, nil, {product_sku: Club::DEFAULT_PRODUCT.join(',')})
+      answer = user.recover(@terms_of_membership_with_gateway, nil, {product_sku: Settings.others_product})
       assert answer[:code] == Settings.error_codes.success, answer[:message]
       assert_equal 'provisional', user.status, "Status was not updated."
       assert_equal user.current_membership.parent_membership_id, nil
@@ -330,7 +330,6 @@ class UserTest < ActiveSupport::TestCase
     @saved_user.set_as_canceled
     
     @saved_user.recover(@terms_of_membership_with_gateway)
-
     next_bill_date = @saved_user.bill_date + @terms_of_membership_with_gateway.installment_period.days
 
     Timecop.freeze( @saved_user.next_retry_bill_date ) do

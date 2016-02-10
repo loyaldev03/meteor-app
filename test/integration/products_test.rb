@@ -29,7 +29,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
   end
 
   test "product list" do
-    unsaved_product = FactoryGirl.build(:product)
+    unsaved_product = FactoryGirl.build(:random_product)
     saved_product = create_product unsaved_product
     visit products_path(@partner.prefix, @club.name)
 
@@ -43,7 +43,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
 
   # Create a member with Allow backorder at false
   test "create, update, delete a product" do
-    unsaved_product = FactoryGirl.build(:product, allow_backorder: false)
+    unsaved_product = FactoryGirl.build(:random_product, allow_backorder: false)
     saved_product = create_product unsaved_product
     
     assert page.has_content?(saved_product.name)
@@ -78,7 +78,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
   end
 
   test "all links in product show must work" do
-    unsaved_product = FactoryGirl.build(:product)
+    unsaved_product = FactoryGirl.build(:random_product)
     saved_product = create_product unsaved_product
 
     click_link_or_button 'Back'
@@ -90,7 +90,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
   end
 
   test "Stock limit at Product" do
-    unsaved_product = FactoryGirl.create(:product, club_id: @club.id )
+    unsaved_product = FactoryGirl.create(:random_product, club_id: @club.id )
     visit products_path(@partner.prefix, @club.name)
     within("#products_table") do
       assert page.has_content?(unsaved_product.name)
@@ -103,7 +103,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
   end
 
   test "Create empty product" do
-    unsaved_product = FactoryGirl.create(:product, club_id: @club.id )
+    unsaved_product = FactoryGirl.create(:random_product, club_id: @club.id )
     visit products_path(@partner.prefix, @club.name)
 
     click_link_or_button 'New Product'
@@ -114,7 +114,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
   end
 
   test "Create an invalid product" do
-    unsaved_product = FactoryGirl.create(:product, club_id: @club.id )
+    unsaved_product = FactoryGirl.create(:random_product, club_id: @club.id )
     visit products_path(@partner.prefix, @club.name)
 
     click_link_or_button 'New Product'
@@ -124,52 +124,52 @@ class ProductsTest < ActionDispatch::IntegrationTest
   end
 
   test "Create a product with negative stock" do
-    unsaved_product = FactoryGirl.build(:product, club_id: @club.id, stock: -3 )
+    unsaved_product = FactoryGirl.build(:random_product, club_id: @club.id, stock: -3 )
     create_product unsaved_product, false
     assert page.has_content?("Stock cannot be negative. Enter positive stock, or allow backorder")
   end
 
   test "Duplicate product in the same club" do
-    unsaved_product = FactoryGirl.create(:product, club_id: @club.id )
+    unsaved_product = FactoryGirl.create(:random_product, club_id: @club.id )
     create_product unsaved_product, false
     assert page.has_content?("has already been taken")
   end
   
   test "Create a product with package limit - 19 chars length" do
-      unsaved_product = FactoryGirl.build(:product, club_id: @club.id, package: "abcdefghijklmnopqrs" )
+      unsaved_product = FactoryGirl.build(:random_product, club_id: @club.id, package: "abcdefghijklmnopqrs" )
     create_product unsaved_product
   end
 
   test "Create a product with cost center limit - 30 chars length" do
-        unsaved_product = FactoryGirl.build(:product, club_id: @club.id, cost_center: "abcdefghijklmnopqrstuvwxyzabcd" )
+        unsaved_product = FactoryGirl.build(:random_product, club_id: @club.id, cost_center: "abcdefghijklmnopqrstuvwxyzabcd" )
     create_product unsaved_product
   end
 
     test "Create a product with cost center more than 30 characters" do
-        unsaved_product = FactoryGirl.build(:product, club_id: @club.id, cost_center: "abcdefghijklmnopqrstuvwxyzabcde" )   
+        unsaved_product = FactoryGirl.build(:random_product, club_id: @club.id, cost_center: "abcdefghijklmnopqrstuvwxyzabcde" )   
         create_product unsaved_product, false
     assert page.has_content?("is too long (maximum is 30 characters)")
   end
 
   test "Create a product with package more than 19 characters" do
-        unsaved_product = FactoryGirl.build(:product, club_id: @club.id, package: "abcdefghijklmnopqrst" )
+        unsaved_product = FactoryGirl.build(:random_product, club_id: @club.id, package: "abcdefghijklmnopqrst" )
     create_product unsaved_product, false
     assert page.has_content?("is too long (maximum is 19 characters)")
   end
 
   test "Create a product with numbers at SKU " do
-    unsaved_product = FactoryGirl.build(:product, club_id: @club.id, sku: "123456789" )
+    unsaved_product = FactoryGirl.build(:random_product, club_id: @club.id, sku: "123456789" )
     create_product unsaved_product
   end
   
   test "Create a product with numbers at package " do
-    unsaved_product = FactoryGirl.build(:product, club_id: @club.id, package: "123456789" )
+    unsaved_product = FactoryGirl.build(:random_product, club_id: @club.id, package: "123456789" )
     create_product unsaved_product, false
     assert page.has_content?("is invalid")
   end
 
   test "Create a member with Allow backorder at true" do
-    unsaved_product = FactoryGirl.build(:product, club_id: @club.id, allow_backorder: true )
+    unsaved_product = FactoryGirl.build(:random_product, club_id: @club.id, allow_backorder: true )
     create_product(unsaved_product)
   end
 end

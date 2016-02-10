@@ -333,7 +333,7 @@ module ActionDispatch
       date
     end
 
-    def fill_in_user(unsaved_user, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])
+    def fill_in_user(unsaved_user, credit_card = nil, tom_type = nil, cc_blank = false, product_sku = Settings.others_product)
       visit users_path( :partner_prefix => unsaved_user.club.partner.prefix, :club_prefix => unsaved_user.club.name )
       click_link_or_button 'New User'
 
@@ -385,12 +385,8 @@ module ActionDispatch
         fill_in 'user[external_id]', :with => unsaved_user.external_id
       end 
 
-      product_skus.each do |product|
-        if product == 'KIT-CARD'
-          check 'kit_card_product_sku' 
-        else
-          select(product, :from => "product_sku")
-        end
+      unless product_sku.blank?
+        select(product_sku, :from => "product_sku")
       end
 
       alert_ok_js
@@ -413,8 +409,8 @@ module ActionDispatch
       end
     end
 
-    def create_user(unsaved_user, credit_card = nil, tom_type = nil, cc_blank = false, product_skus = ['KIT-CARD'])
-      fill_in_user(unsaved_user, credit_card, tom_type, cc_blank, product_skus)
+    def create_user(unsaved_user, credit_card = nil, tom_type = nil, cc_blank = false, product_sku = Settings.others_product)
+      fill_in_user(unsaved_user, credit_card, tom_type, cc_blank, product_sku)
       begin
         wait_until{ assert find_field('input_first_name').value == unsaved_user.first_name }
       rescue
@@ -590,7 +586,7 @@ module ActionDispatch
       end
     end
 
-    def search_fulfillments(all_times = false, initial_date = nil, end_date = nil, status = nil, type = nil, package = nil)
+    def search_fulfillments(all_times = false, initial_date = nil, end_date = nil, status = nil, type = 'sloops', package = nil)
       visit fulfillments_index_path(partner_prefix: @partner.prefix, club_prefix: @club.name)
       within("#fulfillments_table")do
         check "all_times" if all_times
@@ -629,14 +625,14 @@ module ActionDispatch
         select status, :from => "status" unless status.nil?
         unless type.nil?
           if type == 'sloops'
-            find(:css, "#radio_product_type_SLOOPS[value='SLOOPS']").set(true)
+            find(:css, "#radio_product_filter_[value='']").set(true)
           else
-            fill_in "product_type", :with => type
+            fill_in "input_product_filter", :with => type
           end
         end
 
         unless package.nil?
-          find(:css, "#radio_product_type_SLOOPS_package").set(true)
+          find(:css, "#radio_product_filter_package").set(true)
           fill_in "input_product_package", :with => package
         end
       end
@@ -644,7 +640,7 @@ module ActionDispatch
       click_link_or_button "Report"
     end
 
-    def update_status_on_fulfillments(fulfillments, new_status, all = false, type = 'KIT-CARD', validate = true)
+    def update_status_on_fulfillments(fulfillments, new_status, all = false, validate = true)
       previous_status = fulfillments.first.status
       within("#report_results")do
         select new_status, :from => "new_status"
@@ -664,7 +660,7 @@ module ActionDispatch
         
         if validate
           fulfillments.each do |fulfillment|
-            find("tr", :text => "Changed status on Fulfillment ##{fulfillment.id} #{type} from #{previous_status} to #{new_status}")
+            find("tr", :text => "Changed status on Fulfillment ##{fulfillment.id} #{fulfillment.product_sku} from #{previous_status} to #{new_status}")
           end
         end
       end
@@ -734,12 +730,10 @@ module ActionDispatch
 
       end  
       if not user.current_membership.enrollment_info.nil?
-        if not user.current_membership.enrollment_info.product_sku.blank? and not user.status == 'applied'
+        if user.current_membership.enrollment_info.product and not user.status == 'applied'
           within(".nav-tabs"){ click_on 'Fulfillments' }
           within("#fulfillments") do
-            user.enrollment_infos.first.product_sku.to_s.split(',') do |product|
-              assert page.has_content?(product)
-            end
+            assert page.has_content?(user.enrollment_infos.first.product.sku)
           end
         end
       end

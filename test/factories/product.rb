@@ -1,47 +1,48 @@
 FactoryGirl.define do
-
   factory :product do
-    name "Bracelet"
-    package "NCARFLAG"
-    sku "Bracelet"
-    cost_center "Bracelet"
+    name Settings.others_product.capitalize
+    sku Settings.others_product
+    package Settings.others_product
+    cost_center Settings.others_product.capitalize
     stock 10
     weight 5
+
+    factory :random_product do
+      sequence(:sku) {|n| Settings.others_product+"#{n}" }
+      sequence(:name) {|n| (Settings.others_product+"#{n}").capitalize }
+    end
+
+    factory :product_without_stock_and_not_recurrent do
+      sequence(:sku) {|n| Settings.others_product+"#{n}" }
+      sequence(:name) {|n| (Settings.others_product+"#{n}").capitalize }
+      stock 0
+      recurrent false
+    end
+
+    factory :product_without_stock_and_recurrent do
+      sequence(:sku) {|n| Settings.others_product+"#{n}" }
+      sequence(:name) {|n| (Settings.others_product+"#{n}").capitalize }
+      recurrent true
+      stock 0
+    end
+
+    factory :product_without_stock_and_not_backorder do
+      sequence(:sku) {|n| Settings.others_product+"#{n}" }
+      sequence(:name) {|n| (Settings.others_product+"#{n}").capitalize }
+      stock 0
+      allow_backorder false
+    end
+
+    factory :product_with_recurrent do
+      sequence(:sku) {|n| Settings.others_product+"#{n}" }
+      sequence(:name) {|n| (Settings.others_product+"#{n}").capitalize }
+      recurrent true
+    end
+
+    factory :product_without_recurrent do
+      sequence(:sku) {|n| Settings.others_product+"#{n}" }
+      sequence(:name) {|n| (Settings.others_product+"#{n}").capitalize }
+      recurrent false
+    end
   end
-
-  factory :product_without_stock_and_not_recurrent, class: Product do
-    name "Circlet"
-    package "NCARFLAG"
-    sku "circlet"
-    cost_center "circlet"
-    stock 0
-    recurrent false
-  end  	
-
-  factory :product_without_stock_and_recurrent, class: Product do
-    name "Kit kard"
-    package "NCARFLAG"
-    cost_center "kit-card"
-    sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
-    recurrent true
-    stock 0
-  end 
-
-  factory :product_with_recurrent, class: Product do
-    name "Kit kard"
-    package "KIT-CARD"
-    sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
-    cost_center "kit-card"
-    recurrent true
-    stock 10
-  end  
-
-  factory :product_without_recurrent, class: Product do
-    name "Kit kard"
-    package "KIT-CARD"
-    sequence(:sku) {|n| Settings.kit_card_product+"#{n}" }
-    cost_center "kit-card"
-    recurrent false
-    stock 10
-  end  
 end

@@ -32,19 +32,16 @@
           <%= fulfillment_selectable_statuses(:status, params[:status]) %>
         </td>
         <td width="240px">
-          <%= radio_button_tag 'radio_product_type', Settings.kit_card_product, Settings.kit_card_product == params[:product_type] %>
-          <%= label_tag Settings.kit_card_product, nil, :class => 'help-inline' %>
+          <%= radio_button_tag 'radio_product_filter', '', params[:product_filter].blank? %>
+          <%= label_tag 'All', nil, :class => 'help-inline' %>
           <br>
-          <%= radio_button_tag 'radio_product_type', Settings.others_product, Settings.others_product == params[:product_type] %>
-          <%= label_tag Settings.others_product, nil, :class => 'help-inline' %>
-          <br>
-          <%= radio_button_tag 'radio_product_type', Settings.others_product+'_others', params[:radio_product_type] == Settings.others_product+'_others' %>
-          <%= text_field_tag :input_product_type, (params[:radio_product_type] == Settings.others_product+'_others' ? params[:product_type] : '' ), :class => 'help-inline', 
+          <%= radio_button_tag 'radio_product_filter', 'sku', params[:radio_product_filter] == 'sku' %>
+          <%= text_field_tag :input_product_filter, (params[:radio_product_filter] == 'sku' ? params[:product_filter] : '' ), :class => 'help-inline', 
             :placeholder => "Sku" %>
-          <%= hidden_field_tag :product_type %>
+          <%= hidden_field_tag :product_filter %>
           <br>
-          <%= radio_button_tag 'radio_product_type', Settings.others_product+'_package', params[:radio_product_type] == Settings.others_product+'_package' %>
-          <%= text_field_tag :input_product_package, (params[:radio_product_type] == Settings.others_product+'_package' ? params[:product_type] : '' ), :class => 'help-inline',
+          <%= radio_button_tag 'radio_product_filter', 'package', params[:radio_product_filter] == 'package' %>
+          <%= text_field_tag :input_product_package, (params[:radio_product_filter] == 'package' ? params[:product_filter] : '' ), :class => 'help-inline',
             :placeholder => "Package" %>
           <%= hidden_field_tag :product_package %>
         </td>
@@ -64,7 +61,7 @@
 <%= render :partial => "report_result" %>
 
 <script type="text/javascript">
-  $(document).ready( fulfillments_index_functions('<%= generate_xls_fulfillments_path %>', '<%= fulfillments_index_path %>', '<%= t("error_messages.fulfillment_file_cant_be_empty") %>', '<%= Settings.kit_card_product %>', '<%= Settings.others_product %>') );
+  $(document).ready( fulfillments_index_functions('<%= generate_xls_fulfillments_path %>', '<%= fulfillments_index_path %>', '<%= t("error_messages.fulfillment_file_cant_be_empty") %>', '<%= Settings.others_product %>') );
 </script>
 
 

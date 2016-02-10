@@ -43,6 +43,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     if tom.name != @terms_of_membership_with_gateway.name
       select(tom.name, :from => 'terms_of_membership_id')
     end
+    sleep 50
     if product
       select(product.name, :from => 'product_sku')
     end
@@ -107,18 +108,17 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
   test "Recover an user using CS which was enrolled with a product sku that does not have stock" do
     setup_user(true, true)
-    prods = Product.where(sku: @saved_user.enrollment_infos.first.product_sku.split(','))
-    prods.each do |p| 
-      p.stock =  0
-      p.allow_backorder = false
-      p.save
-    end
-    recover_user(@saved_user,@terms_of_membership_with_gateway)
+    product = FactoryGirl.create(:product_without_stock_and_not_backorder, club_id: @club.id)
+    visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
+    assert find_field('input_first_name').value == @saved_user.first_name
+    click_on 'Recover'
+    page.has_selector?("option[value='#{Settings.others_product}']")
+    page.has_no_selector?("option[value='#{product.name}']")
   end
 
   test "Recover an user using CS with a new product" do
     setup_user(true, true)
-    product = FactoryGirl.create(:product, club_id: @club.id)
+    product = FactoryGirl.create(:product_without_recurrent, club_id: @club.id)
     recover_user(@saved_user,@terms_of_membership_with_gateway, product)
     @saved_user.reload
     assert_not_nil @saved_user.fulfillments.where(product_sku: product.sku)
@@ -292,7 +292,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     @terms_of_membership_with_gateway.provisional_days = 0
     @terms_of_membership_with_gateway.installment_amount = 0.0
     @terms_of_membership_with_gateway.save
-    enrollment_info = FactoryGirl.build :complete_enrollment_info_with_cero_amount, :product_sku => 'KIT-CARD'
+    enrollment_info = FactoryGirl.build :complete_enrollment_info_with_cero_amount, :product_sku => Settings.others_product
     unsaved_user = FactoryGirl.build(:user_with_api)
     
     assert_difference('User.count') do
@@ -317,5 +317,5 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
     recover_user( @saved_user, @terms_of_membership_with_gateway )
     validate_user_recovery( @saved_user, @terms_of_membership_with_gateway )
-  end
+  end   
 end

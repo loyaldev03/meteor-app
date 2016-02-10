@@ -248,7 +248,7 @@ class User < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    SendFulfillmentJob.perform_later(self.id) unless skip_send_fulfillment
+    SendFulfillmentJob.perform_later(self.id) if not skip_send_fulfillment and current_membership.enrollment_info.product_id
     
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -421,8 +421,8 @@ class User < ActiveRecord::Base
     false
   end
 
-  def fulfillments_products_to_send
-    current_membership.enrollment_info.product_sku ? current_membership.enrollment_info.product_sku.split(',') : []
+  def product_to_send
+    current_membership.enrollment_info.product
   end
   
   ###############################################
@@ -663,10 +663,8 @@ class User < ActiveRecord::Base
     end
   end
 
-  def replenish_stock_on_enrollment_failure(skip_product_validation, product_sku)
-    unless skip_product_validation
-      Product.where(sku: product_sku.split(','), club_id: club.id).update_all "stock = stock + 1"
-    end
+  def replenish_stock_on_enrollment_failure(product_id)
+    Product.where(id: product_id).update_all "stock = stock + 1"
   end
 
   def enroll(tom, credit_card, amount, agent = nil, recovery_check = true, cc_blank = false, user_params = nil, skip_credit_card_validation = false, skip_product_validation = false, skip_user_validation = false)
@@ -679,21 +677,20 @@ class User < ActiveRecord::Base
       return { :message => I18n.t('error_messages.cant_recover_user', :cs_phone_number => club.cs_phone_number), :code => Settings.error_codes.cant_recover_user }
     end
 
-    unless skip_product_validation
-      user_params[:product_sku].to_s.split(',').each do |sku|
-        product = Product.find_by(club_id: club.id, sku: sku)
-        if product.nil?
-          return { message: I18n.t('error_messages.product_does_not_exists'), code: Settings.error_codes.product_does_not_exists }
-        else
-          result = product.decrease_stock
-          return result if result[:code] != Settings.error_codes.success
-        end
+    product = nil
+    if not skip_product_validation and not user_params[:product_sku].blank?
+      product = Product.find_by(club_id: club.id, sku: user_params[:product_sku])
+      if product.nil?
+        return { message: I18n.t('error_messages.product_does_not_exists'), code: Settings.error_codes.product_does_not_exists }
+      else
+        result = product.decrease_stock
+        return result if result[:code] != Settings.error_codes.success
       end
     end
 
     # CLEAN ME: => This validation is done at self.enroll
     if not skip_user_validation and not self.valid? 
-      replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
+      replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
       return { message: I18n.t('error_messages.user_data_invalid'), code: Settings.error_codes.user_data_invalid, 
                errors: self.errors_merged(credit_card) }
     end
@@ -718,10 +715,9 @@ class User < ActiveRecord::Base
           trans.operation_type = operation_type
           trans.membership_id = nil
           trans.save
-          replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
+          replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
           return answer
         end
-        trans.update_attribute :operation_type, operation_type
       end
     
       if self.new_record?
@@ -735,6 +731,7 @@ class User < ActiveRecord::Base
       self.save! validate: !skip_user_validation
 
       enrollment_info.membership = membership
+      enrollment_info.product = product
       enrollment_info.save
       
       if trans
@@ -756,7 +753,7 @@ class User < ActiveRecord::Base
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
-      replenish_stock_on_enrollment_failure(skip_product_validation, user_params[:product_sku])
+      replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
       trans.update_attribute(:operation_type, Settings.operation_types.error_on_enrollment_billing) if trans and not trans.success
       Auditory.report_issue(error_message, e, { user: self.inspect, credit_card: credit_card.inspect, enrollment_info: enrollment_info.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?

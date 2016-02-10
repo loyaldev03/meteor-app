@@ -29,7 +29,7 @@ class Club < ActiveRecord::Base
 
   before_validation :complete_urls
   before_save :not_allow_multiple_mailchimp_clients_with_same_list_id
-  after_create :add_default_member_groups, :add_default_product, :add_default_disposition_type
+  after_create :add_default_member_groups, :add_default_disposition_type
   after_update :resync_with_merketing_tool_process
 
   validates :partner_id, :cs_phone_number, presence: true
@@ -45,8 +45,6 @@ class Club < ActiveRecord::Base
   has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            url: "/system/:attachment/:id/:style/:filename",
                            styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
-
-  DEFAULT_PRODUCT = ['KIT-CARD']
 
   # marketing_tool_attributes possible keys:
   # Pardot : pardot_email, pardot_user_key, pardot_password
@@ -171,20 +169,6 @@ class Club < ActiveRecord::Base
         m.name= name
         m.club_id = self.id
         m.save
-      end
-    end
-
-    def add_default_product
-      Club::DEFAULT_PRODUCT.each do |sku|
-        p = Product.new 
-        p.sku = sku
-        p.package = sku
-        p.name = sku
-        p.stock = 100
-        p.recurrent = true
-        p.allow_backorder = true
-        p.club_id = self.id
-        p.save
       end
     end
 
