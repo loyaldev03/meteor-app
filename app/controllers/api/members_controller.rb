@@ -241,6 +241,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>status</strong> String with member's current status. </li>
   #     <li><strong>join_date</strong> String with date when the member join. This date is updated each time the member is recovered, or it is saved the sale. It is in datetime with the offset format. (Eg: "2013-04-23T15:17:09-04:00" ) </li>
   #     <li><strong>cancel_date</strong> String with date schedule when the member will be canceled. If there is no date schedule this value will be null. It is in datetime with the offset format. If member does not have cancel date set, this value will be blank. (Eg: "2013-04-23T15:17:09-04:00" )  </li>
+  #     <li><strong>terms_of_membership_id</strong> Subscription plan's ID related to member's current membership.
   #  </ul>
   # @response_field [Hash] member Hash with member information.
   #  <ul>
@@ -261,7 +262,6 @@ class Api::MembersController < ApplicationController
   #     <li><strong>wrong_address</strong> Reason the member was set as undeliverable. </li>
   #     <li><strong>wrong_phone_number</strong> Reason the member was set as unreachable. </li>
   #     <li><strong>member_since_date</strong> Date when the member was created. It is in datetime with the offset format. </li>
-  #     <li><strong>reactivation_times</strong> Integer value that tells us how many times this member was recovered. </li>
   #     <li><strong>blacklisted</strong> Boolean value that says if the member is blacklisted or not (true = blacklisted, false = not blacklisted) </li>
   #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. </li>
   #     <li><strong>member_group_type</strong> Group type the member belongs to. </li>
@@ -274,7 +274,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request.
   #
   # @example_response
-  #   {"code":"000","member":{"first_name":"Megan","last_name":"Brenann","email":"alice@brennan.com","address":"SomeSt","city":"Dresden","state":"AL","zip":"12345","birth_date":"1989-09-03","phone_country_code":1,"phone_area_code":123,"phone_local_number":1123,"type_of_phone_number":"other","gender":"","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T13:03:07-05:00","reactivation_times":0,"external_id":null,"blacklisted":false,"member_group_type":"VIP","preferences":{"example_color":"blue","example_team":"example"}},"credit_card":{"last_4_digits":"8431","expire_month":2,"expire_year":2014},"current_membership":{"status":"lapsed","join_date":"2013-01-15T13:03:19-05:00","cancel_date":"2013-04-10T20:00:00-04:00"}}
+  #   {"code":"000","member":{"first_name":"Megan","last_name":"Brenann","email":"alice@brennan.com","address":"SomeSt","city":"Dresden","state":"AL","zip":"12345","birth_date":"1989-09-03","phone_country_code":1,"phone_area_code":123,"phone_local_number":1123,"type_of_phone_number":"other","gender":"","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T13:03:07-05:00","external_id":null,"blacklisted":false,"member_group_type":"VIP","preferences":{"example_color":"blue","example_team":"example"}},"credit_card":{"last_4_digits":"8431","expire_month":2,"expire_year":2014},"current_membership":{"status":"lapsed","join_date":"2013-01-15T13:03:19-05:00","cancel_date":"2013-04-10T20:00:00-04:00","terms_of_membership_id":338}}
   # @example_response_description Example response to a valid request
   #
   def show
@@ -303,7 +303,6 @@ class Api::MembersController < ApplicationController
         wrong_address: user.wrong_address,
         wrong_phone_number: user.wrong_phone_number,
         member_since_date: user.member_since_date.to_datetime.change(:offset => user.get_offset_related).to_s,
-        reactivation_times: user.reactivation_times,
         external_id: user.external_id,
         blacklisted: user.blacklisted,
         member_group_type: ( user.member_group_type.nil? ? nil : user.member_group_type.name ),
@@ -317,7 +316,8 @@ class Api::MembersController < ApplicationController
       current_membership:{
         status: membership.status,
         join_date: membership.join_date.to_datetime.change(:offset => user.get_offset_related).to_s,
-        cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => user.get_offset_related).to_s
+        cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => user.get_offset_related).to_s,
+        terms_of_membership_id: membership.terms_of_membership_id
       }
     }
     response.merge!( external_id: user.external_id ) if user.club.requires_external_id

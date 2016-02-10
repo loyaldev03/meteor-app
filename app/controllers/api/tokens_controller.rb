@@ -19,7 +19,7 @@ class Api::TokensController < ApplicationController
   # @response_field [String] location
   # 
   # @example_request
-  #   curl -v -k -X POST -d "email=testmail@gmail.com&password=testpassword" https://dev.affinitystop.com:3000/api/v1/tokens
+  #   -curl -v -k -X POST -d "email=testmail@gmail.com&password=testpassword" https://dev.affinitystop.com:3000/api/v1/tokens
   # @example_request_description Example with curl. 
   #
   # @example_response
