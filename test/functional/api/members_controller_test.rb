@@ -2365,7 +2365,7 @@ class Api::MembersControllerTest < ActionController::TestCase
 
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs

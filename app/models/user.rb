@@ -704,7 +704,7 @@ class User < ActiveRecord::Base
       if amount.to_f != 0.0      
         trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration)
+        trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration, nil, nil, operation_type)
         answer = trans.process
         unless trans.success?
           operation_type = Settings.operation_types.error_on_enrollment_billing
@@ -717,7 +717,7 @@ class User < ActiveRecord::Base
           return answer
         end
       end
-          
+
       if self.new_record?
         self.credit_cards << credit_card
       elsif not skip_credit_card_validation
