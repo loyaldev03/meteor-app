@@ -695,23 +695,18 @@ class User < ActiveRecord::Base
                errors: self.errors_merged(credit_card) }
     end
 
-    membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent, enrollment_amount: amount)
-    membership.update_membership_info_by_hash user_params
-    self.current_membership = membership
-
     begin
       operation_type = check_enrollment_operation(tom)
       if amount.to_f != 0.0      
         trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration, nil, nil, operation_type)
+        trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration, tom.id, nil, operation_type)
         answer = trans.process
         unless trans.success?
           operation_type = Settings.operation_types.error_on_enrollment_billing
           Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
         # TODO: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
           trans.operation_type = operation_type
-          trans.membership_id = nil
           trans.save
           replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
           return answer
@@ -726,10 +721,13 @@ class User < ActiveRecord::Base
       end
 
       self.save! validate: !skip_user_validation
-      self.memberships << membership
+      membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent, enrollment_amount: amount)
+      membership.update_membership_info_by_hash user_params
       membership.product = product
-      membership.save
-      Auditory.audit(agent, membership, "New Membership record created.", self, Settings.operation_types.enrollment)
+      self.memberships << membership
+      self.current_membership = membership
+      self.save! validate: !skip_user_validation
+      
       
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
@@ -748,6 +746,7 @@ class User < ActiveRecord::Base
       response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) unless self.is_not_drupal?
       response
     rescue Exception => e
+      byebug
       logger.error e.inspect
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
       replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
@@ -834,7 +833,6 @@ class User < ActiveRecord::Base
       self.memberships << new_membership
       self.current_membership = new_membership
       self.save
-      Auditory.audit(agent, membership, "New Membership record created.", self, Settings.operation_types.enrollment)
       
       if trans
         trans.membership_id = self.current_membership.id

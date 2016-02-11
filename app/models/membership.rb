@@ -7,8 +7,7 @@ class Membership < ActiveRecord::Base
 
   serialize :preferences, JSON
 
-  attr_accessible :created_by, :join_date, :status, :cancel_date, :user_id, :prospect_id, 
-                  :enrollment_amount, :product_sku, :product_description, :mega_channel,
+  attr_accessible :created_by, :join_date, :cancel_date, :enrollment_amount, :product_sku, :product_description, :mega_channel,
                   :marketing_code, :fulfillment_code, :ip_address, :user_agent, :referral_host,
                   :referral_parameters, :referral_path, :visitor_id, :landing_url, :terms_of_membership_id,
                   :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,
@@ -16,6 +15,8 @@ class Membership < ActiveRecord::Base
 
   # validates :terms_of_membership, :presence => true
   # validates :member, :presence => true
+  
+  after_create :audit_creation
 
   CS_MEGA_CHANNEL = 'other'
   CS_CAMPAIGN_MEDIUM = 'phone'
@@ -53,4 +54,9 @@ class Membership < ActiveRecord::Base
       self.joint = params[:joint]
     end
   end
+
+  private
+    def audit_creation
+      Auditory.audit(created_by, self, "New Membership record created.", self.user, Settings.operation_types.enrollment)
+    end
 end

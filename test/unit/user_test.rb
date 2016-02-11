@@ -63,7 +63,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Monthly user should be billed if it is active or provisional" do
-    assert_difference('Operation.count', 4) do
+    assert_difference('Operation.count', 5) do
       user = create_active_user(@wordpress_terms_of_membership, :provisional_user_with_cc)
       prev_bill_date = user.next_retry_bill_date
       answer = user.bill_membership

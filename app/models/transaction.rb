@@ -76,7 +76,7 @@ class Transaction < ActiveRecord::Base
     self.amount = amount
     self.payment_gateway_configuration = payment_gateway_configuration
     self.membership_id = membership.nil? ? user.current_membership_id : membership.id
-    self.terms_of_membership_id = terms_of_membership_id || user.terms_of_membership.id
+    self.terms_of_membership_id = terms_of_membership_id || user.terms_of_membership.id 
     self.operation_type = operation_type_to_set
     self.save
     @options = {

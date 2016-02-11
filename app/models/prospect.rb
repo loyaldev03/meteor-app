@@ -1,7 +1,7 @@
 class Prospect < ActiveRecord::Base
   include Extensions::UUID
 
-  has_many :memberships
+  has_one :membership
   belongs_to :terms_of_membership
   belongs_to :club
 
