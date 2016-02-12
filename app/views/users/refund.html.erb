@@ -4,11 +4,11 @@
   <table class="table table-bordered">
     <tr>
       <td> 
-        <div class="input-prepend input-append"> 
-            <%= t('activerecord.attributes.transaction.refund_amount_help') %>: 
-            (Max : <%= number_to_currency(@transaction.amount_available_to_refund) %> )            
+        <div class="input-prepend control-group"> 
+            <label class='help-inline'> <%= t('activerecord.attributes.transaction.refund_amount_help') %>: 
+            (Max : <%= number_to_currency(@transaction.amount_available_to_refund) %>)&nbsp;&nbsp;</label>
             
-            <span class="add-on">$</span><%= text_field_tag :refund_amount, nil ,:id => "refunded_amount" %> 
+            <span class="add-on">$</span><%= text_field_tag :refund_amount, params[:refund_amount] ,:id => "refunded_amount" %> 
         </div>
       </td>
     </tr>
