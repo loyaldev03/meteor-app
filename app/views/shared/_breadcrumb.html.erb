@@ -27,52 +27,49 @@
         <% end %>
       </li>      
       <% if params[:controller] == 'users' and params[:action] == 'index' %>
-        <%= delimiter %><li class="active">Search</li>
+        <li class="active"><%= delimiter %>Search</li>
       <% end %>
       <% if params[:controller] == 'users' and params[:action] == 'new' %>
-        <%= delimiter %><li class="active">New user</li>
+        <li class="active"><%= delimiter %>New user</li>
       <% end %>
       <% if params[:controller] == 'fulfillments' %>
-        <%= delimiter %><li class="active">Fulfillments</li>
+        <li class="active"><%= delimiter %>Fulfillments</li>
       <% end %>
       <% if params[:controller] == 'terms_of_memberships' %>
-        <%= delimiter %><a href="<%= terms_of_memberships_path %>">Subscription Plans</a>
+        <li><%= delimiter %><a href="<%= terms_of_memberships_path %>">Subscription Plans</a></li>
       <% end %>
       <% if params[:controller] == 'terms_of_memberships' and ['show','edit'].include? params[:action]  %>
-        <%= delimiter %><li class="active"><%= @tom.name %></li>
+        <li class="active"><%= delimiter %><%= @tom.name %></li>
       <% end %>
       <% if params[:controller] == 'terms_of_memberships' and params[:action] == 'new' %>
-        <%= delimiter %><li class="active">New Subscription Plan</li>
+        <li class="active"><%= delimiter %>New Subscription Plan</li>
       <% end %>
       <% if params[:controller] == 'email_templates' %>
-        <%= delimiter %><a href="<%= terms_of_memberships_path %>">Subscription Plans</a>
-        <%= delimiter %><li class="active"> <%= @tom.name %> </li>
-        <%= delimiter %><a href="<%= terms_of_membership_email_templates_path %>">Communications</a>
+        <li><%= delimiter %><a href="<%= terms_of_memberships_path %>">Subscription Plans</a></li>
+        <li class="active"><%= delimiter %><%= @tom.name %></li>
+        <li><%= delimiter %><a href="<%= terms_of_membership_email_templates_path %>">Communications</a></li>
       <% end %>
       <% if params[:controller] == 'email_templates' and params[:action] == 'new' %>
-        <%= delimiter %><li class="active">New Communication</li>
+        <li class="active"><%= delimiter %>New Communication</li>
       <% end %>
       <% if params[:controller] == 'email_templates' and ['show', 'edit'].include? params[:action] %>
-        <%= delimiter %><li class="active"><%= @et.name %></li>
+        <li class="active"><%= delimiter %><%= @et.name %></li>
       <% end %>
     <% end %>
 
     <% if @current_user %>
-      <%= delimiter %>
-      <li><a href="<%= users_path %>">Users</a></li>
-      <%= delimiter %>
-      <li><a href="<%= show_user_path %>">User</a></li>
-      <%= delimiter %>
+      <li><%= delimiter %><a href="<%= users_path %>">Users</a></li>
+      <li><%= delimiter %><a href="<%= show_user_path %>">User</a></li>
       <% if params[:controller].include?('user_notes') %>
-        <li class="active">Notes</li>
+        <li class="active"><%= delimiter %>Notes</li>
       <% elsif params[:controller].include?('credit_cards') %>
-        <li class="active">Credit card</li>
+        <li class="active"><%= delimiter %>Credit card</li>
       <% elsif params[:controller].include?('operations') %>
-        <li class="active">Operation</li>
+        <li class="active"><%= delimiter %>Operation</li>
       <% elsif params[:controller].include?('terms_of_membership') %>
-        <li class="active">Subscription Plan</li>
+        <li class="active"><%= delimiter %>Subscription Plan</li>
       <% else %>
-        <li class="active"><%= params[:action].humanize %></li>
+        <li class="active"><%= delimiter %><%= params[:action].humanize %></li>
       <% end %>
     <% end %>
 
