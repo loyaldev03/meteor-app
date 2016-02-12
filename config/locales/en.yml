@@ -167,6 +167,7 @@ en:
     chargeback_amount_greater_than_available: "Amount to chargeback cannot be greater than transaction's available amount"
     chargeback_adjudication_date_not_blank: "Adjudication date cannot be blank."
     cannot_chargeback_transaction: "Transaction cannot be chargebacked."
+    membership_billing_with_error: "This error should be checked during the same day it was reported in order to make sure that we are avoiding multiple unnecessary billings on the user. We should validate with the gateway if this transaction was correctly process, and in case it was we should proceed to update the transaction data according to it and also make sure to leave the user's next_retry_bill_date and bill_date set properly. In case the gateway confirms that the transaction was not process, we should delete this transaction to avoid having unnecessary records."
     club_cash:
       negative_amount: "Check amount value, please. Amount cannot be less than 0 (zero)."
       null_amount: "Check amount value, please. Amount cannot be blank or null."
