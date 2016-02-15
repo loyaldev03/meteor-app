@@ -720,9 +720,9 @@ class User < ActiveRecord::Base
       membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent, enrollment_amount: amount)
       membership.update_membership_info_by_hash user_params
       membership.product = product
-      self.memberships << membership
-      self.current_membership = membership
-      self.save! validate: !skip_user_validation
+      membership.user = self
+      membership.save!
+      self.update_attribute :current_membership_id, membership.id
       
       
       if trans
