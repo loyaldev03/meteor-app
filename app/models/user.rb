@@ -419,10 +419,6 @@ class User < ActiveRecord::Base
     end
     false
   end
-
-  def product_to_send
-    current_membership.product
-  end
   
   ###############################################
 
@@ -720,7 +716,7 @@ class User < ActiveRecord::Base
         credit_card = active_credit_card
       end
 
-      self.save! validate: !skip_user_validation
+      self.save! validate: !skip_user_validation unless self.id
       membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent, enrollment_amount: amount)
       membership.update_membership_info_by_hash user_params
       membership.product = product
@@ -746,7 +742,6 @@ class User < ActiveRecord::Base
       response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) unless self.is_not_drupal?
       response
     rescue Exception => e
-      byebug
       logger.error e.inspect
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
       replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product

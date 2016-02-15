@@ -57,7 +57,7 @@ class SendFulfillmentJob < ActiveJob::Base
     user = User.find user_id
     if user.fulfillments.where_not_processed.empty?
       begin
-        product = user.product_to_send
+        product = user.current_membership.product
         fulfillment = Fulfillment.new product_sku: product.sku
         fulfillment.product_package = product.package
         fulfillment.recurrent = product.recurrent 
@@ -67,11 +67,11 @@ class SendFulfillmentJob < ActiveJob::Base
         fulfillment.save!
         proceed_with_gamer_analysis(fulfillment)
       rescue ActiveRecord::RecordInvalid => e
-        Auditory.report_issue("Send Fulfillment", e, { user: user.id, product: user.product_to_send.sku })
+        Auditory.report_issue("Send Fulfillment", e, { user: user.id, product: user.current_membership.product_sku })
       end
     else
       message = "The user has already a not processed fulfillment and we cannot assign the requested fulfillment. Contact a Fulfillment Manager to decide what to do."
-      Auditory.report_issue("Send Fulfillment", message, { user: user.id, product: user.product_to_send.sku })
+      Auditory.report_issue("Send Fulfillment", message, { user: user.id, product: user.current_membership.product_sku })
     end
   end
 end
