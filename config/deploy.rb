@@ -123,10 +123,14 @@ namespace :deploy do
 
   # taken from http://stackoverflow.com/questions/5735656
   task :tag do
-    user = `git config --get user.name`.chomp
-    email = `git config --get user.email`.chomp
-    puts `git tag #{stage}_#{release_name} #{current_revision} -m "Deployed by #{user} <#{email}>"`
-    puts `git push --tags origin`
+    if rails_env == 'production'
+      user = `git config --get user.name`.chomp
+      email = `git config --get user.email`.chomp
+      puts `git tag #{stage}_#{release_name} #{current_revision} -m "Deployed by #{user} <#{email}>"`
+      puts `git push --tags origin`
+    else
+      puts `echo 'No new tag created for #{rails_env}.'`
+    end
   end
 end
 
@@ -214,5 +218,3 @@ after 'deploy:update', 'restart_delayed_jobs'
 after "deploy:update", "elasticsearch:reindex" if fetch(:elasticsearch_reindex, false)
 after 'deploy', 'customtasks:customcleanup'
 after "deploy", "deploy:tag"
-
-
