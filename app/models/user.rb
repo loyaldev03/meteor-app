@@ -434,7 +434,7 @@ class User < ActiveRecord::Base
           response = if prorated
             prorated_enroll(new_tom, agent, credit_card_params, self.current_membership)
           else 
-            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, self.current_membership, true, true, true)
+            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, nil, true, true, true)
           end
 
           if response[:code] == Settings.error_codes.success
