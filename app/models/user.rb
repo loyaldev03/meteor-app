@@ -247,7 +247,8 @@ class User < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    SendFulfillmentJob.perform_later(self.id) if not skip_send_fulfillment and current_membership.product_id
+
+    PostEnrollmentTasks.perform_later(self.id, skip_send_fulfillment)
     
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days

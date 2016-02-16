@@ -302,6 +302,38 @@ module TasksHelpers
     end
   end
 
+  def self.delete_testing_accounts
+    today = Time.zone.now.to_date
+    base = User.where(testing_account: true)
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:delete_testing_accounts rake task, processing #{base.length} users"
+    base.find_in_batches do |group|
+      group.to_enum.with_index.each do |user,index| 
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
+          Operation.delete_all(["user_id = ?", user.id])
+          UserNote.delete_all(["user_id = ?", user.id])
+          UserPreference.delete_all(["user_id = ?", user.id])
+          CreditCard.delete_all(["user_id = ?", user.id])
+          Transaction.delete_all(["user_id = ?", user.id])
+          Fulfillment.delete_all(["user_id = ?", user.id])
+          Communication.delete_all(["user_id = ?", user.id])
+          ClubCashTransaction.delete_all(["user_id = ?", user.id])
+          Membership.delete_all(["user_id = ?", user.id])
+          user.marketing_tool_sync_unsubscription
+          user.cancel_user_at_remote_domain
+          user.index.remove user rescue nil
+          user.delete
+        rescue Exception => e
+          Auditory.report_issue("Users::deleteTestingAccounts", e, { :user => user.id })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
+      end
+    end
+  end
+
+
   #######################################################
   ################ FULFILLMENT ##########################
   #######################################################
