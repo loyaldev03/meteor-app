@@ -294,8 +294,8 @@ class UserTest < ActiveSupport::TestCase
         end
       end
       @user.reload
-      assert_equal(next_bill_date_before,@user.next_retry_bill_date)
-      assert_equal(bill_date_before,@user.bill_date)
+      assert_equal(next_bill_date_before.to_s, @user.next_retry_bill_date.to_s)
+      assert_equal(bill_date_before.to_s, @user.bill_date.to_s)
     end
   end
 

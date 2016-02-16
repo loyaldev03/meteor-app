@@ -19,7 +19,7 @@ class PaymentGatewayConfigurationTest < ActionDispatch::IntegrationTest
     fill_in "payment_gateway_configuration[aus_login]", with: new_pgc.aus_login if new_pgc.aus_login
     fill_in "payment_gateway_configuration[aus_password]", with: new_pgc.aus_password if new_pgc.aus_password
     confirm_ok_js
-      end
+  end
 
   test "Add PGC, Show a PGC and Edit PGC- Login by General Admin" do
     visit club_path(@partner.prefix, @club.id)

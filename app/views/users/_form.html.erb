@@ -242,7 +242,7 @@
           <table class="hidden_table_border">
             <tr class = "control-group">
               <th>
-                <%= f.label :product_sku, t('activerecord.attributes.enrollment_info.product_sku') %>
+                <%= f.label :product_sku, t('activerecord.attributes.membership.product_sku') %>
               </th>
               <td> 
                 <%= select_tag :product_sku, options_from_collection_for_select(@current_club.products.with_stock, "id", "sku"),  :include_blank => true %>
@@ -295,11 +295,11 @@ Please, have in mind that fields with ' * ' are required.
 <% if @user.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
   <%= f.hidden_field :product_sku, :value => '' %>
-  <%= f.hidden_field :mega_channel, :value => EnrollmentInfo::CS_MEGA_CHANNEL %>
-  <%= f.hidden_field :campaign_medium, :value => EnrollmentInfo::CS_CAMPAIGN_MEDIUM %>
+  <%= f.hidden_field :mega_channel, :value => Membership::CS_MEGA_CHANNEL %>
+  <%= f.hidden_field :campaign_medium, :value => Membership::CS_CAMPAIGN_MEDIUM %>
   <%= f.hidden_field :landing_url, :value => request.env['HTTP_HOST'] %>
   <%= f.hidden_field :referral_path, :value => request.env['REQUEST_URI'] %>
   <%= f.hidden_field :ip_address, :value => request.env['REMOTE_ADDR'] %>
-  <%= f.hidden_field :campaign_description, :value => EnrollmentInfo::CS_CAMPAIGN_DESCRIPTION %>
+  <%= f.hidden_field :campaign_description, :value => Membership::CS_CAMPAIGN_DESCRIPTION %>
 <% end %>
 

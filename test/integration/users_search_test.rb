@@ -30,7 +30,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
     
     if create_new_user
-      @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, :enrollment_info, {}, { :created_by => @admin_agent })
+      @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, :membership_with_enrollment_info, {}, { :created_by => @admin_agent })
     end
 
     sign_in_as(@admin_agent)
@@ -332,7 +332,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
         
     unsaved_user = FactoryGirl.build(:user_with_api)
     credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
     @saved_user = User.find_by email: unsaved_user.email
     
@@ -357,7 +357,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     
     unsaved_user = FactoryGirl.build(:user_with_api)
     credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
     @saved_user = User.find_by email: unsaved_user.email
 

@@ -158,13 +158,12 @@ class ActiveSupport::TestCase
       active_merchant_stubs 
       active_merchant_stubs_store
     end
-    membership = FactoryGirl.create("#{user_type}_membership".to_sym, { terms_of_membership: tom }.merge(membership_args))
+
+    membership = FactoryGirl.create("#{user_type}_membership", { terms_of_membership: tom }.merge(membership_args))
     active_user = FactoryGirl.create(user_type, { club: tom.club, current_membership: membership }.merge(user_args))
     active_user.memberships << membership
+    active_user.current_membership = membership
     active_user.save
-    ei = FactoryGirl.create(enrollment_type, :user_id => active_user.id) unless enrollment_type.nil?
-    membership.enrollment_info = ei
-    active_user.reload
     active_user
   end  
 
@@ -268,8 +267,8 @@ module ActionDispatch
       end
     end
         
-    def create_user_by_sloop(agent, user, credit_card, enrollment_info, terms_of_membership, validate = true, cc_blank = false)
-      enrollment_info = FactoryGirl.build(:enrollment_info) if enrollment_info.nil?
+    def create_user_by_sloop(agent, user, credit_card, membership, terms_of_membership, validate = true, cc_blank = false)
+      membership = FactoryGirl.build(:membership_with_enrollment_info) if membership.nil?
       if cc_blank
         credit_card_to_load = FactoryGirl.build(:blank_credit_card)
       elsif credit_card.nil?
@@ -299,18 +298,18 @@ module ActionDispatch
                                 :phone_country_code => user.phone_country_code,
                                 :phone_area_code => user.phone_area_code,
                                 :phone_local_number => user.phone_local_number,
-                                :enrollment_amount => enrollment_info.enrollment_amount,
+                                :enrollment_amount => membership.enrollment_amount,
                                 :terms_of_membership_id => terms_of_membership.id,
                                 :birth_date => user.birth_date,
                                 :credit_card => {:number => credit_card_to_load.number,
                                                  :expire_month => credit_card_to_load.expire_month,
                                                  :expire_year => credit_card_to_load.expire_year },
-                                :product_sku => enrollment_info.product_sku,
-                                :product_description => enrollment_info.product_description,
-                                :mega_channel => enrollment_info.mega_channel,
-                                :marketing_code => enrollment_info.marketing_code,
-                                :fulfillment_code => enrollment_info.fulfillment_code,
-                                :ip_address => enrollment_info.ip_address
+                                :product_sku => membership.product_sku,
+                                :product_description => membership.product_description,
+                                :mega_channel => membership.mega_channel,
+                                :marketing_code => membership.marketing_code,
+                                :fulfillment_code => membership.fulfillment_code,
+                                :ip_address => membership.ip_address
                                 }, :setter => { :cc_blank => cc_blank },
                                 :api_key => agent.authentication_token, :format => :json})
       if validate
@@ -729,11 +728,11 @@ module ActionDispatch
         assert page.has_selector?("#link_user_add_club_cash") if user.status == 'provisional' or user.status == 'active'
 
       end  
-      if not user.current_membership.enrollment_info.nil?
-        if user.current_membership.enrollment_info.product and not user.status == 'applied'
+      if not user.current_membership.nil?
+        if user.current_membership.product and not user.status == 'applied'
           within(".nav-tabs"){ click_on 'Fulfillments' }
           within("#fulfillments") do
-            assert page.has_content?(user.enrollment_infos.first.product.sku)
+            assert page.has_content?(user.current_membership.product.sku)
           end
         end
       end

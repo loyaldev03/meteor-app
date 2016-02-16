@@ -136,7 +136,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by_email(unsaved_user.email)  
 
@@ -677,11 +677,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "display user with blank product_sku." do
     setup_user
-    @saved_user.current_membership.enrollment_info = FactoryGirl.create(:enrollment_info, :product_sku => '', :user_id => @saved_user.id)
+    @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent, product_sku: '' })
     @saved_user.set_as_canceled!
-
     @saved_user.recovered
-
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     validate_view_user_base(@saved_user)
   end
@@ -726,7 +724,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   test "Recover user from sloop with the same credit card" do
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     active_merchant_stubs_store(credit_card.number)    
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_approval.name,false)
@@ -846,7 +844,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by_email(unsaved_user.email)  
 
@@ -925,7 +923,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     created_user = User.find_by_email(unsaved_user.email)  
 
@@ -1067,7 +1065,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club_with_family.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     created_user = User.find_by_email(unsaved_user.email)  
 
@@ -1082,7 +1080,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     
     visit users_path( :partner_prefix => unsaved_user.club.partner.prefix, :club_prefix => unsaved_user.club.name )
     click_link_or_button 'New User'

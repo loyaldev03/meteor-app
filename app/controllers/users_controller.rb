@@ -80,7 +80,7 @@ class UsersController < ApplicationController
     @user = User.new
     @credit_card = @user.credit_cards.build
     @terms_of_memberships = TermsOfMembership.where(:club_id => @current_club )
-    @enrollment_info = @user.enrollment_infos.build
+    @membership = @user.memberships.build
     @months = 1..12
     @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
   end

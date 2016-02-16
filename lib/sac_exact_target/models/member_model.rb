@@ -104,10 +104,6 @@ module SacExactTarget
       terms_of_membership_fieldmap.each do |api_field, our_field| 
         attributes << SacExactTarget.format_attribute(terms_of_membership, api_field, our_field)
       end
-      enrollment_info = membership.enrollment_info
-      enrollment_fieldmap.each do |api_field, our_field| 
-        attributes << SacExactTarget.format_attribute(enrollment_info, api_field, our_field)
-      end  
       if Rails.env.production? and self.user.preferences and preferences_fieldmap
         user_preferences = self.user.user_preferences
         preferences_fieldmap.each do |api_field, our_field|
@@ -155,11 +151,6 @@ module SacExactTarget
         'Terms_of_membership' => 'terms_of_membership_id',
         'Join_date' => 'join_date',
         'Cancel_date' => 'cancel_date',
-      }
-    end
-
-    def enrollment_fieldmap
-      { 
         'Marketing_code' => 'marketing_code',
         'Mega_channel' => 'mega_channel',
         'Fulfillment_code' => 'fulfillment_code',

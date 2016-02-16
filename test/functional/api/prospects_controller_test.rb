@@ -50,7 +50,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
   test "admin should create a prospect" do
     sign_in @admin_user
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     assert_difference('Operation.count') do
       assert_difference('Prospect.count') do
@@ -64,7 +64,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
   test "api user should create a prospect" do
     sign_in @api_user
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     assert_difference('Operation.count') do
       assert_difference('Prospect.count') do
@@ -79,7 +79,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
   test "supervisor should not create a prospect" do
     sign_in @supervisor_user
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     assert_difference('Prospect.count',0) do
       do_post
@@ -90,7 +90,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
   test "representative should not create a prospect" do
     sign_in @representative_user
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     assert_difference('Prospect.count',0) do
       do_post
@@ -101,7 +101,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
   test "try to create a prospect without sending params" do
     sign_in @admin_user
     @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :enrollment_info
+    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     post( :create, {:format => :json})
     assert @response.body.include? "There are some params missing. Please check them."

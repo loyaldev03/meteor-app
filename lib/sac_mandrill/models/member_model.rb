@@ -26,10 +26,6 @@
       terms_of_membership_fieldmap.each do |api_field, our_field| 
         attributes << SacMandrill.format_attribute(terms_of_membership, api_field, our_field)
       end
-      enrollment_info = membership.enrollment_info
-      enrollment_fieldmap.each do |api_field, our_field| 
-        attributes << SacMandrill.format_attribute(enrollment_info, api_field, our_field)
-      end
       if Rails.env.production? and self.user.preferences and preferences_fieldmap
         member_preferences = self.user.user_preferences
         preferences_fieldmap.each do |api_field, our_field|
@@ -69,11 +65,6 @@
         'TOMID' => 'terms_of_membership_id',
         'JOINDATE' => 'join_date',
         'CANCELDATE' => 'cancel_date',
-      }
-    end
-
-    def enrollment_fieldmap
-      { 
         'MKTCODE' => 'marketing_code',
         'MCHANNEL' => 'mega_channel',
         'FCODE' => 'fulfillment_code',

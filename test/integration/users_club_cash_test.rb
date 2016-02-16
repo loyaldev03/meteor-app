@@ -163,7 +163,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
 
   test "set club cash expire date on user created by sloop once it is billed" do
     setup_user false
-    @enrollment_info = FactoryGirl.build(:enrollment_info)
+    @enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     @credit_card = FactoryGirl.build :credit_card
     @user = FactoryGirl.build :user_with_api
 

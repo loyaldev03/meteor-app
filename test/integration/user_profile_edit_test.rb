@@ -28,7 +28,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
       active_merchant_stubs
       unsaved_user =  FactoryGirl.build(:provisional_user_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
       credit_card = FactoryGirl.build(:credit_card)
-      enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => 0.0)
+      enrollment_info = FactoryGirl.build(:membership_with_enrollment_info_without_enrollment_amount)
 
       @terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
@@ -589,7 +589,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     
     within(".nav-tabs"){ click_on("Operations") }
     select "50", :from => "operations_table_length"
-    within("#operations_table")do
+    within("#operations_table") do
       assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-")
       assert page.has_content?("Assigned fulfillment upon enrollment.")
       assert page.has_content?("Member billed successfully $#{@terms_of_membership_with_gateway.installment_amount}")
@@ -636,7 +636,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
 
     unsaved_user =  FactoryGirl.build(:provisional_user_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
     credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:enrollment_info, :enrollment_amount => 0.0)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info_without_enrollment_amount)
     @terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     new_user = User.find_by(email: unsaved_user.email)

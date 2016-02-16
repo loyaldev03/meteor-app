@@ -69,7 +69,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
       excecute_like_server(@club.time_zone) do 
         credit_card = FactoryGirl.build(:credit_card_master_card)
-        enrollment_info = FactoryGirl.build(:enrollment_info)
+        enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
         create_user_by_sloop(@agent_admin, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
       end
       @saved_user = User.find_by(email: unsaved_user.email)

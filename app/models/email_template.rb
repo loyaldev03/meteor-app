@@ -10,7 +10,7 @@ class EmailTemplate < ActiveRecord::Base
     :prebill,                 # Sent a pre-specified number of days before billing the member.
     :manual_payment_prebill,  # Sent 14 days before next billing day.
     :refund,                  # Sent when CS does a refund.
-    :birthday,                # Sent if birthday is on enrollment_info
+    :birthday,                # Sent if birth day is present on user's model.
     :pillar,                  # Emails sent after join date and active/prov status. they use days attribute
     :hard_decline,            # Emails sent when hard decline happens
     :soft_decline,            # Emails sent when soft decline happens
@@ -58,13 +58,13 @@ class EmailTemplate < ActiveRecord::Base
     when :refund
       "Sent when doing a refund."
     when :birthday
-      "Sent if birthday is on enrollment_info"
+      "Sent if birth day is present on user's model."
     when :pillar
       "Emails sent a certain amount of days after join date on active and provisional members."
     when :hard_decline
-      "Emails sent when hard decline happens"
+      "Emails sent when hard decline happens."
     when :soft_decline
-      "Emails sent when soft decline happens"
+      "Emails sent when soft decline happens."
     when :membership_bill
       "Emails sent when successfully billing user's memberships."
     when :membership_renewal

@@ -87,21 +87,16 @@ module Pardot
       end
 
       unless cm.nil?
-        e = cm.enrollment_info
-        unless e.nil?
-          map.merge!({
-            marketing_code: e.marketing_code.to_s.capitalize,
-            mega_channel: e.mega_channel.to_s.capitalize,
-            joint: (e.joint ? 1 : 0),
-            fulfillment_code: e.fulfillment_code,
-            campaign_medium_version: e.campaign_medium_version,
-            campaign_medium: e.campaign_medium.to_s.capitalize,
-            product_sku: e.product_sku,
-            landing_url: e.landing_url,
-            enrollment_amount: "%.2f" % e.enrollment_amount
-          })
-        end
-        map.merge!({ 
+        map.merge!({
+          marketing_code: cm.marketing_code.to_s.capitalize,
+          mega_channel: cm.mega_channel.to_s.capitalize,
+          joint: (cm.joint ? 1 : 0),
+          fulfillment_code: cm.fulfillment_code,
+          campaign_medium_version: cm.campaign_medium_version,
+          campaign_medium: cm.campaign_medium.to_s.capitalize,
+          product_sku: cm.product_sku,
+          landing_url: cm.landing_url,
+          enrollment_amount: "%.2f" % cm.enrollment_amount,
           installment_amount: "%.2f" % cm.terms_of_membership.installment_amount,
           terms_of_membership_id: cm.terms_of_membership_id,
           quota: cm.quota,
