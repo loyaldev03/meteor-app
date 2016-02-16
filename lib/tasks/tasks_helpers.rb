@@ -306,7 +306,7 @@ module TasksHelpers
     today = Time.zone.now.to_date
     base = User.where(testing_account: true)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:delete_testing_accounts rake task, processing #{base.length} users"
-    base.find_in_batches do |group|
+    base.select{|user| user.transactions.sum(:amount)==0.0}.find_in_batches do |group|
       group.to_enum.with_index.each do |user,index| 
         tz = Time.zone.now
         begin
