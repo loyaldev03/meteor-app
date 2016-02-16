@@ -320,8 +320,8 @@ module TasksHelpers
           Communication.delete_all(["user_id = ?", user.id])
           ClubCashTransaction.delete_all(["user_id = ?", user.id])
           Membership.delete_all(["user_id = ?", user.id])
-          user.marketing_tool_sync_unsubscription
-          user.cancel_user_at_remote_domain
+          user.marketing_tool_sync_unsubscription(false)
+          user.cancel_user_at_remote_domain_without_delay
           user.index.remove user rescue nil
           user.delete
         rescue Exception => e

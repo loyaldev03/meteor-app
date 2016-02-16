@@ -1277,12 +1277,16 @@ class User < ActiveRecord::Base
   end
 
   # used for member blacklist
-  def marketing_tool_sync_unsubscription
+  def marketing_tool_sync_unsubscription(with_delay = true)
     case(club.marketing_tool_client)
     when 'exact_target'
-      exact_target_unsubscribe if defined?(SacExactTarget::MemberModel)
+      if defined?(SacExactTarget::MemberModel)
+        with_delay ? exact_target_unsubscribe : exact_target_unsubscribe_without_delay 
+      end
     when 'mailchimp_mandrill'
-      mailchimp_unsubscribe if defined?(SacMailchimp::MemberModel)
+      if defined?(SacMailchimp::MemberModel)
+        with_delay ? mailchimp_unsubscribe : mailchimp_unsubscribe_withou_delay
+      end
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
