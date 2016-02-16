@@ -7,6 +7,8 @@ class PostEnrollmentTasks < ActiveJob::Base
     include_rules = { first_name: ['test'], last_name: ['test'], email: ['xagax', 'stoneacreinc'] }
     not_equal_rules = { email: ['guest@stoneacreinc.com'], last_name: ['testaro', 'tester', 'testerman', 'testes', 'teston', 'betesta', 'caitest', 'chitester', 'detesta', 'drtesta', 'malatesta', 'notestine', 'palmitesta', 'potestio', 'testa', 'testoni', 'testroet', 'testroete'] }
 
+    mark_as_testing_account = true if @user.first_name == 'name'
+    
     include_rules.each do |attribute, set_of_words|
       set_of_words.each do |word|
         mark_as_testing_account = true if @user.send(attribute).downcase.include? word
