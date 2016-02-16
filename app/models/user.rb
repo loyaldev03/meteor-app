@@ -1285,7 +1285,7 @@ class User < ActiveRecord::Base
       end
     when 'mailchimp_mandrill'
       if defined?(SacMailchimp::MemberModel)
-        with_delay ? mailchimp_unsubscribe : mailchimp_unsubscribe_withou_delay
+        with_delay ? mailchimp_unsubscribe : mailchimp_unsubscribe_without_delay
       end
     end
   rescue Exception => e
