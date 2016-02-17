@@ -44,6 +44,21 @@
       <% if params[:controller] == 'terms_of_memberships' and params[:action] == 'new' %>
         <li class="active"><%= delimiter %>New Subscription Plan</li>
       <% end %>
+      <% if params[:controller] == 'products' %>
+        <li><%= delimiter %><a href="<%= products_path %>">Products</a></li>
+      <% end %>
+      <% if params[:controller] == 'products' and params[:action] == 'new' %>
+        <li><%= delimiter %>New Product</li>
+      <% end %>
+      <% if params[:controller] == 'products' and params[:action] == 'show' %>
+        <li><%= delimiter %><%= @product.sku %></li>
+      <% end %>
+      <% if params[:controller] == 'products' and params[:action] == 'bulk_update' %>
+        <li><%= delimiter %>Bulk update</li>
+      <% end %>
+      <% if params[:controller] == 'products' and params[:action] == 'bulk_create' %>
+        <li><%= delimiter %>Bulk create</li>
+      <% end %>
       <% if params[:controller] == 'email_templates' %>
         <li><%= delimiter %><a href="<%= terms_of_memberships_path %>">Subscription Plans</a></li>
         <li class="active"><%= delimiter %><%= @tom.name %></li>

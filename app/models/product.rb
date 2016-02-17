@@ -2,10 +2,9 @@ class Product < ActiveRecord::Base
   belongs_to :club
   has_many :fulfillments
 
-  attr_accessible :stock, :allow_backorder
-
   validates :sku, presence: true, format: /\A[0-9a-zA-Z\-_]+\z/, length: { minimum: 2 }, uniqueness: { scope: [:club_id, :deleted_at] }
   validates :cost_center, format: /\A[a-zA-Z\-_]+\z/, length: { minimum: 2, maximum: 30 }, allow_nil: true
+  validates :name, presence: true
 
   validates :package, format: /\A[a-zA-Z\-_]+\z/, length: { maximum: 19 }
   validates :stock, numericality: { only_integer: true, less_than: 1999999 }, allow_backorder: true
@@ -17,6 +16,8 @@ class Product < ActiveRecord::Base
   before_destroy :no_fulfillment_related?
 
   acts_as_paranoid
+
+  BULK_PROCESS_FIELDS = [ :sku, :name, :package, :stock_to_add, :allow_backorder, :weight, :cost_center ]
 
   def self.datatable_columns
     ['id', 'name', 'sku', 'stock', 'allow_backorder']
@@ -101,41 +102,58 @@ class Product < ActiveRecord::Base
     temp.unlink
   end
 
-  def self.send_bulk_update_results(agent_email, results_file_path)
-    Notifier.product_bulk_update_result(results_file_path, agent_email).deliver!
+  def self.send_bulk_process_results(agent_email, results_file_path)
+    Notifier.product_bulk_process_result(results_file_path, agent_email).deliver!
     File.delete(results_file_path)
   end
 
-  def self.bulk_update(club_id, agent_email, file_path)
+  def self.bulk_process(club_id, agent_email, file_path)
     package = Axlsx::Package.new
     package.workbook.add_worksheet(:name => 'Results') do |sheet|
-      sheet.add_row ['sku', 'stock', 'allow_backorder', 'result']
+      sheet.add_row ['Sku', 'Name', 'Package', 'StockToAdd', 'Allow Backorder', 'Weight', 'Cost Center', 'result']
       CSV.foreach(file_path, headers: true) do |row|
-        sku, stock, allow_backorder = row[0], row[1], row[2]
-        product = Product.where(sku: sku, club_id: club_id).first
-        new_row = [sku, stock, allow_backorder]
-        if product 
-          if ['yes','no'].include? allow_backorder
-            product.stock = stock unless stock.blank?
-            product.allow_backorder = allow_backorder=='yes' ? true : false
-            if product.save 
-              new_row << 'Updated successfully.'
+        allow_backorder = row[4]
+        sku = row[0].upcase
+        new_row = [row[0], row[1], row[2], row[3], row[4], row[5], row[6]]
+        if row.count != 7
+          new_row << "Wrong number of rows. Review example file."
+        elsif allow_backorder.blank? or ['yes','no'].include? allow_backorder.to_s.downcase
+          if( row[3].is_numeric? )
+            product = Product.where(sku: sku, club_id: club_id).first_or_initialize
+            product.name = row[1] unless row[1].blank?
+            product.package = row[2] unless row[2].blank?
+            product.stock = product.stock.to_i + row[3].to_i
+            product.weight = row[5].to_f unless row[5].blank?
+            product.cost_center ||= row[6].to_s
+            product.cost_center = row[6].to_s unless row[6].blank?
+            product.allow_backorder = allow_backorder.to_s.downcase == 'yes' ? true : false
+            
+            message = if product.new_record?
+              'Successfully created.'
+            else 
+              product.changed? ? "Successfully updated: #{product.changed.join(',')}" : "Nothing was updated."
+            end
+            
+            if product.save
+              new_row << message
             else
-              new_row << product.errors.messages.map{|attribute,errors| "#{attribute}: #{errors.join(',')}"}.join(".")
+              message = product.new_record? ? "Could not create product: " : "Could not update product: " 
+              message << product.errors.messages.map{|attribute,errors| "#{attribute}: #{errors.join(',')}"}.join(".")
+              new_row << message
             end
           else
-            new_row << "Allow backorder value is invalid."       
+            new_row << "Stock value is invalid."
           end
-        else 
-          new_row << "Product not found."
+        else
+          new_row << "Allow backorder value is invalid."
         end
         sheet.add_row new_row
       end
     end
-    results_file = File.open("tmp/files/bulk_update_results#{Time.current}.xlsx", 'w')
+    results_file = File.open("tmp/files/bulk_process_results#{Time.current}.xlsx", 'w')
     package.serialize results_file.path
     results_file.close
-    Product.delay.send_bulk_update_results(agent_email, results_file.path)
+    Product.delay.send_bulk_process_results(agent_email, results_file.path)
     File.delete(file_path)
   end
 end
