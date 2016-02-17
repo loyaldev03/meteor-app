@@ -126,8 +126,9 @@ namespace :deploy do
     if rails_env == 'production'
       user = `git config --get user.name`.chomp
       email = `git config --get user.email`.chomp
-      puts `git tag #{stage}_#{release_name} #{current_revision} -m "Deployed by #{user} <#{email}>"`
-      puts `git push --tags origin`
+      tag_name = "#{stage}_#{release_name}"
+      puts `git tag #{tag_name} #{current_revision} -m "Deployed by #{user} <#{email}>"`
+      puts `git push origin #{tag_name}`
     else
       puts `echo 'No new tag created for #{rails_env}.'`
     end
