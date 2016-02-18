@@ -152,14 +152,12 @@ class FulfillmentsController < ApplicationController
     redirect_to list_fulfillment_files_path
   end
 
-  def suspected_fulfillments    
+  def suspected_fulfillments
     my_authorize! :manual_review, Fulfillment, @current_club.id
-    params[:initial_date] ||= (Time.current - 7.days).to_date.to_s
-    params[:end_date] ||= (Time.current).to_date.to_s
-    initial_date = Time.new(params[:initial_date].split[0],params[:initial_date].split[1],params[:initial_date].split[2],0,0,0,Time.now.in_time_zone(current_club.time_zone).formatted_offset)
-    end_date = Time.new(params[:end_date].split[0],params[:end_date].split[1],params[:end_date].split[2],23,59,59,Time.now.in_time_zone(current_club.time_zone).formatted_offset)
-    @suspected_fulfillment_data = Fulfillment.where("status = ? AND club_id = ? AND assigned_at BETWEEN ? and ?", 
-                    'manual_review_required', current_club.id, initial_date.utc, end_date.utc).
+    params[:initial_date] ||= (Time.current - 7.days).to_date
+    params[:end_date] ||= (Time.current).to_date
+    @suspected_fulfillment_data = Fulfillment.where("status = ? AND club_id = ? AND date(assigned_at) BETWEEN ? and ?", 
+                    'manual_review_required', current_club.id, params[:initial_date], params[:end_date]).
                     order('created_at DESC').group_by{ |f| f.created_at.to_date }
   end
 
