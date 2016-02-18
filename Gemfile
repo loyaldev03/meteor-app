@@ -62,7 +62,7 @@ gem "paranoia", "~> 2.0"
 #gem "airbrake"
 gem "zendesk_api"
 
-
+gem "newrelic_rpm"
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
