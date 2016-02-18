@@ -3,6 +3,7 @@ class PostEnrollmentTasks < ActiveJob::Base
   attr :user
 
   def testing_account_analysis
+    mark_as_testing_account = false
     if ['name', 'firstname', 'test', 'sactest'].include? @user.first_name
       mark_as_testing_account = true
     elsif ['test', 'sactest', 'fctest', 'testing'].include? @user.last_name
