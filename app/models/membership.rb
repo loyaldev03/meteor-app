@@ -40,7 +40,7 @@ class Membership < ActiveRecord::Base
       self.user_agent = params[:user_agent]
       self.referral_host = params[:referral_host]
       self.referral_parameters = params[:referral_parameters]
-      self.referral_path = params[:referral_path]
+      self.referral_path = params[:referral_path].truncate(255) if params[:referral_path]
       self.visitor_id = params[:visitor_id]
       self.landing_url = params[:landing_url].downcase if params[:landing_url]
       self.preferences = params[:preferences]

@@ -89,5 +89,6 @@ class Api::ProspectsController < ApplicationController
       params[:landing_url] = params[:landing_url].downcase if params[:landing_url]
       params[:campaign_medium] = params[:campaign_medium].downcase if params[:campaign_medium]
       params[:campaign_medium_version] = params[:campaign_medium_version].downcase if params[:campaign_medium_version]
+      params[:referral_path] = params[:referral_path].truncate(255) if params[:referral_path]
     end
 end
