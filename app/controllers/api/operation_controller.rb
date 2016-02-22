@@ -25,7 +25,7 @@ class Api::OperationController < ApplicationController
   # @example_request_description Example of valid request.
   #
   # @example_response
-  #   {"message":"Operation created succesfully.","code":"000"}
+  #   {"message":"Operation created succesfully.", "code":"000"}
   # @example_response_description Example response to valid request.
   #
 	def create

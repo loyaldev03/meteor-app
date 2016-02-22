@@ -64,19 +64,19 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @example_request
-  #   curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"alice\",\"last_name\":\"brennan\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"deadbeef\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"},\"product_sku\":\"KIT-CARD\",\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\",\"marketing_code\":\"marketing code\",\"fulfillment_code\":\"1\",\"ip_address\":\"192.168.1.1\",\"user_agent\":\"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537...\"},\"api_key\":\"o6ESwPCNtsMkJnDLzvpC\"}" -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
+  #    curl -v -k -X POST --data-ascii '{"member":{"first_name":"alice", "last_name":"brennan", "address":"SomeSt", "city":"Dresden", "state":"AL", "gender":"", "zip":"12345", "phone_country_code":"1", "phone_area_code":"123", "phone_local_number":"1123", "birth_date":"1989-09-03", "email":"alice@brennan.com", "country":"US", "prospect_id":"deadbeef", "enrollment_amount":"0.0", "terms_of_membership_id":"1", "credit_card":{"number":"371449635398431", "expire_month":"2", "expire_year":"2014"}, "product_sku":"KIT-CARD", "landing_url":"http://www.google.com", "mega_channel":"super channel", "marketing_code":"marketing code", "fulfillment_code":"1", "ip_address":"192.168.1.1", "user_agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537..."}, "api_key":"3v5L15ovoJyee8mKh5DQ"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
   # @example_request_description Requesting enroll of a valid member, with params in json format.
   #
   # @example_response 
-  #   {"message":"Member enrolled successfully $0.0 on TOM(1) -test2-","code":"000","member_id":11349950166,"autologin_url":"","status":"provisional"}
+  #   {"message":"Member enrolled successfully $0.0 on TOM(1) -test2-", "code":"000", "member_id":11349950166, "autologin_url":"", "status":"provisional"}
   # @example_response_description Example response to a valid request
   #
   # @example_request
-  #   curl -v -k -X POST --data-ascii "{\"member\":{\"first_name\":\"\",\"last_name\":\"\", \"address\":\"\",\"city\":\"\",\"state\":\"\",\"gender\":\"\",\"zip\":\"\",\"phone_country_code\":\"\",\"phone_area_code\":\"\",\"phone_local_number\":\"\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"prospect_id\":\"\", \"enrollment_amount\":\"0.0\",\"terms_of_membership_id\":\"1\",\"product_sku\":\"KIT-CARD\",\"landing_url\":\"http://www.google.com\",\"mega_channel\":\"super channel\",\"marketing_code\":\"marketing code\",\"fulfillment_code\":\"1\",\"ip_address\":\"192.168.1.1\",\"user_agent\":\"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537...\"},\"api_key\":\"DyqgeuHrxmb9QA8gsU22\"}" -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
+  #   curl -v -k -X POST --data-ascii '{"member":{"first_name":"", "last_name":"", "address":"", "city":"", "state":"", "gender":"", "zip":"", "phone_country_code":"", "phone_area_code":"", "phone_local_number":"", "birth_date":"1989-09-03", "email":"alice@brennan.com", "country":"US", "prospect_id":"", "enrollment_amount":"0.0", "terms_of_membership_id":"1", "product_sku":"KIT-CARD", "landing_url":"http://www.google.com", "mega_channel":"super channel", "marketing_code":"marketing code", "fulfillment_code":"1", "ip_address":"192.168.1.1", "user_agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537..."}, "api_key":"DyqgeuHrxmb9QA8gsU22"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
   # @example_request_description Requesting enroll sending some params as blank
   #
   # @example_response 
-  #   {"message":"Member information is invalid.","code":"405","errors":{"phone_country_code":["can't be blank","is not a number","is too short (minimum is 1 characters)"],"phone_area_code":["can't be blank","is not a number","is too short (minimum is 1 characters)"],"phone_local_number":["can't be blank","is not a number","is too short (minimum is 1 characters)"],"first_name":["can't be blank","is invalid"],"last_name":["can't be blank","is invalid"],"address":["is invalid"],"state":["can't be blank","is invalid"],"city":["can't be blank","is invalid"],"zip":["can't be blank","The zip code is not valid for the selected country."],"credit_card":{"number":["is required"],"expire_month":["is required"],"expire_year":["is required"]}}}
+  #   {"message":"Member information is invalid.", "code":"405", "errors":{"phone_country_code":["can't be blank", "is not a number", "is too short (minimum is 1 characters)"], "phone_area_code":["can't be blank", "is not a number", "is too short (minimum is 1 characters)"], "phone_local_number":["can't be blank", "is not a number", "is too short (minimum is 1 characters)"], "first_name":["can't be blank", "is invalid"], "last_name":["can't be blank", "is invalid"], "address":["is invalid"], "state":["can't be blank", "is invalid"], "city":["can't be blank", "is invalid"], "zip":["can't be blank", "The zip code is not valid for the selected country."], "credit_card":{"number":["is required"], "expire_month":["is required"], "expire_year":["is required"]}}}
   # @example_response_description Example response to a request we are sending params as blank. (Params sent as blank: first_name, last_name, address, city, state, gender, zip, phone_country_code, phone_area_code, phone_local_number and credit_card's information) 
   #
   # @response_field [String] message Shows the method results and also informs the errors.
@@ -84,8 +84,8 @@ class Api::MembersController < ApplicationController
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.
   # @response_field [Hash] errors A hash with members and credit card errors.
   #   <ul>
-  #     <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). In the particular case that one or more of credit_card's field are wrong, the key will be "credit_card", and the value will be a hash that follows the same logic as this error hash. (Eg: "credit_card":{"number":["is required"],"expire_month":["is required"],"expire_year":["is required"]})  </li>
-  #     <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank","is invalid"]). </li>
+  #     <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). In the particular case that one or more of credit_card's field are wrong, the key will be "credit_card", and the value will be a hash that follows the same logic as this error hash. (Eg: "credit_card":{"number":["is required"], "expire_month":["is required"], "expire_year":["is required"]})  </li>
+  #     <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank", "is invalid"]). </li>
   #   </ul>
   #
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.
@@ -159,11 +159,11 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @example_request 
-  #   curl -v -k -X PUT --data-ascii "{\"member\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"credit_card\":{\"number\":\"371449635398431\",\"expire_month\":\"2\",\"expire_year\":\"2014\"}},\"api_key\":\"o6ESwPCNtsMkJnDLzvpC\"}" -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members/1
+  #   curl -v -k -X PUT --data-ascii '{"member":{"first_name":"Megan", "last_name":"Brenann", "address":"SomeSt", "city":"Dresden", "state":"AL", "gender":"m", "zip":"12345", "phone_country_code":"1", "phone_area_code":"123", "phone_local_number":"1123", "birth_date":"1989-09-03", "email":"alice@brennan.com", "country":"US", "credit_card":{"number":"371449635398431", "expire_month":"2", "expire_year":"2014"}}, "api_key":"o6ESwPCNtsMkJnDLzvpC"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members/1
   # @example_request_description Requesting member update with valid params and in json format.
   #
   # @example_response 
-  #   {"message":"Member updated successfully","code":"000","member_id":1}
+  #   {"message":"Member updated successfully", "code":"000", "member_id":1}
   # @example_response_description Example response to a valid request
   #
   # @response_field [String] message Shows the method results and also informs the errors.
@@ -172,7 +172,7 @@ class Api::MembersController < ApplicationController
   # @response_field [Hash] errors A hash with members errors.
   #   <ul>
   #     <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). </li>
-  #     <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank","is invalid"]). </li>
+  #     <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank", "is invalid"]). </li>
   #   </ul>
   def update
     response = {}
@@ -274,7 +274,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request.
   #
   # @example_response
-  #   {"code":"000","member":{"first_name":"Megan","last_name":"Brenann","email":"alice@brennan.com","address":"SomeSt","city":"Dresden","state":"AL","zip":"12345","birth_date":"1989-09-03","phone_country_code":1,"phone_area_code":123,"phone_local_number":1123,"type_of_phone_number":"other","gender":"","bill_date":null,"wrong_address":null,"wrong_phone_number":null,"member_since_date":"2013-01-15T13:03:07-05:00","external_id":null,"blacklisted":false,"member_group_type":"VIP","preferences":{"example_color":"blue","example_team":"example"}},"credit_card":{"last_4_digits":"8431","expire_month":2,"expire_year":2014},"current_membership":{"status":"lapsed","join_date":"2013-01-15T13:03:19-05:00","cancel_date":"2013-04-10T20:00:00-04:00","terms_of_membership_id":338}}
+  #   {"code":"000", "member":{"first_name":"Megan", "last_name":"Brenann", "email":"alice@brennan.com", "address":"SomeSt", "city":"Dresden", "state":"AL", "zip":"12345", "birth_date":"1989-09-03", "phone_country_code":1, "phone_area_code":123, "phone_local_number":1123, "type_of_phone_number":"other", "gender":"", "bill_date":null, "wrong_address":null, "wrong_phone_number":null, "member_since_date":"2013-01-15T13:03:07-05:00", "external_id":null, "blacklisted":false, "member_group_type":"VIP", "preferences":{"example_color":"blue", "example_team":"example"}}, "credit_card":{"last_4_digits":"8431", "expire_month":2, "expire_year":2014}, "current_membership":{"status":"lapsed", "join_date":"2013-01-15T13:03:19-05:00", "cancel_date":"2013-04-10T20:00:00-04:00", "terms_of_membership_id":338}}
   # @example_response_description Example response to a valid request
   #
   def show
@@ -344,7 +344,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request.
   #
   # @example_response
-  #   {"message":"Member updated successfully","code":"000"}
+  #   {"message":"Member updated successfully", "code":"000"}
   # @example_response_description Example response to a valid request.
   #
   def club_cash
@@ -389,7 +389,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"message":"Next bill date changed to 2013-05-21","code":"000"}
+  #   {"message":"Next bill date changed to 2013-05-21", "code":"000"}
   # @example_response_description Example response to a valid request.
   #
   def next_bill_date
@@ -419,7 +419,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   { "list":[20,21,22,24,25],"code":"000" }
+  #   { "list":[20,21,22,24,25], "code":"000" }
   # @example_response_description Example response to a valid request.
   #
   def find_all_by_updated
@@ -456,7 +456,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"list":[11349950041,11349950042,11349950043,11349950044,11349950045,11349950046,11349950047,11349950048],"code":"000"}
+  #   {"list":[11349950041,11349950042,11349950043,11349950044,11349950045,11349950046,11349950047,11349950048], "code":"000"}
   # @example_response_description Example response to a valid request.
   #
   def find_all_by_created
@@ -492,7 +492,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"message":"Member cancellation scheduled to 2013-05-21 - Reason: Did not know I have enrolled","code":"000"}
+  #   {"message":"Member cancellation scheduled to 2013-05-21 - Reason: Did not know I have enrolled", "code":"000"}
   # @example_response_description Example response to a valid request.
   #
   def cancel
@@ -521,8 +521,8 @@ class Api::MembersController < ApplicationController
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.
   # @response_field [Hash] errors A hash with members and credit card errors.
   #   <ul>
-  #     <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). In the particular case that one or more of credit_card's field are wrong, the key will be "credit_card", and the value will be a hash that follows the same logic as this error hash. (Eg: "credit_card":{"number":["is required"],"expire_month":["is required"],"expire_year":["is required"]})  </li>
-  #     <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank","is invalid"]). </li>
+  #     <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). In the particular case that one or more of credit_card's field are wrong, the key will be "credit_card", and the value will be a hash that follows the same logic as this error hash. (Eg: "credit_card":{"number":["is required"], "expire_month":["is required"], "expire_year":["is required"]})  </li>
+  #     <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank", "is invalid"]). </li>
   #   </ul>
   #
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.
@@ -573,8 +573,8 @@ class Api::MembersController < ApplicationController
   # @response_field [Integer] member_id Member's id. Integer autoincrement value that is used by platform. This value will be returned only if the member is enrolled successfully.
   # @response_field [Hash] errors A hash with members and credit card errors.
   #   <ul>
-  #     <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). In the particular case that one or more of credit_card's field are wrong, the key will be "credit_card", and the value will be a hash that follows the same logic as this error hash. (Eg: "credit_card":{"number":["is required"],"expire_month":["is required"],"expire_year":["is required"]})  </li>
-  #     <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank","is invalid"]). </li>
+  #     <li> <strong>key</strong> member's field name with error. (Eg: first_name, last_name, etc.). In the particular case that one or more of credit_card's field are wrong, the key will be "credit_card", and the value will be a hash that follows the same logic as this error hash. (Eg: "credit_card":{"number":["is required"], "expire_month":["is required"], "expire_year":["is required"]})  </li>
+  #     <li> <strong>value</strong> Array of strings with errors. (Eg: ["can't be blank", "is invalid"]). </li>
   #   </ul>
   #
   # @response_field [String] autologin_url Url provided by Drupal, used to autologin a member into it. This URL is used by campaigns in order to redirect members to their drupal account. This value wll be returned as blank in case the club is not related to drupal.
@@ -585,6 +585,14 @@ class Api::MembersController < ApplicationController
   #     <li><strong>provisional</strong> The member will be within a period of provisional. This period will be set according to the subscription plan the member was enrolled with. Once the period finishes, the member will be billed, and if it is successful, it will be set as 'active'. </li>
   #     <li><strong>applied</strong> Member is in confirmation process. An agent will be in charge of accepting or rejecting the enroll. In case the enroll is accepeted, the member will be set as provisional. On the other hand, if the member is reject, it will be set as lapsed. </li>
   #   </ul> 
+  #
+  # @example_request
+  #   curl -v -k -X POST -d "api_key=3v5L15ovoJyee8mKh5DQ&id_or_email=11349954802&terms_of_membership_id=182&prorated=true" https://dev.affinitystop.com:3000/api/v1/members/update_terms_of_membership
+  # @example_request_description Example of valid request. 
+  #
+  # @example_response
+  #   {"message":"Member enrolled successfully $0.0 on TOM(182) -test-", "code":"000", "member_id":11349954824, "autologin_url":"", "status":"active", "api_role":["91284557"], "bill_date":"02/21/2017"}
+  # @example_response_description Example response to a valid request.
   #
   def update_terms_of_membership
     new_tom = TermsOfMembership.find(params[:terms_of_membership_id])
@@ -624,7 +632,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"message":"Member billed successfully $10 Transaction id: 6043044a-1185-4323-aa46-64cd4941d511. Reason: paid related to product","code":"000"}
+  #   {"message":"Member billed successfully $10 Transaction id: 6043044a-1185-4323-aa46-64cd4941d511. Reason: paid related to product", "code":"000"}
   # @example_response_description Example response to a valid request.
   #
   def sale
@@ -661,7 +669,7 @@ class Api::MembersController < ApplicationController
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"message":"Email address belongs to an already created member.","landing_url":"http://member_landing.com","banner_url":"http://member_banner.com","member_id":15,"code":"000"}
+  #   {"message":"Email address belongs to an already created member.", "landing_url":"http://member_landing.com", "banner_url":"http://member_banner.com", "member_id":15, "code":"000"}
   # @example_response_description Example response to a valid request.
   #
   def get_banner_by_email

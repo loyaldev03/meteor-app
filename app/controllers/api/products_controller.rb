@@ -21,7 +21,7 @@ class Api::ProductsController < ApplicationController
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"code":"000","stock":9746,"allow_backorder":true}
+  #   {"code":"000", "stock":9746, "allow_backorder":true}
   # @example_response_description Example response to valid request.
   #
   def get_stock
@@ -58,7 +58,7 @@ class Api::ProductsController < ApplicationController
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"code":"000","product_list":[{"sku":"KIT-CARD","stock":9746,"allow_backorder":true}],"skus_could_not_found":["AnoterOne","carflag"]}
+  #   {"code":"000", "product_list":[{"sku":"KIT-CARD", "stock":9746, "allow_backorder":true}], "skus_could_not_found":["AnoterOne", "carflag"]}
   # @example_response_description Example response to valid request.
   #
   def get_list_of_stock

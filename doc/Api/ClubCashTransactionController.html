@@ -374,6 +374,47 @@
 			
 			
 			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Example of valid request.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -v -k -X POST --data-ascii '{"club_cash_transaction":{"amount":"10", "description":"testing"}, "api_key":"3v5L15ovoJyee8mKh5DQ"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members/11349954802/club_cash_transaction
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"message":"Club cash processed at drupal correctly. Amount: 10. Concept: testing", "code":"000"}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to a valid request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
+			
 		</div>	
     
   </div>
@@ -395,7 +436,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Tue Dec 22 12:23:57 2015 with ruby-2.2.0
+  Generated on Mon Feb 22 10:08:27 2016 with ruby-2.2.0
 </div>
 
   </body>

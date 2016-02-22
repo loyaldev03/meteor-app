@@ -18,6 +18,14 @@ class Api::ClubCashTransactionController < ApplicationController
   # @response_field [String] code Code related to the method result.
   # @response_field [String] errors A hash with club cash and members errors.
   #
+  # @example_request
+  #   curl -v -k -X POST --data-ascii '{"club_cash_transaction":{"amount":"10", "description":"testing"}, "api_key":"3v5L15ovoJyee8mKh5DQ"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members/11349954802/club_cash_transaction
+  # @example_request_description Example of valid request. 
+  #
+  # @example_response
+  #   {"message":"Club cash processed at drupal correctly. Amount: 10. Concept: testing", "code":"000"}
+  # @example_response_description Example response to a valid request.
+  #
   def create
     user = User.find(params[:member_id])
     my_authorize! :manage_club_cash_api, ClubCashTransaction, user.club_id

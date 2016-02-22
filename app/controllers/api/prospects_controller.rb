@@ -51,11 +51,11 @@ class Api::ProspectsController < ApplicationController
   # @response_field [String] prospect_id Prospect's id. This ID is unique for each prospect. (36 characters string)
   #
   # @example_request 
-  #   curl -v -k -X POST --data-ascii "{\"prospect\":{\"first_name\":\"Megan\",\"last_name\":\"Brenann\", \"address\":\"SomeSt\",\"city\":\"Dresden\",\"state\":\"AL\",\"gender\":\"m\",\"zip\":\"12345\",\"phone_country_code\":\"1\",\"phone_area_code\":\"123\",\"phone_local_number\":\"1123\",\"birth_date\":\"1989-09-03\",\"email\":\"alice@brennan.com\",\"country\":\"US\",\"terms_of_membership_id\":\"1\"},\"api_key\":\"JWPGnS7bsfB7yizwxJ6F\"}" -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/prospects
+  #   curl -v -k -X POST --data-ascii '{"prospect":{"first_name":"Megan", "last_name":"Brenann", "address":"SomeSt", "city":"Dresden", "state":"AL", "gender":"m", "zip":"12345", "phone_country_code":"1", "phone_area_code":"123", "phone_local_number":"1123", "birth_date":"1989-09-03", "email":"alice@brennan.com", "country":"US", "terms_of_membership_id":"1"}, "api_key":"3v5L15ovoJyee8mKh5DQ"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/prospects
   # @example_request_description Example of request.
   #
   # @example_response 
-  #   {"message":"Prospect was successfuly saved.","code":"000","prospect_id":"55e8f945-9d24-4d10-95cd-b0dcfcdb7f5c"}
+  #   {"message":"Prospect was successfuly saved.", "code":"000", "prospect_id":"55e8f945-9d24-4d10-95cd-b0dcfcdb7f5c"}
   # @example_response_description Example response to valid request.
   #
   def create
