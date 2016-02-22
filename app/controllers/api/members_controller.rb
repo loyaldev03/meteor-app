@@ -594,7 +594,7 @@ class Api::MembersController < ApplicationController
     raise ActiveRecord::RecordNotFound if user.nil?
     prorated = params[:prorated].nil? ? true : params[:prorated].to_s.to_bool
 
-    render json: user.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card])
+    render json: user.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card], { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_API })
   rescue ActiveRecord::RecordNotFound => e
     message = (e.to_s.include? "TermsOfMembership") ? "Subscription plan not found" : "Member not found"
     render json: { :message => message, :code => Settings.error_codes.not_found }
