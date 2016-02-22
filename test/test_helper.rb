@@ -190,7 +190,7 @@ module ActionDispatch
 
     def setup
       stubs_elasticsearch_index
-      FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by(email: "batch@xagax.com")
+      FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by(email: Settings.batch_agent_email)
       page.driver.browser.manage.window.resize_to(1024,720)
     end
 

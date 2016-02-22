@@ -78,10 +78,10 @@ FactoryGirl.define do
   end
 
   factory :batch_agent, class: Agent do
-    email "batch@xagax.com"
-    username "batch@xagax.com"
-    password  "batch@xagax.com"
-    password_confirmation  "batch@xagax.com"
+    email { Settings.batch_agent_email }
+    username { Settings.batch_agent_email }
+    password  { Settings.batch_agent_email }
+    password_confirmation  { Settings.batch_agent_email }
     authentication_token {Devise.friendly_token.first(8)}
   end
 end

@@ -11,6 +11,7 @@ defaults: &defaults
   fulfillment_naamma_report_emails: 'sonia@xagax.com'
   fulfillment_nfla_report_emails: 'sonia@xagax.com'
   hot_rod_cancellation_emails: 'sonia@xagax.com,clawler@fullcu.be'
+  batch_agent_email: 'batch@xagax.com'
   others_product: "SLOOPS"
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe']
   elasticsearch:

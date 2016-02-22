@@ -6,7 +6,7 @@ class Auditory
   # operation_type : operation type used by reporting/web to group operations
   # operation_date : date when the operation related was done. If this value is nil we save that operation with Time.zone.now
   def self.audit(current_agent, object, description, user = nil, operation_type = Settings.operation_types.others, operation_date = Time.zone.now, notes = nil)
-    agent = current_agent || Agent.find_by(email: 'batch@xagax.com')
+    agent = current_agent || Agent.find_by(email: Settings.batch_agent_email)
     o = Operation.new :operation_date => operation_date, 
       :resource => object, :description => description, :operation_type => operation_type
     o.created_by = agent

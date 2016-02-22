@@ -10,7 +10,7 @@ namespace :fulfillments do
       tall = Time.zone.now
 
       fulfillment_file = FulfillmentFile.new 
-      fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
+      fulfillment_file.agent = Agent.find_by_email(Settings.batch_agent_email)
 
       if Rails.env=='prototype'
         fulfillment_file.club = Club.find 41
@@ -91,7 +91,7 @@ namespace :fulfillments do
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
 
       fulfillment_file = FulfillmentFile.new 
-      fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
+      fulfillment_file.agent = Agent.find_by_email(Settings.batch_agent_email)
 
       if Rails.env=='prototype'
         fulfillment_file.club = Club.find 41
@@ -175,7 +175,7 @@ namespace :fulfillments do
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
 
       fulfillment_file = FulfillmentFile.new 
-      fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
+      fulfillment_file.agent = Agent.find_by_email(Settings.batch_agent_email)
 
       if Rails.env=='prototype'
         fulfillment_file.club = Club.find 2
@@ -311,7 +311,7 @@ namespace :fulfillments do
     ActiveRecord::Base.logger = Rails.logger
 
     fulfillment_file = FulfillmentFile.new 
-    fulfillment_file.agent = Agent.find_by_email('batch@xagax.com')
+    fulfillment_file.agent = Agent.find_by_email(Settings.batch_agent_email)
 
     if Rails.env=='prototype'
       fulfillment_file.club = Club.find 48
