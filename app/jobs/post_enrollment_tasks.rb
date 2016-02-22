@@ -8,8 +8,8 @@ class PostEnrollmentTasks < ActiveJob::Base
       mark_as_testing_account = true
     elsif ['test', 'sactest', 'fctest', 'testing'].include? @user.last_name
       mark_as_testing_account = true
-    elsif ['xagax.com', 'stoneacreinc.com', 'meteoraffinity.com'].include? @user.email.split("@").last
-      mark_as_testing_account = true if @user.email != 'guest@xagax.com'
+    elsif @user.email != 'guest@xagax.com' and ['xagax.com', 'stoneacreinc.com', 'meteoraffinity.com'].include? @user.email.split("@").last
+      mark_as_testing_account = true
     end
 
     if mark_as_testing_account
