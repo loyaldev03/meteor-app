@@ -422,7 +422,7 @@ class User < ActiveRecord::Base
   
   ###############################################
 
-  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil)
+  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil)
     if can_change_tom?
       new_tom = TermsOfMembership.find new_tom_id
 
@@ -432,9 +432,9 @@ class User < ActiveRecord::Base
         else
           previous_membership = current_membership
           response = if prorated
-            prorated_enroll(new_tom, agent, credit_card_params, self.current_membership)
-          else 
-            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, nil, true, true, true)
+            prorated_enroll(new_tom, agent, credit_card_params, membership_params)
+          else
+            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, membership_params, true, true, true)
           end
 
           if response[:code] == Settings.error_codes.success
@@ -455,13 +455,13 @@ class User < ActiveRecord::Base
 
   def save_the_sale(new_tom_id, agent = nil)
     message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
-    change_terms_of_membership(new_tom_id, message, Settings.operation_types.save_the_sale, agent)
+    change_terms_of_membership(new_tom_id, message, Settings.operation_types.save_the_sale, agent, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM })
   end
 
   def downgrade_user
     new_tom_id = self.terms_of_membership.downgrade_tom_id
     message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
-    answer = change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_user)
+    answer = change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_user, nil, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_DOWNGRADE })
     if answer[:code] != Settings.error_codes.success
       Auditory.report_issue("DowngradeUser::Error", answer[:message], { user: self.inspect, answer: answer })
     else
@@ -717,6 +717,7 @@ class User < ActiveRecord::Base
       end
 
       self.save! validate: !skip_user_validation unless self.id
+      
       membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent, enrollment_amount: amount)
       membership.update_membership_info_by_hash user_params
       membership.product = product
@@ -1320,7 +1321,7 @@ class User < ActiveRecord::Base
     def check_upgradable
       if terms_of_membership.upgradable?
         if join_date.to_date + terms_of_membership.upgrade_tom_period.days <= Time.new.getlocal(self.get_offset_related).to_date
-          change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade)
+          change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade, nil, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_UPGRADE })
           return false
         end
       end

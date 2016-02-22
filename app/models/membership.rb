@@ -20,6 +20,8 @@ class Membership < ActiveRecord::Base
 
   CS_MEGA_CHANNEL = 'other'
   CS_CAMPAIGN_MEDIUM = 'phone'
+  CS_CAMPAIGN_MEDIUM_DOWNGRADE = 'downgrade'
+  CS_CAMPAIGN_MEDIUM_UPGRADE = 'upgrade'
   CS_CAMPAIGN_DESCRIPTION = 'CS Join'
 
   def self.datatable_columns
