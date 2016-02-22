@@ -27,7 +27,10 @@ class Membership < ActiveRecord::Base
   end
 
   def cancel_because_of_membership_change
-    self.update_attributes cancel_date: Time.zone.now, status: 'lapsed'
+    self.status = 'lapsed'
+    self.cancel_date = Time.zone.now
+    self.save
+    # self.update_attributes cancel_date: Time.zone.now, status: 'lapsed'
   end
 
   def update_membership_info_by_hash(params)

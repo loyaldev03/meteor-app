@@ -273,7 +273,7 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   test "Create an user with Synced Status" do
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+    enrollment_info  = FactoryGirl.build(:membership_with_enrollment_info)
 
     # @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
@@ -291,7 +291,7 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   test "Create an user with Not Synced status" do
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+    enrollment_info  = FactoryGirl.build(:membership_with_enrollment_info)
 
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.last
@@ -309,7 +309,7 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
 
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+    enrollment_info  = FactoryGirl.build(:membership_with_enrollment_info)
 
     Drupal.enable_integration!
     Drupal.test_mode!
@@ -333,7 +333,7 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+    enrollment_info  = FactoryGirl.build(:membership_with_enrollment_info)
 
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by(email: unsaved_user.email)
@@ -367,7 +367,7 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   test "Should not let agent to update api_id when user is applied" do
     unsaved_user =  FactoryGirl.build(:user_with_api, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info  = FactoryGirl.build(:complete_enrollment_info_with_amount)
+    enrollment_info  = FactoryGirl.build(:membership_with_enrollment_info)
     @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)

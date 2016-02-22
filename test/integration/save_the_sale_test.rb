@@ -52,13 +52,11 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    product = @saved_user.enrollment_infos.first.product
+    product = @saved_user.current_membership.product
     product.delete
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
-      end
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
     end
   end
 
@@ -66,15 +64,13 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    product = @saved_user.enrollment_infos.first.product
+    product = @saved_user.current_membership.product
     product.stock = 0 
     product.allow_backorder = false
     product.save
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
-      end
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
     end
   end
 
@@ -82,15 +78,13 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false, true)
     assert_equal @saved_user.status, "active"
     
-    product = @saved_user.enrollment_infos.first.product
+    product = @saved_user.current_membership.product
     product.stock = 0 
     product.allow_backorder = false
     product.save
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
-      end
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
     end
   end
 
@@ -98,9 +92,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user
     assert_equal @saved_user.status, "provisional"
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
-      end
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
     end
   end
 
@@ -109,9 +101,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "active"
     
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
-      end
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
     end
   end
 
@@ -120,9 +110,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "active"
       
     assert_difference('Membership.count',0) do 
-      assert_difference('EnrollmentInfo.count',0) do
-        save_the_sale(@saved_user, @saved_user.current_membership.terms_of_membership, false)
-      end
+      save_the_sale(@saved_user, @saved_user.current_membership.terms_of_membership, false)
     end
     assert page.has_content?("Nothing to change. Member is already enrolled on that TOM")
   end
@@ -131,9 +119,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false,true)
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @terms_of_membership_with_gateway2)
-      end
+      save_the_sale(@saved_user, @terms_of_membership_with_gateway2)
     end
   end
 
@@ -142,9 +128,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "provisional"
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @terms_of_membership_with_gateway2)
-      end
+      save_the_sale(@saved_user, @terms_of_membership_with_gateway2)
     end
   end
 
@@ -152,9 +136,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(false,true)
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @terms_of_membership_with_approval)
-      end
+      save_the_sale(@saved_user, @terms_of_membership_with_approval)
     end
   end
 
@@ -163,9 +145,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "provisional"
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @terms_of_membership_with_approval)
-      end
+      save_the_sale(@saved_user, @terms_of_membership_with_approval)
     end
   end
 
@@ -174,9 +154,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "active"
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @terms_of_membership_with_gateway)
-      end
+      save_the_sale(@saved_user, @terms_of_membership_with_gateway)
     end
   end
 
@@ -185,9 +163,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "provisional"
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @terms_of_membership_with_gateway2)
-      end
+      save_the_sale(@saved_user, @terms_of_membership_with_gateway2)
     end
   end
 
@@ -196,9 +172,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "active"
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @terms_of_membership_with_approval2)
-      end
+      save_the_sale(@saved_user, @terms_of_membership_with_approval2)
     end
   end
 
@@ -206,9 +180,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     setup_user(true,false)
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @terms_of_membership_with_approval2)
-      end
+      save_the_sale(@saved_user, @terms_of_membership_with_approval2)
     end
   end
 
@@ -234,9 +206,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     @saved_user = create_user(unsaved_user, nil, @lifetime_terms_of_membership.name, true)
 
     assert_difference('Membership.count') do 
-      assert_difference('EnrollmentInfo.count') do
-        save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
-      end
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway)
     end
 
     validate_view_user_base(@saved_user)
