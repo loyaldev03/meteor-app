@@ -247,7 +247,8 @@ class User < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    SendFulfillmentJob.perform_later(self.id) if not skip_send_fulfillment and current_membership.product_id
+
+    PostEnrollmentTasks.perform_later(self.id, skip_send_fulfillment)
     
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -1276,12 +1277,16 @@ class User < ActiveRecord::Base
   end
 
   # used for member blacklist
-  def marketing_tool_sync_unsubscription
+  def marketing_tool_sync_unsubscription(with_delay = true)
     case(club.marketing_tool_client)
     when 'exact_target'
-      exact_target_unsubscribe if defined?(SacExactTarget::MemberModel)
+      if defined?(SacExactTarget::MemberModel)
+        with_delay ? exact_target_unsubscribe : exact_target_unsubscribe_without_delay 
+      end
     when 'mailchimp_mandrill'
-      mailchimp_unsubscribe if defined?(SacMailchimp::MemberModel)
+      if defined?(SacMailchimp::MemberModel)
+        with_delay ? mailchimp_unsubscribe : mailchimp_unsubscribe_without_delay
+      end
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"

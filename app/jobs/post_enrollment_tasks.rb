@@ -1,5 +1,21 @@
-class SendFulfillmentJob < ActiveJob::Base
+class PostEnrollmentTasks < ActiveJob::Base
   queue_as :fulfillments
+  attr :user
+
+  def testing_account_analysis
+    mark_as_testing_account = false
+    if ['name', 'firstname', 'test', 'sactest'].include? @user.first_name
+      mark_as_testing_account = true
+    elsif ['test', 'sactest', 'fctest', 'testing'].include? @user.last_name
+      mark_as_testing_account = true
+    elsif @user.email != 'guest@xagax.com' and ['xagax.com', 'stoneacreinc.com', 'meteoraffinity.com'].include? @user.email.split("@").last
+      mark_as_testing_account = true
+    end
+
+    if mark_as_testing_account
+      @user.update_attribute :testing_account, true
+    end
+  end
 
   def update_sumarize_data(fulfillment)
     Fulfillment.where(id: fulfillment.id).update_all("
@@ -51,28 +67,39 @@ class SendFulfillmentJob < ActiveJob::Base
     end
   end
 
-  def perform(user_id)
+  def send_fulfillment
     # we always send fulfillment to new members or members that do not have 
     # opened fulfillments (meaning that previous fulfillments expired).
-    user = User.find user_id
-    if user.fulfillments.where_not_processed.empty?
+    if @user.fulfillments.where_not_processed.empty?
       begin
-        product = user.current_membership.product
+        product = @user.current_membership.product
         fulfillment = Fulfillment.new product_sku: product.sku
         fulfillment.product_package = product.package
         fulfillment.recurrent = product.recurrent 
-        fulfillment.user_id = user.id
-        fulfillment.club_id = user.club_id
+        fulfillment.user_id = @user.id
+        fulfillment.club_id = @user.club_id
         fulfillment.product = product
         fulfillment.save!
-        proceed_with_gamer_analysis(fulfillment)
+        if not @user.testing_account?
+          proceed_with_gamer_analysis(fulfillment)
+        else
+          fulfillment.set_as_canceled
+        end
+
       rescue ActiveRecord::RecordInvalid => e
-        Auditory.report_issue("Send Fulfillment", e, { user: user.id, product: user.current_membership.product_sku })
+        Auditory.report_issue("Send Fulfillment", e, { user: @user.id, product: @user.current_membership.product_sku })
       end
     else
       message = "The user has already a not processed fulfillment and we cannot assign the requested fulfillment. Contact a Fulfillment Manager to decide what to do."
-      Auditory.report_issue("Send Fulfillment", message, { user: user.id, product: user.current_membership.product_sku })
+      Auditory.report_issue("Send Fulfillment", message, { user: @user.id, product: @user.current_membership.product_sku })
     end
+  end
+
+  def perform(user_id, skip_send_fulfillment)
+    @user = User.find user_id
+
+    testing_account_analysis
+    send_fulfillment if not skip_send_fulfillment and @user.current_membership.product_id
   end
 end
   
