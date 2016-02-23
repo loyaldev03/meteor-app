@@ -47,6 +47,7 @@ class Ability
     cannot :chargeback, Transaction
     cannot :toggle_testing_account, User
     cannot :manual_review, Fulfillment
+    cannot :bulk_process, Product
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
 

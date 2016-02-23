@@ -61,19 +61,23 @@ class ProductsController < ApplicationController
     render json: { success: false, message: "Sku '#{@product.sku}' is already taken within this club." }
   end
 
-  def bulk_update
-    if params[:file]
-      if ['text/csv','application/vnd.ms-excel'].include? params[:file].content_type
-        temporary_file = File.open("tmp/files/bulk_update_#{Time.current}.csv", "w")
-        temporary_file.write params[:file].open.read
-        temporary_file.close
-        Product.delay.bulk_update(@current_club.id, current_agent.email, temporary_file.path)
-        redirect_to products_url, notice: "File will be processed in a few moments. We will send you the results on your email."
+  def bulk_process
+    my_authorize! :bulk_process, Product, current_club.id
+    if request.post?
+      if params[:file]
+        if ['text/csv','application/vnd.ms-excel'].include? params[:file].content_type
+          temporary_file = File.open("tmp/files/bulk_process_#{Time.current}.csv", "w")
+          temporary_file.write params[:file].open.read
+          temporary_file.close
+          temporary_file
+          Product.delay.bulk_process(@current_club.id, current_agent.email, temporary_file.path)
+          redirect_to products_url, notice: "File will be processed in a few moments. We will send you the results to your email."
+        else 
+          redirect_to bulk_process_products_url, alert: "Format not supported. Please, provide a .csv file"
+        end
       else 
-        redirect_to products_url, alert: "Format not supported. Please, provide a .csv file"
+        redirect_to bulk_process_products_url, alert: "No file provided."
       end
-    else 
-      redirect_to products_url, alert: "No file provided for to bulk update products."
     end
   end
 
@@ -90,7 +94,6 @@ class ProductsController < ApplicationController
   end
 
   private
-
     def check_permissions
       my_authorize! :manage, Product, @current_club.id
     end

@@ -115,7 +115,7 @@ SacPlatform::Application.routes.draw do
 
       resources :products do 
         collection do
-          put 'bulk_update'
+          match 'bulk_process' => 'products#bulk_process', via: [:get, :post]
         end
       end
       resources :disposition_types, :except => [ :show, :destroy ]

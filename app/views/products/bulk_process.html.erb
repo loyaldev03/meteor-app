@@ -1,0 +1,24 @@
+<div>
+  <%= form_tag(bulk_process_products_path, method: 'post', multipart: true, id: 'bulk_process_form') do %>
+    <%= label :file, "Products csv file", :class => 'help-inline' %>: 
+    <%= file_field_tag 'file', accept: '.csv', id: 'bulk_process_file' %>
+    <%= submit_tag 'Process Bulk Process File', class: 'btn btn-primary', id: 'bulk_process_submit' %>
+    <%= link_to "Download example file", '/examples/products_bulk_process_example.csv', class: 'btn' %>
+    <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.attributes.product.bulk_process_help_title'), :content => t('activerecord.attributes.product.bulk_process_help_content')} %>
+  <% end %>
+</div>
+
+<div class="span7">
+  <div class="help_div" >
+    <h4> Validations related to fields included in the Bulk process </h4>
+    <ul>
+    <% Product::BULK_PROCESS_FIELDS.each do |field| %>
+      <li><b><%= field %></b> <%= t("activerecord.attributes.product.validations.#{field}") %> </li>
+    <% end %>
+  </ul>
+  </div>
+</div>
+
+<script>
+  $(document).ready(bulk_process_products_functions())
+</script>

@@ -266,15 +266,18 @@ function product_index_functions(column_count){
       }
     })
   });
-  $("#bulk_update_submit").click(function(event){
+}
+
+function bulk_process_products_functions(){
+  $("#bulk_process_submit").click(function(event){
     event.preventDefault();
-    if($("#bulk_update_file").prop('files').length == 0){
+    if($("#bulk_process_file").prop('files').length == 0){
       alert("No file provided for to bulk update products.");
     }else{
-      if($("#bulk_update_file").prop('files')[0].size > 1002867){
+      if($("#bulk_process_file").prop('files')[0].size > 1002867){
         alert("File exceeds maximum size limit.");
       }else{
-        $("#bulk_update_form").submit();
+        $("#bulk_process_form").submit();
       }
     }
   });

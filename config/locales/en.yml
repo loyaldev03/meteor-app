@@ -582,8 +582,16 @@ en:
         is_visible: 'Is Visible?'
         is_visible_label: 'Will product be visible?'
         is_visible_help: 'This option makes a product invisible in the fulfillment file manager.'
-        bulk_update_help_title: 'Products bulk Update'
-        bulk_update_help_content: "Allows to update the STOCK (numeric value) and ALLOW BACKORDER (options: 'yes' or 'no') values from several products using a csv file providing the SKU to identify each product to update. Each column shall be separated by comma and each row by a new line. The format of each row is SKU, STOCK and ALLOW BACKORDER (example: FLAG,100,yes)"
+        bulk_process_help_title: 'Products bulk create'
+        bulk_process_help_content: "Allows to create/update several products at once using a csv file providing the required data. If the sku provided does belongs to an already created product we will proceed to update it, and in case it doesn't we will create it. Each column shall be separated by comma and each row by a new line. The format of each row is SKU, NAME, PACKAGE, STOCK TO ADD, ALLOW BACKORDER, WEIGHT, COST CENTER). Example: FLAGDALE,Flag Dale,Flag,100,yes,2.5,FDALE."
+        validations:
+          sku: 'Required and unique string with at least 2 characters.'
+          name: 'String of charactes. Accepts letters and numbers.'
+          package: 'String with a max amount of 20 characters. Only accepts letters.'
+          stock_to_add: 'Numerical value. Max value: 1999999. Only accepts numbers.'
+          cost_center: 'String between 2 and 20 characters. Only accepts letters.'
+          weight: 'Float value.'
+          allow_backorder: 'String value. Only accepts "yes" or "no"'
       payment_gateway_configuration:
         report_group: 'Report Group'
         report_group_help: 'The exact name of the report group set up in Litle that you want all orders to be added to.'
