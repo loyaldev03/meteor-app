@@ -1,7 +1,7 @@
 class AddEnrollmentInfosColumnsOnMemberships < ActiveRecord::Migration
   def change
     add_column :memberships, :enrollment_amount, :decimal, :precision => 11, :scale => 2, :default => 0.0
-    add_column :memberships, :product_sku, :string, limit: 32
+    add_column :memberships, :product_sku, :text
     add_column :memberships, :product_id, :integer
     add_column :memberships, :product_description, :text
     add_column :memberships, :mega_channel, :string
