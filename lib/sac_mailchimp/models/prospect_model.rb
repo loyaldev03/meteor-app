@@ -16,7 +16,7 @@ module SacMailchimp
           begin
             options = { :update_existing => true, :double_optin => false }
             client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
-3          end
+          end
         else
           res = { "error" => "Email already saved as member." }
         end

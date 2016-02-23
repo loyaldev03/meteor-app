@@ -225,4 +225,27 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_equal fulfillment.suspected_fulfillment_evidences.last.email_match, true 
     assert_equal fulfillment.email_matches_count, 1
   end
+
+  test "Fulfillment should set as canceled when user is testing account" do
+    setup_products
+    @credit_card = FactoryGirl.build(:credit_card)
+    ['admin@xagax.com', 'admin@stoneacreinc.com'].each do |email|
+      user = FactoryGirl.build(:user, email: email)
+      user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
+      fulfillment = user.fulfillments.last
+      assert user.testing_account?
+      assert_equal fulfillment.status, 'canceled'
+    end
+    user = FactoryGirl.build(:user, first_name: 'test')
+    user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
+    fulfillment = user.fulfillments.last
+    assert user.testing_account?
+    assert_equal fulfillment.status, 'canceled'
+
+    user = FactoryGirl.build(:user, last_name: 'test')
+    user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
+    fulfillment = user.fulfillments.last
+    assert user.testing_account?
+    assert_equal fulfillment.status, 'canceled'
+  end
 end

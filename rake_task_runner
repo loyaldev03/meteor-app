@@ -74,7 +74,10 @@ if [ "$1" == "production" ]; then
   echo "`date` running remote script distribute_production_data.sh"
   ssh deploy@50.116.28.74 -p 30003 '/home/deploy/sac-platform-reporting/current/scripts/distribute_production_data.sh >> /home/deploy/sac-platform-reporting/current/log/nightly.log 2>&1'
 fi
-
+if [ `date +"%d"` == "1"]; then
+  echo "`date` rake users:delete_testing_accounts"
+  cd /var/www/$2/current && bundle exec rake users:delete_testing_accounts  >> $LOGFILE 2>&1 &
+fi
 echo "`date` rake mkt_tools:sync_prospects_to_exact_target"
 cd /var/www/$2/current && bundle exec rake mkt_tools:sync_prospects_to_exact_target  >> $LOGFILE 2>&1 &
 echo "`date` rake mkt_tools:sync_prospects_to_mailchimp"

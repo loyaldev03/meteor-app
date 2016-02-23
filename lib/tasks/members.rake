@@ -176,6 +176,20 @@ namespace :users do
     Rails.logger.info "Finished running members:sync_all_to_drupal task"
   end
 
+  desc "Delete every user with testing_account flag as true"
+  task :delete_testing_accounts => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/destroy_testing_accounts.log")
+    Rails.logger.level = Logger::DEBUG
+    ActiveRecord::Base.logger = Rails.logger
+    tall = Time.zone.now
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
+    begin 
+      TasksHelpers.delete_testing_accounts
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run task"        
+    end  
+  end
+
   desc "NO LONGER USED (https://www.pivotaltracker.com/story/show/104026972) - Magazine cancellation file generation for hot rod"
   task :send_magazine_cancellation_email => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/send_magazine_cancellation.log")
