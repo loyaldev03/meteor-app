@@ -154,10 +154,14 @@ class FulfillmentsController < ApplicationController
 
   def suspected_fulfillments
     my_authorize! :manual_review, Fulfillment, @current_club.id
-    params[:initial_date] ||= (Time.current - 7.days).to_date
-    params[:end_date] ||= (Time.current).to_date
-    @suspected_fulfillment_data = Fulfillment.where("status = ? AND club_id = ? AND date(assigned_at) BETWEEN ? and ?", 
-                    'manual_review_required', current_club.id, params[:initial_date], params[:end_date]).
+    params[:initial_date] = params[:initial_date].nil? ? (Time.current - 7.days).to_date : params[:initial_date].to_date
+    params[:end_date] = params[:end_date].nil? ? (Time.current).to_date : params[:end_date].to_date
+
+    initial_date = params[:initial_date].in_time_zone(current_club.time_zone).beginning_of_day.utc
+    end_date = params[:end_date].in_time_zone(current_club.time_zone).end_of_day.utc
+
+    @suspected_fulfillment_data = Fulfillment.where("status = ? AND club_id = ? AND assigned_at BETWEEN ? and ?", 
+                    'manual_review_required', current_club.id, initial_date, end_date).
                     order('created_at DESC').group_by{ |f| f.created_at.to_date }
   end
 

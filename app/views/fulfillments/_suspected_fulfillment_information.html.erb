@@ -5,7 +5,7 @@
     <thead>
       <tr> <td colspan="7" class="ligthgrey"> <b> Suspected </b> </td> </tr>
       <tr id='suspected_information_columns_name'>
-        <th><%= I18n.t('activerecord.attributes.fulfillment.created_at') %></th>
+        <th width='85px'><%= I18n.t('activerecord.attributes.fulfillment.created_at') %></th>
         <th><%= I18n.t('activerecord.attributes.fulfillment.user_id') %></th>
         <th><%= I18n.t('activerecord.attributes.fulfillment.email') %></th>
         <th><%= I18n.t('activerecord.attributes.fulfillment.full_name') %></th>
@@ -16,7 +16,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><%= I18n.l(fulfillment.created_at,:format => :default) %></td>
+        <td width='85px'><%= I18n.l(fulfillment.created_at,:format => :default) %></td>
         <td><%= link_to fulfillment.user_id, show_user_path(club_prefix: current_club.name, user_prefix: fulfillment.user_id), target:'_blank' %></td>
         <td><%= fulfillment.email %></td>
         <td><%= fulfillment.full_name %></td>
