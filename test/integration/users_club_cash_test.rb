@@ -184,7 +184,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
   end
 
   test "add club cash amount using the amount on user TOM enrollment amount = 0" do
-    enrollment_info = FactoryGirl.build(:complete_enrollment_info_with_cero_amount)
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
