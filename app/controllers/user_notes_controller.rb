@@ -11,10 +11,7 @@ class UserNotesController < ApplicationController
 
   def create 
     my_authorize! :manage, UserNote, @current_club.id
-    user_note = UserNote.new(:description => params[:user_note][:description])
-    user_note.communication_type_id = params[:user_note][:communication_type_id]
-    user_note.disposition_type_id = params[:user_note][:disposition_type_id]
-    user_note.communication_type_id = params[:user_note][:communication_type_id]
+    user_note = UserNote.new user_note_params
     user_note.created_by_id = @current_agent.id
     user_note.user_id = @current_user.id
     
@@ -25,4 +22,10 @@ class UserNotesController < ApplicationController
       render action: "new"
     end
   end
+
+
+  private
+    def user_note_params
+      params.require(:user_note).permit(:description, :communication_type_id, :disposition_type_id)
+    end
 end

@@ -13,7 +13,7 @@ class PaymentGatewayConfigurationsController < ApplicationController
 
 	def create
 		my_authorize! :create, PaymentGatewayConfiguration, @current_club.id
-		@payment_gateway_configuration = PaymentGatewayConfiguration.new(params[:payment_gateway_configuration])
+		@payment_gateway_configuration = PaymentGatewayConfiguration.new params.require(:payment_gateway_configuration).permit(:login, :merchant_key, :password, :gateway, :report_group, :aus_login, :aus_password)
 		@payment_gateway_configuration.club_id = @current_club.id
 		success = false
 		if @current_club.members_count.to_i == 0 and @current_club.users.count == 0
@@ -48,7 +48,7 @@ class PaymentGatewayConfigurationsController < ApplicationController
     my_authorize! :show, PaymentGatewayConfiguration, @payment_gateway_configuration.club_id
 		
 		cleanup_for_update!(params[:payment_gateway_configuration])
-		if @payment_gateway_configuration.update_attributes(params[:payment_gateway_configuration])
+		if @payment_gateway_configuration.update_attributes params.require(:payment_gateway_configuration).permit(:login, :merchant_key, :password, :report_group, :aus_login, :aus_password)
 			flash.now[:notice] = "Payment Gateway updated successfully"
 			redirect_to payment_gateway_configuration_path, :notice => "Payment Gateway Configuration updated successfully."
 		else
@@ -62,5 +62,4 @@ class PaymentGatewayConfigurationsController < ApplicationController
       hash.delete(:aus_password) if hash[:aus_password].blank?
     end
   end
-
 end

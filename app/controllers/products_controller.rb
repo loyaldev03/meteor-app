@@ -34,9 +34,8 @@ class ProductsController < ApplicationController
   # POST /products
   def create
     my_authorize! :create, Product, @current_club.id
-    @product = Product.new
+    @product = Product.new(product_params)
     @product.club_id = @current_club.id
-    @product.update_product_data_by_params(params[:product])
     if @product.save
       redirect_to product_path(@current_partner.prefix,@current_club.name, @product), notice: 'Product was successfully created.'
     else
@@ -51,8 +50,7 @@ class ProductsController < ApplicationController
   def update
     @product = Product.find(params[:id])
     my_authorize! :update, Product, @product.club_id
-    @product.update_product_data_by_params params[:product]
-    if @product.save
+    if @product.update product_params
       render json: { success: true }
     else
       render json: { success: false, message: 'Product was not updated.', errors: @product.errors }
@@ -94,6 +92,10 @@ class ProductsController < ApplicationController
   end
 
   private
+    def product_params
+      params.require(:product).permit(:sku, :name, :package, :recurrent, :stock, :weight, :allow_backorder, :is_visible, :cost_center)
+    end
+
     def check_permissions
       my_authorize! :manage, Product, @current_club.id
     end

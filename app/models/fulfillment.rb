@@ -7,8 +7,6 @@
 # status => open , archived
 #
 class Fulfillment < ActiveRecord::Base
-  attr_accessible :product_sku
-
   belongs_to :user
   belongs_to :club
   belongs_to :product

@@ -22,10 +22,6 @@ class Agent < ActiveRecord::Base
   # This is in addition to a real persisted field like 'username'
   attr_accessor :login
 
-  # Setup accessible (or protected) attributes for your model
-  attr_accessible :email, :password, :password_confirmation, :remember_me, :username, :login, :first_name, 
-    :last_name, :roles, :club_roles_attributes
-
   validates :username, presence: true, 
                        length: { maximum: 20, too_long: 'Pick a shorter username' },
                        uniqueness: { scope: :deleted_at }
@@ -122,8 +118,8 @@ class Agent < ActiveRecord::Base
   end
 
   def set_club_roles(club_roles_info)
-    club_roles_info.each do |club_role|
-      self.club_roles << ClubRole.create(club_role.last) 
+    club_roles_info.each do |index, club_role|
+      self.club_roles << ClubRole.create(role: club_role[:role], club_id: club_role[:club_id]) 
     end
   end
 

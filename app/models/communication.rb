@@ -1,5 +1,4 @@
 class Communication < ActiveRecord::Base
-  attr_accessible :email, :processed_at, :sent_success, :response
   belongs_to :user
   serialize :external_attributes
 

@@ -4,8 +4,6 @@ class Domain < ActiveRecord::Base
   belongs_to :club
   acts_as_paranoid
 
-  attr_accessible :data_rights, :deleted_at, :description, :hosted, :partner, :url
-  
   # this validation is comented because it does not works the nested form
   # of partner. TODO: can we add this validation without problems?
   # validates :partner, :presence => true 

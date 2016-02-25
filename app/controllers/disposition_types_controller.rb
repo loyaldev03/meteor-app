@@ -16,7 +16,7 @@ class DispositionTypesController < ApplicationController
   end
 
   def create 
-    @disposition_type = DispositionType.new params[:disposition_type]
+    @disposition_type = DispositionType.new disposition_type_params
     my_authorize! :create, DispositionType, @current_club.id
     @disposition_type.club = @current_club
     if @disposition_type.save
@@ -34,10 +34,15 @@ class DispositionTypesController < ApplicationController
   def update
   	@disposition_type = DispositionType.find params[:id]
     my_authorize! :update, DispositionType, @disposition_type.club_id
-  	if @disposition_type.update_attributes params[:disposition_type]
+  	if @disposition_type.update_attributes disposition_type_params
   		redirect_to disposition_types_path, :notice => 'Disposition type succesfuly created.'
   	else
       render action: "edit" 
   	end
   end
+
+  private
+    def disposition_type_params
+      params.require(:disposition_type).permit(:name)
+    end
 end

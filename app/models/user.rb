@@ -24,14 +24,7 @@ class User < ActiveRecord::Base
   delegate :cancel_date, to: :current_membership
   delegate :time_zone, to: :club
   ##### 
-
-  attr_accessible :address, :bill_date, :city, :country, :description, 
-      :email, :external_id, :first_name, :phone_country_code, :phone_area_code, :phone_local_number, 
-      :last_name, :next_retry_bill_date, 
-      :bill_date, :state, :zip, :member_group_type_id, :blacklisted, :wrong_address,
-      :wrong_phone_number, :credit_cards_attributes, :birth_date,
-      :gender, :type_of_phone_number, :preferences, :current_join_date
-
+  
   serialize :preferences, JSON
   serialize :additional_data, JSON
 
@@ -627,7 +620,7 @@ class User < ActiveRecord::Base
     
     user = User.find_by(email: user_params[:email], club_id: club.id)
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
-    credit_card = CreditCard.new credit_card_params
+    credit_card = CreditCard.new number: credit_card_params[:number], expire_year: credit_card_params[:expire_year], expire_month: credit_card_params[:expire_month]
 
     if user.nil?
       user = User.new

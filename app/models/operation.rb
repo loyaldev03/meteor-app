@@ -2,7 +2,6 @@ class Operation < ActiveRecord::Base
   belongs_to :created_by, -> { with_deleted }, class_name: 'Agent', foreign_key: 'created_by_id'
   belongs_to :resource, polymorphic: true
   belongs_to :user
-  attr_accessible :description, :operation_date, :resource, :notes, :operation_type
 
   before_create :set_operation_date_if_nil
 

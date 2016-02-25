@@ -119,5 +119,3 @@ gem 'encryptor'
 ###################
 
 gem 'bureaucrat'
-
-gem 'protected_attributes' # TODO: remove this gem after upgrading

@@ -38,18 +38,6 @@ class Product < ActiveRecord::Base
     end
   end
 
-  def update_product_data_by_params(params)
-  	self.name = params[:name]
-  	self.recurrent = params[:recurrent]
-  	self.sku = params[:sku]
-    self.package = params[:package]
-  	self.stock = params[:stock]
-  	self.weight = params[:weight]
-    self.cost_center = params[:cost_center]
-    self.allow_backorder = params[:allow_backorder]
-    self.is_visible = params[:is_visible]
-  end
-
   def decrease_stock(quantity=1)
     if self.reload.has_stock?
       Product.where(id: self.id).update_all "stock = stock - #{quantity}"

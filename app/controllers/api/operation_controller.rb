@@ -30,16 +30,10 @@ class Api::OperationController < ApplicationController
   #
 	def create
   	user = User.find(params[:member_id])
-    
-    o = Operation.new( 
-      :operation_date => params[:operation_date], 
-      :resource => user, 
-      :description => params[:description], 
-      :operation_type => params[:operation_type]
-    )
+    o = Operation.new( params.permit(:operation_date, :description, :operation_type) )
     o.created_by_id = @current_agent.id
+    o.resource = user
     o.user = user
-
     o.save!
     render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
     rescue ActiveRecord::RecordInvalid => e

@@ -9,6 +9,4 @@ class ClubRole < ActiveRecord::Base
   validates :role,
     presence: true,
     uniqueness: { scope: [:agent_id, :club_id] }
-
-  attr_accessible :role, :club_id
 end

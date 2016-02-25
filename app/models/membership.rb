@@ -7,12 +7,6 @@ class Membership < ActiveRecord::Base
 
   serialize :preferences, JSON
 
-  attr_accessible :created_by, :join_date, :cancel_date, :enrollment_amount, :product_sku, :product_description, :mega_channel,
-                  :marketing_code, :fulfillment_code, :ip_address, :user_agent, :referral_host,
-                  :referral_parameters, :referral_path, :visitor_id, :landing_url, :terms_of_membership_id,
-                  :preferences, :cookie_value, :cookie_set, :campaign_medium, :campaign_description,
-                  :campaign_medium_version, :joint
-
   # validates :terms_of_membership, :presence => true
   # validates :member, :presence => true
   
@@ -30,10 +24,7 @@ class Membership < ActiveRecord::Base
   end
 
   def cancel_because_of_membership_change
-    self.status = 'lapsed'
-    self.cancel_date = Time.zone.now
-    self.save
-    # self.update_attributes cancel_date: Time.zone.now, status: 'lapsed'
+    self.update_attributes cancel_date: Time.zone.now, status: 'lapsed'
   end
 
   def update_membership_info_by_hash(params)
