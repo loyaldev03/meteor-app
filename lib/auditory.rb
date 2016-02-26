@@ -23,14 +23,16 @@ class Auditory
   end
 
   def self.create_ticket(comment, error)
-    ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
-      :subject => "[#{Rails.env}] #{error}",
-      :comment => { :value => comment },
-      :submitter_id => ZENDESK_API_CLIENT.current_user.id,
-      :assignee_id => ZENDESK_API_CLIENT.current_user.id,
-      :type => "incident",
-      :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
-      :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
+    # ZendeskAPI::Ticket.new(ZENDESK_API_CLIENT,
+    #   :subject => "[#{Rails.env}] #{error}",
+    #   :comment => { :value => comment },
+    #   :submitter_id => ZENDESK_API_CLIENT.current_user.id,
+    #   :assignee_id => ZENDESK_API_CLIENT.current_user.id,
+    #   :type => "incident",
+    #   :tags => (Rails.env == 'production' ? "support-ruby-production" : "support-ruby" ),
+    #   :priority => (Rails.env == 'production' ? "urgent" : "normal" ))
+    PivotalTracker::Client.token = Settings.pivotal_tracker.token
+    project = PivotalTracker::Project.find(Settings.pivotal_tracker.project_id)
   end
   
   def self.report_issue(error = "Special Error", exception = '', params = {}, add_backtrace = true)

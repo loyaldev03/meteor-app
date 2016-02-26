@@ -14,6 +14,9 @@ defaults: &defaults
   batch_agent_email: 'batch@xagax.com'
   others_product: "SLOOPS"
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe']
+  pivotal_tracker:
+    project_id: 840477
+    token: "93edf6fdb44a44b280a675b85c464c5b"
   elasticsearch:
     url: 'localhost:9200/'
   lyris_service:
@@ -409,8 +412,10 @@ production:
   xxxyyyzzz: 7faf4f991bc44841a00423b8db9602bb
   elasticsearch:
     url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
+  pivotal_tracker:
+    project_id: 840771
 
-prototype:
+  prototype:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
   elasticsearch:

@@ -59,8 +59,8 @@ gem 'jquery-rails'
 
 gem "paranoia", "~> 2.0"
 
-#gem "airbrake"
-gem "zendesk_api"
+gem 'exception_notification', github: 'stoneacre/exception_notification'
+gem 'pivotal-tracker'
 
 gem "newrelic_rpm"
 # To use ActiveModel has_secure_password
