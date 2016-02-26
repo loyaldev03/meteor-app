@@ -1,5 +1,5 @@
 Rails.application.configure do
-  unless %w(test).include? Rails.env 
+  unless %w(test development).include? Rails.env 
     config.middleware.use ExceptionNotification::Rack,
                           :ignore_exceptions => ['ActionController::InvalidAuthenticityToken']
 
