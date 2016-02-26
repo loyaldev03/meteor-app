@@ -1,6 +1,5 @@
 require 'auditory'
 require 'exception_notification'
-# SacPlatform::Application.config.middleware.use ExceptionNotifier if ['production', 'staging', 'prototype'].include?(Rails.env)
 require 'axlsx'
 require 'csv'
 Dir["#{Rails.root}/lib/exceptions/*.rb"].each {|file| require file }
