@@ -43,6 +43,7 @@ class Membership < ActiveRecord::Base
       self.marketing_code = params[:marketing_code].downcase if params[:marketing_code]
       self.fulfillment_code = params[:fulfillment_code].downcase if params[:fulfillment_code]
       self.ip_address = params[:ip_address]
+      self.product_sku = params[:product_sku]
       self.user_agent = params[:user_agent]
       self.referral_host = params[:referral_host]
       self.referral_parameters = params[:referral_parameters]

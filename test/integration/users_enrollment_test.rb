@@ -176,6 +176,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     within("#fulfillments") { assert page.has_content?(created_user.fulfillments.first.product_sku) }
     assert_equal(Fulfillment.count, 1)
     assert_equal created_user.fulfillments.last.product_sku, created_user.current_membership.product_sku
+    assert_equal created_user.fulfillments.last.product_id, Product.find_by(sku: created_user.current_membership.product_sku, club_id: created_user.club_id).id
   end
 
   # Reject new enrollments if billing is disable
