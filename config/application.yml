@@ -415,7 +415,7 @@ production:
   pivotal_tracker:
     project_id: 840771
 
-  prototype:
+prototype:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
   elasticsearch:
