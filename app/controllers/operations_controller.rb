@@ -34,7 +34,7 @@ class OperationsController < ApplicationController
   end
 
   def operation_params
-    params.require(:operation).permite(:notes)
+    params.require(:operation).permit(:notes)
   end
 
 end
