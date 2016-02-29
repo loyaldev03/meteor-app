@@ -530,7 +530,7 @@ test "Agency role - Recover an user" do
     @agent.save
     visit products_path(@club.partner.prefix, @club.name)
     within("#products_table_wrapper")do
-      assert page.has_content?(Product.first.name)
+      assert page.has_content?(@club.products.first.name)
     end
   end
 
