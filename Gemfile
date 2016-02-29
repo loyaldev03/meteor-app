@@ -88,6 +88,7 @@ group :development do
   gem 'daemons'
   gem 'foreman'
   gem 'quiet_assets'
+  gem 'mailcatcher', require: false
 end
 
 gem 'tire'
