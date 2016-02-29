@@ -11,12 +11,12 @@ class CreditCardsController < ApplicationController
   end
 
   def create
-    @credit_card = CreditCard.new(params[:credit_card])
+    @credit_card = CreditCard.new credit_card_params
     @credit_card.user_id = @current_user.id
     @months = 1..12
     @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
 
-    response = @current_user.update_credit_card_from_drupal(params[:credit_card], @current_agent)
+    response = @current_user.update_credit_card_from_drupal(credit_card_params , @current_agent)
 
     if response[:code] == Settings.error_codes.success
       @current_user.api_user.save!(force: true) rescue nil
@@ -69,4 +69,7 @@ class CreditCardsController < ApplicationController
       my_authorize! :manage, CreditCard, @current_club.id
     end
 
+    def credit_card_params
+      params.require(:credit_card).permit(:number, :expire_month, :expire_year)
+    end
 end

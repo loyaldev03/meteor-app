@@ -33,7 +33,7 @@ class EmailTemplatesController < ApplicationController
     @tom = TermsOfMembership.find(params[:terms_of_membership_id])
     my_authorize! :create, EmailTemplate, @tom.club_id
 
-    @et = EmailTemplate.new(params[:email_template])
+    @et = EmailTemplate.new params.require(:email_template).permit(:name, :template_type, :days)
     @et.client = @tom.club.marketing_tool_client
     @et.terms_of_membership_id = @tom.id
     prepare_et_data_to_save(params)
@@ -72,6 +72,7 @@ class EmailTemplatesController < ApplicationController
       flash[:error] = "Template Type already in use."
       render action: "edit"
     else
+      @et.assign_attributes params.require(:email_template).permit(:name, :template_type, :days)
       prepare_et_data_to_save(params)
       if @et.save
         flash[:notice] = "Your Communication #{@et.name} (ID: #{@et.id}) was successfully updated"
@@ -150,8 +151,6 @@ class EmailTemplatesController < ApplicationController
 
   private
     def prepare_et_data_to_save(post_data)
-      @et.name = post_data[:email_template][:name]
-      @et.template_type = post_data[:email_template][:template_type]
       if ['pillar','prebill'].include? @et.template_type
         @et.days = post_data[:email_template][:days].to_i
       else

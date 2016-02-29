@@ -28,7 +28,7 @@ class Admin::PartnersController < ApplicationController
 
   # POST /partners
   def create
-    @partner = Partner.new(params[:partner])
+    @partner = Partner.new(partner_params)
     if @partner.save
       redirect_to admin_partner_path(@partner), notice: "The partner #{@partner.prefix} - #{@partner.name} was successfully created."
     else
@@ -39,7 +39,7 @@ class Admin::PartnersController < ApplicationController
   # PUT /partners/1
   def update
     @partner = Partner.find(params[:id])
-    if @partner.update_attributes(params[:partner])
+    if @partner.update partner_params
       redirect_to admin_partner_path(@partner), notice: "The partner #{@partner.prefix} - #{@partner.name} was successfully updated." 
     else
       render action: "edit"
@@ -56,5 +56,8 @@ class Admin::PartnersController < ApplicationController
       params[:action] == 'dashboard' ? '2-cols' : 'application'
     end
 
+    def partner_params
+      params.require(:partner).permit(:prefix, :name, :contract_uri, :website_url, :description, domains_attributes: [:url, :description, :data_rights, :hosted])
+    end
 end
 

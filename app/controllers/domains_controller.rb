@@ -34,9 +34,8 @@ class DomainsController < ApplicationController
 
   # POST /domains
   def create
-    @domain = Domain.new(:url => params[:domain][:url], :data_rights => params[:domain][:data_rights], :description => params[:domain][:description], :hosted => params[:domain][:hosted])
+    @domain = Domain.new domain_params
     @domain.partner = @current_partner
-    @domain.club_id = params[:domain][:club_id]
 
     my_authorize!(:create, Domain, @domain.club_id)
     if @domain.save
@@ -51,14 +50,8 @@ class DomainsController < ApplicationController
   def update
     @domain = Domain.find(params[:id])
     my_authorize!(:update, Domain, @domain.club_id)
-    @domain.url = params[:domain][:url]
-    @domain.data_rights = params[:domain][:data_rights]
-    @domain.description = params[:domain][:description]
-    @domain.hosted = params[:domain][:hosted]
-    if not params[:domain][:club_id].nil? and @domain.club.nil?
-      @domain.club_id = params[:domain][:club_id]       
-    end
-    if @domain.save
+    params.delete(:club_id) if params[:club_id].nil? and @domain.club.nil?
+    if @domain.update domain_params
       redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully updated."
     else
       load_clubs_related
@@ -81,4 +74,9 @@ class DomainsController < ApplicationController
   def load_clubs_related
     @clubs = @current_agent.has_global_role? ? Club.select("id,name").where(:partner_id => @current_partner) : @current_agent.clubs.where("partner_id = ? and club_roles.role = 'admin'", @current_partner.id)
   end
+
+  private
+    def domain_params
+      params.require(:domain).permit(:url, :description, :data_rights, :hosted, :club_id)
+    end
 end

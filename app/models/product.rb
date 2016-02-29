@@ -7,7 +7,7 @@ class Product < ActiveRecord::Base
   validates :name, presence: true
 
   validates :package, format: /\A[a-zA-Z\-_]+\z/, length: { maximum: 19 }
-  validates :stock, numericality: { only_integer: true, less_than: 1999999 }, allow_backorder: true
+  validates :stock, numericality: { only_integer: true, less_than: 1999999, greater_than: -1999999 }, allow_backorder: true
 
   scope :with_stock, -> { where('(allow_backorder = true) OR (allow_backorder = false and stock > 0)') }
 
@@ -36,18 +36,6 @@ class Product < ActiveRecord::Base
       errors.add :sku, "Cannot change this sku. There are fulfillments related to it."
       false
     end
-  end
-
-  def update_product_data_by_params(params)
-  	self.name = params[:name]
-  	self.recurrent = params[:recurrent]
-  	self.sku = params[:sku]
-    self.package = params[:package]
-  	self.stock = params[:stock]
-  	self.weight = params[:weight]
-    self.cost_center = params[:cost_center]
-    self.allow_backorder = params[:allow_backorder]
-    self.is_visible = params[:is_visible]
   end
 
   def decrease_stock(quantity=1)

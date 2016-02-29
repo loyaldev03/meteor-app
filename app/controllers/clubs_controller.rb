@@ -46,7 +46,7 @@ class ClubsController < ApplicationController
   # POST /clubs
   def create
     my_authorize!(:create, Club)
-    @club = Club.new(params[:club])
+    @club = Club.new params.require(:club).permit(:name, :description, :cs_phone_number, :theme, :logo, :require_external_attributes, :club_cash_enable, :family_memberships_allowed, :time_zone, :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :api_type, :api_username, :api_password, :marketing_tool_client, :payment_gateway_errors_email)
     prepare_marketing_tool_attributes(params[:marketing_tool_attributes], params[:club][:marketing_tool_client]) if params[:marketing_tool_attributes]
     @club.partner = @current_partner
     if @club.save
@@ -61,11 +61,11 @@ class ClubsController < ApplicationController
     my_authorize!(:show, Club, params[:id])
     @club = Club.find(params[:id])
     prepare_marketing_tool_attributes(params[:marketing_tool_attributes], params[:club][:marketing_tool_client])
-    unless check_domain_belongs_to_partner(params[:club][:drupal_domain_id])
+    unless check_domain_belongs_to_partner(params[:drupal_domain_id])
       flash.now[:error] = "Agent can't assign domain. Domain not available."
       render action: "edit" 
     else
-      if @club.update_attributes(params[:club])
+      if @club.update params.require(:club).permit(:name, :description, :cs_phone_number, :theme, :logo, :require_external_attributes, :club_cash_enable, :family_memberships_allowed, :time_zone, :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :drupal_domain_id, :api_type, :api_username, :api_password, :marketing_tool_client, :payment_gateway_errors_email)
         redirect_to club_path(:partner_prefix => @current_partner.prefix, :id => @club.id), notice: "The club #{@club.name} was successfully updated."
       else
         render action: "edit"

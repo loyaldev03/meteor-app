@@ -24,13 +24,17 @@ class OperationsController < ApplicationController
     operation = Operation.find(params[:id])
     my_authorize! :edit, Operation, operation.user.club_id
     @link = (view_context.link_to "#{operation.id}", operation_path(@current_partner.prefix,@current_club.name,@current_user.id,operation.id))
-    if operation.update_attributes(params[:operation])
+    if operation.update_attributes(operation_params)
       message = "Edited operation note #{@link}".html_safe
       Auditory.audit(@current_agent, operation, message, @current_user, Settings.operation_types.operation_updated)
       redirect_to show_user_path, notice: message
     else
       render action: "show" 
     end
+  end
+
+  def operation_params
+    params.require(:operation).permit(:notes)
   end
 
 end

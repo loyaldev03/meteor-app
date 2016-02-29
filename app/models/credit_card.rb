@@ -2,8 +2,6 @@ class CreditCard < ActiveRecord::Base
   belongs_to :user
   has_many :transactions
 
-  attr_accessible :active, :number, :expire_month, :expire_year, :blacklisted, :token
-
   before_create :set_data_before_credit_card_number_disappear
   before_destroy :confirm_presence_of_another_credit_card_related_to_user
   after_save :elasticsearch_index_asyn_call

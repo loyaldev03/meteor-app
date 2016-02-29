@@ -35,7 +35,7 @@ class Api::ProspectsController < ApplicationController
   #     <li><strong>referral_host</strong> Link where is being redirect when after subimiting the enroll. (It shows the params in it).[optional]</li>
   #     <li><strong>referral_parameters</strong> [optional]</li>
   #     <li><strong>referral_path</strong> [optional]</li>
-  #     <li><strong>user_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information.[optional]</li>
+  #     <li><strong>visitor_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information.[optional]</li>
   #     <li><strong>landing_url</strong> Url from where the submit comes from.[optional]</li>
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json. [optional]</li>
   #     <li><strong>cookie_value</strong> Cookie from where the enrollment is being submitted.[optional]</li>
@@ -66,7 +66,7 @@ class Api::ProspectsController < ApplicationController
       my_authorize! :manage_prospects_api, Prospect, tom.club_id
       response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
       standarize_params(params[:prospect])
-      prospect = Prospect.new(params[:prospect])
+      prospect = Prospect.new params.require(:prospect).permit(:first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, :phone_area_code ,:phone_local_number, :birth_date, :preferences, :gender, :ip_address, :referral_host, :referral_parameters, :cookie_value,:marketing_code, :product_sku, :visitor_id, :landing_url, :mega_channel, :user_agent, :joint,:campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description, :source)
       prospect.club_id = tom.club_id
       if prospect.save
         Auditory.audit(current_agent, prospect, "User visits checkout page.", nil, Settings.operation_types.checkout_page_visit)

@@ -47,10 +47,10 @@ class Admin::AgentsController < ApplicationController
       @agent = tmp_agent
       @agent.roles = nil
       @agent.delete_club_roles(tmp_agent.club_roles)
-      @agent.assign_attributes(params[:agent])
+      @agent.assign_attributes agent_params
       @agent.deleted_at = nil
     else
-      @agent = Agent.new(params[:agent])
+      @agent = Agent.new agent_params
     end
 
     if @current_agent.has_global_role?
@@ -103,10 +103,10 @@ class Admin::AgentsController < ApplicationController
     success = false
     ClubRole.transaction do
       begin
-        cleanup_for_update!(params[:agent])
-        if params[:agent][:roles].present? and params[:club_roles_attributes].present?
+        cleanup_for_update! params[:agent]
+        if agent_params[:roles].present? and params[:club_roles_attributes].present?
           flash.now[:error] = 'Cannot set both global and club roles at the same time'
-        elsif @agent.update_attributes(params[:agent])
+        elsif @agent.update_attributes agent_params
           if params[:club_roles_attributes]
             @agent.set_club_roles(params[:club_roles_attributes])
           end
@@ -186,5 +186,9 @@ class Admin::AgentsController < ApplicationController
 
     def load_clubs_related
       @clubs = @current_agent.has_global_role? ? Club.order("name ASC").select("id,name") : @current_agent.clubs.where("club_roles.role = 'admin'")
+    end
+
+    def agent_params
+      params.require(:agent).permit(:email, :username, :password, :password_confirmation, :roles)
     end
 end
