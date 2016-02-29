@@ -7,7 +7,7 @@ class Product < ActiveRecord::Base
   validates :name, presence: true
 
   validates :package, format: /\A[a-zA-Z\-_]+\z/, length: { maximum: 19 }
-  validates :stock, numericality: { only_integer: true, less_than: 1999999 }, allow_backorder: true
+  validates :stock, numericality: { only_integer: true, less_than: 1999999, greater_than: -1999999 }, allow_backorder: true
 
   scope :with_stock, -> { where('(allow_backorder = true) OR (allow_backorder = false and stock > 0)') }
 
