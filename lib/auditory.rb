@@ -24,6 +24,7 @@ class Auditory
 
   def self.create_user_story(description, error)
     PivotalTracker::Client.token = Settings.pivotal_tracker.token
+    PivotalTracker::Client.use_ssl = true
     project = PivotalTracker::Project.find(Settings.pivotal_tracker.project_id)
     project.stories.create(name: "[#{Rails.env}] #{error}", story_type: 'bug', description: description)
   end
