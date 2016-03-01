@@ -27,7 +27,7 @@ class Api::MembersController < ApplicationController
   #     <li><strong>gender</strong> Gender of the member. The values we are recieving are "M" for male or "F" for female. [optional] </li>
   #     <li><strong>type_of_phone_number</strong> Type of the phone number the member has input (home, mobile, others). [optional] </li>
   #     <li><strong>external_id</strong> Member's id related to an external platform that we don't administrate. [optional] </li>
-  #     <li><strong>terms_of_memberhip_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level.  </li>
+  #     <li><strong>terms_of_membership_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at member level.  </li>
   #     <li><strong>enrollment_amount</strong> Amount of money that takes to enroll. It is present at member level. </li>
   #     <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd" [optional] </li>
   #     <li><strong>prospect_id</strong> Id of the prospect the enrollment info is related to. [optional] </li>
