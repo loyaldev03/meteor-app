@@ -414,6 +414,7 @@ production:
     url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
   pivotal_tracker:
     project_id: 840771
+    token: "93edf6fdb44a44b280a675b85c464c5b"
 
 prototype:
   <<: *defaults
