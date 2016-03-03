@@ -10,7 +10,7 @@ class Membership < ActiveRecord::Base
   # validates :terms_of_membership, :presence => true
   # validates :member, :presence => true
   
-  after_create :audit_creation
+  after_create :audit_creation_and_assign_default_created_by
 
   CS_MEGA_CHANNEL = 'other'
   CS_CAMPAIGN_MEDIUM = 'phone'
@@ -55,6 +55,7 @@ class Membership < ActiveRecord::Base
 
   private
     def audit_creation
+      self.created_by ||= Agent.find_by(email: 'batch@xagax.com')
       Auditory.audit(created_by, self, "New Membership record created.", self.user, Settings.operation_types.enrollment)
     end
 end
