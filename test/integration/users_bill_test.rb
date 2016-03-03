@@ -27,7 +27,12 @@ class UsersBillTest < ActionDispatch::IntegrationTest
 
     if create_user
       unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
-      @saved_user = create_user(unsaved_user)
+      # @saved_user = create_user(unsaved_user)
+      enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, enrollment_amount: 0.0)
+      credit_card_to_load = FactoryGirl.build(:credit_card)
+      create_user_by_sloop(@admin_agent, unsaved_user, credit_card_to_load, enrollment_info, @terms_of_membership_with_gateway)
+      @saved_user = User.find_by email: unsaved_user.email
+      visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     end
   end
 
@@ -41,13 +46,13 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   
     alert_ok_js
     click_on 'Refund'
-    sleep(5) #wait for communication to be sent. 
     if check_refund
       page.has_content?("This transaction has been approved")
       within(".nav-tabs"){ click_on("Operations") }
       within("#operations_table")do
         assert page.has_content?("Communication 'Test refund' sent")
         assert page.has_content?("Refund success $#{amount.to_f}")
+        assert page.has_content?(I18n.l(Time.zone.now.in_time_zone(@saved_user.get_club_timezone), :format => :only_date))
       end
     end
   end
@@ -94,7 +99,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     unless date.nil?
       page.execute_script("window.jQuery('#next_bill_date').next().click()")
       within("#ui-datepicker-div") do
-        if (date.month != Time.zone.now.month)
+        unless page.has_content? date.strftime("%B")
           within(".ui-datepicker-header")do
             find(".ui-icon-circle-triangle-e").click
           end
@@ -166,74 +171,14 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "create an user billing enroll > 0" do
-    active_merchant_stubs
-    setup_user
-    bill_user(@saved_user, false)
-  end 
-
-  test "create an user billing enroll > 0 + refund" do
+  test "create an user billing enroll > 0 and refund enrollment transaction" do
     active_merchant_stubs
     setup_user
     bill_user(@saved_user, true)
-  end 
-
-  test "create an user billing enroll = 0 provisional_days = 0 installment amount > 0" do
-    active_merchant_stubs
-    setup_user(0)
-    bill_user(@saved_user, false)
-  end 
-
-  test "uncontrolled refund more than transaction amount" do
-    active_merchant_stubs
-    setup_user
-    bill_user(@saved_user, false)
-    
-    assert_difference('Transaction.count', 0) do 
-      make_a_refund(Transaction.last, 999999, false)
-    end
-    assert page.has_content?("Cant credit more $ than the original transaction amount")
   end
 
-  test "two uncontrolled refund more than transaction amount" do
-    active_merchant_stubs
-    setup_user
-    bill_user(@saved_user, true, (@terms_of_membership_with_gateway.installment_amount / 2))
-    amount_to_refund = (@terms_of_membership_with_gateway.installment_amount / 2) + 1
-    assert_difference('Transaction.count', 0) do 
-      @saved_user.reload
-      make_a_refund(@saved_user.transactions.where("operation_type = 101").order("created_at ASC").first, amount_to_refund, false)
-    end
-    assert page.has_content?("Cant credit more $ than the original transaction amount")
-  end
-
-  test "partial refund - uncontrolled refund" do
-    active_merchant_stubs
-    setup_user
-    bill_user(@saved_user, true, (@terms_of_membership_with_gateway.installment_amount / 2))
-  end 
-
-  test "two partial refund - uncontrolled refund" do
-    active_merchant_stubs
-    setup_user
-    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-    bill_user(@saved_user, true, final_amount)
-    assert_difference('Transaction.count') do 
-      @saved_user.reload
-      make_a_refund(@saved_user.transactions.where("operation_type = 101").order("created_at ASC").first, final_amount)
-    end
-  end 
-
-  test "uncontrolled refund special characters" do
-    active_merchant_stubs
-    setup_user
-    bill_user(@saved_user, false)
-    assert_difference('Transaction.count', 0) do 
-      make_a_refund(Transaction.last, "&%$", false)
-    end
-  end
-
-  test "Change user from Provisional (trial) status to Lapse (inactive) status" do
+  # Change user from Lapsed status to Provisional status
+  test "Change user from Provisional (trial) or active status to Lapsed (inactive) status" do
     setup_user
     @saved_user.set_as_canceled
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -242,10 +187,15 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     within("#td_mi_next_retry_bill_date")do
       assert page.has_no_content?(I18n.l(Time.zone.now.in_time_zone(@saved_user.get_club_timezone), :format => :only_date))
     end
-  end
-
-  test "Change user from active status to lapsed status" do
-    setup_user
+    @saved_user.recover(@terms_of_membership_with_gateway)
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    assert find_field('input_first_name').value == @saved_user.first_name
+    
+    next_bill_date = @saved_user.current_membership.join_date + @terms_of_membership_with_gateway.provisional_days
+    
+    within("#td_mi_next_retry_bill_date")do
+      assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date))
+    end
     @saved_user.set_as_active!
     @saved_user.set_as_canceled
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -256,20 +206,6 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "Change user from Lapse status to Provisional status" do
-    setup_user
-    @saved_user.set_as_canceled
-    @saved_user.recover(@terms_of_membership_with_gateway)
-    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-    assert find_field('input_first_name').value == @saved_user.first_name
-    
-    next_bill_date = @saved_user.current_membership.join_date + @terms_of_membership_with_gateway.provisional_days
-    
-    within("#td_mi_next_retry_bill_date")do
-      assert page.has_no_content?(I18n.l(next_bill_date, :format => :only_date))
-    end
-  end
-  
   test "Change Next Bill Date for blank" do
     setup_user
     @saved_user.set_as_canceled
@@ -278,7 +214,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     
     change_next_bill_date(nil)
     assert page.has_content?(I18n.t('error_messages.next_bill_date_blank'))
-  end  
+  end
 
   test "Change Next Bill Date for tomorrow" do
     setup_user
@@ -364,15 +300,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     end
   end 
 
-  test "Lapsed user" do
-    setup_user
-    @saved_user.set_as_canceled
-    @saved_user.current_membership.join_date = Time.zone.now-3.day
-    final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);
-    answer = @saved_user.bill_membership
-    assert (answer[:code] == Settings.error_codes.user_status_dont_allow), answer[:message]
-  end 
-
+  # uncontrolled refund special characters.
   test "Refund from CS" do
     setup_user
     @saved_user.current_membership.join_date = Time.zone.now-3.day
@@ -382,9 +310,19 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     assert find_field('input_first_name').value == @saved_user.first_name
     within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table_wrapper"){ assert page.has_selector?('#refund') }
-    make_a_refund(Transaction.last, final_amount)
+    
+    assert_difference('Transaction.count', 0) do 
+      make_a_refund(Transaction.last, "&%$", false)
+    end
+    assert_difference('Transaction.count') do
+      make_a_refund(@saved_user.transactions.where("operation_type = 101").order("created_at ASC").first, final_amount)
+    end
+    assert_difference('Transaction.count', 0) do
+      make_a_refund(@saved_user.transactions.where("operation_type = 101").order("created_at ASC").first, final_amount+1, false)
+      assert page.has_content?("Cant credit more $ than the original transaction amount")
+    end
   end 
-  
+
   test "Partial refund from CS" do
     setup_user
     @saved_user.current_membership.join_date = Time.zone.now-3.day
@@ -397,12 +335,6 @@ class UsersBillTest < ActionDispatch::IntegrationTest
       assert page.has_selector?('#refund')
     end
     make_a_refund(Transaction.last, final_amount)
-    page.has_content?("This transaction has been approved")
-    within(".nav-tabs"){ click_on("Operations") }
-    within("#operations_table")do
-      assert page.has_content?("Refund success $#{final_amount.to_f}")
-      assert page.has_content?(I18n.l(Time.zone.now.in_time_zone(@saved_user.get_club_timezone), :format => :only_date))
-    end
   end 
 
   test "Billing membership amount on the Next Bill Date" do
@@ -474,6 +406,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
 
   test "Try billing an user with credit card ok, and within a club that allows billing." do
     setup_user
+    active_merchant_stubs    
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)      
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     fill_in('amount', :with => '100')
@@ -493,7 +426,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "Try billing an user without providing the amount and/or description" do
+  test "Try billing an user providing invalid billing information. (no amount, no description, negative amounts)." do
     setup_user
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
@@ -506,12 +439,6 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     fill_in('description', :with => 'asd')
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     assert page.has_content?("Amount, description and type cannot be blank.")
-  end
-
-  test "Try billing an user with negative amount." do
-    setup_user
-    visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     fill_in('amount', :with => '-100')
     fill_in('description', :with => 'asd')
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))

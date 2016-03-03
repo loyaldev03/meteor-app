@@ -752,7 +752,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     @saved_user = User.find_by_email(@user.email)
     @saved_user.set_as_active
     @saved_user.update_attribute(:recycled_times,0)
-    @saved_user.current_membership.update_attribute(:join_date,Time.zone.now-1.year)
 
     fulfillment = Fulfillment.find_by_product_sku(recurrent_product.sku)
     fulfillment.set_as_in_process
@@ -767,7 +766,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     end
     within("#fulfillments")do
       assert page.has_content?(I18n.l @saved_user.join_date + 1.year, :format => :only_date)
-      assert page.has_content?(I18n.l @saved_user.join_date + 2.year, :format => :only_date)
       assert page.has_content?(recurrent_product.sku)
       assert page.has_content?('bad_address')
     end

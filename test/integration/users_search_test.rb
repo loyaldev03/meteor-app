@@ -187,7 +187,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     stubs_elasticsearch_index
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
+    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
     saved_credit_card = @saved_user.active_credit_card
     ['admin', 'supervisor'].each do |role|
       @admin_agent.update_attribute(:roles, "supervisor")
@@ -208,7 +208,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     stubs_elasticsearch_index
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
+    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
     saved_credit_card = @saved_user.active_credit_card
     @admin_agent.update_attribute(:roles, "representative")
     visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -333,8 +333,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     unsaved_user = FactoryGirl.build(:user_with_api)
     credit_card = FactoryGirl.build(:credit_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
-    @saved_user = User.find_by email: unsaved_user.email
+    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
     
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -358,8 +357,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     unsaved_user = FactoryGirl.build(:user_with_api)
     credit_card = FactoryGirl.build(:credit_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
-    @saved_user = User.find_by email: unsaved_user.email
+    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
 
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)

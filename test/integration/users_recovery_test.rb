@@ -86,12 +86,11 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
       assert page.has_content?("Member recovered successfully $0.0 on TOM(#{tom.id}) -#{tom.name}-")
     end
 
-    membership = user.current_membership
     within(".nav-tabs") do
       click_on("Memberships")
     end
     within("#memberships_table")do
-      assert page.has_content?(membership.id.to_s)
+      assert page.has_content?(user.current_membership.id.to_s)
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
       assert page.has_content?('lapsed')
     end    
@@ -145,7 +144,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     validate_user_recovery(@saved_user,@new_terms_of_membership_with_gateway)
   end 
 
-  test "Recover an user by Annual Usership" do
+  test "Recover an user by Annual membership" do
     setup_user
     @terms_of_membership_with_gateway.update_attribute(:installment_type, "1.year")
     recover_user(@saved_user, @terms_of_membership_with_gateway)
