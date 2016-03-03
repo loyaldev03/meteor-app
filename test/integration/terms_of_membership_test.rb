@@ -200,9 +200,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
-
-    saved_user = User.find_by_email unsaved_user.email
+    saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => saved_user.id)
     within("#table_membership_information") do
@@ -233,9 +231,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
-
-    saved_user = User.find_by_email unsaved_user.email
+    saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => saved_user.id)
     within("#table_membership_information") do
@@ -266,9 +262,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
-
-    saved_user = User.find_by_email unsaved_user.email
+    saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => saved_user.id)
     within("#table_membership_information") do
@@ -299,9 +293,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
-
-    saved_user = User.find_by_email unsaved_user.email
+    saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => saved_user.id)
     within("#table_membership_information") do
@@ -450,8 +442,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
-    @saved_user = User.find_by_email(unsaved_user.email)  
+    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
     visit show_user_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :user_prefix => @saved_user.id)
     within("#td_mi_club_cash_amount") { assert page.has_content?(initial_amount_of_club_cash) }
   end
@@ -474,8 +465,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
-    @saved_user = User.find_by_email(unsaved_user.email)  
+    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
     visit show_user_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :user_prefix => @saved_user.id)
   end
 
@@ -1142,8 +1132,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => the_tom.club_id)
     credit_card = FactoryGirl.build(:credit_card_master_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, the_tom)
-    @saved_user = User.find_by_email(unsaved_user.email)  
+    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, the_tom)
     visit show_user_path(:partner_prefix => the_tom.club.partner.prefix, :club_prefix => the_tom.club.name, :user_prefix => @saved_user.id)
   end
 end

@@ -315,6 +315,7 @@ module ActionDispatch
       if validate
         assert_response :success
       end
+      User.find_by(email: user.email, club_id: terms_of_membership.club_id)
     end
 
 

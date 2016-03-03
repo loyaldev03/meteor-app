@@ -199,6 +199,15 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
+  test "Should not allow lapsed user to get it's membersihp billed" do
+    user = enroll_user(@terms_of_membership)
+    user.set_as_canceled
+    assert_difference('Transaction.count',0) do
+      user.bill_membership
+    end
+    assert (answer[:code] == Settings.error_codes.user_status_dont_allow), answer[:message]
+  end
+
   ######################################
   ############ DECLINE ###################
   test "Monthly user SD until gets HD" do 
