@@ -54,7 +54,7 @@ class Membership < ActiveRecord::Base
   end
 
   private
-    def audit_creation
+    def audit_creation_and_assign_default_created_by
       self.created_by ||= Agent.find_by(email: 'batch@xagax.com')
       Auditory.audit(created_by, self, "New Membership record created.", self.user, Settings.operation_types.enrollment)
     end
