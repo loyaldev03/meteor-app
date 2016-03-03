@@ -312,6 +312,10 @@ class User < ActiveRecord::Base
     "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
   end
 
+  def payment_gateway_configuration
+    @payment_gateway_configuration ||= terms_of_membership.payment_gateway_configuration
+  end
+
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
 
   def can_be_synced_to_remote?
@@ -493,7 +497,7 @@ class User < ActiveRecord::Base
     validation = has_problems_to_bill?
     if not validation and self.next_retry_bill_date.to_date <= Time.zone.now.to_date
       amount = terms_of_membership.installment_amount
-      if terms_of_membership.payment_gateway_configuration.nil?
+      if payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
         Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
         Auditory.report_issue("Billing", message, { user: self.inspect, membership: current_membership.inspect })
@@ -501,11 +505,11 @@ class User < ActiveRecord::Base
       else
         credit_card = active_credit_card
         credit_card.recycle_expired_rule(recycled_times)
-        trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
+        trans = Transaction.obtain_transaction_by_gateway!(payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
         trans.response_result = I18n.t('error_messages.airbrake_error_message')
         trans.response = { message: message } 
-        trans.prepare(self, credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
+        trans.prepare(self, credit_card, amount, payment_gateway_configuration, nil, nil, Settings.operation_types.membership_billing)
         answer = trans.process
         if trans.success?
           credit_card.save # lets update year if we recycle this member
@@ -538,9 +542,9 @@ class User < ActiveRecord::Base
       answer = { message: "Amount must be greater than 0.", code: Settings.error_codes.wrong_data }
     else
       if billing_enabled?
-        trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
+        trans = Transaction.obtain_transaction_by_gateway!(payment_gateway_configuration.gateway)
         trans.transaction_type = "sale"
-        trans.prepare_no_recurrent(self, active_credit_card, amount, terms_of_membership.payment_gateway_configuration, nil, nil, type)
+        trans.prepare_no_recurrent(self, active_credit_card, amount, payment_gateway_configuration, nil, nil, type)
         answer = trans.process
         if trans.success?
           message = "Member billed successfully $#{amount} Transaction id: #{trans.id}. Reason: #{description}"
@@ -753,7 +757,7 @@ class User < ActiveRecord::Base
     amount_to_process = ((tom.installment_amount - amount_in_favor)*100).round / 100.0
 
     if amount_to_process >= 0
-      trans = Transaction.obtain_transaction_by_gateway!(terms_of_membership.payment_gateway_configuration.gateway)
+      trans = Transaction.obtain_transaction_by_gateway!(payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount_to_process, tom.payment_gateway_configuration, tom.id, nil, operation_type)
       answer = trans.process
@@ -1220,7 +1224,7 @@ class User < ActiveRecord::Base
       begin    
         new_credit_card.user = self
         new_credit_card.active = set_active
-        new_credit_card.gateway = self.terms_of_membership.payment_gateway_configuration.gateway if new_credit_card.gateway.nil?
+        new_credit_card.gateway = payment_gateway_configuration.gateway if new_credit_card.gateway.nil?
         if new_credit_card.errors.size == 0
           new_credit_card.save!
           message = "Credit card #{new_credit_card.last_digits} added" + (set_active ? " and activated." : ".")

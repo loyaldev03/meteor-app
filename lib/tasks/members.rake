@@ -42,7 +42,7 @@ namespace :users do
       Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{User.count} members"
       TasksHelpers.refresh_autologin
     rescue Exception => e
-      Auditory.report_issue("Billing::Today", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+      Auditory.report_issue("Users::Users", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"})"
     end    
   end

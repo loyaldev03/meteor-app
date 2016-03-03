@@ -134,7 +134,7 @@ class EmailTemplatesController < ApplicationController
       rescue ActiveRecord::RecordNotFound
         render json: { code: Settings.error_codes.not_found, message: "Member not found."}
       rescue Exception => e
-        Auditory.report_issue("EmailTemplate::test_communication", e, { :user => user.inspect, :template => template.inspect })
+        Auditory.report_issue("EmailTemplate::test_communication", e, { :user => user.id, :template => template.inspect })
         render json: { code: Settings.error_codes.unrecoverable_error, message: e.to_s}
       end
     else
