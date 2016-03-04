@@ -171,7 +171,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     @saved_user.update_attribute(:blacklisted,true)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-    find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
+    find(:xpath, "//a[@id='recovery']")['class'].include? 'disabled'
   end
 
   test "Recover an user with CC blacklisted" do
@@ -316,5 +316,5 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
     recover_user( @saved_user, @terms_of_membership_with_gateway )
     validate_user_recovery( @saved_user, @terms_of_membership_with_gateway )
-  end   
+  end
 end

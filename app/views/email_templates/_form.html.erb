@@ -4,7 +4,7 @@
     <div class="control-group">
       <%= f.label :name, 'Name', :class => 'control-label required_asterisk' %>
       <div class="controls" id="control_email_template_name">
-        <%= f.text_field :name, :class => 'text_field manual_validation' %>
+        <%= f.text_field :name, :class => 'text_field manual_validation', required: true %>
         <%= render :partial => "shared/help", :locals => { 
             :title => t('activerecord.attributes.email_template.name'), 
             :content => t('activerecord.attributes.email_template.help_for_name') } %>
@@ -13,7 +13,7 @@
     <div class="control-group">
       <%= f.label :template_type, 'Template Type', :class => 'control-label required_asterisk' %>
       <div class="controls" id="control_email_template_template_type">
-        <%= select_tag 'email_template[template_type]', options_for_select(template_types_options(@tom.id, @et.template_type, @et.client), @et.template_type), :class => 'manual_validation', :include_blank => (@et.new_record?) %>
+        <%= select_tag 'email_template[template_type]', options_for_select(template_types_options(@tom.id, @et.template_type, @et.client), @et.template_type), :class => 'manual_validation', :include_blank => (@et.new_record?), required: true %>
         <%= render :partial => "shared/help", :locals => { 
             :title => t('activerecord.attributes.email_template.template_type'), 
             :content => t('activerecord.attributes.email_template.help_for_type') } %>

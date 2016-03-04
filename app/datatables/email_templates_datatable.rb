@@ -32,7 +32,7 @@ private
         		:terms_of_membership_id => TermsOfMembership.find(email_template.terms_of_membership_id).id, 
         		:id => email_template.id
         	), 
-        	:method => :delete, :confirm => I18n.t("are_you_sure"), :id => 'destroy', :class => 'btn btn-mini btn-danger') if @current_agent.can? :destroy, EmailTemplate, @current_club.id
+        	:method => :delete, data: {:confirm => I18n.t("are_you_sure")}, :id => 'destroy', :class => 'btn btn-mini btn-danger') if @current_agent.can? :destroy, EmailTemplate, @current_club.id
       	)
       ]
     end

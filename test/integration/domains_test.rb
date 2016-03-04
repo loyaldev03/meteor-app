@@ -20,8 +20,10 @@ class DomainTest < ActionDispatch::IntegrationTest
     assert page.has_content?("Domains")
 
     click_link_or_button 'New Domain'
-    click_link_or_button 'Create Domain'
-    assert page.has_content?(I18n.t('errors.messages.blank'))
+    assert_difference('Domain.count', 0) do
+      click_link_or_button 'Create Domain'
+    end
+    assert_equal new_domain_path(partner_prefix: @partner.prefix), current_path 
   end
 
   test "create domain" do

@@ -1,26 +1,26 @@
 <%= render :partial => "shared/user_information" %>
 
 
-<%= form_tag(user_recover_path) do %>
+<%= form_tag(user_recover_path, id: 'user_recover_form') do %>
 	<table class="table table-bordered">
 		<tr>
-			<td> 
+			<td colspan='2'> 
 				<label class="help-inline"> Today in: <%= @current_user.current_membership.terms_of_membership.name %> </label>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<%= label :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %> 
+				<%= label_tag :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %> 
         <%= select_tag :terms_of_membership_id, options_from_collection_for_select(TermsOfMembership.where(:club_id => @current_club ), "id", "name") %> 
 			</td>
       <td>
-        <%= label :product_sku, t('activerecord.attributes.fulfillment.product'), :class => 'help-inline' %>
+        <%= label_tag :product_sku, t('activerecord.attributes.fulfillment.product'), :class => 'help-inline' %>
         <%= select_tag :product_sku, options_from_collection_for_select(@current_club.products.with_stock, "sku", "name"),  :include_blank => true %>
       </td>
 		</tr>
 		<tr>
-      <td colspan=2> 
-      	<%= submit_tag t('buttons.recover'), :class => 'btn btn-primary', :id => 'recover_button', :confirm => t('are_you_sure') %>
+      <td colspan='2'> 
+      	<%= submit_tag t('buttons.recover'), :class => 'btn btn-primary', :id => 'recover_button', data: {:confirm => t('are_you_sure')} %>
         <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn', :id => 'cancel_button' %> 
       </td>
 		</tr>
@@ -28,5 +28,5 @@
 <% end %>
 
 <script>
-  $(document).ready(recover_user_functions());
+  $(document).ready(disable_form_buttons_upon_submition('user_recover_form'));
 </script>

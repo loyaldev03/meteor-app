@@ -21,7 +21,7 @@
             method: :post, 
             class: 'btn btn-warning', 
             id: "sync_to_remote",
-            confirm: 'Are you sure?' do %>
+            data: {confirm: 'Are you sure?'} do %>
           <i class='icon-retweet'></i>
           <%= t('buttons.sync_to_remote') %>
         <% end %>
@@ -71,7 +71,7 @@
           <span class='toggler-content'>
             <%= form_for @current_user, url: user_update_sync_path, html: { class: 'form-inline', style: 'display: inline;', method: 'put' } do |f| %>
               <%= f.text_field :api_id, :class => 'text_field' %>
-              <%= f.submit 'Update', class: 'btn-danger', confirm: 'Are you sure?' %>
+              <%= f.submit 'Update', class: 'btn-danger', data: { confirm: 'Are you sure?' } %>
             <% end %>
           </span>
           &nbsp;
@@ -81,7 +81,7 @@
             <span class='toggler-content'><%= t('buttons.stop_editing') %></span>
           <% end %>
           <% if @current_user.api_id.present? %>
-            <%= link_to user_update_sync_path(user: { api_id: '' }), method: :put, confirm: 'Are you sure?', class: 'btn btn-warning' do %>
+            <%= link_to user_update_sync_path(user: { api_id: '' }), method: :put, data: {confirm: 'Are you sure?'}, class: 'btn btn-warning' do %>
               <i class='icon-remove'></i>
               <%= t('buttons.unset') %>
             <% end %>

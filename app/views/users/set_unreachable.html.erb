@@ -1,6 +1,6 @@
 <%= render :partial => "shared/user_information" %>
 
-<%= form_for(user_set_unreachable_path) do %>
+<%= form_for(user_set_unreachable_path, html:{id: 'user_set_unreachable_form'}) do %>
   <table class="table table-bordered" id="unreachable_table">
     <thead>
     <tr>
@@ -12,10 +12,15 @@
     <tr>
     <th> 
       <%= submit_tag t('buttons.set_wrong_phone_number'), :class => 'btn btn-primary', 
-                               :confirm => t('are_you_sure') %>
+                               data: {:confirm => t('are_you_sure')} %>
       <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %> 
     </th>
     </tr>
     </thead>
   </table>
 <% end %>
+
+
+<script type="text/javascript">
+  $(document).ready(disable_form_buttons_upon_submition('user_set_unreachable_form'));
+</script>

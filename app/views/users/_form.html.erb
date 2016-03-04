@@ -8,7 +8,7 @@
 <% unless @user.new_record? %>
   <table class="table table-condensed"> 
    <tr class="control-group"> 
-      <td colspan="4">
+      <td>
       <%= t('activerecord.attributes.user.user_classification_type') %>:
       <% if !@member_group_types.nil? %>
         <%= f.select :member_group_type_id, 
@@ -24,7 +24,7 @@
 
 <table id="table_demographic_information" class="table table-bordered table-condensed table-nohover">
   <thead>
-    <tr class="box_title"><th colspan="2"><h4>Demographic information</h4></th></tr>
+    <tr class="box_title"><th colspan="2">Demographic information</th></tr>
   </thead>
   <tbody>
     <tr>
@@ -116,7 +116,7 @@
 
 <table id="table_contact_information" class="table table-bordered table-condensed table-nohover">
   <thead>
-    <tr class="box_title"><th colspan="2"><h4>Contact Information</h4></th></tr>
+    <tr class="box_title"><th colspan="2">Contact Information</th></tr>
   </thead>
   <tbody>
     <tr>
@@ -124,7 +124,7 @@
         <table class="hidden_table_border">
           <tr class = "control-group">
             <th>
-              <%= f.label :phone_number, t('activerecord.attributes.user.phone_number'), :class => 'help-inline required_asterisk' %>
+              <label class='help-inline required_asterisk'><%= t('activerecord.attributes.user.phone_number') %></label>
             </th>
             <td> 
               <%= f.text_field :phone_country_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_country_code') %> 
@@ -260,9 +260,7 @@ Please, have in mind that fields with ' * ' are required.
 <% if @current_club.requires_external_id %>
   <table id="external_id" class="table table-bordered table-condensed table-nohover">
     <thead>
-      <tr class="box_title">
-        <th><h4>Additional Information</h4> </th>
-      </tr>
+      <tr class="box_title"><th>Additional Information</th></tr>
     </thead>
     <tbody>
       <tr>

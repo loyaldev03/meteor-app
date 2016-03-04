@@ -4,18 +4,17 @@
     <%= 
       link_to "#", 
         class: "btn btn-info #{large_button} disabled",
-        disabled: true,
         id: "resend_welcome_email" do %>
       <i class='icon-envelope'></i>
       <%= t('buttons.resend_welcome_email') %>
     <% end %>      
   <% else %>
     <%= 
-      link_to user_resend_welcome_path(@current_partner.prefix, @current_club.name, @current_user.id), 
+      link_to user_resend_welcome_path(@current_partner.prefix, @current_club.name, @current_user.id),
         method: :post, 
         class: "btn #{large_button} btn-info",
         id: "resend_welcome_email", 
-        confirm: 'Are you sure?' do %>
+        data: {confirm: 'Are you sure?'} do %>
       <i class='icon-envelope'></i>
       <%= t('buttons.resend_welcome_email') %>
     <% end %>

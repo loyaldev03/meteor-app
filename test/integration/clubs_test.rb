@@ -64,7 +64,7 @@ class ClubTest < ActionDispatch::IntegrationTest
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     click_link_or_button 'Create Club'
-    assert page.has_content?("can't be blank")
+    assert_equal new_club_path(partner_prefix: @partner.prefix), current_path
   end
 
   test "should read club" do

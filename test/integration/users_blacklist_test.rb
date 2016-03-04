@@ -192,7 +192,7 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
     @saved_user.update_attribute(:blacklisted,true)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-    assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
-    assert find(:xpath, "//a[@id='blacklist_btn' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='recovery']")[:class].include? 'disabled'
+    assert find(:xpath, "//a[@id='blacklist_btn']")[:class].include? 'disabled'
   end
 end

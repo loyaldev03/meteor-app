@@ -68,25 +68,20 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
   end
 
   # Error message when adding a wrong club cash
-
   test "invalid characters on club cash" do
     setup_user
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     click_on 'Add club cash'
     fill_in 'club_cash_transaction[amount]', :with => "random text"
     alert_ok_js
-    click_on 'Save club cash transaction'
-    assert page.has_content?(I18n.t("error_messages.club_cash_transaction_invalid_amount"))
-  end
-
-  test "add club cash with ammount 0" do
-    setup_user
-    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-    click_on 'Add club cash'
+    assert_difference('ClubCashTransaction.count', 0) do
+      click_on 'Save club cash transaction'
+    end
+    
     fill_in 'club_cash_transaction[amount]', :with => "0"
     alert_ok_js
     click_on 'Save club cash transaction'
-    assert page.has_content?('Can not process club cash transaction with amount 0 or letters.')
+    assert page.has_content?('Can not process club cash transaction with amount 0 or letters.')    
   end
 
   test "add club cash with float ammount" do

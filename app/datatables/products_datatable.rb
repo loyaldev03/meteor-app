@@ -20,7 +20,7 @@ private
         (link_to(I18n.t(:show), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini', :id => 'show') if @current_agent.can? :read, Product, @current_club.id).to_s+
         ((link_to(I18n.t(:edit), @url_helpers.edit_product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini', :id => 'edit', 'data-toggle' => 'custom-remote-modal', 'data-target' => product.id.to_s) + edit_modal(product)) if @current_agent.can? :edit, Product, @current_club.id).to_s+
         (link_to(I18n.t(:destroy), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :method => :delete,
-                :confirm => I18n.t("are_you_sure"), :id => 'destroy',
+                data: {:confirm => I18n.t("are_you_sure")}, :id => 'destroy',
                 :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, Product, @current_club.id).to_s
       ]
     end

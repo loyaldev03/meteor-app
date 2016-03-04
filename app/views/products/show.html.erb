@@ -48,6 +48,6 @@
   <%= link_to t('destroy', :default => t("helpers.links.destroy")),
               product_path(@current_partner.prefix, @current_club.name, @product),
               :method => 'delete',
-              :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')),
+              data: {:confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?'))},
               :class => 'btn btn-danger' %>
 </div>

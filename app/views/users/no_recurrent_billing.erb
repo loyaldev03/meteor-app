@@ -1,21 +1,21 @@
 <%= render :partial => "shared/user_information" %>
 
-<%= form_tag(user_no_recurrent_billing_path) do %>
+<%= form_tag(user_no_recurrent_billing_path, id: 'no_recurrent_billing_form') do %>
 	<table class="table table-bordered" > 
 		<tr>
 			<th>
-				<%= label :amount, I18n.t('activerecord.attributes.transaction.amount'), :class => 'help-inline' %>
-				<%= text_field_tag :amount %>
+				<%= label_tag :amount, I18n.t('activerecord.attributes.transaction.amount'), :class => 'help-inline' %>
+				<%= text_field_tag :amount, nil, type: :number, min: 0, step: :any, required: true%>
 			</th>
 			<th>
-				<%= label :type, "Type", :class => 'help-inline' %>
+				<%= label_tag :type, "Type", :class => 'help-inline' %>
 				<%= select_tag :type, options_for_select(Transaction::ONE_TIME_BILLINGS), :class => "select_field" %>
 			</th>
 		</tr>
 		<tr>
 			<th colspan="2">
-				<%= label :description, I18n.t('activerecord.attributes.transaction.description'), :class => 'help-inline' %>
-				<%= text_area_tag :description, nil, :style => 'width: 99%; height: 50px' %>
+				<%= label_tag :description, I18n.t('activerecord.attributes.transaction.description'), :class => 'help-inline' %>
+				<%= text_area_tag :description, nil, :style => 'width: 99%; height: 50px', required: true %>
 			</th>
 		</tr>
 		<tr>
@@ -26,3 +26,7 @@
 		</tr>
 	</table>
 <% end %>
+
+<script>
+  $(document).ready(disable_form_buttons_upon_submition('no_recurrent_billing_form'));
+</script>

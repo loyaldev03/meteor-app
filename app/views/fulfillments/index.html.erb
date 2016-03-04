@@ -15,23 +15,23 @@
   <%= form_tag(fulfillments_index_path, :id => "fulfillment_report_form") do %>
     <table class="table table-bordered" id ="fulfillments_table">
     	<tr>
-        <td width="90px">
-          <%= label :all_times, t('all_times'), :class => 'help-inline' %>
+        <td style="width=90px;">
+          <%= label_tag :all_times, nil, :class => 'help-inline' %>
           <%= check_box_tag :all_times, 1, params[:all_times] %> 
         </td>
     		<td id="td_initial_date">
-  	  		<%= label :initial_date, t('initial_date'), :class => 'help-inline' %>
+  	  		<%= label_tag :initial_date, nil, :class => 'help-inline' %>
   	  	  <%= text_field_tag :initial_date, params[:initial_date], { :class => 'datepicker input-small', :readonly => 'readonly' } %> 
     		</td>
     		<td id="td_end_date">
-  	  		<%= label :end_date, t('end_date'), :class => 'help-inline' %>
+  	  		<%= label_tag :end_date, nil, :class => 'help-inline' %>
   	  	  <%= text_field_tag :end_date, params[:end_date], { :class => 'datepicker input-small', :readonly => 'readonly' } %> 
     		</td>
     		<td>
-          <%= label :status, t('activerecord.attributes.fulfillment.status'), :class => 'help-inline' %>
+          <%= label_tag :status, nil, :class => 'help-inline' %>
           <%= fulfillment_selectable_statuses(:status, params[:status]) %>
         </td>
-        <td width="240px">
+        <td style="width:240px;">
           <%= radio_button_tag 'radio_product_filter', '', params[:product_filter].blank? %>
           <%= label_tag 'All', nil, :class => 'help-inline' %>
           <br>

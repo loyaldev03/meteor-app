@@ -310,7 +310,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
 
-    assert find(:xpath, "//a[@id='link_user_set_undeliverable' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].include? 'disabled'
 
     within('.nav-tabs'){ click_on('Credit Cards')}
     within("#credit_cards") do
@@ -441,7 +441,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     end
   end 
 
-test "Agency role - Recover an user" do
+  test "Agency role - Recover an user" do
     setup_agency
     setup_user
     @saved_user.set_as_canceled!
@@ -449,7 +449,7 @@ test "Agency role - Recover an user" do
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
 
-    assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='recovery']")[:class].include? 'disabled'
   end
 
    ###############################################################
@@ -766,42 +766,42 @@ test "Agency role - Recover an user" do
     FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
     validate_view_user_base(@saved_user)
 
-    assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='save_the_sale']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='blacklist_btn']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='add_user_note']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='cancel']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='add_credit_card']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:disabled] == nil
-    assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='save_the_sale']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='blacklist_btn']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='add_user_note']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='cancel']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].exclude? 'disabled'
     within('.nav-tabs'){click_on 'Credit Cards'}
-    within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:disabled] == nil }
+    within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
   
     @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
     active_merchant_stubs
     @saved_user.bill_membership
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within('.nav-tabs'){click_on 'Transactions'}
-    within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
+    within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:class].exclude? 'disabled' }
 
     @saved_user.set_as_canceled
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-    assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='recovery']")[:class].exclude? 'disabled'
     within('.nav-tabs'){click_on 'Credit Cards'}
-    within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil }
+    within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled' }
 
     visit products_path(@partner.prefix, @club.name)
-    assert find(:xpath, "//a[@id='new_product']")[:disabled] == nil
+    assert find(:xpath, "//a[@id='new_product']")[:class].exclude? 'disabled'
     within('#products_table')do
-      assert find(:xpath, "//a[@id='show']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled'
     end
 
     visit fulfillments_index_path(@partner.prefix, @club.name)
-    within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:disabled] == nil}
+    within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:class].exclude? 'disabled'}
   end
 
     test "club role representative available actions" do
@@ -820,29 +820,29 @@ test "Agency role - Recover an user" do
       FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
-      assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='save_the_sale']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='blacklist_btn']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='add_user_note']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='cancel']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_set_undeliverable' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='add_credit_card']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='save_the_sale']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='blacklist_btn']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='add_user_note']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='cancel']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].exclude? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
-      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:disabled] == nil }
+      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
     
       @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
       active_merchant_stubs
       @saved_user.bill_membership
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
       within('.nav-tabs'){click_on 'Transactions'}
-      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
+      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:class].exclude? 'disabled' }
 
       @saved_user.set_as_canceled
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-      assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='recovery']")[:class].exclude? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
     end
@@ -863,31 +863,31 @@ test "Agency role - Recover an user" do
       FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
-      assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='save_the_sale']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='blacklist_btn']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='add_user_note']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='cancel']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='add_credit_card']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='save_the_sale']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='blacklist_btn']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='add_user_note']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='cancel']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].exclude? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
-      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:disabled] == nil }
+      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
     
       @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
       active_merchant_stubs
       @saved_user.bill_membership
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
       within('.nav-tabs'){click_on 'Transactions'}
-      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
+      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:class].exclude? 'disabled' }
 
       @saved_user.set_as_canceled
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-      assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='recovery']")[:class].exclude? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
-      within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil }
+      within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled' }
     end
 
     test "club role agency available actions" do
@@ -907,42 +907,42 @@ test "Agency role - Recover an user" do
 
       visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
 
-      assert find(:xpath, "//a[@id='edit' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='save_the_sale' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='blacklist_btn' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='add_user_note' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='cancel' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='link_user_set_undeliverable' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='link_user_set_unreachable' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='add_credit_card' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='link_user_change_next_bill_date' and @disabled='disabled']")
-      assert find(:xpath, "//a[@id='link_user_add_club_cash' and @disabled='disabled']")
+      assert find(:xpath, "//a[@id='edit']")[:class].include? 'disabled'
+      assert find(:xpath, "//a[@id='save_the_sale']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='blacklist_btn']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='add_user_note']")[:class].include? 'disabled'
+      assert find(:xpath, "//a[@id='cancel']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].include? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].include? 'disabled'
+      assert find(:xpath, "//a[@id='add_credit_card']")[:class].include? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].include? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].include? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
-      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button' and @disabled='disabled']") }
+      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].include? 'disabled' }
     
       @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
       active_merchant_stubs
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
       within('.nav-tabs'){click_on 'Transactions'}
-      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund' and @disabled='disabled']") }
+      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:class].include? 'disabled' }
 
       @saved_user.set_as_canceled
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-      assert find(:xpath, "//a[@id='recovery' and @disabled='disabled']")
+      assert find(:xpath, "//a[@id='recovery']")[:class].include? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
 
 
       visit products_path(@partner.prefix, @club.name)
-      assert find(:xpath, "//a[@id='new_product']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='new_product']")[:class].exclude? 'disabled'
       within('#products_table')do
-        assert find(:xpath, "//a[@id='show']")[:disabled] == nil
-        assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
-        assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil
+        assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'
+        assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
+        assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled'
       end
 
       visit fulfillments_index_path(@partner.prefix, @club.name)
-      within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:disabled] == nil}
+      within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:class].exclude? 'disabled'}
     end
 
     #Profile fulfillment_managment - Delete Credit Card
@@ -962,42 +962,42 @@ test "Agency role - Recover an user" do
       FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
-      assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='save_the_sale']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='blacklist_btn']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='add_user_note']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='cancel']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='add_credit_card']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:disabled] == nil
-      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='save_the_sale']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='blacklist_btn']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='add_user_note']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='cancel']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].exclude? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
-      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:disabled] == nil }
+      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
     
       @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
       active_merchant_stubs
       @saved_user.bill_membership
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
       within('.nav-tabs'){click_on 'Transactions'}
-      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:disabled] == nil }
+      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:class].exclude? 'disabled' }
 
       @saved_user.set_as_canceled
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-      assert find(:xpath, "//a[@id='recovery']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='recovery']")[:class].exclude? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
 
       visit products_path(@partner.prefix, @club.name)
-      assert find(:xpath, "//a[@id='new_product']")[:disabled] == nil
+      assert find(:xpath, "//a[@id='new_product']")[:class].exclude? 'disabled'
       within('#products_table')do
-        assert find(:xpath, "//a[@id='show']")[:disabled] == nil
-        assert find(:xpath, "//a[@id='edit']")[:disabled] == nil
-        assert find(:xpath, "//a[@id='destroy']")[:disabled] == nil
+        assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'
+        assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
+        assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled'
       end
 
       visit fulfillments_index_path(@partner.prefix, @club.name)
-      within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:disabled] == nil}
+      within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:class].exclude? 'disabled'}
     end
 
     test "fulfillment_managment role - Fulfillment File page" do

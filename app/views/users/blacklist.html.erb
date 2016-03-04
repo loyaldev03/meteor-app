@@ -4,8 +4,8 @@
   <table class="table table-bordered">
     <tr>
       <td> 
-        <%= label :reason, t('reason'), :class => 'help-inline' %> 
-        <%= select_tag :reason, options_from_collection_for_select(@blacklist_reasons, "name", "name"), :class => "required", :include_blank => true %>
+        <%= label_tag :reason, t('reason'), :class => 'help-inline' %> 
+        <%= select_tag :reason, options_from_collection_for_select(@blacklist_reasons, "name", "name"),:include_blank => true, required: true, data: { confirm: 'This user will be blacklisted. Are you really sure?' } %>
       </td>
     </tr>
     <tr>
@@ -16,5 +16,5 @@
 <% end%>
 
 <script>
-  $(document).ready(blacklist_user_functions());
+  $(document).ready(disable_form_buttons_upon_submition('blacklist_form'));
 </script>

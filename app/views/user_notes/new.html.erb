@@ -9,7 +9,7 @@
       </td>
     </tr>
     <tr>
-      <td> <%= f.text_area :description, :style => 'width: 99%; height: 200px', :class => 'required' %> </td>
+      <td> <%= f.text_area :description, :style => 'width: 99%; height: 200px', required: true %> </td>
     </tr>
     <tr> 
       <td> <%= submit_tag t('buttons.save_user_note'), :class => 'btn btn-primary' %>
@@ -20,5 +20,5 @@
  <% end %>
  
 <script type="text/javascript">
-  $(document).ready( user_note_functions() );
+  $(document).ready( disable_form_buttons_upon_submition('new_user_note') );
 </script>

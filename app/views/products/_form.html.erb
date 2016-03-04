@@ -2,13 +2,13 @@
   <div class="control-group">
     <%= f.label :name, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.text_field :name, :class => 'text_field' %>
+      <%= f.text_field :name, :class => 'text_field', required: true %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :package, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.text_field :package, :class => 'text_field' %>
+      <%= f.text_field :package, :class => 'text_field', required: true %>
       <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.package_help')} %> 
     </div>
   </div>
@@ -16,7 +16,7 @@
   <div class="control-group">
     <%= f.label :sku, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.text_field :sku, :class => 'text_field' %>
+      <%= f.text_field :sku, :class => 'text_field', required: true %>
       <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.sku_help')} %> 
     </div>
   </div>
@@ -29,7 +29,7 @@
   <div class="control-group">
     <%= f.label :stock, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.number_field :stock, :class => 'number_field' %>
+      <%= f.number_field :stock, :class => 'number_field', required: true %>
     </div>
   </div>
   <div class="control-group">
@@ -53,7 +53,7 @@
   <div class="control-group">
     <%= f.label :cost_center, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.text_field :cost_center, :class => 'text_field' %>
+      <%= f.text_field :cost_center, :class => 'text_field', maxlength: 30, required: true %>
     </div>
   </div>
 

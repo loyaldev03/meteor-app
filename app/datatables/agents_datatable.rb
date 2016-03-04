@@ -20,8 +20,10 @@ private
         I18n.l(agent.created_at,:format=>:long),
         (link_to(I18n.t(:show), @url_helpers.admin_agent_path(agent), :class => 'btn btn-mini') if @current_agent.is_admin?).to_s+
         (link_to(I18n.t(:edit), @url_helpers.edit_admin_agent_path(agent), :class => 'btn btn-mini') if @current_agent.is_admin?).to_s+
-        (link_to(I18n.t(:destroy), @url_helpers.admin_agent_path(agent), :method => :delete,
-                        :confirm => I18n.t("are_you_sure"), :class => 'btn btn-mini btn-danger') if @current_agent.is_admin?).to_s
+        (link_to(I18n.t(:destroy), @url_helpers.admin_agent_path(agent), 
+                        :method => :delete,
+                        :data => {confirm: 'Are you sure?'}, 
+                        :class => 'btn btn-mini btn-danger') if @current_agent.is_admin?).to_s
       ]
     end
   end

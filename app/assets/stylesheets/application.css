@@ -110,6 +110,14 @@ div.dataTables_filter input {
 
 .box_title {
   background-color: #B0D3E6;
+  font-size: 18px;
+  height: 40px;
+}
+
+.box_title th{ vertical-align: middle !important; }
+
+.nowrap{
+  white-space:nowrap;
 }
 
 .datepicker_for_search_nbd {
@@ -121,7 +129,11 @@ div.dataTables_filter input {
 }
 
 .btn-large-w {
-  width: 160px; 
+  width: 160px !important;
+}
+
+.disabled {
+  pointer-events: none;  Disables the button completely. Better than just cursor: default; 
 }
 
 .hidden_table_border, .hidden_table_border th, .hidden_table_border td   {

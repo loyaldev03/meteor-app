@@ -26,7 +26,7 @@ private
         (link_to(I18n.t('activerecord.model.suspected_fulfillments'), @url_helpers.suspected_fulfillments_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :manual_review, Fulfillment, club.id).to_s+
         (link_to(I18n.t('activerecord.model.disposition_types'), @url_helpers.disposition_types_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :read, DispositionType, club.id).to_s+
         (link_to(I18n.t(:destroy), @url_helpers.club_path(:partner_prefix => @current_partner.prefix, :id => club.id), :method => :delete,
-                        :confirm => I18n.t("are_you_sure"),
+                        :data => {:confirm => I18n.t("are_you_sure")},
                         :class => 'btn btn-mini btn-danger') if @current_agent.can? :update, Club).to_s      ]
     end
   end

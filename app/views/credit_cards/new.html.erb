@@ -3,3 +3,7 @@
 <%= form_for @credit_card, :as => :credit_card, :url => credit_cards_path do |f| %>
   <%= render :partial => 'form', :locals => { :f => f } %>
 <% end%>
+
+<script>
+  $(document).ready(disable_form_buttons_upon_submition('new_credit_card'));
+</script>

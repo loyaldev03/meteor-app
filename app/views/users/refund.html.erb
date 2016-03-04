@@ -8,7 +8,7 @@
             <label class='help-inline'> <%= t('activerecord.attributes.transaction.refund_amount_help') %>: 
             (Max : <%= number_to_currency(@transaction.amount_available_to_refund) %>)&nbsp;&nbsp;</label>
             
-            <span class="add-on">$</span><%= text_field_tag :refund_amount, params[:refund_amount] ,:id => "refunded_amount" %> 
+            <span class="add-on">$</span><%= text_field_tag :refund_amount, params[:refund_amount] ,:id => "refunded_amount", required: true, type: :number, step: :any %> 
         </div>
       </td>
     </tr>
@@ -20,5 +20,5 @@
 <% end %>
 
 <script>
-  $(document).ready(refund_user_functions());
+  $(document).ready(disable_form_buttons_upon_submition('refund_form'));
 </script>

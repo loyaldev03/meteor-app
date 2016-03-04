@@ -82,11 +82,13 @@ class AgentsTest < ActionDispatch::IntegrationTest
     click_link_or_button 'New Agent'
     assert page.has_content?('New Agent')     
     assert current_path == new_admin_agent_path
-    click_link_or_button 'Create Agent'
-    assert page.has_content?(I18n.t('errors.messages.blank'))
+    assert_difference('Agent.count', 0) do
+      click_link_or_button 'Create Agent'
+    end
+    assert new_admin_agent_path, current_path
   end
 
-  test "create agent" do
+  test "create agent and do not allow duplicates" do
     setup_environment
     visit new_admin_agent_path
     unsaved_agent = FactoryGirl.build(:agent)
@@ -100,15 +102,12 @@ class AgentsTest < ActionDispatch::IntegrationTest
       click_link_or_button 'Create Agent'
     end
     assert page.has_content?("Agent was successfully created")
-  end
 
-  test "create duplicated agent" do
-    setup_environment
     visit new_admin_agent_path
-    fill_in 'agent[email]', :with => @admin_agent.email
-    fill_in 'agent[username]', :with => @admin_agent.username
-    fill_in 'agent[password]', :with => @admin_agent.password
-    fill_in 'agent[password_confirmation]', :with => @admin_agent.password_confirmation
+    fill_in 'agent[email]', :with => unsaved_agent.email
+    fill_in 'agent[username]', :with => unsaved_agent.username
+    fill_in 'agent[password]', :with => unsaved_agent.password
+    fill_in 'agent[password_confirmation]', :with => unsaved_agent.password_confirmation
     assert_difference('Agent.count', 0) do
       click_link_or_button 'Create Agent'
     end
@@ -207,13 +206,14 @@ class AgentsTest < ActionDispatch::IntegrationTest
     visit new_admin_agent_path
     fill_in 'agent[email]', :with => "&%$"
     click_link_or_button 'Create Agent'
-    assert page.has_content?("is invalid")
+    assert new_admin_agent_path, current_path
   end
   
   test "create an agent with different password confirmation" do
     setup_environment
     visit new_admin_agent_path
     fill_in 'agent[email]', :with => 'testing@email.com'
+    fill_in 'agent[username]', :with => 'username'
     fill_in 'agent[password]', :with => "password"
     fill_in 'agent[password_confirmation]', :with => 'pass'
 
@@ -362,11 +362,10 @@ class AgentsTest < ActionDispatch::IntegrationTest
     assert saved_agent.roles.blank?
   end
 
-  
 
-  #####################################################
-  # CLUBS ROLES
-  ##################################################### 
+  # #####################################################
+  # # CLUBS ROLES
+  # ##################################################### 
 
   def prepare_agents_with_club_roles
     club = FactoryGirl.create(:simple_club_with_gateway)
