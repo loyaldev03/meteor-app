@@ -14,7 +14,7 @@ class Communication < ActiveRecord::Base
       end
       if template.nil?
         message = "'#{template_type}' and TOMID ##{user.terms_of_membership_id}"
-        logger.error "* * * * * Template does not exist - Template missing: " + message + " - Member: #{user.inspect}"
+        logger.error "* * * * * Template does not exist - Template missing: " + message + " - Member: #{user.id}"
       else
         c = Communication.new email: user.email
         c.user_id = user.id
@@ -57,8 +57,8 @@ class Communication < ActiveRecord::Base
     logger.error "* * * * * #{e}"
     update_attributes sent_success: false, response: e, processed_at: Time.zone.now
     unless e.to_s.include?("Timeout")
-      Auditory.report_issue("Communication deliver_exact_target", e, { user: user.inspect, 
-        current_membership: user.current_membership.inspect, communication: self.inspect })
+      Auditory.report_issue("Communication deliver_exact_target", e, { user: user.id, 
+        current_membership: user.current_membership.id, communication: self.inspect })
       Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
     end
   end  
@@ -75,7 +75,7 @@ class Communication < ActiveRecord::Base
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { user: user.inspect, template: template.inspect })
+    Auditory.report_issue("Testing::Communication deliver_exact_target", e, { user: user.id, template: template.inspect })
     { sent_success: false, response: e.to_s }
   end
 
@@ -94,8 +94,8 @@ class Communication < ActiveRecord::Base
     logger.error "* * * * * #{e}"
     update_attributes sent_success: false, response: e, processed_at: Time.zone.now
     unless e.to_s.include?("Timeout")
-      Auditory.report_issue("Communication deliver_mandrill", e, { user: user.inspect, 
-        current_membership: user.current_membership.inspect, communication: self.inspect })
+      Auditory.report_issue("Communication deliver_mandrill", e, { user: user.id, 
+        current_membership: user.current_membership.id, communication: self.inspect })
       Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
     end
   end
@@ -111,7 +111,7 @@ class Communication < ActiveRecord::Base
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { user: user.inspect, template: template.inspect })
+    Auditory.report_issue("Testing::Communication deliver_mandrill", e, { user: user.id, template: template.inspect })
     { sent_success: false, response: e.to_s }
   end
 
@@ -134,8 +134,8 @@ class Communication < ActiveRecord::Base
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes sent_success: false, response: e, processed_at: Time.zone.now
-    Auditory.report_issue("Communication deliver_lyris", e, { user: user.inspect, 
-      current_membership: user.current_membership.inspect, communication: self.inspect })
+    Auditory.report_issue("Communication deliver_lyris", e, { user: user.id, 
+      current_membership: user.current_membership.id, communication: self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_lyris, queue: :lyris_email, priority: 15
@@ -162,7 +162,7 @@ class Communication < ActiveRecord::Base
       Notifier.soft_decline(user).deliver_now!
     else
       message = "Deliver action could not be done."
-      Auditory.report_issue("Communication deliver_action_mailer", message, { user: user.inspect, communication: self.inspect })
+      Auditory.report_issue("Communication deliver_action_mailer", message, { user: user.id, communication: self.inspect })
       logger.error "Template type #{template_type} not supported."
     end
     update_attributes sent_success: true, processed_at: Time.zone.now, response: response
@@ -170,7 +170,7 @@ class Communication < ActiveRecord::Base
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes sent_success: false, response: e, processed_at: Time.zone.now
-    Auditory.report_issue("Communication deliver_action_mailer", e, { user: user.inspect, communication: self.inspect })
+    Auditory.report_issue("Communication deliver_action_mailer", e, { user: user.id, communication: self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_action_mailer, queue: :email_queue, priority: 15

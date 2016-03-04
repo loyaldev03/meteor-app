@@ -210,7 +210,7 @@ class UsersController < ApplicationController
         end
       rescue Exception => e
         flash.now[:error] = t('error_messages.airbrake_error_message')
-        Auditory.report_issue("User:cancel", e, { :user => @current_user.inspect })
+        Auditory.report_issue("User:cancel", e, { :user => @current_user.id })
       end
     end
   end
@@ -352,7 +352,7 @@ class UsersController < ApplicationController
     end
   rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    Auditory.report_issue("User:sync", e, { :user => @current_user.inspect })
+    Auditory.report_issue("User:sync", e, { :user => @current_user.id })
     redirect_to show_user_path
   end
 
@@ -375,7 +375,7 @@ class UsersController < ApplicationController
     redirect_to show_user_path, notice: message
   rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    Auditory.report_issue("User:reset_password", e, { :user => @current_user.inspect })
+    Auditory.report_issue("User:reset_password", e, { :user => @current_user.id })
     redirect_to show_user_path
   end
 
@@ -390,7 +390,7 @@ class UsersController < ApplicationController
     redirect_to show_user_path, notice: message
   rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    Auditory.report_issue("User:resend_welcome", e, { :user => @current_user.inspect })
+    Auditory.report_issue("User:resend_welcome", e, { :user => @current_user.id })
     redirect_to show_user_path
   end
 

@@ -205,7 +205,6 @@ class TransactionTest < ActiveSupport::TestCase
     assert_difference('Transaction.count',0) do
       user.bill_membership
     end
-    assert (answer[:code] == Settings.error_codes.user_status_dont_allow), answer[:message]
   end
 
   ######################################

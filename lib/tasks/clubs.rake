@@ -7,7 +7,7 @@ namespace :clubs do
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
-      Club.all.each do |club|
+      Club.where(billing_enable: true).each do |club|
         club.update_attribute(:members_count, club.users.count + 0)
       end
     rescue Exception => e

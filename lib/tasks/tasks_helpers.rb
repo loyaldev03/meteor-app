@@ -329,6 +329,9 @@ module TasksHelpers
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
     end
+  rescue Exception => e
+    Auditory.report_issue("Users::DeleteTestingAccount", e)
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
 
@@ -351,6 +354,9 @@ module TasksHelpers
         end
       end
     end
+  rescue Exception => e
+    Auditory.report_issue("Users::ProcessFulfillmentsUpToday", e)
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   #######################################################
