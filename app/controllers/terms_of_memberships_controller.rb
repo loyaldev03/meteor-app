@@ -30,7 +30,7 @@ class TermsOfMembershipsController < ApplicationController
   def edit
     @tom = TermsOfMembership.find(params[:id])
     my_authorize! :edit, TermsOfMembership, @tom.club_id 
-    if !@tom.can_update_or_delete
+    if !@tom.can_update?
       flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
       redirect_to terms_of_memberships_url
     end
@@ -42,7 +42,7 @@ class TermsOfMembershipsController < ApplicationController
   def update
     @tom = TermsOfMembership.find(params[:id])
     my_authorize! :update, TermsOfMembership, @tom.club_id
-    if @tom.can_update_or_delete
+    if @tom.can_update?
       prepare_tom_data_to_save(params)
       if @tom.save
         flash[:notice] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
