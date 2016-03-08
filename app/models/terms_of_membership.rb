@@ -64,6 +64,8 @@ class TermsOfMembership < ActiveRecord::Base
     if self.memberships.first or self.prospects.first
       errors.add(:base, 'There are users enrolled related to this Subscription Plan')
       false
+    else
+      true
     end
   end
 
@@ -71,6 +73,8 @@ class TermsOfMembership < ActiveRecord::Base
     if Membership.includes(:user).where(terms_of_membership_id: self.id, users: {testing_account: false}).first
       errors.add(:base, 'There are users enrolled related to this Subscription Plan')
       false
+    else
+      true
     end
   end
 
