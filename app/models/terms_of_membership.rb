@@ -31,8 +31,8 @@ class TermsOfMembership < ActiveRecord::Base
 
   validate :validate_payment_gateway_configuration
 
-  before_destroy :can_update_or_delete
-  before_update :can_update_or_delete
+  before_destroy :can_delete?
+  before_update :can_update?
 
   ###########################################
   
@@ -60,8 +60,18 @@ class TermsOfMembership < ActiveRecord::Base
     ['id', 'name', 'api_role', 'created_at', 'agent_id']
   end
 
-  def can_update_or_delete
-    not self.memberships.first and not self.prospects.first
+  def can_delete?
+    if self.memberships.first or self.prospects.first
+      errors.add(:base, 'There are users enrolled related to this Subscription Plan')
+      false
+    end
+  end
+
+  def can_update?
+    if Membership.includes(:user).where(terms_of_membership_id: self.id, users: {testing_account: false}).first
+      errors.add(:base, 'There are users enrolled related to this Subscription Plan')
+      false
+    end
   end
 
   private

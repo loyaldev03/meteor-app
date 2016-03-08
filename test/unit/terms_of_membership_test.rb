@@ -140,4 +140,30 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
       assert_not_nil user.operations.where(operation_type: Settings.operation_types.tom_upgrade).first
     end
   end
+
+  test "Should only allow updating TOMs when there are only testing accounts or no members at all" do
+    active_merchant_stubs
+    user = enroll_user(@terms_of_membership)
+
+    @terms_of_membership.name = "NewNameToTest"    
+    assert !@terms_of_membership.save
+    user.update_attribute :testing_account, true
+    assert @terms_of_membership.save
+    FactoryGirl.create(:prospect, terms_of_membership_id: @terms_of_membership.id)
+    @terms_of_membership.name = "NewNameToTest2"
+    assert @terms_of_membership.save
+  end
+
+  test "Should not allow deleting TOMs when there are members related to it" do
+    active_merchant_stubs
+    user = enroll_user(@terms_of_membership)
+    
+    assert !@terms_of_membership.destroy
+    User.delete_all
+    Membership.delete_all
+    prospect = FactoryGirl.create(:prospect, terms_of_membership_id: @terms_of_membership.id)
+    assert !@terms_of_membership.destroy
+    prospect.delete
+    assert @terms_of_membership.destroy
+  end
 end
