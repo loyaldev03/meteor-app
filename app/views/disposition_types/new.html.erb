@@ -1,6 +1,6 @@
 <%- model_class = @disposition_type.class -%>
 <div class="page-header">
-	<h1><%=t '.title', :default => t('helpers.titles.edit', :model => model_class.model_name.human,
+	<h1><%=t '.title', :default => t('helpers.titles.new', :model => model_class.model_name.human,
                                  :default => "New #{model_class.model_name.human}") %></h1>
 </div>
 <%= form_for @disposition_type, :as => :disposition_type, :url => disposition_types_path(:id => @disposition_type), :html => { :class => 'form-horizontal' } do |f| %>
