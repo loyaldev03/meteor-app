@@ -94,8 +94,11 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   # Should not let agent to update api_id when user is 
   # Platform will create Drupal account by Drupal API
   test "Create an user with 'Not synced', 'Synced error' and 'Synced' Status and update it's api id" do
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, credit_card, nil, @terms_of_membership_with_gateway)
+    # @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, credit_card, nil, @terms_of_membership_with_gateway)
+    @saved_user = FactoryGirl.create(:user, club_id: @club.id)
+    FactoryGirl.create(:credit_card_master_card, user_id: @saved_user.id)
+    membership = FactoryGirl.create(:user_membership, user_id: @saved_user.id, terms_of_membership_id: @terms_of_membership_with_gateway.id)
+    @saved_user.update_attribute :current_membership_id, membership.id
 
     # with not synced status
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
@@ -106,7 +109,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     within("#span_mi_sync_status"){ page.has_content?('Not Synced') }
     
     # with synced error status
-    @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, credit_card, nil, @terms_of_membership_with_gateway)
     @saved_user.update_attributes(last_sync_error_at: Time.zone.now, sync_status: 'with_error')
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
 
@@ -119,7 +121,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     # with synced status
     @saved_user.update_attributes(last_sync_error_at: nil, updated_at: Time.zone.now-1, last_synced_at: Time.zone.now, sync_status: 'synced')
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    assert find_field('input_first_name').value == @unsaved_user.first_name
 
     within(".nav-tabs"){ page.has_selector?("#sync_status") }
     within(".nav-tabs"){ click_on("Sync Status") }
@@ -232,7 +233,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     # Should not let agent to update api_id when user is
     @saved_user.set_as_applied
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    assert find_field('input_first_name').value == @unsaved_user.first_name
     
     within(".nav-tabs"){ click_on("Sync Status") }
     within("#sync_status"){ assert page.has_no_selector?("edit_api_id") }
