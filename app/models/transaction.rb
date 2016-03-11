@@ -78,6 +78,7 @@ class Transaction < ActiveRecord::Base
     self.membership_id = membership.nil? ? user.current_membership_id : membership.id
     self.terms_of_membership_id = terms_of_membership_id || user.terms_of_membership.id 
     self.operation_type = operation_type_to_set
+    self.club_id = user.club_id
     self.save
     @options = {
       order_id: invoice_number,
