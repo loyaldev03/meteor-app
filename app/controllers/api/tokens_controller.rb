@@ -36,25 +36,19 @@ class Api::TokensController < ApplicationController
       return
     end
 
-    @user = Agent.find_by(email: email) unless email.nil?
+    @user = Agent.find_by(email: [email,email.downcase]) unless email.nil?
       
-    if @user.nil?
-      @user = Agent.find_by(email: email.downcase) unless email.nil?
-    end
-
     if @user.nil?
       logger.info("User #{email} failed signin, user cannot be found.")
       respond_with({:message=>"Invalid email or password."}, :status=>401, :location => nil)
       return
     end
 
-    # http://rdoc.info/github/plataformatec/devise/master/Devise/Models/TokenAuthenticatable
-    @user.restore_authentication_token!
-
     if not @user.valid_password?(password)
       logger.info("User #{email} failed signin, password \"#{password}\" is invalid")
       respond_with({:message=>"Invalid email or password."}, :status=>401, :location => nil)
     else
+      @user.generate_authentication_token
       respond_with({:token=>@user.authentication_token}, :status=>200, :location => nil)
     end
   end
@@ -94,4 +88,3 @@ class Api::TokensController < ApplicationController
       my_authorize! :manage_token_api, Agent
     end
 end
-

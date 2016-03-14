@@ -18,6 +18,8 @@ class Agent < ActiveRecord::Base
   has_many :fulfillment_files
   has_many :terms_of_memberships
 
+  after_save :ensure_authentication_token
+
   # Virtual attribute for authenticating by either username or email
   # This is in addition to a real persisted field like 'username'
   attr_accessor :login
@@ -32,6 +34,13 @@ class Agent < ActiveRecord::Base
 
   has_many :club_roles
   has_many :clubs, -> {uniq}, through: :club_roles
+
+  def generate_authentication_token
+    loop do
+      self.authentication_token = Devise.friendly_token
+      break if (self.save! rescue false)
+    end
+  end
 
   def which_is_the_role_for_this_club?(club_id)
     self.club_roles.where(club_id: club_id).first
@@ -143,4 +152,10 @@ class Agent < ActiveRecord::Base
     end
   end
 
+  private
+    def ensure_authentication_token
+      if self.authentication_token.blank?
+        generate_authentication_token
+      end
+    end
 end
