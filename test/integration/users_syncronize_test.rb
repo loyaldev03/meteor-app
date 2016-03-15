@@ -19,10 +19,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id)
     @terms_of_membership_without_api = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club_without_api.id)
     
-    @club.update_attribute(:name,"club_uno")
     Time.zone = @club.time_zone
     @partner = @club.partner
-    @partner.update_attribute(:prefix,"partner_uno")
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
     @unsaved_user = FactoryGirl.build(:active_user)
     sign_in_as(@admin_agent)  
