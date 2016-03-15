@@ -152,7 +152,7 @@ class User < ActiveRecord::Base
     ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
-                        :lapsed, :do => [:cancellation, 'nillify_club_cash', 'after_marketing_tool_sync']
+                        :lapsed, :do => [:cancellation, 'nillify_club_cash']
     after_transition applied:                         :lapsed, do: [:set_user_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
     after_transition all => all, :do => :propagate_membership_data
@@ -1055,7 +1055,6 @@ class User < ActiveRecord::Base
         end
       end
     end
-    marketing_tool_sync_unsubscription if self.blacklisted?
     answer
   end
   ###################################################################
@@ -1441,6 +1440,7 @@ class User < ActiveRecord::Base
       self.save(validate: false)
       Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, current_membership, "Member canceled", self, Settings.operation_types.cancel)
+      marketing_tool_sync_unsubscription
     end
 
     def propagate_membership_data
@@ -1532,11 +1532,11 @@ class User < ActiveRecord::Base
     end
 
     def after_marketing_tool_sync
-      marketing_tool_sync
+      self.lapsed? ? marketing_tool_sync_unsubscription : marketing_tool_sync
     end
 
     def set_marketing_client_sync_as_needed
-      self.need_sync_to_marketing_client = true if not self.blacklisted and (defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel))
+      self.need_sync_to_marketing_client = true if not self.lapsed? and (defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel))
     end
     
     def days_until_next_bill_date
