@@ -587,11 +587,11 @@ class Api::MembersController < ApplicationController
   #   </ul> 
   #
   # @example_request
-  #   curl -v -k -X POST -d "api_key=3v5L15ovoJyee8mKh5DQ&id_or_email=11349954802&terms_of_membership_id=182&prorated=true" https://dev.affinitystop.com:3000/api/v1/members/update_terms_of_membership
+  #   curl -v -k -X POST --data-ascii '{"api_key":"G6qq3KzWQVi9zgfFVXud","id_or_email":" 11349954971","terms_of_membership_id":"376","credit_card":{"number":"XXXXXXXXXXXXXXXXXXX", "expire_month":"12", "expire_year":"2016"}}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members/update_terms_of_membership
   # @example_request_description Example of valid request. 
   #
   # @example_response
-  #   {"message":"Member enrolled successfully $0.0 on TOM(182) -test-", "code":"000", "member_id":11349954824, "autologin_url":"", "status":"active", "api_role":["91284557"], "bill_date":"02/21/2017"}
+  #   {"message":"Member enrolled successfully $0.0 on TOM(372) -test-", "code":"000", "member_id":11349954971, "autologin_url":"", "status":"active", "api_role":["6"], "bill_date":"02/21/2017"}
   # @example_response_description Example response to a valid request.
   #
   def update_terms_of_membership
