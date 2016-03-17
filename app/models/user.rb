@@ -792,7 +792,7 @@ class User < ActiveRecord::Base
     if self.active?
       base = transactions.where('terms_of_membership_id = ? and operation_type in (?)', terms_of_membership_id, Settings.operation_types.membership_billing)
       sale_transaction = base.last
-      if sale_transaction.nil? or (sale_transaction and sale_transaction.refunded_amount != 0.0)
+      if sale_transaction and sale_transaction.refunded_amount != 0.0
         return { message: I18n.t('error_messages.prorated_enroll_failure', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.error_on_prorated_enroll }
       end
       club_cash_to_deduct = club_cash_not_used(base.count == 1)
