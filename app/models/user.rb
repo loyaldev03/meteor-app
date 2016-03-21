@@ -766,7 +766,7 @@ class User < ActiveRecord::Base
       self.reload
       trans = self.transactions.last
     end
-    trans
+    return trans, answer
   end
 
   def prorated_enroll(tom, agent = nil, credit_card_params = nil, user_params = nil, skip_user_validation = false)
@@ -792,16 +792,16 @@ class User < ActiveRecord::Base
     if self.active?
       base = transactions.where('terms_of_membership_id = ? and operation_type in (?)', terms_of_membership_id, Settings.operation_types.membership_billing)
       sale_transaction = base.last
-      if sale_transaction.nil? or (sale_transaction and sale_transaction.refunded_amount != 0.0)
+      if (sale_transaction and sale_transaction.refunded_amount != 0.0) or (not sale_transaction and transactions.where('terms_of_membership_id = ? and operation_type in (?)', terms_of_membership_id, Settings.operation_types.tom_change_billing).first)
         return { message: I18n.t('error_messages.prorated_enroll_failure', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.error_on_prorated_enroll }
       end
       club_cash_to_deduct = club_cash_not_used(base.count == 1)
-      trans = proceed_to_bill_prorated_amount(agent, tom, amount_in_favor, credit_card, sale_transaction, operation_type)
+      trans, answer = proceed_to_bill_prorated_amount(agent, tom, amount_in_favor, credit_card, sale_transaction, operation_type)
       message = "Membership prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{tom.id}) -#{tom.name}-. Final amount #{trans.transaction_type=='sale' ? 'billed' : 'refunded'} $#{trans.amount}."
     else
       days_already_in_provisional = (Time.zone.now.to_date - join_date.to_date ).to_i
       if days_already_in_provisional >= tom.provisional_days
-        trans = proceed_to_bill_prorated_amount(agent, tom, 0.0, credit_card, nil, operation_type) 
+        trans, answer = proceed_to_bill_prorated_amount(agent, tom, 0.0, credit_card, nil, operation_type) 
         message = "Membership reached end of provisional period after Subscription Plan change to TOM(#{tom.id}) -#{tom.name}-. Billing $#{trans.amount} according to new installment amount."
       else
         operation_type = Settings.operation_types.enrollment_billing
@@ -810,7 +810,7 @@ class User < ActiveRecord::Base
 
     if trans 
       unless trans.success?
-        operation_type = Settings.operation_types.error_on_prorate_billing
+        operation_type = Settings.operation_types.tom_change_billing_with_error
         Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type)
         trans.operation_type = operation_type
         trans.membership_id = nil

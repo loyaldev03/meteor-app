@@ -62,6 +62,7 @@ defaults: &defaults
     chargeback_rebutted: 125
     tom_change_billing: 127
     membership_balance_transfer: 128
+    tom_change_billing_with_error: 129
     #profile
     cancel: 200 
     future_cancel: 201
