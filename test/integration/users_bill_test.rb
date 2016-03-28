@@ -212,8 +212,9 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     @saved_user.recover(@terms_of_membership_with_gateway)
     @saved_user.set_as_active
     
-    change_next_bill_date(nil)
-    assert page.has_content?(I18n.t('error_messages.next_bill_date_blank'))
+    assert('Operation.count', 0) do 
+      change_next_bill_date(nil)
+    end
   end
 
   test "Change Next Bill Date for tomorrow" do
