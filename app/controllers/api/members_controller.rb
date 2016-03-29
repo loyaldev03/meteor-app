@@ -598,11 +598,10 @@ class Api::MembersController < ApplicationController
     new_tom = TermsOfMembership.find(params[:terms_of_membership_id])
     my_authorize! :api_change, TermsOfMembership, new_tom.club_id
 
-    user = User.find_by("club_id = ? AND ( id = ? OR email = ? )", new_tom.club_id, params[:id_or_email], params[:id_or_email])
-    raise ActiveRecord::RecordNotFound if user.nil?
+    user = User.find_by!("club_id = ? AND ( id = ? OR email = ? )", new_tom.club_id, params[:id_or_email], params[:id_or_email])
     prorated = params[:prorated].nil? ? true : params[:prorated].to_s.to_bool
 
-    render json: user.change_terms_of_membership(params[:terms_of_membership_id], "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card], { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_API })
+    render json: user.change_terms_of_membership(new_tom, "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card], { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_API })
   rescue ActiveRecord::RecordNotFound => e
     message = (e.to_s.include? "TermsOfMembership") ? "Subscription plan not found" : "Member not found"
     render json: { :message => message, :code => Settings.error_codes.not_found }

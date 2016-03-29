@@ -420,31 +420,35 @@ class User < ActiveRecord::Base
   
   ###############################################
 
-  def change_terms_of_membership(new_tom_id, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil)
+  def change_terms_of_membership(tom, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil)
     if can_change_tom?
-      new_tom = TermsOfMembership.find new_tom_id
+      new_tom = tom.kind_of?(TermsOfMembership) ? tom : TermsOfMembership.find_by(id: tom)
 
-      if new_tom.club_id == self.club_id
-        if new_tom_id.to_i == terms_of_membership.id
-          response = { message: "Nothing to change. Member is already enrolled on that TOM.", code: Settings.error_codes.nothing_to_change_tom }
-        else
-          previous_membership = current_membership
-          response = if prorated
-            prorated_enroll(new_tom, agent, credit_card_params, membership_params)
+      if new_tom
+        if new_tom.club_id == self.club_id
+          if new_tom.id == terms_of_membership.id
+            response = { message: "Nothing to change. Member is already enrolled on that TOM.", code: Settings.error_codes.nothing_to_change_tom }
           else
-            enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, membership_params, true, true, true)
-          end
+            previous_membership = current_membership
+            response = if prorated
+              prorated_enroll(new_tom, agent, credit_card_params, membership_params)
+            else
+              enroll(new_tom, self.active_credit_card, 0.0, agent, false, 0, membership_params, true, true, true)
+            end
 
-          if response[:code] == Settings.error_codes.success
-            Auditory.audit(agent, new_tom, operation_message, self, operation_type)
-            Membership.find(previous_membership.id).cancel_because_of_membership_change
-            self.current_membership.update_attribute :parent_membership_id, previous_membership.id
-          # update manually this fields because we cant cancel member
+            if response[:code] == Settings.error_codes.success
+              Auditory.audit(agent, new_tom, operation_message, self, operation_type)
+              Membership.find_by(id: previous_membership.id).cancel_because_of_membership_change
+              self.current_membership.update_attribute :parent_membership_id, previous_membership.id
+            # update manually this fields because we cant cancel member
+            end
           end
+          response
+        else
+          { message: "Tom(#{new_tom.id}) to change belongs to another club.", code: Settings.error_codes.tom_to_downgrade_belongs_to_different_club }
         end
-        response
       else
-        { message: "Tom(#{new_tom_id}) to change belongs to another club.", code: Settings.error_codes.tom_to_downgrade_belongs_to_different_club }
+        { message: "Subscription plan not found", code: Settings.error_codes.not_found }
       end
     else
       { message: "Member status does not allows us to change the subscription plan.", code: Settings.error_codes.user_status_dont_allow }
@@ -457,9 +461,9 @@ class User < ActiveRecord::Base
   end
 
   def downgrade_user
-    new_tom_id = self.terms_of_membership.downgrade_tom_id
-    message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
-    answer = change_terms_of_membership(new_tom_id, message, Settings.operation_types.downgrade_user, nil, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_DOWNGRADE })
+    new_tom = self.terms_of_membership.downgrade_tom
+    message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom.id})"
+    answer = change_terms_of_membership(new_tom, message, Settings.operation_types.downgrade_user, nil, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_DOWNGRADE })
     if answer[:code] != Settings.error_codes.success
       Auditory.report_issue("DowngradeUser::Error", answer[:message], { user: self.inspect, answer: answer })
     else
