@@ -357,7 +357,7 @@ class Transaction < ActiveRecord::Base
         end
         { message: answer.message, code: Settings.error_codes.success }
       else
-        { message: "Error: " + answer.message, code: self.response_code }
+        { message: "Error: " + answer.message.to_s, code: self.response_code }
       end
     end
 
