@@ -1,15 +1,15 @@
 <%= render :partial => "shared/user_information" %>
 
-<%= form_tag(user_manual_billing_path) do %>
+<%= form_tag(user_manual_billing_path, id: 'manual_billing_form') do %>
 	<table class="table table-bordered">
 		<tr>
 			<td>
-				<%= label :amount, I18n.t('activerecord.attributes.transaction.amount')+I18n.t('activerecord.attributes.transaction.amount_help', :minimun_amount => number_to_currency(@tom.installment_amount)), :class => 'help-inline' %>
-				<%= text_field_tag :amount %>
+				<%= label_tag :amount, I18n.t('activerecord.attributes.transaction.amount')+I18n.t('activerecord.attributes.transaction.amount_help', :minimun_amount => number_to_currency(@tom.installment_amount)), :class => 'help-inline' %>
+				<%= text_field_tag :amount, nil, type: :number, min: 0, step: :any, required: true %>
 			</td>
 			<td>
-				<%= label :payment_type, I18n.t('activerecord.attributes.transaction.payment_type'), :class => 'help-inline' %>
-				<%= select_tag :payment_type, options_for_select([['Cash', 'cash'], ['Check', 'check']]),:include_blank => '' %>
+				<%= label_tag :payment_type, I18n.t('activerecord.attributes.transaction.payment_type'), :class => 'help-inline' %>
+				<%= select_tag :payment_type, options_for_select([['Cash', 'cash'], ['Check', 'check']]),:include_blank => '', required: true %>
 			</td>
 		</tr>
 		<tr>
@@ -20,3 +20,7 @@
 		</tr>
 	</table>
 <% end %>
+
+<script>
+  $(document).ready(disable_form_buttons_upon_submition('manual_billing_form'));
+</script>

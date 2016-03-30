@@ -673,7 +673,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     click_link_or_button 'Add a note'
     click_link_or_button 'Save note'
-    within("#user_notes_table"){ assert page.has_content?("Can't be blank.") }
+    assert_equal current_path, new_user_note_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
   end
 
   test "display user with blank product_sku." do

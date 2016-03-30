@@ -5,32 +5,32 @@
   <div class="control-group">
     <%= f.label :email, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.text_field :email, :class => 'text_field' %>
+      <%= f.text_field :email, :class => 'text_field', required: true, type: :email %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :username, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.text_field :username, :class => 'text_field' %>
+      <%= f.text_field :username, :class => 'text_field', required: true %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :password, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.password_field :password, :class => 'text_field' %>
+      <%= f.password_field :password, :class => 'text_field', required: @agent.new_record? %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :password_confirmation, :class => 'control-label required_asterisk', :style => "width:auto" %>
     <div class="controls">
-      <%= f.password_field :password_confirmation, :class => 'text_field' %>
+      <%= f.password_field :password_confirmation, :class => 'text_field', required: @agent.new_record? %>
     </div>
   </div>
 
   <% if @agent.club_roles.empty? and not @current_agent.roles.empty? %>
     <div class="control-group" id="div_agent_roles">
-      &nbsp &nbsp &nbsp<%= link_to "clear", "#", :class => "btn btn-mini", :style => "display: #{@agent.roles.blank? ? 'none' : true}", :id => "clear_global_role"%>
-      <%= f.label :roles, 'Global Roles', :class => 'control-label' %>
+      &nbsp; &nbsp; &nbsp;<%= link_to "clear", "#", :class => "btn btn-mini", :style => "display: #{@agent.roles.blank? ? 'none' : true}", :id => "clear_global_role"%>
+      <label class='control-label'> Global Roles </label>
       <div class="controls">
          <% Agent::ROLES.each do |role| %>
           <%= label_tag nil, role, class: 'radiobutton' do %>
@@ -43,7 +43,7 @@
   <% end %>
 
   <div class="control-group">
-    <%= f.label :club_roles, 'Club Roles', :class => 'control-label' %>
+    <label class='control-label'> Club Roles </label>
     <div class="controls">
       <table class="table table-bordered table-condensed" style="width:600px; margin-top: 10px;" id="club_role_table">
         <tr >

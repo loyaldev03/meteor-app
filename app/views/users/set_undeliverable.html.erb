@@ -8,4 +8,9 @@
   	</tr>
   </thead>
 </table>
-<%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %> 
+<%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %>
+
+
+<script type="text/javascript">
+  $(document).ready(disable_form_buttons_upon_submition('set_undeliverable'));
+</script>

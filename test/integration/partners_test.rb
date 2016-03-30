@@ -7,20 +7,12 @@ class PartnersTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  test "create_empty_partner" do
+  test "Required fields marks in New Partner page and try to create_empty_partner" do
     visit admin_partners_path
     assert page.has_content?('Partners')
     click_link_or_button 'New Partner'
     assert page.has_content?('New Partner')
-    click_link_or_button 'Create Partner'
-    assert page.has_content?("errors")
-    assert page.has_content?(I18n.t('errors.messages.blank'))
-  end
 
-  test "Required fields marks in New Partner page" do
-    visit admin_partners_path
-    assert page.has_content?('Partners')
-    click_link_or_button 'New Partner'
     within("#div_prefix") do
       assert page.has_css?('.required_asterisk')
     end
@@ -30,8 +22,12 @@ class PartnersTest < ActionDispatch::IntegrationTest
     within("#div_domain_url") do
       assert page.has_css?('.required_asterisk')
     end
+    
+    assert_difference('Partner.count', 0) do
+      click_link_or_button 'Create Partner'
+    end
+    assert_equal current_path, new_admin_partner_path
   end
-  
 
   test "create partner" do
     unsaved_partner = FactoryGirl.build(:partner)
@@ -67,8 +63,10 @@ class PartnersTest < ActionDispatch::IntegrationTest
 
   test "create a partner with invalid characters" do
     visit new_admin_partner_path
+    saved_domain = FactoryGirl.create(:simple_domain)
     fill_in 'partner[name]', with: '!"#$%&/()'
     fill_in 'partner[prefix]', with: '!"#$%&/()'
+    fill_in 'domain_url', with: saved_domain.url
 
     assert_difference('Partner.count', 0) do
       click_link_or_button 'Create Partner'

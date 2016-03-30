@@ -4,12 +4,12 @@
 
 <%= render :partial => "shared/user_information" %>
 
-<%= form_tag(user_change_next_bill_date_path) do %>
+<%= form_tag(user_change_next_bill_date_path, id: 'user_change_next_bill_date_form') do %>
   <table class="table table-bordered">
     <tr>
       <td>
-        <%= label :next_bill_date, t('activerecord.attributes.user.next_retry_bill_date'), :class => 'help-inline' %> 
-        <%= text_field_tag :next_bill_date, nil ,:class => 'datepicker', :readonly => true %> 
+        <%= label_tag :next_bill_date, t('activerecord.attributes.user.next_retry_bill_date'), :class => 'help-inline' %> 
+        <%= text_field_tag :next_bill_date, nil ,:class => 'datepicker readonly', required: true %> 
       </td>
     </tr>
     <tr>

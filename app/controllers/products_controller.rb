@@ -62,10 +62,10 @@ class ProductsController < ApplicationController
   def bulk_process
     my_authorize! :bulk_process, Product, current_club.id
     if request.post?
-      if params[:file]
-        if ['text/csv','application/vnd.ms-excel'].include? params[:file].content_type
+      if params[:bulk_process_file]
+        if ['text/csv','application/vnd.ms-excel'].include? params[:bulk_process_file].content_type
           temporary_file = File.open("tmp/files/bulk_process_#{Time.current}.csv", "w")
-          temporary_file.write params[:file].open.read
+          temporary_file.write params[:bulk_process_file].open.read
           temporary_file.close
           temporary_file
           Product.delay.bulk_process(@current_club.id, current_agent.email, temporary_file.path)

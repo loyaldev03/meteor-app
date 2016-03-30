@@ -21,9 +21,12 @@ private
         transaction.last_digits,
         (transaction.can_be_refunded? ? link_to(I18n.t('refund'),
             @url_helpers.user_refund_path(@current_partner.prefix,@current_club.name,@current_user.id, :transaction_id => transaction.id), 
-            :class=>"btn btn-warning btn-mini", :id => 'refund' ,:disabled=>(!@current_agent.can? :refund, Transaction, @current_club.id)) : '')+
-        ((transaction.can_be_chargeback? and @current_user.can_be_chargeback?) ? link_to(I18n.t('chargeback'), @url_helpers.user_chargeback_path(@current_partner.prefix,@current_club.name,@current_user.id, :transaction_id => transaction.id),
-            :class=>"btn btn-warning btn-mini", :id => 'chargeback' ,:disabled=>(!@current_agent.can? :chargeback, Transaction, @current_club.id)) : '')
+            :class=>"btn btn-mini btn-warning #{('disabled' unless @current_agent.can?(:refund, Transaction, @current_club.id))}", 
+            :id => 'refund') : '')+
+        ((transaction.can_be_chargeback? and @current_user.can_be_chargeback?) ? link_to(I18n.t('chargeback'), 
+            @url_helpers.user_chargeback_path(@current_partner.prefix,@current_club.name,@current_user.id, :transaction_id => transaction.id),
+            :class=>"btn btn-mini btn-danger #{('disabled' unless @current_agent.can?(:refund, Transaction, @current_club.id))}", 
+            :id => 'chargeback') : '')
       ]
     end
   end

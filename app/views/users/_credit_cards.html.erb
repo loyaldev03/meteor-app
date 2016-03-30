@@ -36,12 +36,12 @@
         <%= t('activerecord.attributes.credit_card.active') if cc.active %>
         <% if cc.can_be_activated? %>
           <%= form_for cc, :as => :credit_card, :url => credit_card_activate_path(:credit_card_id => cc.id), method: :post do |f| %>
-            <%= submit_tag 'Activate', :name => 'activate', :class=> "btn btn-warning confirm", :id => "activate_credit_card_button" ,:disabled => (cannot? :activate, CreditCard, @current_club.id) %>
+            <%= submit_tag 'Activate', :name => 'activate', :class=> "btn btn-warning #{'disabled' if cannot? :activate, CreditCard, @current_club.id }", :id => "activate_credit_card_button", data: {confirm: 'Are you sure?'}%>
           <% end %>
         <% end %>
         <% if @current_user.lapsed? and not @current_user.blacklisted and not cc.active and not @current_user.is_chargeback? and can? :destroy, CreditCard %>
           <%= link_to(I18n.t(:destroy), credit_card_path(@current_partner.prefix, @current_club.name, @current_user.id, cc.id), :method => :delete, :id => "destroy",
-                        :confirm => I18n.t("are_you_sure"),
+                        data: {:confirm => I18n.t("are_you_sure")},
                         :class => 'btn btn-mini btn-danger') %>
         <% end %>
       </td>

@@ -1,6 +1,6 @@
 <%= render :partial => "shared/user_information" %>
 
-<%= form_tag(user_save_the_sale_path) do %>
+<%= form_tag(user_save_the_sale_path, id: 'save_the_sale_form') do %>
   <table class="table table-bordered">
     <tr>
       <td>
@@ -9,12 +9,12 @@
     </tr>
     <tr>
       <td>
-        <%= label :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %>: 
+        <%= label_tag :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %>: 
         <%= select_tag :terms_of_membership_id, options_from_collection_for_select(TermsOfMembership.where(:club_id => @current_club ), "id", "name") %> 
       </td>
     </tr>
     <tr>
-      <td> <%= submit_tag t('buttons.save_te_sale'), :class => 'btn btn-primary', :confirm => t('are_you_sure'), :id => "save_the_sale_button" %>
+      <td> <%= submit_tag t('buttons.save_te_sale'), :class => 'btn btn-primary', data: {:confirm => t('are_you_sure')}, :id => "save_the_sale_button" %>
         <%= link_to t('buttons.full_save'), user_full_save_path , :class=> 'btn btn-success', :id => 'full_save_button' %> 
         <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn', :id => 'cancel_button' %> </td>
     </tr>
@@ -23,6 +23,6 @@
 
 
 <script>
-  $(document).ready( save_the_sale_functions() );
+  $(document).ready( disable_form_buttons_upon_submition('save_the_sale_form') );
 </script>
 

@@ -4,21 +4,20 @@
   <table class="table table-bordered">
     <tr>
       <td>
-        <%= label :adjudication_date, t('activerecord.attributes.transaction.adjudication_date'), :class => 'help-inline' %> 
-        <%= text_field_tag :adjudication_date, nil ,:class => 'datepicker required',
-                           :readonly => 'readonly' %>
+        <%= label_tag :adjudication_date, t('activerecord.attributes.transaction.adjudication_date'), :class => 'help-inline' %> 
+        <%= text_field_tag :adjudication_date, nil ,:class => 'datepicker readonly', required: true %>
       </td>
       <td> 
         <div class="input-prepend input-append"> 
           <%= t('activerecord.attributes.transaction.refund_amount_help') %>: 
           (Max : <%= number_to_currency(@transaction.amount_available_to_refund) %>)
-          <span class="add-on">$</span><%= text_field_tag :amount, nil ,:id => "amount" %>
+          <span class="add-on">$</span><%= text_field_tag :amount, nil ,:id => "amount", required: true, type: :number, step: :any %>
         </div>
       </td>
     </tr>
     <tr>
       <td colspan="2"> 
-        <%= label :reason, t('reason'), :class => 'help-inline' %> 
+        <%= label_tag :reason, t('reason'), :class => 'help-inline' %> 
         <%= text_area_tag :reason, nil, :style => 'width: 99%; height: 50px'  %>
       </td>
     </tr>

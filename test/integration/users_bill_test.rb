@@ -212,8 +212,9 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     @saved_user.recover(@terms_of_membership_with_gateway)
     @saved_user.set_as_active
     
-    change_next_bill_date(nil)
-    assert page.has_content?(I18n.t('error_messages.next_bill_date_blank'))
+    assert('Operation.count', 0) do 
+      change_next_bill_date(nil)
+    end
   end
 
   test "Change Next Bill Date for tomorrow" do
@@ -430,26 +431,37 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     setup_user
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
-    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount, description and type cannot be blank.")
+
+    assert_difference('Transaction.count',0) do 
+      click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
+    end
+    assert_equal current_path, user_no_recurrent_billing_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
+
     fill_in('amount', :with => '100')
-    click_link_or_button (I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount, description and type cannot be blank.")
+    assert_difference('Transaction.count',0) do 
+      click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
+    end
+    assert_equal current_path, user_no_recurrent_billing_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
+
     fill_in('amount', :with => '')
     fill_in('description', :with => 'asd')
-    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount, description and type cannot be blank.")
+    assert_difference('Transaction.count',0) do 
+      click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
+    end
+    assert_equal current_path, user_no_recurrent_billing_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     fill_in('amount', :with => '-100')
     fill_in('description', :with => 'asd')
-    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
-    assert page.has_content?("Amount must be greater than 0.")
+    assert_difference('Transaction.count',0) do 
+      click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
+    end
+    assert_equal current_path, user_no_recurrent_billing_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
   end
 
   test "Try billing an user within a club that do not allow billing." do
     setup_user
     @saved_user.club.update_attribute( :billing_enable, false)
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    assert find(:xpath, "//a[@id='no_recurrent_bill_btn' and @disabled='disabled']")
+    assert find(:xpath, "//a[@id='no_recurrent_bill_btn']")[:class].include? 'disabled'
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     assert page.has_selector?('#blacklist_btn')
   end

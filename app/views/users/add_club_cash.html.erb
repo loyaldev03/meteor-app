@@ -11,16 +11,16 @@
   <table class="table table-condensed table-bordered">
     <tr> 
       <td>
-	      <%= label :amount, I18n.t('activerecord.attributes.club_cash_transaction.amount'), :class=>"help-inline" %>
+	      <%= label_tag :club_cash_transaction_amount, I18n.t('activerecord.attributes.club_cash_transaction.amount'), :class=>"help-inline" %>
 	      <%= text_field :club_cash_transaction, :amount, 
-            :value => (params[:club_cash_transaction][:amount] if params[:club_cash_transaction]) %>
-        </br>
+            :value => (params[:club_cash_transaction][:amount] if params[:club_cash_transaction]), required: true, type: :number, step: :any %> 
+        <br>
         <p class="help-inline"> <%= I18n.t('activerecord.attributes.club_cash_transaction.amount_help') %> </p>
       </td>      
     </tr>
     <tr> 
       <td> 
-	    <%= label :description, t('activerecord.attributes.club_cash_transaction.description') %>
+	    <%= label_tag :club_cash_transaction_description, t('activerecord.attributes.club_cash_transaction.description') %>
 	    <%= text_area :club_cash_transaction, :description, :style => 'width: 99%; height: 200px' %>
       </td>
     </tr>

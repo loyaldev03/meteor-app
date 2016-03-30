@@ -15,7 +15,7 @@
   <div class="control-group">
     <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.plan_name'), :class => 'control-label required_asterisk', :style => "width:auto" %>
     <div class="controls">
-      <%= f.text_field :name, :class => 'text_field required', :minlength => 3 %>
+      <%= f.text_field :name, :class => 'text_field required', required: true %>
       <%= render :partial => "shared/help", :locals => { 
         :title => t('activerecord.attributes.terms_of_membership.wizard.plan_name'), 
         :content => t('activerecord.attributes.terms_of_membership.wizard.plan_name_help') } %> 
@@ -195,7 +195,7 @@
 
 <div id="" class="form-actions">
   <%= link_to t('cancel', :default => t("helpers.links.cancel")), terms_of_memberships_path, :class => 'btn', 
-    :confirm => t('activerecord.attributes.terms_of_membership.wizard.cancel_button_caption') %>
+    data: {:confirm => t('activerecord.attributes.terms_of_membership.wizard.cancel_button_caption')} %>
   <div style = "float: right;">
     <%= f.submit "clear", :id => 'back', :class => 'btn', :type => "reset" %>
     <%= f.submit nil, :id => 'next', :class => 'btn btn-primary' %>

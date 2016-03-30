@@ -15,14 +15,14 @@
     <div class="control-group" id="div_prefix">
       <%= f.label :prefix, :class => 'control-label required_asterisk' %>
       <div class="controls">
-        <%= f.text_field :prefix, :class => 'text_field' %>
+        <%= f.text_field :prefix, :class => 'text_field', required: true %>
       </div>
     </div>
   <% end %>
   <div class="control-group" id="div_name">
     <%= f.label :name, :class => 'control-label required_asterisk' %>
     <div class="controls">
-      <%= f.text_field :name, :class => 'text_field ' %>
+      <%= f.text_field :name, :class => 'text_field ', required: true %>
     </div>
   </div>
   <div class="control-group">
@@ -53,7 +53,7 @@
       <div class="control-group" id="div_domain_url">
         <%= domain_fields.label :url, :class => 'control-label required_asterisk' %>
         <div class="controls">
-          <%= domain_fields.text_field :url, :class => 'text_field', :name => "partner[domains_attributes][0][url]", :value => (params[:partner][:domains_attributes]["0"][:url] if params[:partner]) %>
+          <%= domain_fields.text_field :url, :class => 'text_field', :name => "partner[domains_attributes][0][url]", :value => (params[:partner][:domains_attributes]["0"][:url] if params[:partner]), type: :url, required: true %>
           <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.domain.url_help')} %> 
         </div>
       </div>

@@ -1,14 +1,13 @@
 $(document).ready( function() {
   $('.help').popover({offset: 10, trigger: 'hover', html: true });
 
-  $('.confirm').click( function(event){
-    var answer = confirm('Are you sure?');
-    return answer 
-  });
-
   $('.datatable').DataTable({
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "sPaginationType": "full_numbers"
+  });
+
+  $(".readonly").keydown(function(event){
+    event.preventDefault();
   });
 
   $('.datatable_only_sorting').DataTable({
@@ -46,7 +45,7 @@ $(document).ready( function() {
   $(function() {
     $.ajaxSetup({
       error: function(jqXHR, exception) {
-        endAjaxLoader();
+        endAjaxLoader(true);
         if (jqXHR.status == 0) {
           alert('The operation is taking more than expected. Please wait a moment while we finish processing this request and check if it was done.');
         }else
@@ -56,6 +55,12 @@ $(document).ready( function() {
     });
   });
 });
+
+function disable_form_buttons_upon_submition(form_id){
+  $('#'+form_id).submit(function(){
+    startAjaxLoader(true);
+  })  
+}
 
 function flash_message(message, error){
   message_type = error ? "alert-error" : "alert-info"
@@ -72,7 +77,7 @@ function global_ajax_error_messages(jqXHR){
     return 'Something went wrong.'
 }
 
-function startAjaxLoader(){
+function startAjaxLoader(disableButtons){
   var opts = {
     lines: 9, // The number of lines to draw
     length: 4, // The length of each line
@@ -92,13 +97,19 @@ function startAjaxLoader(){
     left: 'auto' // Left position relative to parent in px
   };
   var spinner = new Spinner(opts).spin();
-  $("#ajax_loader").append(spinner.el);
-  $("#ajax_loader").slideDown("slow");
+  if(disableButtons) {
+    $("#ajax_loader").append(spinner.el);
+    $("#ajax_loader").slideDown("slow");
+    $('.content :submit, .content :button, .content a').addClass('disabled');
+  };
 };
 
-function endAjaxLoader(){
-  $("#ajax_loader").slideUp();
-  $('.spinner').remove();
+function endAjaxLoader(enableButtons){
+  if(enableButtons){
+    $("#ajax_loader").slideUp();
+    $('.spinner').remove();
+    $('.content :submit, .content :button, .content a').removeClass('disabled');
+  };
 };
 
 function agent_index_functions(column_count){
@@ -239,14 +250,14 @@ function product_index_functions(column_count){
   });
   $('#products_table').on('submit', '.modal-body form', function(event){
     event.preventDefault();
-    startAjaxLoader();
+    startAjaxLoader(true);
     var productId = $(this).data('target');
     $.ajax({
       type: 'put',
       url: $(this).attr('action'),
       data: $(this).serialize(),
       success: function(data){
-        endAjaxLoader();
+        endAjaxLoader(true);
         if(data.success == true){
           $("#products_table").DataTable().ajax.reload();
           $('#myModal'+productId).modal('hide');
@@ -261,7 +272,7 @@ function product_index_functions(column_count){
         }
       },
       error: function(jqXHR, exception){
-        endAjaxLoader();
+        endAjaxLoader(true);
         alert(global_ajax_error_messages(jqXHR));
       }
     })
@@ -277,6 +288,7 @@ function bulk_process_products_functions(){
       if($("#bulk_process_file").prop('files')[0].size > 1002867){
         alert("File exceeds maximum size limit.");
       }else{
+        startAjaxLoader(true);
         $("#bulk_process_form").submit();
       }
     }
@@ -309,8 +321,7 @@ function user_index_functions(){
       alert("No filters selected.");
       event.preventDefault(); 
     }else{
-      startAjaxLoader();
-      $('#submit_button').attr('disabled', 'disabled');
+      startAjaxLoader(true);
       update_select_only = false;
 
     $.ajax({
@@ -320,14 +331,12 @@ function user_index_functions(){
         contentType: 'application/javascript',
         data: $(this).serialize(),
         success: function(data){
-          endAjaxLoader();
-          $('#submit_button').removeAttr('disabled');
+          endAjaxLoader(true);
         },
         error: function(jqXHR, exception){
-          endAjaxLoader();
+          endAjaxLoader(true);
           if (jqXHR.status == 0) {
             alert('The search is talking more than expected. Please, try again in a moment.');
-            $('#submit_button').removeAttr('disabled');
           }else
             global_ajax_error_messages(jqXHR);
         }
@@ -505,10 +514,8 @@ function new_user_functions(){
                                 yearRange: 'c-100:c',
                                 buttonImageOnly: true});
   $('#new_user').submit( function(event) {
-    startAjaxLoader();
+    startAjaxLoader(true);
     $('#error_explanation').hide();
-    $('#submit_button').attr('disabled', 'disabled');
-    $('#cancel_button').hide();
     event.preventDefault();
 
     $.ajax({
@@ -518,7 +525,7 @@ function new_user_functions(){
       url: "/api/v1/members",
       data: JSON.stringify(retrieve_information()),
       success: function(data) {
-        endAjaxLoader();
+        endAjaxLoader(true);
         $('input').parent().parent().removeClass("error");
         if (data.code == 000) {
           alert (data.message);
@@ -526,8 +533,6 @@ function new_user_functions(){
         }else{
           $('#error_explanation').show();
           $('#error_explanation ul').empty();
-          $('#submit_button').removeAttr('disabled');
-          $('#cancel_button').show();
           $('#error_explanation ul').append("<b>"+data.message+"</b>");
           for (var key in data.errors){
             if (data.errors.hasOwnProperty(key)) {
@@ -550,10 +555,8 @@ function new_user_functions(){
         }
       },
       error: function(jqXHR, exception){
-        endAjaxLoader();
+        endAjaxLoader(true);
         alert(global_ajax_error_messages(jqXHR));
-        $('#submit_button').removeAttr('disabled');
-        $('#cancel_button').show();
       }
     });
   });
@@ -606,9 +609,7 @@ function edit_user_functions(){
                                 buttonImageOnly: true});    
 
   $('form').submit( function(event) {
-    startAjaxLoader();
-    $('#submit_button').attr('disabled', 'disabled');
-    $('#cancel_button').hide();
+    startAjaxLoader(true);
     event.preventDefault();
 
     $.ajax({
@@ -618,14 +619,12 @@ function edit_user_functions(){
       url: "/api/v1/members/"+id,
       data: JSON.stringify(retrieve_information()),
       success: function(data) {
-        endAjaxLoader();
+        endAjaxLoader(true);
         alert(data.message);
         $('input').parent().parent().removeClass("error");
         if (data.code == 000)
           window.location.replace('../'+id);
         else{
-          $('#submit_button').removeAttr('disabled');
-          $('#cancel_button').show();
           $('#error_explanation').show();
           $('#error_explanation ul').empty();
           $('#error_explanation ul').append("<b>"+data.message+"</b>");
@@ -656,22 +655,18 @@ function club_cash_functions(){
 
   $('#error_explanation').hide();
   $('form').submit( function(event) {
-    startAjaxLoader();
-    $('#submit_button').attr('disabled', 'disabled');
-    $('#cancel_button').hide();
+    startAjaxLoader(true);
     event.preventDefault(); 
     $.ajax({
       type: 'POST',
       url: "/api/v1/members/"+id+"/club_cash_transaction",
       data: $("form").serialize(),
       success: function(data) {
-        endAjaxLoader();
+        endAjaxLoader(true);
         if (data.code == 000){
           alert(data.message);
           window.location.replace('../'+id);
         }else{
-          $('#submit_button').removeAttr("disabled");
-          $('#cancel_button').show();
           $('#error_explanation').show();
           $("#error_explanation ul").empty();
           $('#error_explanation ul').append("<b>"+data.message+"</b>");
@@ -783,14 +778,10 @@ function fulfillment_files_functions() {
   $(".dataTables_paginate").css({ float: "left" });
 
   $("#fulfillment_files_table").on('click', '#mark_as_sent', function(event){
-    if($(this).attr('disabled') == 'disabled'){
-      event.preventDefault();
-    }else{
     if(confirm("Are you sure you want to mark all the fulfillments that are in progress as sent?")){
-        $(this).attr('disabled', 'disabled');
-      }else{
-        event.preventDefault();
-      }
+      startAjaxLoader(true);
+    }else{
+      event.preventDefault();
     }
   });
 }  
@@ -813,10 +804,10 @@ function show_user_functions(){
 
   var objectsFetch = {transactions:true, notes:false, fulfillments:false, communications:false, operations:false, credit_cards:false, club_cash_transactions:false, memberships:false }
 
-  $(".btn").on('click',function(event){
-    if($(this).attr('disabled') == 'disabled')
-      event.preventDefault(); 
-  })
+  // $(".btn").on('click',function(event){
+  //   if($(this).attr('disabled') == 'disabled')
+  //     event.preventDefault(); 
+  // })
 
   mark_as_sent_fulfillment("../fulfillments/");
   resend_fulfillment("../fulfillments/");
@@ -834,7 +825,7 @@ function show_user_functions(){
     for(var key in objectsFetch){ 
       if(key == objects_to_search){
         if(!objectsFetch[objects_to_search]){
-          startAjaxLoader();
+          startAjaxLoader(false);
           $.ajax({
             url: user_prefix+"/"+objects_to_search+"_content",
             success: function(html){
@@ -843,7 +834,7 @@ function show_user_functions(){
               objectsFetch[objects_to_search] = true
             }
           });
-          endAjaxLoader();
+          endAjaxLoader(false);
         }
       }
     }
@@ -852,63 +843,26 @@ function show_user_functions(){
   });
   $("#sync_to_remote").click(function(){
     if(confirm("Are you sure?")){
-      startAjaxLoader();
+      startAjaxLoader(false);
     }
   });
 };
 
 function user_cancellation_functions(){
-  $("#user_cancelation_form").validate({
-     submitHandler: function(form) {
-      if (confirm('This user will be canceled. Are you really sure?')) {
-        form.submit();            
-      }else
-      return false;
-     }
-  })
+  disable_form_buttons_upon_submition('user_cancelation_form');
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-};
-
-function blacklist_user_functions(){
-  $("#blacklist_form").validate({
-     submitHandler: function(form) {
-      if (confirm('This user will be blacklisted. Are you really sure?')) {
-        form.submit();            
-      } else {
-        return false;
-      }
-    }
-  })
-}
-
-function user_note_functions(){
-  $('#new_user_note').validate();
 };
 
 function user_change_next_bill_date(){
+  disable_form_buttons_upon_submition('user_change_next_bill_date_form');
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
-};
-
-function refund_user_functions(){
-  $('#refund_form').submit( function(event) {
-    $('#refund_form input:submit').attr("disabled", true);
-    if ($("#refunded_amount").val().match(/^[0-9 .]+$/)){
-      
-    }else{
-      $('input:submit').attr("disabled", false);
-      alert("Incorrect refund value.");
-      event.preventDefault(); 
-    };
-  })
 };
 
 function chargeback_user_functions(){
   $('#chargeback_form').submit( function(event) {
-    $('#chargeback_form input:submit').attr("disabled", true);
     if($("#amount").val().match(/^[0-9 .]+$/)){
-      
+      startAjaxLoader(true);
     }else{
-      $('input:submit').attr("disabled", false);
       alert("Incorrect chargeback value.");
       event.preventDefault(); 
     };
@@ -1080,7 +1034,7 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
 function mark_as_sent_fulfillment(url){
   $('*#mark_as_sent').click( function(event){
     button = $(this)
-    button.attr('disabled', 'disabled');
+    startAjaxLoader(true);
     event.preventDefault();
     $.ajax({
       type: 'PUT',
@@ -1088,10 +1042,9 @@ function mark_as_sent_fulfillment(url){
       success: function(data) {
         if (data.code == "000"){
           button.parent().children().hide();
-          //button.parent().append("<div class='alert-info alert'>"+data.message+"</div>");
           button.parent().parent().after("<tr><td colspan='8'><p style='text-align: center;'><div class='alert-info alert'>"+data.message+"</div></p></td></tr>");
         }else{
-          button.removeAttr('disabled');
+          endAjaxLoader(true);
           alert(data.message);
         };
       },
@@ -1102,7 +1055,7 @@ function mark_as_sent_fulfillment(url){
 function resend_fulfillment(url){
   $('*#resend').click( function(event){
     button = $(this)
-    button.attr('disabled', 'disabled');
+    startAjaxLoader(true);
     event.preventDefault();
     $.ajax({
       type: 'PUT',
@@ -1112,7 +1065,7 @@ function resend_fulfillment(url){
           button.parent().children().hide();
           button.parent().parent().after("<tr><td colspan='8'><p style='text-align: center;'><div class='alert-info alert'>"+data.message+"</div></p></td></tr>");
         }else{
-          button.removeAttr('disabled');
+          endAjaxLoader(true);
           alert(data.message);
         };
       },
@@ -1127,22 +1080,6 @@ function show_terms_of_membership_functions(){
   });
 }
 
-function save_the_sale_functions(){
-  $('form').submit( function(event) {
-  $('#save_the_sale_button').attr('disabled', 'disabled');
-  $('#full_save_button').hide();
-  $('#cancel_button').hide();
-    startAjaxLoader();
-  });
-}
-
-function recover_user_functions(){
-  $('form').submit( function(event) {
-  $('#recover_button').attr('disabled', 'disabled');
-  $('#cancel_button').hide();
-    startAjaxLoader();
-  }); 
-}
 
 function admin_form_functions(){
   var count = 0;
@@ -1350,19 +1287,19 @@ function email_templates_functions() {
     switch_days();
   });
 
-  $("#et_form").submit(function(event) {
-    var isValid = true;
-    $('form input[type="text"], form select').each(function() {
-      if($(this).hasClass('manual_validation')) {
-        $('#control_'+$(this).attr('id')+' div[id="error_inline"]').remove();
-        if ($.trim($(this).val()) == '') {
-          isValid = false;
-          $('#control_'+$(this).attr('id')).append('<div id="error_inline" style="display:inline-block;"> can\'t be blank </div>');
-        }
-      }
-    });
-    if (isValid == false) event.preventDefault();
-  });
+  // $("#et_form").submit(function(event) {
+  //   var isValid = true;
+  //   $('form input[type="text"], form select').each(function() {
+  //     if($(this).hasClass('manual_validation')) {
+  //       $('#control_'+$(this).attr('id')+' div[id="error_inline"]').remove();
+  //       if ($.trim($(this).val()) == '') {
+  //         isValid = false;
+  //         $('#control_'+$(this).attr('id')).append('<div id="error_inline" style="display:inline-block;"> can\'t be blank </div>');
+  //       }
+  //     }
+  //   });
+  //   if (isValid == false) event.preventDefault();
+  // });
 }
 
 function email_templates_table_index_functions(column_count) {
@@ -1385,34 +1322,25 @@ function test_communications_functions() {
   $('#test_communication').submit(function(event){ event.preventDefault() });
   $("#communications_table").on('click', 'a', function(event){
     if($("#test_communication").valid()){
+      startAjaxLoader(true);
       event.preventDefault();
-      is_processing = false;
-      $("#communications_table a").each( function(){
-        if($(this).attr('disabled') == 'disabled')
-          is_processing = true;
-      });
-      if(is_processing == false){
-        button = $(this)
-        user_id = $("#communication_user_id").val();
-        template_id = button.attr('name');
-        button.attr('disabled', 'disabled');
-        startAjaxLoader();
-        $.ajax({
-          type: "POST",
-          url: "",
-          data: { email_template_id:template_id, user_id:user_id },
-          success: function(data){
-            button.parent().next().empty();
-            if (data.code == "000"){
-              button.parent().next().append("<div class='alert-info alert'>"+data.message+"</div>");
-            }else{
-              button.parent().next().append("<div class='error-info alert'>"+data.message+"</div>");
-            };
-            endAjaxLoader();
-            button.removeAttr("disabled");
-          },
-        })
-      }
+      button = $(this);
+      user_id = $("#communication_user_id").val();
+      template_id = button.attr('name');
+      $.ajax({
+        type: "POST",
+        url: "",
+        data: { email_template_id:template_id, user_id:user_id },
+        success: function(data){
+          button.parent().next().empty();
+          if (data.code == "000"){
+            button.parent().next().append("<div class='alert-info alert'>"+data.message+"</div>");
+          }else{
+            button.parent().next().append("<div class='error-info alert'>"+data.message+"</div>");
+          };
+          endAjaxLoader(true);
+        },
+      })
     }
   });
 }
@@ -1429,12 +1357,12 @@ function suspected_fulfillments_functions(){
 
   $('#suspected_list td[data-href]').click(function(event){
     event.preventDefault();
-    startAjaxLoader()
+    startAjaxLoader(true)
     $('#suspected_list tr').removeClass("info");
     $(this).parent().addClass("info");
     $('#evidences_information').show();
     $('#evidences_information').load($(this).data('href'), function(){
-      endAjaxLoader();
+      endAjaxLoader(true);
     });
   });
     $(".datepicker").datepicker({ constrainInput: true,

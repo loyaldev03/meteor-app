@@ -3,7 +3,7 @@
 		<thead>
 		<tr>
 			<td colspan="9">
-				<%= label :status, t('activerecord.attributes.fulfillment.new_status'), :class => 'help-inline' %>
+				<%= label_tag :status, nil, :class => 'help-inline' %>
 				<%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
 				<%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
 				<%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
