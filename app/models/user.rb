@@ -1208,8 +1208,8 @@ class User < ActiveRecord::Base
     # Drupal sends X when member does not change the credit card number      
     if credit_card[:number].blank?
       { code: Settings.error_codes.invalid_credit_card, message: I18n.t('error_messages.invalid_credit_card'), errors: { number: "Credit card is blank." }}
-    elsif credit_card[:number].include?('X')
-      if active_credit_card.last_digits.to_s == credit_card[:number][-4..-1].to_s # lets update expire month
+    elsif credit_card[:number].to_s.include?('X')
+      if active_credit_card.last_digits.to_s == credit_card[:number].to_s[-4..-1] # lets update expire month
         answer = active_credit_card.update_expire(new_year, new_month, current_agent)
         answer.merge!(credit_card_id: active_credit_card.id)
       else # do not update nothing, credit cards do not match or its expired
