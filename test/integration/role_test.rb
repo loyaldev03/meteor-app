@@ -825,7 +825,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       assert find(:xpath, "//a[@id='blacklist_btn']")[:class].exclude? 'disabled'
       assert find(:xpath, "//a[@id='add_user_note']")[:class].exclude? 'disabled'
       assert find(:xpath, "//a[@id='cancel']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].include? 'disabled'
       assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
       assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
       assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
