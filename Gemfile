@@ -36,7 +36,7 @@ gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem 'jquery-ui-rails'
 
 gem 'carmen-rails'
-gem 'country_code_select', '~> 1.0.0' 
+gem 'country_code_select', '~> 1.0.0'
 gem 'i18n-country-translations'
 gem 'devise'
 gem 'devise-async'
@@ -99,7 +99,7 @@ group :test do
   gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'
-  gem 'selenium-webdriver', '>=2.45.0'
+  gem 'selenium-webdriver', '>=2.52.0'
   gem 'brakeman'
   gem 'simplecov'
   gem "timecop"
