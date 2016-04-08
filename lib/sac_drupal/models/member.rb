@@ -219,7 +219,7 @@ module Drupal
       end
 
       # Add dynamyc preferences.
-      unless m.preferences.nil?
+      if m.preferences.present?
         m.preferences.each do |key, value|
           map.merge!({
             "field_phoenix_pref_#{key}" =>  {
