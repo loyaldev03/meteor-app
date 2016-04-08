@@ -6,23 +6,28 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   # SETUP
   ############################################################
 
-  def setup_user
+  def setup_user(with_api = true)
     Drupal.enable_integration!
     Drupal.test_mode!
-    # Pardot.enable_integration! ==> NoMethodError: undefined method `enable_integration!' for Pardot:Module
-    # response = '{"id"=>"1810071", "campaign_id"=>"831", "salutation"=>nil, "first_name"=>nil, "last_name"=>nil, "email"=>"cal+sda@ggmail.com", "password"=>nil, "company"=>nil, "website"=>nil, "job_title"=>nil, "department"=>nil, "country"=>nil, "address_one"=>nil, "address_two"=>nil, "city"=>nil, "state"=>nil, "territory"=>nil, "zip"=>nil, "phone"=>nil, "fax"=>nil, "source"=>nil, "annual_revenue"=>nil, "employees"=>nil, "industry"=>nil, "years_in_business"=>nil, "comments"=>nil, "notes"=>nil, "score"=>"0", "grade"=>nil, "last_activity_at"=>nil, "recent_interaction"=>"Never active", "crm_lead_fid"=>nil, "crm_contact_fid"=>nil, "crm_owner_fid"=>nil, "crm_account_fid"=>nil, "crm_opportunity_fid"=>nil, "crm_opportunity_created_at"=>nil, "crm_opportunity_updated_at"=>nil, "crm_opportunity_value"=>nil, "crm_opportunity_status"=>nil, "crm_last_sync"=>nil, "crm_is_sale_won"=>nil, "is_do_not_email"=>nil, "is_do_not_call"=>nil, "opted_out"=>nil, "short_code"=>"fcc52", "is_reviewed"=>nil, "is_starred"=>nil, "created_at"=>"2012-11-13 07:45:46", "updated_at"=>"2012-11-13 07:45:47", "campaign"=>{"id"=>"831", "name"=>"Website Tracking"}, "profile"=>{"id"=>"281", "name"=>"Default", "profile_criteria"=>[{"id"=>"1361", "name"=>"Company Size", "matches"=>"Unknown"}, {"id"=>"1371", "name"=>"Industry", "matches"=>"Unknown"}, {"id"=>"1381", "name"=>"Location", "matches"=>"Unknown"}, {"id"=>"1391", "name"=>"Job Title", "matches"=>"Unknown"}, {"id"=>"1401", "name"=>"Department", "matches"=>"Unknown"}]}, "visitors"=>nil, "visitor_activities"=>nil, "lists"=>nil}'
-    # Pardot::Member.any_instance.stubs(:save!).returns(response)
 
     @admin_agent = Agent.find_by(roles: 'admin') || FactoryGirl.create(:confirmed_admin_agent)
     @club = FactoryGirl.create(:club_with_api)
     @club_without_api = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id)
+    @terms_of_membership_with_gateway_and_api = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id)
     @terms_of_membership_without_api = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club_without_api.id)
     
     Time.zone = @club.time_zone
     @partner = @club.partner
     @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
     @unsaved_user = FactoryGirl.build(:active_user)
+
+    if with_api
+      body = { uid: 43655, uri: 'https://test/api/user/43655', urllogin: { token: 'PWWDuGc-elRE', url: 'https://test/l/PWWDuGc-elRE' } }
+      Faraday::Connection.any_instance.stubs(:post).returns(Hashie::Mash.new({ status: 200, body: {uid: 43655, uri: 'https://test/api/user/43655', urllogin: {token: 'PWWDuGc-elRE', url: 'https://test/l/PWWDuGc-elRE'}} }))
+      @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, nil, nil, @terms_of_membership_with_gateway_and_api)
+    else
+      @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, nil, nil, @terms_of_membership_without_api)
+    end
     sign_in_as(@admin_agent)  
   end
 
@@ -53,37 +58,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   #   visit show_member_path(:partner_prefix => @saved_member.club.partner.prefix, :club_prefix => @saved_member.club.name, :member_prefix => @saved_member.id)
   # end
 
-  test "Syncronize a club - club has a good drupal domain" do
-    setup_user
-  	assert_not_equal(@club.api_username, nil)
-  	assert_not_equal(@club.api_password, nil)
-  	assert_not_equal(@club.drupal_domain_id, nil)
-  end
-
-  test "Club with invalid 'drupal domain' (that is, a domain where there is no drupal installed)" do
-    setup_user
-    @club.update_attribute(:drupal_domain_id, 999);
-    @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, nil, nil, @terms_of_membership_with_gateway)
-    visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
-    assert find_field('input_first_name').value == @unsaved_user.first_name
-
-    within(".nav-tabs"){ click_on("Sync Status") }
-    within("#sync_status"){	click_link_or_button(I18n.t('buttons.login_remotely_as_user')) }
-
-    assert find_field('input_first_name').value == @unsaved_user.first_name
-    within("#sync_status"){ click_link_or_button(I18n.t('buttons.password_reset')) }
-    assert find_field('input_first_name').value == @unsaved_user.first_name
-    within("#sync_status"){ assert page.has_selector?("#show_remote_data") }
-    assert find_field('input_first_name').value == @unsaved_user.first_name
-
-    within("#span_api_id"){ assert page.has_content?("none") }
-    within("#td_mi_last_sync_error_at"){ assert page.has_content?("none") }
-    within("#td_autologin_url"){ assert page.has_content?("none") }
-  end
-
   test "Club without 'drupal domain'" do
-    setup_user
-    @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, nil, nil, @terms_of_membership_without_api)
+    setup_user(false)
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
 
     within(".nav-tabs") do
@@ -94,7 +70,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   # Should not let agent to update api_id when user is 
   test "Create an user with 'Not synced', 'Synced error' and 'Synced' Status and update it's api id" do
     setup_user
-    @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, nil, nil, @terms_of_membership_with_gateway)
 
     # with not synced status
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
@@ -148,19 +123,20 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
       click_on("Operations")
     end
     within("#operations_table") do
-      assert page.has_content?("User's api_id changed from nil to \"1234\"")
+      assert page.has_content?("User's api_id changed from \"43655\" to \"1234\"")
     end
     within(".nav-tabs") do
       click_on("Sync Status")
     end
     within("#span_api_id")do
+        @saved_user.reload
       assert page.has_content?(@saved_user.api_id.to_s)
     end
 
     # do not allow to use another user's same api_id
     @unsaved_user2 = FactoryGirl.build(:active_user, :club_id => @club.id)
     credit_card2 = FactoryGirl.build(:credit_card_american_express)
-    @saved_user2 = create_user_by_sloop(@admin_agent, @unsaved_user2, credit_card2, nil, @terms_of_membership_with_gateway)
+    @saved_user2 = create_user_by_sloop(@admin_agent, @unsaved_user2, credit_card2, nil, @terms_of_membership_with_gateway_and_api)
     @saved_user2.update_attribute(:api_id, "5678")
   
     within(".nav-tabs"){ click_on("Sync Status") }
@@ -214,7 +190,6 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
 
   test 'Platform will create Drupal account by Drupal API' do
     setup_user
-    @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, nil, nil, @terms_of_membership_with_gateway)
     @saved_user.update_attribute(:api_id, "1234")
     
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
