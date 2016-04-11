@@ -311,7 +311,7 @@
     <tr class="box_title"><th>Preferences</th></tr>
   </thead>
   <tbody>
-    <% unless @current_user.preferences.nil? %>
+    <% unless @current_user.preferences.present? %>
       <% @current_user.preferences.each do |key, value| %>
         <tr><td> <%= key %>: <%= value %> </td></tr>
       <% end %>
