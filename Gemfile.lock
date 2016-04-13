@@ -509,7 +509,7 @@ DEPENDENCIES
   ruby-prof
   rvm-capistrano
   sass-rails
-  selenium-webdriver (>= 2.52.0)
+  selenium-webdriver (>= 2.53.0)
   settingslogic (= 2.0.8)
   simplecov
   state_machine (= 1.1.2)
