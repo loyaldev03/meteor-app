@@ -93,11 +93,10 @@ class Communication < ActiveRecord::Base
   rescue Exception => e
     logger.error "* * * * * #{e}"
     update_attributes sent_success: false, response: e, processed_at: Time.zone.now
-    unless e.to_s.include?("Timeout")
-      Auditory.report_issue("Communication deliver_mandrill", e, { user: user.id, 
-        current_membership: user.current_membership.id, communication: self.inspect })
-      Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
-    end
+
+    raise NonReportableException.new if (['Timeout','504','408'].select{|word| e.to_s.include? word}).any?
+    Auditory.report_issue("Communication deliver_mandrill", e, { user: user.id, current_membership: user.current_membership.id, communication: self.inspect })
+    Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
   end
   handle_asynchronously :deliver_mandrill, queue: :mandrill_email, priority: 15
 
