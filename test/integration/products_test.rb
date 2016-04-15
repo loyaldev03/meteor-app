@@ -51,9 +51,8 @@ class ProductsTest < ActionDispatch::IntegrationTest
     assert page.has_content?(saved_product.stock.to_s)
     assert page.has_content?(saved_product.weight.to_s)
 
-
     visit products_path(@partner.prefix, @club.name)
-    first(:link, "Edit").click
+    within("tr", text: saved_product.sku){ click_link_or_button "Edit" }
     assert page.has_content?('Edit Product')
 
     fill_in 'product[stock]', with: saved_product.stock + 1
