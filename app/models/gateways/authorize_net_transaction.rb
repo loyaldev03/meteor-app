@@ -26,7 +26,7 @@ class AuthorizeNetTransaction < Transaction
     def save_response(answer)
       self.response = answer
       self.success = answer.success?
-      logger.error answer.inspect
+      logger.info answer.inspect
       if answer.params
         self.response_transaction_id=answer.params['transaction_id']
         # self.response_auth_code=answer.params['auth_code']

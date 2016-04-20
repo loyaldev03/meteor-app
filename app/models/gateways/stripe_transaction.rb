@@ -10,7 +10,7 @@ class StripeTransaction < Transaction
     gateway = ActiveMerchant::Billing::StripeGateway.new login: pgc.login
     params = user.stripe_id ? {customer: user.stripe_id, :set_default => true} : {email: user.email, :set_default => true}
     answer = gateway.store(am_credit_card, params)
-    logger.error "AM::Store::Answer => " + answer.inspect
+    logger.info "AM::Store::Answer => " + answer.inspect
     raise answer.params["error"]["code"] if answer.params["error"]
     if user.stripe_id
       answer.params["fingerprint"]

@@ -11,7 +11,7 @@ class FirstDataTransaction < Transaction
     gateway = ActiveMerchant::Billing::FirstdataE4Gateway.new(login_data)
     answer = gateway.store(am_credit_card)
 
-    logger.error "AM::Store::Answer => " + answer.inspect
+    logger.info "AM::Store::Answer => " + answer.inspect
     raise answer.message unless answer.success?    
     answer.params["transarmor_token"] if answer.params
   end

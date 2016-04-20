@@ -14,7 +14,7 @@ class MerchantESolutionsTransaction < Transaction
     login_data = { login: pgc.login, password: pgc.password, merchant_key: pgc.merchant_key }
     gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(login_data)
     answer = gateway.store(am_credit_card)
-    logger.error "AM::Store::Answer => " + answer.inspect
+    logger.info "AM::Store::Answer => " + answer.inspect
     raise answer.params['error_code'] unless answer.success?
     answer.params['transaction_id']
   end
