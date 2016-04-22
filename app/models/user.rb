@@ -32,11 +32,12 @@ class User < ActiveRecord::Base
   before_save :wrong_address_logic
   before_save :set_marketing_client_sync_as_needed
   after_create :elasticsearch_asyn_call
-  after_update :elasticsearch_asyn_call
-  after_update :after_save_sync_to_remote_domain
-  after_destroy 'cancel_user_at_remote_domain'
   after_create 'asyn_desnormalize_preferences(force: true)'
+  after_update :elasticsearch_asyn_call
+  after_update :mkt_tool_check_email_changed_for_sync
+  after_update :after_save_sync_to_remote_domain
   after_update :asyn_desnormalize_preferences
+  after_destroy 'cancel_user_at_remote_domain'
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_user_at_remote_domain
@@ -1540,7 +1541,7 @@ class User < ActiveRecord::Base
     end
 
     def set_marketing_client_sync_as_needed
-      self.need_sync_to_marketing_client = true if not self.lapsed? and (defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel))
+      self.need_sync_to_marketing_client = true if (defined?(SacExactTarget::MemberModel) or defined?(SacMailchimp::MemberModel))
     end
     
     def days_until_next_bill_date
@@ -1565,6 +1566,14 @@ class User < ActiveRecord::Base
         0.0
       else
         (terms_of_membership.club_cash_installment_amount*(days_until_next_bill_date/terms_of_membership.installment_period.to_f)).round
+      end
+    end
+
+    def mkt_tool_check_email_changed_for_sync
+      if self.email_changed?
+        if club.mailchimp_mandrill_client?
+          marketing_tool_update_email(self.email_change.first) if defined?(SacMailchimp::MemberModel)
+        end
       end
     end
 end

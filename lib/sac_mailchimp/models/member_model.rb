@@ -4,7 +4,6 @@ module SacMailchimp
     def save!
       if has_fake_email? 
         res = Gibbon::MailChimpError.new "Email address looks fake or invalid. Synchronization was canceled"
-        res.code = "-100"
       else
         res = new_record? ? create! : update!
       end
@@ -14,10 +13,9 @@ module SacMailchimp
     def new_record?
       # Find by subscriber key. We can search by email, euid or leid. euid is an ID attached to the email, it means it changes when the email changes. leid is an ID attached to the subscriber, it does not change when the email is updated.
       # We are serching by leid, which is the ID attached to the subscriber.
-      mailchimp_identification = self.user.marketing_client_id.nil? ? {email: self.user.email} : {leid: self.user.marketing_client_id}
-      res = Gibbon::API.lists.member_info({ id: mailchimp_list_id, emails: [mailchimp_identification] })
-      @subscriber = res
-      @subscriber["success_count"] == 0
+      # Gibbon::Retrieve raise the followingexception when the subscriber is not found: Gibbon::MailChimpError: the server responded with status 404
+      new_record = client.lists(mailchimp_list_id).members(email).retrieve rescue false
+      new_record.blank?
     rescue Gibbon::MailChimpError => e
       update_member e
       raise e
@@ -26,11 +24,23 @@ module SacMailchimp
     def unsubscribe!
     	begin
         return if has_fake_email?
-      	client.lists.unsubscribe({:id => mailchimp_list_id, :email => { :email => self.user.email }})
+        client.lists(mailchimp_list_id).members(email).update(body: { status: "unsubscribed" })
       rescue Gibbon::MailChimpError => e
         update_member e
         raise e
     	end
+    end
+
+    def clean!(former_email)
+      begin
+        unless has_fake_email?(former_email)
+          client.lists(mailchimp_list_id).members(email(former_email)).update(body: { status: 'cleaned' })
+        end
+        subscribe!
+      rescue Gibbon::MailChimpError => e
+        update_member e
+        raise e
+      end
     end
 
     def subscribe!
@@ -40,21 +50,17 @@ module SacMailchimp
     def create!
 			options = {:double_optin => false}
       begin
-      	client.lists.subscribe( subscriber({:email => self.user.email}, options) )
+        client.lists(mailchimp_list_id).members.create(body: { email_address: self.user.email, status: subscriber_status, merge_fields: subscriber_data })
       rescue Gibbon::MailChimpError => e
         update_member e
         raise e
       end
     end
 
-    def update!
-    	options = { :update_existing => true, :double_optin => false }
+    def update!(body_options={})
     	begin
-        # We check if the subscriber is a prospect or not. In case it is a prospect we make reference 
-        # to the leid we do not have saved. In case it is not prospect we use marketing_client we have.
-        # TODO: if we have a marketing_client_id in prospect too we would be avoiding this step.
-        mailchimp_identification = self.user.marketing_client_id.nil? ? @subscriber["data"].first["leid"] : self.user.marketing_client_id
-      	client.lists.subscribe( subscriber({:leid => mailchimp_identification}, options) )
+        data = { body: { status: subscriber_status, merge_fields:  subscriber_data }.merge(body_options) }
+        client.lists(mailchimp_list_id).members(email).update(data)
       rescue Gibbon::MailChimpError => e
         update_member e
         raise e
@@ -71,7 +77,7 @@ module SacMailchimp
       elsif res.instance_of? Gibbon::MailChimpError 
         { 
           marketing_client_synced_status: 'error',
-          marketing_client_last_sync_error: "Code: #{res.code} Message: #{res.message}.",
+          marketing_client_last_sync_error: res.to_s,
           marketing_client_last_sync_error_at: Time.zone.now
         }
       else
@@ -83,7 +89,7 @@ module SacMailchimp
           marketing_client_id: res["leid"]
         }
       end
-      additional_data = if res.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include? res.code.to_s
+      additional_data = if res.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.select{|code| res.to_s.include? code }.any?
         {marketing_client_id: nil, need_sync_to_marketing_client: true}
       else
         {need_sync_to_marketing_client: false}
@@ -93,7 +99,7 @@ module SacMailchimp
       self.user.reload rescue self.user
     end
 
-    def subscriber(mailchimp_identification ,options={})
+    def subscriber_data
     	attributes = {}
     	fieldmap.each do |api_field, our_field| 
         attributes.merge!(SacMailchimp.format_attribute(self.user, api_field, our_field))
@@ -116,7 +122,7 @@ module SacMailchimp
         attributes.merge!({ "PREF2" => self.user.preferences["example_team"].to_s })
       end
 
-			{ id: mailchimp_list_id, :email => mailchimp_identification, :merge_vars => attributes }.merge!(options)
+			attributes
     end
 
     #If any of these variables are changed, please check Mandrill's variable too.
@@ -194,15 +200,23 @@ module SacMailchimp
     end
 
     def client
-      Gibbon::API.new
+      Gibbon::Request.new
+    end
+
+    def email(subscriber_email = nil)
+      Digest::MD5.hexdigest(subscriber_email || self.user.email)
+    end
+
+    def subscriber_status
+      self.user.lapsed? ? 'unsubscribed' : 'subscribed' 
     end
 
     def mailchimp_list_id
     	@list_id ||= self.user.club.marketing_tool_attributes["mailchimp_list_id"]
     end
 
-    def has_fake_email?
-      ["mailinator.com", "test.com", "noemail.com"].include? self.user.email.split("@")[1]
+    def has_fake_email?(subscriber_email = nil)
+      ["mailinator.com", "test.com", "noemail.com"].include? (subscriber_email || self.user.email).split("@")[1]
     end
 	end
 end
