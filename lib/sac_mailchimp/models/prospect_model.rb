@@ -3,31 +3,25 @@ module SacMailchimp
 
     def save!(club)
       setup_club(club)
-      if self.prospect.email and not ["mailinator.com", "test.com", "noemail.com"].include? self.prospect.email.split("@")[1]
-        subscriber = SacMailchimp::ProspectModel.find_by_email self.prospect.email, mailchimp_list_id
-        res = if subscriber["status"]=='error'
-          subscriber
-        elsif subscriber["success_count"] == 0
-          begin 
-            options = {:double_optin => false}
-            client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
-          end       
-        elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_user?(subscriber["data"].first["email"], club_id)
-          begin
-            options = { :update_existing => true, :double_optin => false }
-            client.lists.subscribe( subscriber({:email => self.prospect.email}, options) )
-          end
+      res = if self.prospect.email and not ["mailinator.com", "test.com", "noemail.com"].include? self.prospect.email.split("@")[1]
+        new_record = client.lists(mailchimp_list_id).members(email).retrieve rescue false
+        if new_record.blank?
+          client.lists(mailchimp_list_id).members.create(body: { email_address: self.prospect.email, status: 'subscribed', merge_fields: subscriber_data })
+        elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_user?(self.prospect.email, club_id)
+          client.lists(mailchimp_list_id).members(email).update(body: { status: 'subscribed', merge_fields: subscriber_data })
         else
-          res = { "error" => "Email already saved as member." }
+          { "error" => "Email already saved as member." }
         end
       else 
-        res = { "error" => "Email address looks fake or invalid. Synchronization was canceled" }
+        { "error" => "Email address looks fake or invalid. Synchronization was canceled" }
       end
       update_prospect(res)
+    rescue Exception => e
+      update_prospect({ "error" => e.to_s })
     end
 
-    def self.email_belongs_to_prospect_and_no_user?(email, club_id)
-      not Prospect.find_by_email_and_club_id(email, club_id).nil? and User.find_by_email_and_club_id(email, club_id).nil?
+    def self.email_belongs_to_prospect_and_no_user?(subscriber_email, club_id)
+      not Prospect.find_by_email_and_club_id(subscriber_email, club_id).nil? and User.find_by_email_and_club_id(subscriber_email, club_id).nil?
     end
 
     def update_prospect(res)
@@ -44,7 +38,7 @@ module SacMailchimp
       self.prospect.reload rescue self.prospect
     end
 
-    def subscriber(mailchimp_identification ,options={})
+    def subscriber_data
     	attributes = {"STATUS" => 'prospect'}
     	fieldmap.each do |api_field, our_field| 
         attributes.merge!(SacMailchimp.format_attribute(self.prospect, api_field, our_field))
@@ -57,7 +51,7 @@ module SacMailchimp
         attributes.merge!({ "PREF1" => self.prospect.preferences["example_color"].to_s })
         attributes.merge!({ "PREF2" => self.prospect.preferences["example_team"].to_s })
       end
-			{ id: mailchimp_list_id , :email => mailchimp_identification, :merge_vars => attributes }.merge!(options)
+			attributes
     end
 
 		def fieldmap
@@ -115,14 +109,9 @@ module SacMailchimp
     end
 
     def client
-      Gibbon::API.new
+      Gibbon::Request.new
     end
 
-    def self.find_all_by_email!(email, list)
-      # Find by email . I didnt have luck looking for a subscriber by email and List.
-      res = Gibbon::API.lists.member_info({ id: list, emails: [{email: email}] })
-    end
-    
     def setup_club(club)
       @club = club.nil? ? self.prospect.club : club
     end
@@ -131,10 +120,10 @@ module SacMailchimp
       @club.id.to_s
     end
 
-    def self.find_by_email(email, list)
-      find_all_by_email!(email, list)
+    def email
+      Digest::MD5.hexdigest(self.prospect.email)
     end
- 
+
     def mailchimp_list_id
     	@list_id ||= self.prospect.club.marketing_tool_attributes["mailchimp_list_id"]
     end

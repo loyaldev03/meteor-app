@@ -10,7 +10,7 @@ Delayed::Worker.logger.level = Logger::DEBUG
 Delayed::Worker.class_eval do
   def handle_failed_job_with_notification(job, error)
     handle_failed_job_without_notification(job, error)
-    unless error.instance_of? NonReportableException
+    if not error.instance_of? NonReportableException and not %w(test development).include? Rails.env
       Auditory.report_issue(job.name, error, { error: error.inspect, job: job.inspect, handler: job.handler })
     end
   end

@@ -51,6 +51,16 @@ module SacMailchimp
       end
       handle_asynchronously :mailchimp_subscribe, :queue => :mailchimp_sync, priority: 30
 
+      def marketing_tool_update_email(former_email)
+        time_elapsed = Benchmark.ms do
+          mailchimp_member.clean!(former_email)
+        end
+        logger.info "SacMailchimp::clean_subscriber took #{time_elapsed}ms"
+      rescue Exception => e
+        SacMailchimp::report_error("Member:clean", e, self)
+      end
+      handle_asynchronously :marketing_tool_update_email, :queue => :mailchimp_sync, priority: 30
+      
       def mailchimp_unsubscribe
         time_elapsed = Benchmark.ms do
           mailchimp_after_create_sync_to_remote_domain 

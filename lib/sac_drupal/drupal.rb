@@ -14,13 +14,13 @@ module Drupal
     logger.info "  * extending Member and Club at #{I18n.l(Time.zone.now)}"
     Club.send :include, Drupal::ClubExtensions
 
-    if Faraday.respond_to? :register_middleware
+    if Faraday::Request.respond_to? :register_middleware
       logger.info "  * registering Faraday middleware: DrupalAuthentication"
-      Faraday.register_middleware :request,
-        :drupal_auth       => lambda { ::Drupal::FaradayMiddleware::DrupalAuthentication }
+      Faraday::Request.register_middleware :drupal_auth => lambda { ::Drupal::FaradayMiddleware::DrupalAuthentication }
+    end
+    if Faraday::Response.respond_to? :register_middleware
       logger.info "  * registering Faraday middleware: FixNonJsonBody"
-      Faraday.register_middleware :response,
-        :fix_non_json_body => lambda { ::Drupal::FaradayMiddleware::FixNonJsonBody }
+      Faraday::Response.register_middleware :fix_non_json_body => lambda { ::Drupal::FaradayMiddleware::FixNonJsonBody }
     end
 
     nil

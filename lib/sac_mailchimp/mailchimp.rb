@@ -22,8 +22,8 @@ module SacMailchimp
   end
 
   def self.config_integration(mailchimp_api_key)
-    Gibbon::API.api_key = mailchimp_api_key
-    Gibbon::API.throws_exceptions = true
+    Gibbon::Request.api_key = mailchimp_api_key
+    Gibbon::Request.throws_exceptions = true
   end
 
   def self.format_attribute(object, api_field, our_field)
@@ -38,7 +38,7 @@ module SacMailchimp
   end
 
   def self.report_error(message, error, subscriber, raise_exception = true)
-    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include? error.code.to_s)
+    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.select{|code| error.to_s.include? code}.any?)
       subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false) unless subscriber.club.billing_enable
       logger.info error.inspect
       raise NonReportableException.new if raise_exception
