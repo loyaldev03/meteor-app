@@ -17,7 +17,7 @@ module SacMailchimp
       end
       update_prospect(res)
     rescue Exception => e
-      update_prospect({ "error" => e.to_s })
+      update_prospect(Gibbon::MailChimpError.new("unexpected error", { detail: e.to_s }))
     end
 
     def self.email_belongs_to_prospect_and_no_user?(subscriber_email, club_id)
@@ -27,8 +27,8 @@ module SacMailchimp
     def update_prospect(res)
       data = {}
       unless res.nil?
-        data = if res["error"]
-          { marketing_client_sync_result: res["error"] }
+        data = if res.instance_of? Gibbon::MailChimpError
+          { marketing_client_sync_result: res.detail }
         else
           { marketing_client_sync_result: 'Success' }
         end
@@ -59,7 +59,6 @@ module SacMailchimp
         'EMAIL' => 'email',
 		    'FNAME' => 'first_name',
 		    'LNAME' => 'last_name',
-		    'ADDRESS' => 'address',
 		    'CITY' => 'city',
 		    'STATE' => 'state',
 		    'ZIP' => 'zip',
