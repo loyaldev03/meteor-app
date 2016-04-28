@@ -3,7 +3,7 @@ module SacMailchimp
 
     def save!
       if has_fake_email? 
-        res = Gibbon::MailChimpError.new("invalid email", { detail: "Email address looks fake or invalid. Synchronization was canceled" })
+        res = Gibbon::MailChimpError.new('invalid email', { body: {'status' => 100}, detail: "Email address looks fake or invalid. Synchronization was canceled" })
       else
         res = new_record? ? create! : update!
       end
@@ -86,7 +86,7 @@ module SacMailchimp
           marketing_client_synced_status: 'synced',
           marketing_client_last_sync_error: nil,
           marketing_client_last_sync_error_at: nil,
-          marketing_client_id: res["leid"]
+          marketing_client_id: res["unique_email_id"]
         }
       end
       additional_data = if res.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include?(res.body["status"])
