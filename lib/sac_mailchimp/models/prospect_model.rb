@@ -4,16 +4,20 @@ module SacMailchimp
     def save!(club)
       setup_club(club)
       res = if self.prospect.email and not ["mailinator.com", "test.com", "noemail.com"].include? self.prospect.email.split("@")[1]
-        new_record = client.lists(mailchimp_list_id).members(email).retrieve rescue false
-        if new_record.blank?
-          client.lists(mailchimp_list_id).members.create(body: { email_address: self.prospect.email, status: 'subscribed', merge_fields: subscriber_data })
+        subscriber = client.lists(mailchimp_list_id).members(email).retrieve rescue false
+        if subscriber.blank?
+          client.lists(mailchimp_list_id).members.create(body: { email_address: self.prospect.email, status: 'subscribed', merge_fields: subscriber_data.merge('ADMINUNSUB' => 'false') })
         elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_user?(self.prospect.email, club_id)
-          client.lists(mailchimp_list_id).members(email).update(body: { status: 'subscribed', merge_fields: subscriber_data })
+          if subscriber and (['subscribed','cleaned'].include?(subscriber['status']) or (subscriber['status']=='unsubscribed' and subscriber['merge_fields']['ADMINUNSUB'] == 'true'))
+            client.lists(mailchimp_list_id).members(email).update(body: { status: 'subscribed', merge_fields: subscriber_data })
+          else
+            Gibbon::MailChimpError.new('User has unsubscribed in Mailchimp.', { detail: "It seems that the user has unsubscribed in Mailchimp." })
+          end
         else
-          { "error" => "Email already saved as member." }
+          Gibbon::MailChimpError.new('Synchronization canceled.', { detail: "Email already saved as member." })
         end
       else 
-        { "error" => "Email address looks fake or invalid. Synchronization was canceled" }
+        Gibbon::MailChimpError.new('Synchronization canceled.', { detail: "Email address looks fake or invalid. Synchronization was canceled." })
       end
       update_prospect(res)
     rescue Exception => e
