@@ -6,7 +6,7 @@ module SacMailchimp
       res = if self.prospect.email and not ["mailinator.com", "test.com", "noemail.com"].include? self.prospect.email.split("@")[1]
         subscriber = client.lists(mailchimp_list_id).members(email).retrieve rescue false
         if subscriber.blank?
-          client.lists(mailchimp_list_id).members.create(body: { email_address: self.prospect.email, status: 'subscribed', merge_fields: subscriber_data.merge('ADMINUNSUB' => 'false') })
+          client.lists(mailchimp_list_id).members.create(body: { email_address: self.prospect.email.downcase, status: 'subscribed', merge_fields: subscriber_data.merge('ADMINUNSUB' => 'false') })
         elsif SacMailchimp::ProspectModel.email_belongs_to_prospect_and_no_user?(self.prospect.email, club_id)
           if subscriber and (['subscribed','cleaned'].include?(subscriber['status']) or (subscriber['status']=='unsubscribed' and subscriber['merge_fields']['ADMINUNSUB'] == 'true'))
             client.lists(mailchimp_list_id).members(email).update(body: { status: 'subscribed', merge_fields: subscriber_data })
@@ -124,7 +124,7 @@ module SacMailchimp
     end
 
     def email
-      Digest::MD5.hexdigest(self.prospect.email)
+      Digest::MD5.hexdigest(self.prospect.email.downcase)
     end
 
     def mailchimp_list_id

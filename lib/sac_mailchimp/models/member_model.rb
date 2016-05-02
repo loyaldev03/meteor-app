@@ -51,7 +51,7 @@ module SacMailchimp
 
     def create!
       begin
-        client.lists(mailchimp_list_id).members.create(body: { email_address: self.user.email, status: 'subscribed', merge_fields: subscriber_data.merge("ADMINUNSUB" => 'false') })
+        client.lists(mailchimp_list_id).members.create(body: { email_address: self.user.email.downcase, status: 'subscribed', merge_fields: subscriber_data.merge("ADMINUNSUB" => 'false') })
       rescue Gibbon::MailChimpError => e
         update_member e
         raise e
@@ -208,7 +208,7 @@ module SacMailchimp
     end
 
     def email(subscriber_email = nil)
-      Digest::MD5.hexdigest(subscriber_email || self.user.email)
+      Digest::MD5.hexdigest( (subscriber_email || self.user.email).downcase )
     end
 
     def subscriber
@@ -229,7 +229,7 @@ module SacMailchimp
     end
 
     def has_fake_email?(subscriber_email = nil)
-      ["mailinator.com", "test.com", "noemail.com"].include? (subscriber_email || self.user.email).split("@")[1]
+      ["mailinator.com", "test.com", "noemail.com"].include? (subscriber_email || self.user.email).downcase.split("@")[1]
     end
 	end
 end
