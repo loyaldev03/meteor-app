@@ -3,7 +3,7 @@ module SacMailchimp
 
     def save!
       if has_fake_email? 
-        res = Gibbon::MailChimpError.new('invalid email', { body: {'status' => 100}, detail: "Email address looks fake or invalid. Synchronization was canceled" })
+        res = Gibbon::MailChimpError.new('invalid email', { body: {'status' => 100}, title: 'Synchronization canceled.', detail: "Email address looks fake or invalid." })
       else
         res = new_record? ? create! : update!
       end
@@ -14,8 +14,7 @@ module SacMailchimp
       # Find by subscriber key. We can search by email, euid or leid. euid is an ID attached to the email, it means it changes when the email changes. leid is an ID attached to the subscriber, it does not change when the email is updated.
       # We are serching by leid, which is the ID attached to the subscriber.
       # Gibbon::Retrieve raise the followingexception when the subscriber is not found: Gibbon::MailChimpError: the server responded with status 404
-      new_record = client.lists(mailchimp_list_id).members(email).retrieve rescue false
-      new_record.blank?
+      subscriber.blank?
     rescue Gibbon::MailChimpError => e
       update_member e
       raise e
@@ -24,7 +23,7 @@ module SacMailchimp
     def unsubscribe!
     	begin
         return if has_fake_email?
-        client.lists(mailchimp_list_id).members(email).update(body: { status: "unsubscribed" })
+        client.lists(mailchimp_list_id).members(email).update(body: { status: "unsubscribed", merge_fields: {'ADMINUNSUB' => 'true'} })
       rescue Gibbon::MailChimpError => e
         update_member e
         raise e
@@ -34,7 +33,10 @@ module SacMailchimp
     def clean!(former_email)
       begin
         unless has_fake_email?(former_email)
-          client.lists(mailchimp_list_id).members(email(former_email)).update(body: { status: 'cleaned' })
+          res = client.lists(mailchimp_list_id).members(email(former_email)).retrieve rescue false
+          if res and subscriber_has_not_unsubscribed?(res)
+            client.lists(mailchimp_list_id).members(email(former_email)).update(body: { status: 'cleaned', merge_fields: {'ADMINUNSUB' => 'false'} })
+          end
         end
         subscribe!
       rescue Gibbon::MailChimpError => e
@@ -44,23 +46,26 @@ module SacMailchimp
     end
 
     def subscribe!
-      self.save!
+      save!
     end
 
     def create!
-			options = {:double_optin => false}
       begin
-        client.lists(mailchimp_list_id).members.create(body: { email_address: self.user.email, status: subscriber_status, merge_fields: subscriber_data })
+        client.lists(mailchimp_list_id).members.create(body: { email_address: self.user.email, status: 'subscribed', merge_fields: subscriber_data.merge("ADMINUNSUB" => 'false') })
       rescue Gibbon::MailChimpError => e
         update_member e
         raise e
       end
     end
 
-    def update!(body_options={})
+    def update!
     	begin
-        data = { body: { status: subscriber_status, merge_fields:  subscriber_data }.merge(body_options) }
-        client.lists(mailchimp_list_id).members(email).update(data)
+        if subscriber_has_not_unsubscribed?
+          data = { body: { status: subscriber_status, merge_fields:  subscriber_data.merge('ADMINUNSUB' => (self.user.lapsed? ? 'true' : 'false')) } }
+          client.lists(mailchimp_list_id).members(email).update(data)
+        else 
+          Gibbon::MailChimpError.new('User has unsubscribed in Mailchimp.', { body: {'status' => 100}, title: 'Subscriber not updated', detail: "It seems that the user has unsubscribed in Mailchimp." })
+        end
       rescue Gibbon::MailChimpError => e
         update_member e
         raise e
@@ -206,12 +211,21 @@ module SacMailchimp
       Digest::MD5.hexdigest(subscriber_email || self.user.email)
     end
 
+    def subscriber
+      @subscriber = client.lists(mailchimp_list_id).members(email).retrieve rescue false
+    end
+
     def subscriber_status
       self.user.lapsed? ? 'unsubscribed' : 'subscribed' 
     end
 
     def mailchimp_list_id
     	@list_id ||= self.user.club.marketing_tool_attributes["mailchimp_list_id"]
+    end
+
+    def subscriber_has_not_unsubscribed?(response = nil)
+      response ||= subscriber
+      response and (['subscribed','cleaned'].include?(response['status']) or ( response['status']=='unsubscribed' and response['merge_fields']['ADMINUNSUB'] == 'true'))
     end
 
     def has_fake_email?(subscriber_email = nil)
