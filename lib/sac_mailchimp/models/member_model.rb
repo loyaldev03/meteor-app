@@ -33,7 +33,7 @@ module SacMailchimp
     def clean!(former_email)
       begin
         unless has_fake_email?(former_email)
-          res = client.lists(mailchimp_list_id).members(email(former_email)).retrieve rescue false
+          res = client.lists(mailchimp_list_id).members(email(former_email)).retrieve rescue nil
           if res and subscriber_has_not_unsubscribed?(res)
             client.lists(mailchimp_list_id).members(email(former_email)).update(body: { status: 'cleaned', merge_fields: {'ADMINUNSUB' => 'false'} })
           end
@@ -212,7 +212,7 @@ module SacMailchimp
     end
 
     def subscriber
-      @subscriber = client.lists(mailchimp_list_id).members(email).retrieve rescue false
+      @subscriber = client.lists(mailchimp_list_id).members(email).retrieve rescue nil
     end
 
     def subscriber_status
