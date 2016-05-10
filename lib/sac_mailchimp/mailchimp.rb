@@ -1,8 +1,6 @@
 module SacMailchimp
   mattr_accessor :logger 
 
-  NO_REPORTABLE_ERRORS = ["214"]
-
   def self.enable_integration!
     logger.info " ** Initializing SAC Mailchimp integration at #{I18n.l(Time.zone.now)}"
 
@@ -38,12 +36,15 @@ module SacMailchimp
   end
 
   def self.report_error(message, error, subscriber, raise_exception = true)
-    if not subscriber.club.billing_enable or error.to_s.include?("Timeout") or (error.instance_of?(Gibbon::MailChimpError) and SacMailchimp::NO_REPORTABLE_ERRORS.include?(error.body["status"]))
-      subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false) unless subscriber.club.billing_enable
-      logger.info error.inspect
+    raise_exception = !(error.try(:detail).to_s.include? 'is in a complaince state due to unsubsribe, bounce, or compliance review and cannot be subscribed.')
+
+    logger.info error.inspect
+    if not subscriber.club.billing_enable
+      subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false)
+    elsif error.instance_of?(Gibbon::MailChimpError) and error.body.nil? #Timeout
       raise NonReportableException.new if raise_exception
     else
       raise error if raise_exception
-    end  
+    end
   end
 end
