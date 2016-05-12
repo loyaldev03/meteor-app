@@ -61,6 +61,20 @@ namespace :users do
     end
   end
 
+  desc "Process scheduled TOM changes"
+  # This task should be run each day at 3 am ?
+  task :process_scheduled_membership_changes => :environment do
+    Rails.logger = Logger.new("#{Rails.root}/log/members_process_scheduled_membership_changes.log")
+    Rails.logger.level = Logger::DEBUG
+    ActiveRecord::Base.logger = Rails.logger
+    tall = Time.zone.now
+    begin
+      TasksHelpers.process_scheduled_membership_changes
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run members:process_scheduled_membership_changes task"
+    end
+  end
+
   desc "Send Happy birthday email to members"
   # This task should be run each day at 3 am ?
   task :send_happy_birthday => :environment do

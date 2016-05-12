@@ -858,6 +858,11 @@ function user_change_next_bill_date(){
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
 };
 
+function user_save_the_sale_functions(){
+  disable_form_buttons_upon_submition('save_the_sale_form')  
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+}
+
 function chargeback_user_functions(){
   $('#chargeback_form').submit( function(event) {
     if($("#amount").val().match(/^[0-9 .]+$/)){

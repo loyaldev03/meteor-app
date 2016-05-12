@@ -357,7 +357,9 @@ class UserTest < ActiveSupport::TestCase
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
 
     old_membership_id = @saved_user.current_membership_id
-    @saved_user.save_the_sale @terms_of_membership2.id
+    assert_difference('Membership.count',1) do
+      @saved_user.save_the_sale @terms_of_membership2.id
+    end
     @saved_user.reload
       
     assert_equal @saved_user.current_membership.status, @saved_user.status
@@ -372,11 +374,62 @@ class UserTest < ActiveSupport::TestCase
     answer = {:code => 500, message => "Error on sts"}
     User.any_instance.stubs(:enroll).returns(answer)
 
-    @saved_user.save_the_sale @terms_of_membership2.id
-    @saved_user.reload
-      
-    assert_equal @saved_user.current_membership.status, @saved_user.status
-    assert_equal @saved_user.current_membership.cancel_date, nil
+    former_membership_id = @saved_user.current_membership_id
+    assert_difference('Membership.count',0) do
+      @saved_user.save_the_sale @terms_of_membership2.id
+    end
+    assert_equal @saved_user.current_membership_id, former_membership_id
+  end
+
+  test "Scheduled save the sale (do not remove club cash)" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
+    @saved_user.update_attribute :club_cash_amount, 100
+    scheduled_date = (Time.current.to_date + 2.days).to_date
+
+    assert_difference('Membership.count',0) do
+      @saved_user.save_the_sale @terms_of_membership2.id, scheduled_date, {remove_club_cash: false}
+    end
+    assert_equal @saved_user.change_tom_date, scheduled_date
+    assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => false, 'terms_of_membership_id' => @terms_of_membership2.id}
+    
+    Timecop.travel(@saved_user.change_tom_date) do
+      assert_difference('Membership.count', 1) do
+        TasksHelpers.process_scheduled_membership_changes
+      end
+      @saved_user.reload
+      assert_equal @saved_user.club_cash_amount, 100
+      assert_equal @saved_user.change_tom_date, nil
+      assert_equal @saved_user.change_tom_attributes, nil
+      assert_equal @saved_user.terms_of_membership_id, @terms_of_membership2.id
+    end
+  end
+
+  test "Scheduled save the sale (remove club cash)" do
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
+    @saved_user.update_attribute :club_cash_amount, 100
+    scheduled_date = (Time.current.to_date + 2.days).to_date
+
+    assert_difference('Membership.count',0) do
+      @saved_user.save_the_sale @terms_of_membership2.id, scheduled_date, {remove_club_cash: true}
+    end
+    assert_equal @saved_user.change_tom_date, scheduled_date
+    assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => true, 'terms_of_membership_id' => @terms_of_membership2.id}
+    assert_equal @saved_user.club_cash_amount, 100
+    
+    Timecop.travel(@saved_user.change_tom_date) do
+      assert_difference('Membership.count', 1) do
+        TasksHelpers.process_scheduled_membership_changes
+      end
+      @saved_user.reload
+      assert_equal @saved_user.club_cash_amount, 0
+      assert_equal @saved_user.change_tom_date, nil
+      assert_equal @saved_user.change_tom_attributes, nil
+      assert_equal @saved_user.terms_of_membership_id, @terms_of_membership2.id
+    end
   end
 
   test "Downgrade user should fill parent_membership_id" do
@@ -473,9 +526,9 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  ##################################################
-  # => PREBILL
-  ##################################################
+  # ##################################################
+  # # => PREBILL
+  # ##################################################
 
   test "Send Prebill email (7 or 30 days before NBD)" do
     user = create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc)    

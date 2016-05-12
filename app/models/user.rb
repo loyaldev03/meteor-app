@@ -27,6 +27,7 @@ class User < ActiveRecord::Base
   
   serialize :preferences, JSON
   serialize :additional_data, JSON
+  serialize :change_tom_attributes, JSON
 
   before_create :record_date
   before_save :wrong_address_logic
@@ -250,6 +251,8 @@ class User < ActiveRecord::Base
       self.current_join_date = Time.zone.now
     end
     self.recycled_times = 0
+    self.change_tom_date = nil
+    self.change_tom_attributes = nil
     self.save(validate: false)
     assign_club_cash('club cash on enroll', true) unless skip_add_club_cash
   end
@@ -421,7 +424,7 @@ class User < ActiveRecord::Base
   
   ###############################################
 
-  def change_terms_of_membership(tom, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil)
+  def change_terms_of_membership(tom, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil, schedule_date = nil, additional_actions = {})
     if can_change_tom?
       new_tom = tom.kind_of?(TermsOfMembership) ? tom : TermsOfMembership.find_by(id: tom)
 
@@ -431,6 +434,14 @@ class User < ActiveRecord::Base
             response = { message: "Nothing to change. Member is already enrolled on that TOM.", code: Settings.error_codes.nothing_to_change_tom }
           else
             previous_membership = current_membership
+            if schedule_date
+              self.change_tom_date = schedule_date
+              self.change_tom_attributes = additional_actions.merge(terms_of_membership_id: tom.id)
+              self.save(validate: false)
+              Auditory.audit(agent, self, operation_message, self, operation_type)
+              return { message: operation_message, code: Settings.error_codes.success }
+            end
+
             response = if prorated
               prorated_enroll(new_tom, agent, credit_card_params, membership_params)
             else
@@ -456,9 +467,20 @@ class User < ActiveRecord::Base
     end
   end
 
-  def save_the_sale(new_tom_id, agent = nil)
-    message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})"
-    change_terms_of_membership(new_tom_id, message, Settings.operation_types.save_the_sale, agent, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM })
+  def save_the_sale(new_tom_id, date = nil, additional_actions = {}, agent = nil)
+    new_tom = TermsOfMembership.find(new_tom_id)
+    if date.nil? or (date and date.to_date == Time.current.to_date)
+      message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})."
+      operation_type = Settings.operation_types.save_the_sale
+      date = nil
+    else
+      message = "User scheduled to be changed to TOM(#{new_tom.id}) -#{new_tom.name}- at #{date}."
+      operation_type = Settings.operation_types.terms_of_membership_change_scheduled
+    end
+    answer = change_terms_of_membership(new_tom, message, operation_type, agent, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM }, date, additional_actions)
+
+    nillify_club_cash("Removing club cash upon tom change.") if date.nil? and answer[:code] == Settings.error_codes.success and additional_actions[:remove_club_cash]
+    answer
   end
 
   def downgrade_user
@@ -922,9 +944,9 @@ class User < ActiveRecord::Base
   delegate :is_not_drupal?, to: :club
 
   # Resets user club cash in case of a cancelation.
-  def nillify_club_cash
+  def nillify_club_cash(message = 'Removing club cash because of member cancellation')
     if club.allow_club_cash_transaction?
-      add_club_cash(nil, -club_cash_amount, 'Removing club cash because of member cancellation')
+      add_club_cash(nil, -club_cash_amount, message)
       if is_not_drupal?
         self.club_cash_expire_date = nil
         self.save(validate: false)
@@ -1442,6 +1464,8 @@ class User < ActiveRecord::Base
       self.next_retry_bill_date = nil
       self.bill_date = nil
       self.recycled_times = 0
+      self.change_tom_attributes = nil
+      self.change_tom_date = nil
       self.save(validate: false)
       Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, current_membership, "Member canceled", self, Settings.operation_types.cancel)

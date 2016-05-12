@@ -110,7 +110,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.status, "active"
       
     assert_difference('Membership.count',0) do 
-      save_the_sale(@saved_user, @saved_user.current_membership.terms_of_membership, false)
+      save_the_sale(@saved_user, @saved_user.current_membership.terms_of_membership, nil, false, false)
     end
     assert page.has_content?("Nothing to change. Member is already enrolled on that TOM")
   end
@@ -210,5 +210,50 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
     end
 
     validate_view_user_base(@saved_user)
+  end
+
+  test "save the sale with remove club cash option as true" do
+    setup_user
+    assert_difference('Membership.count', 1) do 
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway, nil, true)
+    end
+    @saved_user.reload
+    assert_equal @saved_user.club_cash_amount, 0
+  end
+
+  test "schedule save the sale - club cash remove as true" do
+    setup_user
+    schedule_date = Time.current.to_date + 2.days
+    assert_difference('Membership.count', 0) do 
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway, schedule_date, true, false)
+    end
+    @saved_user.reload
+    assert_equal @saved_user.change_tom_date, schedule_date
+    assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => true, 'terms_of_membership_id' => @new_terms_of_membership_with_gateway.id}
+    assert @saved_user.club_cash_amount != 0
+  
+    within('#td_mi_future_tom_change') do
+      assert page.has_content? schedule_date
+      click_on 'Details'
+      assert page.has_content? @new_terms_of_membership_with_gateway.name
+    end
+  end
+
+  test "schedule save the sale - club cash remove as false" do
+    setup_user
+    schedule_date = Time.current.to_date + 2.days
+    assert_difference('Membership.count', 0) do 
+      save_the_sale(@saved_user, @new_terms_of_membership_with_gateway, schedule_date, false, false)
+    end
+    @saved_user.reload
+    assert_equal @saved_user.change_tom_date, schedule_date
+    assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => false, 'terms_of_membership_id' => @new_terms_of_membership_with_gateway.id}
+    assert @saved_user.club_cash_amount != 0
+  
+    within('#td_mi_future_tom_change') do
+      assert page.has_content? schedule_date
+      click_on 'Details'
+      assert page.has_content? @new_terms_of_membership_with_gateway.name
+    end
   end
 end

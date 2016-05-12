@@ -91,6 +91,7 @@ SacPlatform::Application.routes.draw do
         match '/manual_billing' => 'users#manual_billing', as: 'user_manual_billing', :via => [:get, :post]
         put '/toggle_testing_account' => 'users#toggle_testing_account', as: 'user_toggle_testing_account'
         match '/' => 'users#show', as: 'show_user', :via => [:get, :post]
+        put '/remove_future_tom_change' => 'users#unschedule_future_tom_update', as: 'user_unschedule_future_tom_update'
 
         post '/sync' => 'users#sync', as: 'user_sync'
         put  '/sync' => 'users#update_sync', as: 'user_update_sync'
