@@ -119,8 +119,13 @@ module TasksHelpers
       begin
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
         change_tom_attributes = user.change_tom_attributes
-        user.save_the_sale(change_tom_attributes['terms_of_membership_id'])
-        user.nillify_club_cash("Removing club cash upon scheduled tom change.") if change_tom_attributes['remove_club_cash']
+
+        answer = user.save_the_sale(change_tom_attributes['terms_of_membership_id'])
+        if answer[:code] == Settings.error_codes.success
+          user.nillify_club_cash("Removing club cash upon scheduled tom change.") if change_tom_attributes['remove_club_cash']
+        else      
+          Auditory.report_issue("Users::ProcessScheduledMembershipChange", answer[:message], { :user => user.id })
+        end
       rescue Exception => e
         Auditory.report_issue("Users::ProcessScheduledMembershipChange", e, { :user => user.id })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
