@@ -1307,6 +1307,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   # Tets Authorize net transactions
   def club_with_authorize_net
+    active_merchant_stubs_auth_net
     @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
     @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
     @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)

@@ -8,7 +8,7 @@ module TasksHelpers
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
 
-    base = User.joins(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND users.club_id IN (select id from clubs where billing_enable = true) AND users.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1", Time.zone.now.to_date).limit(4000)
+    base = User.joins(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND users.club_id IN (select id from clubs where billing_enable = true) AND users.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1 AND (users.change_tom_date IS NULL OR DATE(users.change_tom_date) > ?)", Time.zone.now.to_date, Time.zone.now.to_date).limit(4000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:billing rake task, processing #{base.length} users"
     base.to_enum.with_index.each do |user,index| 
       tz = Time.zone.now
@@ -87,8 +87,8 @@ module TasksHelpers
   # Method used from rake task and also from tests!
   def self.cancel_all_member_up_today
     enabled_clubs = Club.where(billing_enable: true).pluck(:id)
-    base = User.joins(:current_membership).where("club_id IN (?) AND date(memberships.cancel_date) <= ? AND memberships.status != ? ", enabled_clubs, Time.zone.now.to_date, 'lapsed')
-    base_for_manual_payment = User.joins(:current_membership).where("club_id IN (?) AND manual_payment = true AND date(bill_date) < ? AND memberships.status != ?", enabled_clubs, Time.zone.now.to_date, 'lapsed')
+    base = User.joins(:current_membership).where("club_id IN (?) AND date(memberships.cancel_date) <= ? AND memberships.status != ? AND (users.change_tom_date IS NULL OR DATE(users.change_tom_date) > ?)", enabled_clubs, Time.zone.now.to_date, 'lapsed', Time.zone.now.to_date)
+    base_for_manual_payment = User.joins(:current_membership).where("club_id IN (?) AND manual_payment = true AND date(bill_date) < ? AND memberships.status != ? AND (users.change_tom_date IS NULL OR DATE(users.change_tom_date) > ?)", enabled_clubs, Time.zone.now.to_date, 'lapsed', Time.zone.now.to_date)
    
     [base, base_for_manual_payment].each do |list|
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:cancel_all_member_up_today rake task, processing #{base.length} users"
@@ -107,6 +107,28 @@ module TasksHelpers
     end
   rescue Exception => e
     Auditory.report_issue("Users::Cancel", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+  end
+
+  def self.process_scheduled_membership_changes
+    enabled_clubs = Club.where(billing_enable: true).pluck(:id)
+    base = User.where(change_tom_date: Time.current.to_date , club_id: enabled_clubs)
+  
+    base.each_with_index do |user, index|
+      tz = Time.zone.now
+      begin
+        Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
+        change_tom_attributes = user.change_tom_attributes
+        user.save_the_sale(change_tom_attributes['terms_of_membership_id'])
+        user.nillify_club_cash("Removing club cash upon scheduled tom change.") if change_tom_attributes['remove_club_cash']
+      rescue Exception => e
+        Auditory.report_issue("Users::ProcessScheduledMembershipChange", e, { :user => user.id })
+        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+      end
+      Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
+    end
+  rescue Exception => e
+    Auditory.report_issue("Users::ProcessScheduledMembershipChange", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
     Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 

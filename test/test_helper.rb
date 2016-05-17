@@ -528,13 +528,15 @@ module ActionDispatch
       end
     end
 
-    def save_the_sale(user, new_terms_of_membership, validate = true)
+    def save_the_sale(user, new_terms_of_membership, schedule_date = nil, remove_club_cash = false, validate = true)
       assert_difference('Fulfillment.count',0) do 
         old_membership = user.current_membership
         next_retry_bill_date_old = user.next_retry_bill_date
         visit show_user_path(partner_prefix: user.club.partner.prefix, club_prefix: user.club.name, user_prefix: user.id)
         click_on 'Save the sale'    
         select(new_terms_of_membership.name, from: 'terms_of_membership_id')
+        select_from_datepicker('change_tom_date', schedule_date) if schedule_date
+        check 'remove_club_cash' if remove_club_cash
         confirm_ok_js
         click_on 'Save the sale'
         if validate

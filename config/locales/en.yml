@@ -47,6 +47,9 @@ en:
   days: "days"
   allow_blank_credit_card: "Allow blank credit card?"
   status: 'Status'
+  future_save_the_sale: "Schedule save the sale to be done at"
+  remove_club_cash: "Remove club cash when proceesing scheduled TOM change"
+  cancel_confirm_when_tom_change_scheduled: "The member you are about to cancel has a future subscription plan scheduled. If the cancelation date you will choose is before the one for the future subscription plan update then that scheduled subscription plan will have no effect."
   menu: 
     admin_menu: 'Admin Menu'
     logout: 'Logout'
@@ -104,6 +107,7 @@ en:
     mark_as_testing_account: "Mark as testing account"
     unmark_as_testing_account: "Unmark as testing account"
     set_not_processed: "Set as not processed"
+    details: 'Details'
   admin:
     agents:
       index:
@@ -351,6 +355,7 @@ en:
         tom: 'TOM'
         quota: 'Quota'
         product_sku: Product
+        change_tom_date: 'Subscription change' 
       disposition_type:
         id: 'ID'
         name: 'Name'

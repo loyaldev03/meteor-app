@@ -46,7 +46,7 @@
         <%= link_to 'Edit', (can?(:api_update, User) ? edit_user_path : '#'), :class => "btn btn-large-w btn-success #{'disabled' if cannot?(:api_update, User)}", :id => 'edit' %>
       </div>
       <div class="span4">
-        <%= link_to('Save the sale', (@current_user.can_change_tom? ? user_save_the_sale_path : '#'),:class => "btn btn-large-w btn-info #{'disabled' unless @current_user.can_change_tom?}",:id => 'save_the_sale') %>
+        <%= link_to('Save the sale', ((can?(:save_the_sale, User) and @current_user.can_change_tom?) ? user_save_the_sale_path : '#'),:class => "btn btn-large-w btn-info #{'disabled' unless @current_user.can_change_tom?}",:id => 'save_the_sale') %>
       </div>
       <div class="span4">
         <%= link_to 'Blacklist', (@current_user.can_be_blacklisted? ? user_blacklist_path : '#'), :class => "btn btn-large-w btn-danger #{'disabled' unless @current_user.can_be_blacklisted?}", :id => "blacklist_btn" %>
@@ -58,7 +58,7 @@
         <%= link_to 'Add a note', (can?(:add_user_note, UserNote) ? new_user_note_path : '#'), :class => "btn btn-large-w btn-success #{'disabled' if cannot?(:add_user_note, UserNote)}", :id => 'add_user_note' %>
       </div>
       <div class="span4">
-        <%= link_to('Cancel', (@current_user.can_be_canceled? ? user_cancel_path : '#'), :class => "btn  btn-large-w btn-danger #{'disabled' unless @current_user.can_be_canceled?}", :id => 'cancel') %>
+        <%= link_to('Cancel', (@current_user.can_be_canceled? ? user_cancel_path : '#'), :class => "btn  btn-large-w btn-danger #{'disabled' unless @current_user.can_be_canceled?}", :id => 'cancel', data: (current_user.change_tom_date.nil? ? {} : {confirm: t('cancel_confirm_when_tom_change_scheduled')})) %>
       </div>
       <% if @current_user.additional_data_form %>
         <div class="span4">
@@ -73,10 +73,10 @@
       </div>
       <% if @current_user.applied? %>
         <div class="span4">
-          <%= link_to "Approve", user_approve_path, :class => "btn btn-large-w btn-info", :confirm => t('are_you_sure'),:id => 'approve', :method => :post %>
+          <%= link_to "Approve", user_approve_path, :class => "btn btn-large-w btn-info", data: {:confirm => t('are_you_sure')},:id => 'approve', :method => :post %>
         </div>
         <div class="span4">
-          <%= link_to "Reject", user_reject_path, :class => "btn btn-large-w btn-danger", :confirm => t('are_you_sure'),:id => 'reject', :method => :post %>
+          <%= link_to "Reject", user_reject_path, :class => "btn btn-large-w btn-danger", data: {:confirm => t('are_you_sure')},:id => 'reject', :method => :post %>
         </div>
       <% end %>
     </div>  
@@ -275,9 +275,39 @@
             </td>
           </tr>
           <tr>
-            <th><%= t('activerecord.attributes.user.cancel_date') %>:</th>
-            <td id="td_mi_cancel_date"><%= I18n.l(@current_membership.cancel_date, :format => :only_date) unless @current_membership.cancel_date.nil? %></td>  
+          <th><%= t('activerecord.attributes.user.cancel_date') %>:</th>
+            <td id="td_mi_cancel_date"><%= I18n.l(@current_membership.cancel_date, :format => :only_date) unless @current_membership.cancel_date.nil? %>
+            </td>
           </tr>
+          <% if current_user.change_tom_date %>
+            <tr>
+              <th><%= t('activerecord.attributes.membership.change_tom_date') %>:</th>
+                <td id="td_mi_future_tom_change">
+                  <%= current_user.change_tom_date %>&nbsp;&nbsp;&nbsp;
+                  <%= link_to t('buttons.details'), "#myModalFutureTomChange", class:"btn btn-mini btn-info #{'disabled' unless (can?(:save_the_sale, User) and @current_user.can_change_tom?)}", 'data-toggle' => 'modal', rel: 'popover' %>
+
+                  <div id='myModalFutureTomChange' class='modal hide fade' tabindex='-1'role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
+                    <div class='modal-header'>
+                      <a href='#' class='close' data-dismiss='modal'>&times</a>
+                      <h3><%= t('activerecord.attributes.membership.change_tom_date') %></h3>
+                    </div>
+                    <div class='modal-body'>
+                      <table>
+                      <tr><td><b>Date</b>: <%= current_user.change_tom_date %></td></tr>
+                      <tr><td><b>Terms Of Membership</b>: <%= TermsOfMembership.find(current_user.change_tom_attributes['terms_of_membership_id']).name %></td></tr>
+                      <tr><td><b>Remove club cash</b>: <%= current_user.change_tom_attributes['remove_club_cash'] ? 'yes' : 'no' %></td></tr>
+                      </table>
+                    </div>
+                    <div class='modal-footer'>
+                      <%= link_to(user_unschedule_future_tom_update_path, method: 'put', :class => "btn btn-danger #{'disabled' unless (can?(:save_the_sale, User) and @current_user.can_change_tom?)}", id: 'remove_future_tom_change', data: {:confirm => t('are_you_sure')}) do %> 
+                        <i class="icon-pencil"></i> Unschedule
+                      <% end %>
+                      <a href='#' class='btn' data-dismiss='modal' >Close</a>
+                    </div>
+                  </div>
+                </td>
+            </tr>
+          <% end %>
           <% if @current_club.allow_club_cash_transaction? %>
             <tr class="ligthgrey">
               <th><%= t('activerecord.attributes.user.club_cash_amount') %>:</th>

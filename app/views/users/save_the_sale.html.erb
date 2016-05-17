@@ -3,7 +3,7 @@
 <%= form_tag(user_save_the_sale_path, id: 'save_the_sale_form') do %>
   <table class="table table-bordered">
     <tr>
-      <td>
+      <td colspan="2">
         <label class="help-inline">Today in: <%= @current_user.terms_of_membership.name %></label>
       </td>
     </tr>
@@ -13,16 +13,30 @@
         <%= select_tag :terms_of_membership_id, options_from_collection_for_select(TermsOfMembership.where(:club_id => @current_club ), "id", "name") %> 
       </td>
     </tr>
+    <tr><th colspan="2">Schedule Save the sale</th></tr>
+    <tr>
+      <td>
+        <%= label_tag :change_tom_date, t('future_save_the_sale'), :class => 'help-inline' %>
+        <%= text_field_tag :change_tom_date, (params[:change_tom_date] || Time.current.to_date), :class => 'datepicker readonly' %> 
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= label_tag :remove_club_cash, t('activerecord.remove_club_cash'), :class => 'help-inline' %>
+        <%= check_box_tag :remove_club_cash, true, params[:remove_club_cash] %>
+      </td>
+    </tr>
     <tr>
       <td> <%= submit_tag t('buttons.save_te_sale'), :class => 'btn btn-primary', data: {:confirm => t('are_you_sure')}, :id => "save_the_sale_button" %>
         <%= link_to t('buttons.full_save'), user_full_save_path , :class=> 'btn btn-success', :id => 'full_save_button' %> 
-        <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn', :id => 'cancel_button' %> </td>
+        <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn', :id => 'cancel_button' %> 
+        </td>
     </tr>
   </table>
 <% end%>
 
 
 <script>
-  $(document).ready( disable_form_buttons_upon_submition('save_the_sale_form') );
+  $(document).ready( user_save_the_sale_functions() );
 </script>
 

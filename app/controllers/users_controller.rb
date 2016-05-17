@@ -99,15 +99,27 @@ class UsersController < ApplicationController
         flash[:error] = "Subscription plan not found"
         redirect_to show_user_path
       else
-        answer = @current_user.save_the_sale(params[:terms_of_membership_id], current_agent)
+        save_the_sale_params = { remove_club_cash: params[:remove_club_cash].present? }
+        answer = current_user.save_the_sale(params[:terms_of_membership_id], params[:change_tom_date], save_the_sale_params, current_agent)
         if answer[:code] == Settings.error_codes.success
-          flash[:notice] = "Save the sale succesfully applied"
+          flash[:notice] = "Save the sale succesfully applied: #{answer[:message]}"
           redirect_to show_user_path
         else
           flash.now[:error] = answer[:message]
         end
       end
     end
+  end
+
+  def unschedule_future_tom_update
+    if current_user.can_change_tom? and @current_user.update_attributes change_tom_date: nil, change_tom_attributes: nil 
+      message = "Unschedule TOM change."
+      Auditory.audit(current_agent, current_user.current_membership, message, current_user, Settings.operation_types.unschedule_save_the_sale)
+      flash[:notice] = message
+    else
+      flash[:error] = "TOM change was not unscheduled."
+    end
+    redirect_to show_user_path
   end
 
   def recover
