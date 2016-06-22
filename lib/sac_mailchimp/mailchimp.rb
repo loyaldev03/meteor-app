@@ -36,7 +36,7 @@ module SacMailchimp
   end
 
   def self.report_error(message, error, subscriber, raise_exception = true)
-    raise_exception = !(error.try(:detail).to_s.include? 'is in a complaince state due to unsubscribe, bounce, or compliance review and cannot be subscribed.')
+    raise_exception = !(error.try(:detail).to_s.include? 'is in a compliance state due to unsubscribe, bounce, or compliance review and cannot be subscribed.')
     logger.info error.inspect
     if not subscriber.club.billing_enable
       subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false)
