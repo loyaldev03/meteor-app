@@ -100,7 +100,7 @@ class UsersController < ApplicationController
         redirect_to show_user_path
       else
         save_the_sale_params = { remove_club_cash: params[:remove_club_cash].present? }
-        answer = current_user.save_the_sale(params[:terms_of_membership_id], params[:change_tom_date], save_the_sale_params, current_agent)
+        answer = current_user.save_the_sale(params[:terms_of_membership_id], current_agent, params[:change_tom_date], save_the_sale_params)
         if answer[:code] == Settings.error_codes.success
           flash[:notice] = "Save the sale succesfully applied: #{answer[:message]}"
           redirect_to show_user_path
