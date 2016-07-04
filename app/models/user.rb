@@ -436,7 +436,7 @@ class User < ActiveRecord::Base
             previous_membership = current_membership
             if schedule_date
               self.change_tom_date = schedule_date
-              self.change_tom_attributes = additional_actions.merge(terms_of_membership_id: tom.id)
+              self.change_tom_attributes = additional_actions.merge(terms_of_membership_id: tom.id, agent_id: agent.id)
               self.save(validate: false)
               Auditory.audit(agent, self, operation_message, self, operation_type)
               return { message: operation_message, code: Settings.error_codes.success }
@@ -467,7 +467,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def save_the_sale(new_tom_id, date = nil, additional_actions = {}, agent = nil)
+  def save_the_sale(new_tom_id, agent = nil, date = nil, additional_actions = {})
     new_tom = TermsOfMembership.find(new_tom_id)
     if date.nil? or (date and date.to_date == Time.current.to_date)
       message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})."
