@@ -119,8 +119,8 @@ module TasksHelpers
       begin
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
         change_tom_attributes = user.change_tom_attributes
-
-        answer = user.save_the_sale(change_tom_attributes['terms_of_membership_id'], Agent.find(change_tom_attributes['agent_id']))
+        agent = Agent.find(change_tom_attributes['agent_id']) if change_tom_attributes['agent_id'] 
+        answer = user.save_the_sale(change_tom_attributes['terms_of_membership_id'], agent)
         if answer[:code] == Settings.error_codes.success
           user.nillify_club_cash("Removing club cash upon scheduled tom change.") if change_tom_attributes['remove_club_cash']
         else      
