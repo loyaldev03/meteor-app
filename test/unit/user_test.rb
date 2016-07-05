@@ -387,9 +387,8 @@ class UserTest < ActiveSupport::TestCase
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
     @saved_user.update_attribute :club_cash_amount, 100
     scheduled_date = (Time.current.to_date + 2.days).to_date
-
     assert_difference('Membership.count',0) do
-      @saved_user.save_the_sale @terms_of_membership2.id, scheduled_date, {remove_club_cash: false}
+      @saved_user.save_the_sale(@terms_of_membership2.id, nil, scheduled_date, {remove_club_cash: false})
     end
     assert_equal @saved_user.change_tom_date, scheduled_date
     assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => false, 'terms_of_membership_id' => @terms_of_membership2.id}
@@ -414,7 +413,7 @@ class UserTest < ActiveSupport::TestCase
     scheduled_date = (Time.current.to_date + 2.days).to_date
 
     assert_difference('Membership.count',0) do
-      @saved_user.save_the_sale @terms_of_membership2.id, scheduled_date, {remove_club_cash: true}
+      @saved_user.save_the_sale(@terms_of_membership2.id, nil, scheduled_date, {remove_club_cash: true})
     end
     assert_equal @saved_user.change_tom_date, scheduled_date
     assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => true, 'terms_of_membership_id' => @terms_of_membership2.id}

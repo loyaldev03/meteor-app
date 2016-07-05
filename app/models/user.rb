@@ -436,7 +436,8 @@ class User < ActiveRecord::Base
             previous_membership = current_membership
             if schedule_date
               self.change_tom_date = schedule_date
-              self.change_tom_attributes = additional_actions.merge(terms_of_membership_id: tom.id, agent_id: agent.id)
+              self.change_tom_attributes = additional_actions.merge(terms_of_membership_id: tom.id)
+              self.change_tom_attributes.merge!(agent_id: agent.id) if agent
               self.save(validate: false)
               Auditory.audit(agent, self, operation_message, self, operation_type)
               return { message: operation_message, code: Settings.error_codes.success }
