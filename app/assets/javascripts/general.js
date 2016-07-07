@@ -786,6 +786,24 @@ function fulfillment_files_functions() {
   });
 }  
 
+function campaigns_functions(){
+  $('#campaigns_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bSort": false,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "sAjaxSource": $('#campaigns_table').data('source')
+  });  
+}
+
+function campaign_form_functions(){
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+}
+
 function club_cash_transactions_functions(column_count){
   $('#club_cash_transactions_table').DataTable({
     "oLanguage": {"sSearch": "Filtered by:"},
