@@ -974,15 +974,8 @@ class User < ActiveRecord::Base
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing", enroll = false)
-    amount = enroll ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount
-    self.add_club_cash(nil, amount, message)
-    if is_not_drupal?
-      if self.club_cash_expire_date.nil? # first club cash assignment
-        self.update_attribute :club_cash_expire_date, join_date + 1.year
-      end
-    end
+    AssignClubCash.set(wait: 5.minutes).perform_later(self.id, message, enroll)
   end
-  handle_asynchronously :assign_club_cash, queue: :club_cash_queue, run_at: Proc.new { 5.minutes.from_now }, priority: 5
 
   # Adds club cash transaction. 
   def add_club_cash(agent, amount = 0, description = nil)
