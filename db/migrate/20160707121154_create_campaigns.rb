@@ -7,6 +7,7 @@ class CreateCampaigns < ActiveRecord::Migration
       t.date        :finish_date
       t.integer     :campaign_type
       t.integer     :transport
+      t.string      :transport_campaign_id
       t.string      :campaign_medium
       t.string      :campaign_medium_version
       t.string      :marketing_code

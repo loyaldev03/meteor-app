@@ -30,7 +30,8 @@ class Campaign < ActiveRecord::Base
     self.campaign_type            = params[:campaign_type]
     self.initial_date             = params[:initial_date]
     self.finish_date              = params[:finish_date]
-    # self.campaign_medium_version  = 
+    self.campaign_medium_version  = 
+    set_campaign_medium
   end
 
   private

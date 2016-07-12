@@ -1,38 +1,56 @@
-<div class="control-group">
-  <%= f.label :name, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :name, :class => 'text_field' %>
+<div class='span6'>
+  <div class="control-group">
+    <%= f.label :name, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :name, :class => 'text_field' %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :source, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :transport, options_for_select(Campaign.transports.map{|transport| [transport.first.humanize, transport.last]}, @campaign.transport), { class: 'form-control' } %> 
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :transport_campaign_id, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :transport_campaign_id, :class => 'text_field' %>
+    </div>
+  </div>
+  
+  <div class="control-group">
+    <%= f.label :campaign_type, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.select :campaign_type, options_for_select(Campaign.campaign_types.map{|campaign_type| [campaign_type.first.humanize, campaign_type.last]}, @campaign.campaign_type), { class: 'form-control' } %> 
+    </div>
   </div>
 </div>
 
-<div class="control-group">
-  <%= f.label :initial_date, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :initial_date, { :class => 'datepicker input-small readonly' } %>
+<div class='span4'>
+  <div class="control-group">
+    <%= f.label :initial_date, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :initial_date, { :class => 'datepicker input-small readonly' } %>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :finish_date, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :finish_date, { :class => 'datepicker input-small readonly' } %> 
+    </div>
+  </div>
+
+  <div class="control-group">
+    <%= f.label :campaign_medium_version, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.number_field :campaign_medium_version, min: 0 %>
+    </div>
   </div>
 </div>
 
-<div class="control-group">
-  <%= f.label :finish_date, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.text_field :finish_date, { :class => 'datepicker input-small readonly' } %> 
-  </div>
-</div>
-
-
-<div class="control-group">
-  <%= f.label :source, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.select :transport, options_for_select(Campaign.transports.map{|transport| [transport.first.humanize, transport.last]}, @campaign.transport), { class: 'form-control' } %> 
-  </div>
-</div>
-
-<div class="control-group">
-  <%= f.label :campaign_type, :class => 'control-label' %>
-  <div class="controls">
-    <%= f.select :campaign_type, options_for_select(Campaign.campaign_types.map{|campaign_type| [campaign_type.first.humanize, campaign_type.last]}, @campaign.campaign_type), { class: 'form-control' } %> 
-  </div>
-</div>
 
 
 <script>
