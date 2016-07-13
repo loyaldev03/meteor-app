@@ -1,4 +1,4 @@
-class CreateCampaigns < ActiveRecord::Migration
+class CreateCampaignTable < ActiveRecord::Migration
   def change
     create_table :campaigns do |t|
       t.string      :name
@@ -17,5 +17,9 @@ class CreateCampaigns < ActiveRecord::Migration
       t.references  :terms_of_membership
       t.timestamps  null: false
     end
+
+    add_index :campaigns, :club_id
+    add_index :campaigns, :initial_date
+    add_index :campaigns, :finish_date
   end
 end

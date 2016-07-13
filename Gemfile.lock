@@ -185,6 +185,7 @@ GEM
     dotenv (0.7.0)
     easy_roles (1.2.0)
     encryptor (1.1.3)
+    enum_help (0.0.15)
     erubis (2.7.0)
     eventmachine (1.0.8)
     excon (0.38.0)
@@ -482,6 +483,7 @@ DEPENDENCIES
   devise-encryptable
   easy_roles
   encryptor
+  enum_help
   exact_target_sdk!
   exception_notification!
   factory_girl_rails
@@ -528,3 +530,6 @@ DEPENDENCIES
   wirble
   yard!
   yard-rest
+
+BUNDLED WITH
+   1.12.4
