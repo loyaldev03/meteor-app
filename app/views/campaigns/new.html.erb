@@ -1,3 +1,9 @@
+<div class='row-fluid'>
+  <div class='span12'>
+		<h2>New Marketing Campaign</h2>
+		<hr />
+	</div>
+</div>
 <%= form_for @campaign, :html => { :class => 'form-horizontal', :id => 'new_campaign' } do |f| %>
   <%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>
