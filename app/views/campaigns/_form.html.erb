@@ -8,35 +8,19 @@
     </div>
 
     <div class="control-group">
-      <%= f.label :source, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.select :transport, options_for_select(Campaign.transports_i18n.invert, @campaign.transport), { class: 'form-control' } %> 
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :marketing_code, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :marketing_code, required: true  %>
-      </div>
-    </div>
-    
-    <div class="control-group">
-      <%= f.label :campaign_type, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.select :campaign_type, options_for_select(Campaign.campaign_types_i18n.invert, @campaign.campaign_type), { class: 'form-control' } %> 
-      </div>
-    </div>
-
-    <div class="control-group">
       <%= f.label :subscription_plan, :class => 'control-label' %>
       <div class="controls">
         <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name"), { class: 'form-control' } %> 
       </div>
     </div>
-  </div>
 
-  <div class='span6'>
+    <div class="control-group">
+      <%= f.label :enrollment_price, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.number_field :enrollment_price, required: true, within: 0...1000, step: 0.01 %>
+      </div>
+    </div>
+
     <div class="control-group">
       <%= f.label :initial_date, :class => 'control-label' %>
       <div class="controls">
@@ -48,6 +32,29 @@
       <%= f.label :finish_date, :class => 'control-label' %>
       <div class="controls">
         <%= f.text_field :finish_date, :class => 'datepicker input-small readonly', required: true  %>
+      </div>
+    </div>
+  </div>
+
+  <div class='span6'>
+    <div class="control-group">
+      <%= f.label :campaign_type, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :campaign_type, options_for_select(Campaign.campaign_types_i18n.invert, @campaign.campaign_type), { class: 'form-control' } %> 
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :source, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :transport, options_for_select(Campaign.transports_i18n.invert, @campaign.transport), { class: 'form-control' } %> 
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :marketing_code, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :marketing_code, required: true  %>
       </div>
     </div>
 
