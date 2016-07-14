@@ -1,1 +1,39 @@
-hello show page
+<div class='row-fluid'>
+  <div class='span12'>
+    <h2><%= @campaign.name %></h2>
+    <h4>Marketing Campaign</h4>
+    <hr />
+  </div>
+</div>
+
+<div>
+  <table class="table table-bordered">
+    <tbody>
+      <tr>
+        <td><b>Campaign Type:</b> <%= @campaign.campaign_type %></td>
+        <td><b>Subscription Plan:</b> <%= @campaign.terms_of_membership.name %></td>
+        <td><b>Enrollment Price:</b> <%= number_to_currency(@campaign.enrollment_price) %></td>
+        <td><b>Running from:</b> <%= @campaign.initial_date %> <b>to</b> <%= @campaign.finish_date %></td>
+      </tr>
+      <tr>
+        <td><b>Source:</b> <%= @campaign.transport %></td>
+        <td><b>Campaign Medium:</b> <%= @campaign.campaign_medium %></td>
+        <td><b>Campaign Medium Version:</b> <%= @campaign.campaign_medium_version %></td>
+        <td><b>Marketing Code:</b> <%= @campaign.marketing_code %></td>
+      </tr>
+      <tr>
+        <td><b>Fulfillment Code:</b> <%= @campaign.fulfillment_code %></td>
+        <td colspan="3">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <div class="form-actions">
+      <%= link_to t(:campaigns_index), campaigns_path, :class => "btn", :id => 'return_btn' %>
+      <%= link_to(t(:edit), edit_campaign_path(partner_prefix: @current_partner.prefix, club_prefix: @current_club.name, :id => @campaign.id.to_s), :class => 'btn') if @current_agent.can? :edit, Campaign, @current_club.id %>
+    </div>
+  </div>
+</div>
