@@ -62,6 +62,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     add_club_cash(@saved_user, 15, "Generic description")
     add_club_cash(@saved_user, -20, "Deducting more than user has.", false)
+    @saved_user.reload
     assert page.has_content?("You can not deduct 20.0 because the user only has 15.0 club cash.")
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within("#td_mi_club_cash_amount") { assert page.has_content?("15") }
@@ -105,6 +106,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
     @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
     @saved_user.bill_membership
     sleep(1) #To wait until billing is finished.
+    @saved_user.reload
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table")do
@@ -165,7 +167,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
     create_user_by_sloop(@admin_agent, @user, @credit_card, @enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by_email(@user.email)
     @saved_user.bill_membership
-
+    @saved_user.reload
   
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -197,6 +199,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
     @saved_user.current_membership.update_attribute :join_date, Time.zone.now-23.months
     @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
     @saved_user.bill_membership
+    @saved_user.reload
     assert_equal(@saved_user.club_cash_amount, current_club_cash + @terms_of_membership_with_gateway.club_cash_installment_amount )
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within("#table_membership_information")do
@@ -221,6 +224,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
     current_club_cash = @saved_user.club_cash_amount
     @saved_user.current_membership.update_attribute :join_date, Time.zone.now-23.months
     @saved_user.bill_membership 
+    @saved_user.reload
     assert_equal(@saved_user.club_cash_amount, (current_club_cash + @terms_of_membership_with_gateway.club_cash_installment_amount) )
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within("#table_membership_information")do
@@ -245,7 +249,8 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
     end
     current_club_cash = @saved_user.club_cash_amount
     @saved_user.current_membership.update_attribute :join_date, Time.zone.now-23.months
-    @saved_user.bill_membership 
+    @saved_user.bill_membership
+    @saved_user.reload
     assert_equal(@saved_user.club_cash_amount, (current_club_cash + @terms_of_membership_with_gateway.club_cash_installment_amount) )
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within("#table_membership_information")do
@@ -272,7 +277,8 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
     assert find_field('input_first_name').value == @saved_user.first_name
     @saved_user.reload
     @saved_user.current_membership.update_attribute :join_date, Time.zone.now-12.months
-    @saved_user.bill_membership 
+    @saved_user.bill_membership
+    @saved_user.reload
     assert_equal(@saved_user.club_cash_amount, @saved_user.terms_of_membership.club_cash_installment_amount )
     @saved_user.reload
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -289,6 +295,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
   test "club cash Renewal" do
     setup_user
     @saved_user.bill_membership
+    @saved_user.reload
     @saved_user.club_cash_expire_date = Date.today - 1
     @saved_user.save
     date = @saved_user.club_cash_expire_date
