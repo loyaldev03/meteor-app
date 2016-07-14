@@ -1,5 +1,6 @@
 class CampaignsController < ApplicationController
   before_filter :validate_club_presence
+  before_action :set_campaign, only: [:show, :edit, :update]
 
   def index
     my_authorize! :list, Campaign, current_club.id
@@ -45,7 +46,11 @@ class CampaignsController < ApplicationController
 
   private
     def campaign_params
-      params.require(:campaign).permit(:name, :transport, :marketing_code, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :campaign_medium_version, :transport_campaign_id, :fulfillment_code)
+      params.require(:campaign).permit(:name, :enrollment_price, :transport, :marketing_code, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :campaign_medium_version, :transport_campaign_id, :fulfillment_code)
+    end
+
+    def set_campaign
+      @campaign = Campaign.find(params[:id])
     end
 
 end
