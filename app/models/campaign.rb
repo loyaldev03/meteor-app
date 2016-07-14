@@ -2,6 +2,7 @@ class Campaign < ActiveRecord::Base
   belongs_to :club
   belongs_to :transport_setting
   has_many :campaign_days
+  belongs_to :terms_of_membership
   
   validates :name, :enrollment_price, :initial_date, :finish_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
