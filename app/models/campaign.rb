@@ -6,7 +6,6 @@ class Campaign < ActiveRecord::Base
 
   before_save :set_fulfillment_code
   before_update :custom_update
-  before_destroy :prevent_destroy
   
   validates :name, :enrollment_price, :initial_date, :finish_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
@@ -70,7 +69,7 @@ class Campaign < ActiveRecord::Base
     end
 
     def set_fulfillment_code
-      self.fulfillment_code = Array.new(16){rand(36).to_s(36)}.join if self.fulfillment_code == 'New automatic code'
+      self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join if self.fulfillment_code == 'New automatic code'
     end
 
     def check_dates_range
@@ -79,10 +78,5 @@ class Campaign < ActiveRecord::Base
           errors.add(:finish_date, "Must be greater or equal than initial date.")
         end
       end
-    end
-
-    def prevent_destroy
-      errors.add(:base, 'Campaign can not be destroyed!')
-      false
     end
 end
