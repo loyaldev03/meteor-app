@@ -14,6 +14,8 @@
  *= require scaffolds
  *= require jquery-ui
  *= require table_sorter_style
+ *= require select2
+ *= require select2-bootstrap
  */
 
 
