@@ -802,6 +802,7 @@ function campaigns_functions(){
 
 
 function campaign_form_functions() {
+
   function set_campaign_code_field() {
     var parent = $("#campaign_marketing_code").parent();
     if ($('#campaign_transport').val() == 'facebook') {
@@ -821,6 +822,11 @@ function campaign_form_functions() {
 
   set_campaign_code_field();
 
+  $("#campaign_terms_of_membership_id").select2({ theme: "bootstrap" });
+  $("#campaign_campaign_type").select2({ theme: "bootstrap" });
+  $("#campaign_transport").select2({ theme: "bootstrap" });
+  $("#campaign_fulfillment_code").select2({ theme: "bootstrap" });
+  
   $('#campaign_transport').change(function(){
     set_campaign_code_field();
   });
