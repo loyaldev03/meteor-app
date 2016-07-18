@@ -36,12 +36,18 @@ class CampaignsController < ApplicationController
 
   def edit
     my_authorize! :edit, Campaign, current_club.id
-    # fill in code
+    @terms_of_memberships = current_club.terms_of_memberships
   end
 
   def update
     my_authorize! :update, Campaign, current_club.id
-    # fill in code
+    if @campaign.update campaign_params
+      flash[:notice] = "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
+      redirect_to campaigns_url
+    else
+      flash[:error] = "Campaign <b>#{@campaign.name}</b> was not updated".html_safe
+      redirect_to campaigns_url
+    end
   end
 
   private
