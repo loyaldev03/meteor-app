@@ -76,10 +76,19 @@
       <%= f.label :fulfillment_code, :class => 'control-label' %>
       <div class="controls">
         <%= f.text_field :fulfillment_code, :class => 'text_field', required: true %>
+        <% if action_name == 'new' %><i id="generate_fulfillment_code" class="icon-refresh"></i><% end %>
       </div>
     </div>
   </div>
 </div>
+
+<% if action_name == 'edit' %>
+<div class='row-fluid'>
+  <div class='span12'>
+    <p class="muted"><i class="icon-info-sign"></i> There are some fields that can not be updated.</p>
+  </div>
+</div>
+<% end %>
 
 <br>
 
