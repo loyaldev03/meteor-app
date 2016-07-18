@@ -34,20 +34,41 @@
         <%= f.text_field :finish_date, :class => 'datepicker input-small readonly', required: true %>
       </div>
     </div>
-  </div>
 
-  <div class='span6'>
     <div class="control-group">
       <%= f.label :campaign_type, :class => 'control-label' %>
       <div class="controls">
         <%= f.select :campaign_type, options_for_select(Campaign.campaign_types_i18n.invert, @campaign.campaign_type), { class: 'form-control' } %> 
       </div>
     </div>
+  </div>
 
+  <div class='span6'>
     <div class="control-group">
       <%= f.label :source, :class => 'control-label' %>
       <div class="controls">
         <%= f.select :transport, options_for_select(Campaign.transports_i18n.invert, @campaign.transport), { class: 'form-control' } %> 
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :transport_campaign_id, 'Source ID', :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :transport_campaign_id, :class => 'text_field', required: true %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :campaign_medium, 'Campaign medium', :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :campaign_medium, :class => 'text_field', disabled: true %>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <%= f.label :campaign_medium_version, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :campaign_medium_version, required: true %>
       </div>
     </div>
 
@@ -59,24 +80,9 @@
     </div>
 
     <div class="control-group">
-      <%= f.label 'Record ID', :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :campaign_medium_version, required: true %>
-      </div>
-    </div>
-    
-    <div class="control-group">
-      <%= f.label :transport_campaign_id, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :transport_campaign_id, :class => 'text_field', required: true %>
-      </div>
-    </div>
-
-    <div class="control-group">
       <%= f.label :fulfillment_code, :class => 'control-label' %>
       <div class="controls">
-        <%= f.text_field :fulfillment_code, :class => 'text_field', required: true %>
-        <% if action_name == 'new' %><i id="generate_fulfillment_code" class="icon-refresh"></i><% end %>
+        <%= f.select :fulfillment_code, options_for_select(@fulfillment_codes, (@campaign ? @campaign.fulfillment_code : nil)), { class: 'form-control' } %> 
       </div>
     </div>
   </div>

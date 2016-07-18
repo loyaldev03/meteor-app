@@ -1,6 +1,7 @@
 class CampaignsController < ApplicationController
   before_filter :validate_club_presence
   before_action :set_campaign, only: [:show, :edit, :update]
+  before_action :set_fulfillment_codes, only: [:new, :edit]
 
   def index
     my_authorize! :list, Campaign, current_club.id
@@ -12,7 +13,6 @@ class CampaignsController < ApplicationController
 
   def show
     my_authorize! :read, Campaign, current_club.id
-    # fill in code
   end
 
   def new
@@ -25,7 +25,6 @@ class CampaignsController < ApplicationController
     my_authorize! :create, Campaign, current_club.id
     @campaign = Campaign.new club_id: current_club.id
     @campaign.set_data(campaign_params)
-
     if @campaign.save
       redirect_to campaign_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @campaign), notice: "The campaign #{@campaign.name} was successfully created."
     else
@@ -59,4 +58,11 @@ class CampaignsController < ApplicationController
       @campaign = Campaign.find(params[:id])
     end
 
+    def set_fulfillment_codes
+      @fulfillment_codes = ['New automatic code']
+      current_club.campaigns.each do |c|
+        @fulfillment_codes << c.fulfillment_code
+      end
+      @fulfillment_codes.uniq!
+    end
 end

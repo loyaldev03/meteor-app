@@ -4,13 +4,13 @@ class Campaign < ActiveRecord::Base
   has_many :campaign_days
   belongs_to :terms_of_membership
 
+  before_save :set_fulfillment_code
   before_update :custom_update
   before_destroy :prevent_destroy
   
   validates :name, :enrollment_price, :initial_date, :finish_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
-  validates :fulfillment_code, uniqueness: true
 
   validate :check_dates_range
 
@@ -47,7 +47,7 @@ class Campaign < ActiveRecord::Base
     self.fulfillment_code         = params[:fulfillment_code] unless params[:fulfillment_code].blank?
     self.transport_campaign_id    = params[:transport_campaign_id] unless params[:transport_campaign_id].blank?
     self.terms_of_membership_id   = params[:terms_of_membership_id] unless params[:terms_of_membership_id].blank?
-    self.campaign_medium_version  = (self.mailchimp? ? 'email' : 'banner') + params[:campaign_medium_version] unless params[:campaign_medium_version].blank?
+    self.campaign_medium_version  = (self.mailchimp? ? 'email' : 'banner') + '_' + params[:campaign_medium_version] unless params[:campaign_medium_version].blank?
     self.campaign_medium = case transport
       when 'facebook', 'twitter'
         :display
@@ -59,7 +59,6 @@ class Campaign < ActiveRecord::Base
   end
 
   private
-
     def custom_update
       name = self.name
       initial_date = self.initial_date
@@ -68,6 +67,10 @@ class Campaign < ActiveRecord::Base
       self.name = name
       self.initial_date = initial_date
       self.finish_date = finish_date
+    end
+
+    def set_fulfillment_code
+      self.fulfillment_code = Array.new(16){rand(36).to_s(36)}.join if self.fulfillment_code == 'New automatic code'
     end
 
     def check_dates_range
