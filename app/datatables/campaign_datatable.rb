@@ -31,7 +31,7 @@ private
   def fetch_campaigns
     campaigns = @current_club.campaigns.order("#{sort_column} #{sort_direction}")
     if params[:sSearch].present?
-      campaigns = campaigns.where("name = :search", search: "#{params[:sSearch].gsub(/\D/,'')}")
+      campaigns = campaigns.where("name like :search", search: "%#{params[:sSearch]}%")
     end
     campaigns.page(page).per_page(per_page)
   end
