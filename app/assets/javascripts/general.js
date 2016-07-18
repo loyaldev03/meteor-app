@@ -801,16 +801,18 @@ function campaigns_functions(){
 }
 
 
-function campaign_form_functions(){
-  function set_campaign_code_field(){
+function campaign_form_functions() {
+  function set_campaign_code_field() {
     var parent = $("#campaign_marketing_code").parent();
-    if($('#campaign_transport').val()=='facebook'){
+    if ($('#campaign_transport').val() == 'facebook') {
       $('#campaign_marketing_code').remove();
       var options = "";
-      for (var i in facebook_marketing_codes.split(',')){ options = options + "<option value="+facebook_marketing_codes.split(',')[i]+">"+facebook_marketing_codes.split(',')[i]+"</option>"};
-      parent.append("<select id='campaign_marketing_code' name='campaign[marketing_code]'>"+options+"</select>");
-    }else{
-      if($('#campaign_marketing_code').is("select")){
+      for (var i in facebook_marketing_codes.split(',')) {
+        options = options + "<option value=" + facebook_marketing_codes.split(',')[i] + ">" + facebook_marketing_codes.split(',')[i] + "</option>"
+      };
+      parent.append("<select id='campaign_marketing_code' name='campaign[marketing_code]'>" + options + "</select>");
+    } else {
+      if ($('#campaign_marketing_code').is("select")) {
         $('#campaign_marketing_code').remove();
         parent.append("<input id='campaign_marketing_code' required=true name='campaign[marketing_code]' type='text' />");
       }
@@ -824,6 +826,31 @@ function campaign_form_functions(){
   });
 
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+
+  if (typeof editing_campaign !== 'undefined' && editing_campaign === true) { disableFields(); }
+  function disableFields() {
+    var fieldsToDisable = [
+      'terms_of_membership_id', 
+      'enrollment_price', 
+      'campaign_type',
+      'transport',
+      'marketing_code',
+      'campaign_medium_version',
+      'transport_campaign_id',
+      'fulfillment_code'
+    ];
+    $.each(fieldsToDisable, function(index, field) {
+      $('#campaign_' + field).prop('disabled', true);
+    });
+  }
+
+  $('#generate_fulfillment_code').click(function() {
+    generateFulfillmentCode();
+  });
+
+  function generateFulfillmentCode() {
+    $('#campaign_fulfillment_code').val(Math.random().toString(16).slice(2));
+  }
 }
 
 function club_cash_transactions_functions(column_count){
