@@ -31,7 +31,7 @@
     <div class="control-group">
       <%= f.label :finish_date, :class => 'control-label' %>
       <div class="controls">
-        <%= f.text_field :finish_date, :class => 'datepicker input-small readonly', required: true  %>
+        <%= f.text_field :finish_date, :class => 'datepicker input-small readonly', required: true %>
       </div>
     </div>
   </div>
@@ -54,14 +54,14 @@
     <div class="control-group">
       <%= f.label :marketing_code, :class => 'control-label' %>
       <div class="controls">
-        <%= f.text_field :marketing_code, required: true  %>
+        <%= f.text_field :marketing_code, required: true %>
       </div>
     </div>
 
     <div class="control-group">
       <%= f.label 'Record ID', :class => 'control-label' %>
       <div class="controls">
-        <%= f.number_field :campaign_medium_version, min: 0, required: true %>
+        <%= f.text_field :campaign_medium_version, required: true %>
       </div>
     </div>
     
