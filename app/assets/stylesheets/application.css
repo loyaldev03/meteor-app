@@ -258,3 +258,5 @@ table.evidences tbody {
     height: 25vw;
     overflow-y: auto;
 }
+
+form#new_campaign i#generate_fulfillment_code { cursor: pointer; }
