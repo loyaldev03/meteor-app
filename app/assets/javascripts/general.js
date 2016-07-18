@@ -833,7 +833,7 @@ function campaign_form_functions() {
 
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
 
-  if (typeof editing_campaign !== 'undefined' && editing_campaign === true) { disableFields(); }
+  if ($('#edit_campaign').length) { disableFields(); }
   function disableFields() {
     var fieldsToDisable = [
       'terms_of_membership_id', 
