@@ -10,6 +10,7 @@ class Campaign < ActiveRecord::Base
   validates :name, :enrollment_price, :initial_date, :finish_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
+  validates :fulfillment_code, uniqueness: true
 
   validate :check_dates_range
 
