@@ -3,6 +3,9 @@ class Campaign < ActiveRecord::Base
   belongs_to :transport_setting
   has_many :campaign_days
   belongs_to :terms_of_membership
+
+  before_update :custom_update
+  before_destroy :prevent_destroy
   
   validates :name, :enrollment_price, :initial_date, :finish_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
@@ -55,11 +58,27 @@ class Campaign < ActiveRecord::Base
   end
 
   private
+
+    def custom_update
+      name = self.name
+      initial_date = self.initial_date
+      finish_date = self.finish_date
+      self.restore_attributes
+      self.name = name
+      self.initial_date = initial_date
+      self.finish_date = finish_date
+    end
+
     def check_dates_range
       if finish_date and initial_date
         if finish_date.to_date < initial_date.to_date
           errors.add(:finish_date, "Must be greater or equal than initial date.")
         end
       end
+    end
+
+    def prevent_destroy
+      errors.add(:base, 'Campaign can not be destroyed!')
+      false
     end
 end
