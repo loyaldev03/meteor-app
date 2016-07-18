@@ -850,12 +850,25 @@ function campaign_form_functions() {
     });
   }
 
-  $('#generate_fulfillment_code').click(function() {
-    generateFulfillmentCode();
+  setCampaignMedium($('#campaign_transport').val());
+  $('#campaign_transport').change(function() {
+    setCampaignMedium($('#campaign_transport').val());
   });
-
-  function generateFulfillmentCode() {
-    $('#campaign_fulfillment_code').val(Math.random().toString(16).slice(2));
+  function setCampaignMedium(transport_type) {
+    var medium = '';
+    switch(transport_type) {
+      case 'facebook':
+      case 'twitter':
+        medium = 'display';
+        break;
+      case 'mailchimp':
+        medium = 'email';
+        break;
+      case 'adwords':
+        medium = 'search';
+        break;
+    }
+    $('#campaign_campaign_medium').val(medium);
   }
 }
 
