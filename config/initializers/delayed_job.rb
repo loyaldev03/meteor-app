@@ -17,6 +17,10 @@ Delayed::Worker.class_eval do
   alias_method_chain :handle_failed_job, :notification
 end
 
+Delayed::Backend::ActiveRecord.configure do |config|
+  config.reserve_sql_strategy = :default_sql
+end
+
 if Rails.env.production?
   DelayedJobWeb.use Rack::Auth::Basic do |username, password|
     username == 'admin' && password == '2p_D5o0768L9m1j'

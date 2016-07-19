@@ -160,10 +160,10 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     daemons (1.1.9)
-    delayed_job (4.1.1)
-      activesupport (>= 3.0, < 5.0)
-    delayed_job_active_record (4.1.0)
-      activerecord (>= 3.0, < 5)
+    delayed_job (4.1.2)
+      activesupport (>= 3.0, < 5.1)
+    delayed_job_active_record (4.1.1)
+      activerecord (>= 3.0, < 5.1)
       delayed_job (>= 3.0, < 5)
     delayed_job_web (1.2.10)
       activerecord (> 3.0.0)
@@ -254,7 +254,7 @@ GEM
     metaclass (0.0.1)
     mime-types (2.99.1)
     mini_portile2 (2.0.0)
-    minitest (5.8.4)
+    minitest (5.9.0)
     mocha (0.14.0)
       metaclass (~> 0.0.1)
     multi_json (1.11.3)
@@ -528,3 +528,6 @@ DEPENDENCIES
   wirble
   yard!
   yard-rest
+
+BUNDLED WITH
+   1.12.4
