@@ -15,6 +15,8 @@ class Club < ActiveRecord::Base
   has_many :agents, -> {uniq}, through: :club_roles
   has_many :fulfillment_files
   has_many :disposition_types
+  has_many :campaigns
+  has_many :transport_settings
 
   belongs_to :api_domain,
     class_name:  'Domain',

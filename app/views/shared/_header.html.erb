@@ -51,9 +51,12 @@
                   <% end %>
                   <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
                     <li><%= link_to t('activerecord.model.fulfillment_files'), list_fulfillment_files_path(@current_club.partner.prefix, @current_club.name) %></li>
-                  <% end %>
+                  <% end %> 
                   <% if current_agent.can? :manual_review, Fulfillment, current_club.id %>
                     <li><%= link_to t('activerecord.model.suspected_fulfillments'), suspected_fulfillments_path(current_club.partner.prefix, current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, Campaign, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.campaign'), campaigns_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
                   <% if @current_agent.can? :read, DispositionType, @current_club.id %>
                     <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>

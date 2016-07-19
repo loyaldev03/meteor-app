@@ -14,6 +14,8 @@
  *= require scaffolds
  *= require jquery-ui
  *= require table_sorter_style
+ *= require select2
+ *= require select2-bootstrap
  */
 
 
@@ -258,3 +260,5 @@ table.evidences tbody {
     height: 25vw;
     overflow-y: auto;
 }
+
+form#new_campaign i#generate_fulfillment_code { cursor: pointer; }

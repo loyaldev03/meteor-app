@@ -63,6 +63,8 @@ gem 'exception_notification', github: 'stoneacre/exception_notification'
 gem 'pivotal-tracker'
 
 gem "newrelic_rpm"
+gem "enum_help"
+gem "select2-rails"
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 

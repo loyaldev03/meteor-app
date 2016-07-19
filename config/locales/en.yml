@@ -50,6 +50,21 @@ en:
   future_save_the_sale: "Schedule save the sale to be done at"
   remove_club_cash: "Remove club cash when proceesing scheduled TOM change"
   cancel_confirm_when_tom_change_scheduled: "The member you are about to cancel has a future subscription plan scheduled. If the cancelation date you will choose is before the one for the future subscription plan update then that scheduled subscription plan will have no effect."
+  enums:
+    campaign:
+      transport:
+        facebook: Facebook
+        twitter: Twitter
+        mailchimp: Mailchimp
+        adwords: Google Adwords
+      campaign_type:
+        sloop: Sloop
+        ptx: Ptx
+        sweeptake: Sweeptake
+        store_promotion: Store promotion
+        newsletter: Newsletter
+        daily_candy: Daily candy
+        freemium: Freemium
   menu: 
     admin_menu: 'Admin Menu'
     logout: 'Logout'
@@ -193,6 +208,7 @@ en:
       payment_gateway_configuration: 'Payment Gateway Configuration'
       terms_of_membership: 'Subscription Plan'
       suspected_fulfillments: 'Suspected Fulfillments'
+      campaign: 'Marketing Campaigns'
     gateway:
       mes: 'Merchant e Solutions'
       litle: Litle
@@ -616,6 +632,12 @@ en:
         aus_password: 'AUS password'
         aus_password_help: 'Account Updater Service service password'
         aus_password_update_help: "Account Updater Service service password. Leaving this field empty will not change current password."
+      campaign:
+        id: 'ID'
+        type: 'Campaign Type'
+        transport: 'Source'
+        start_date: 'Start Date'
+        finish_date: 'Finish Date'
   date: 
     formats:
       default: "%m/%d/%Y"

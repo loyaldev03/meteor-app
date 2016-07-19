@@ -786,6 +786,92 @@ function fulfillment_files_functions() {
   });
 }  
 
+function campaigns_functions(){
+  $('#campaigns_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 6 ] }],
+    "sAjaxSource": $('#campaigns_table').data('source')
+  });  
+}
+
+
+function campaign_form_functions() {
+
+  function set_campaign_code_field() {
+    var parent = $("#campaign_marketing_code").parent();
+    if ($('#campaign_transport').val() == 'facebook') {
+      $('#campaign_marketing_code').remove();
+      var options = "";
+      for (var i in facebook_marketing_codes.split(',')) {
+        options = options + "<option value=" + facebook_marketing_codes.split(',')[i] + ">" + facebook_marketing_codes.split(',')[i] + "</option>"
+      };
+      parent.append("<select id='campaign_marketing_code' name='campaign[marketing_code]'>" + options + "</select>");
+    } else {
+      if ($('#campaign_marketing_code').is("select")) {
+        $('#campaign_marketing_code').remove();
+        parent.append("<input id='campaign_marketing_code' required=true name='campaign[marketing_code]' type='text' />");
+      }
+    }
+  }
+
+  set_campaign_code_field();
+
+  $("#campaign_terms_of_membership_id").select2({ theme: "bootstrap" });
+  $("#campaign_campaign_type").select2({ theme: "bootstrap" });
+  $("#campaign_transport").select2({ theme: "bootstrap" });
+  $("#campaign_fulfillment_code").select2({ theme: "bootstrap" });
+  
+  $('#campaign_transport').change(function(){
+    set_campaign_code_field();
+  });
+
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+
+  if ($('#edit_campaign').length) { disableFields(); }
+  function disableFields() {
+    var fieldsToDisable = [
+      'terms_of_membership_id', 
+      'enrollment_price', 
+      'campaign_type',
+      'transport',
+      'marketing_code',
+      'campaign_medium_version',
+      'transport_campaign_id',
+      'fulfillment_code'
+    ];
+    $.each(fieldsToDisable, function(index, field) {
+      $('#campaign_' + field).prop('disabled', true);
+    });
+  }
+
+  setCampaignMedium($('#campaign_transport').val());
+  $('#campaign_transport').change(function() {
+    setCampaignMedium($('#campaign_transport').val());
+  });
+  function setCampaignMedium(transport_type) {
+    var medium = '';
+    switch(transport_type) {
+      case 'facebook':
+      case 'twitter':
+        medium = 'display';
+        break;
+      case 'mailchimp':
+        medium = 'email';
+        break;
+      case 'adwords':
+        medium = 'search';
+        break;
+    }
+    $('#campaign_campaign_medium').val(medium);
+  }
+}
+
 function club_cash_transactions_functions(column_count){
   $('#club_cash_transactions_table').DataTable({
     "oLanguage": {"sSearch": "Filtered by:"},
