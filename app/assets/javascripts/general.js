@@ -801,36 +801,7 @@ function campaigns_functions(){
 }
 
 
-function campaign_form_functions() {
-
-  function set_campaign_code_field() {
-    var parent = $("#campaign_marketing_code").parent();
-    if ($('#campaign_transport').val() == 'facebook') {
-      $('#campaign_marketing_code').remove();
-      var options = "";
-      for (var i in facebook_marketing_codes.split(',')) {
-        options = options + "<option value=" + facebook_marketing_codes.split(',')[i] + ">" + facebook_marketing_codes.split(',')[i] + "</option>"
-      };
-      parent.append("<select id='campaign_marketing_code' name='campaign[marketing_code]'>" + options + "</select>");
-    } else {
-      if ($('#campaign_marketing_code').is("select")) {
-        $('#campaign_marketing_code').remove();
-        parent.append("<input id='campaign_marketing_code' required=true name='campaign[marketing_code]' type='text' />");
-      }
-    }
-  }
-
-  set_campaign_code_field();
-
-  $("#campaign_terms_of_membership_id").select2({ theme: "bootstrap" });
-  $("#campaign_campaign_type").select2({ theme: "bootstrap" });
-  $("#campaign_transport").select2({ theme: "bootstrap" });
-  $("#campaign_fulfillment_code").select2({ theme: "bootstrap" });
-  
-  $('#campaign_transport').change(function(){
-    set_campaign_code_field();
-  });
-
+function campaignFormFunctions() {
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
 
   if ($('#edit_campaign').length) { disableFields(); }
@@ -850,7 +821,7 @@ function campaign_form_functions() {
     });
   }
 
-  setCampaignMedium($('#campaign_transport').val());
+  
   $('#campaign_transport').change(function() {
     setCampaignMedium($('#campaign_transport').val());
   });
@@ -870,6 +841,13 @@ function campaign_form_functions() {
     }
     $('#campaign_campaign_medium').val(medium);
   }
+
+  $("#campaign_terms_of_membership_id").select2({ theme: "bootstrap" });
+  $("#campaign_campaign_type").select2({ theme: "bootstrap" });
+  $("#campaign_transport").select2({ theme: "bootstrap" });
+  $("#campaign_fulfillment_code").select2({ theme: "bootstrap" });
+
+  setCampaignMedium($('#campaign_transport').val());
 }
 
 function club_cash_transactions_functions(column_count){
