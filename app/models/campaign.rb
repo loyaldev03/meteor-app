@@ -13,8 +13,6 @@ class Campaign < ActiveRecord::Base
 
   validate :check_dates_range
 
-  FACEBOOK_MARKETING_CODES = [ 'audience', 'interest', 'liz_interest' ]
-
   enum campaign_type: {
      sloop:           0,
      ptx:             1,
