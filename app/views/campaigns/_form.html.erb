@@ -82,7 +82,7 @@
     <div class="control-group">
       <%= f.label :fulfillment_code, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :fulfillment_code, options_for_select(@fulfillment_codes, (@campaign ? @campaign.fulfillment_code : nil)), { class: 'form-control' } %> 
+        <%= f.select :fulfillment_code, options_for_select(@fulfillment_codes, @campaign.fulfillment_code), { class: 'form-control' } %> 
       </div>
     </div>
   </div>
@@ -104,6 +104,5 @@
 </div>
 
 <script>
-  var facebook_marketing_codes = "<%= Campaign::FACEBOOK_MARKETING_CODES.join(',') %>";
   $(document).ready( campaignFormFunctions() );
 </script>
