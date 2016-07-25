@@ -1,17 +1,69 @@
-<%= form_for(@transport_setting) do |f| %>
-  <% if @transport_setting.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@transport_setting.errors.count, "error") %> prohibited this transport_setting from being saved:</h2>
-
-      <ul>
-      <% @transport_setting.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
+<div class='row-fluid'>
+  <div class='span6'>
+    <div class="control-group">
+      <%= f.label :transport, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :transport, options_for_select(TransportSetting.transports_i18n.invert, @transport.transport), { class: 'form-control' } %> 
+      </div>
     </div>
-  <% end %>
-
-  <div class="actions">
-    <%= f.submit %>
   </div>
+</div>
+<div class='row-fluid'>
+  <div class='span12'>
+    <h5>Transport Settings</h5>
+  </div>
+</div>
+
+<div id="transport_settings_values">
+  <div class='row-fluid'>
+    <div class='span12'>
+      <div class="control-group">
+        <%= f.label 'Client ID', :class => 'control-label' %>
+        <div class="controls">
+          <%= text_field_tag :fb_client_id, '', class: 'text_field input-xxlarge', required: true %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class='row-fluid'>
+    <div class='span12'>
+      <div class="control-group">
+        <%= f.label :client_secret, :class => 'control-label' %>
+        <div class="controls">
+          <%= text_field_tag :fb_client_secret, '', class: 'text_field input-xxlarge', required: true %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class='row-fluid'>  
+    <div class='span12'>
+      <div class="control-group">
+        <%= f.label :access_token, :class => 'control-label' %>
+        <div class="controls">
+          <%= text_field_tag :fb_access_token, '', class: 'text_field input-xxlarge', required: true %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if action_name == 'edit' %>
+<div class='row-fluid'>
+  <div class='span12'>
+    <p class="muted"><i class="icon-info-sign"></i> There are some fields that can not be updated.</p>
+  </div>
+</div>
 <% end %>
+
+<br>
+
+<div class="form-actions">
+  <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
+  <%= link_to t(:cancel), :back, :class => 'btn', :id => 'cancel_button' %>  
+</div>
+
+<script>
+  $(document).ready( transportSettingsFormFunctions() );
+</script>
