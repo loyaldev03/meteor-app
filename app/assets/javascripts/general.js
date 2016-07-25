@@ -850,6 +850,14 @@ function campaignFormFunctions() {
   setCampaignMedium($('#campaign_transport').val());
 }
 
+function transportSettingsFormFunctions() {
+  $("#transport_setting_transport").change(function() {
+    $("#transport_settings_values").html("");
+  });
+
+  $("#transport_setting_transport").select2({ theme: "bootstrap" });
+}
+
 function club_cash_transactions_functions(column_count){
   $('#club_cash_transactions_table').DataTable({
     "oLanguage": {"sSearch": "Filtered by:"},
