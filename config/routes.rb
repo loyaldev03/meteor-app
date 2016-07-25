@@ -140,6 +140,7 @@ SacPlatform::Application.routes.draw do
       get '/suspected_fulfillment/:id' => 'fulfillments#suspected_fulfillment_information', as: 'suspected_fulfillment_information'
     
       resources :campaigns, except: [:destroy]
+      resources :transport_settings, except: [:destroy]
     end
 
     resources :domains
