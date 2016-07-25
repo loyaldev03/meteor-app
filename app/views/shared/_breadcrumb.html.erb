@@ -81,6 +81,16 @@
       <% if params[:controller] == 'campaign_days' && params[:action] == 'index' %>
         <li class="active"><%= delimiter %>Campaign Days</li>
       <% end %>
+
+      <% if params[:controller] == 'transport_settings' && params[:action] == 'new' %>
+        <li><%= delimiter %><a href="<%= transport_settings_path %>">Transport Settings</a></li>
+        <li><%= delimiter %>New Campaign</li>
+      <% end %>
+      <% if params[:controller] == 'transport_settings' and ['show','edit'].include? params[:action]  %>
+        <li><%= delimiter %><a href="<%= transport_settings_path %>">Transport Settings</a></li>
+        <li><%= delimiter %><%= @transport_setting.name %></li>
+      <% end %>
+
     <% end %>
 
     <% if @current_user %>
