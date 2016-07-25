@@ -400,7 +400,7 @@ test:
 
 production:
   <<: *defaults
-  email_to_send_product_list: 'tbrady@meteoraffinity.com,mhebb@meteoraffinity.com'
+  email_to_send_product_list: 'tbrady@meteoraffinity.com'
   hot_rod_cancellation_emails: 'jbrickman@zinio.com,clawler@fullcu.be'
   fulfillment_naamma_report_emails: ''
   fulfillment_nfla_report_emails: ''
