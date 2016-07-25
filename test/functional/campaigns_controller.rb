@@ -6,15 +6,24 @@ class CampaignsControllerTest < ActionController::TestCase
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
-    @agent = FactoryGirl.create(:agent)    
+    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
     @partner_prefix = @partner.prefix
+  end
+
+  def sign_agent_with_global_role(type)
+     @agent = FactoryGirl.create type
+     sign_in @agent
+  end
+
+  def sign_agent_with_club_role(type, role)
+    @agent = FactoryGirl.create(type, roles: '') 
+    ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
+    sign_in @agent
   end
 
   test "agents that should get index" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
       assert_response :success
     end
@@ -24,8 +33,7 @@ class CampaignsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
      :confirmed_agency_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
       assert_response :unauthorized
     end
@@ -33,8 +41,7 @@ class CampaignsControllerTest < ActionController::TestCase
 
   test "agents that should show campaigns" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       get :show, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
       assert_response :success
     end
@@ -44,8 +51,7 @@ class CampaignsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
      :confirmed_agency_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       get :show, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
       assert_response :unauthorized
     end
@@ -53,8 +59,7 @@ class CampaignsControllerTest < ActionController::TestCase
 
   test "agents that should get new" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       get :new, partner_prefix: @partner_prefix, :club_prefix => @club.name
       assert_response :success
     end
@@ -64,27 +69,15 @@ class CampaignsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       get :new, partner_prefix: @partner_prefix, :club_prefix => @club.name
       assert_response :unauthorized
     end
   end
 
-  #@Sebas could you help me with this test case? It displays this error
-  #ActionView::Template::Error: undefined method `map' for nil:NilClass
-   # app/views/campaigns/_form.html.erb:85:in `_app_views_campaigns__form_html_erb___107854232981373658_57384440'
-   # app/views/campaigns/new.html.erb:8:in `block in _app_views_campaigns_new_html_erb__4329571917558607088_57534560'
-   # app/views/campaigns/new.html.erb:7:in `_app_views_campaigns_new_html_erb__4329571917558607088_57534560'
-   # app/controllers/campaigns_controller.rb:32:in `create'
-   # test/functional/campaigns_controller.rb:248:in `block (2 levels) in <class:CampaignsControllerTest>'
-   # test/functional/campaigns_controller.rb:247:in `block in <class:CampaignsControllerTest>'
-
-
   test "agents that should create campaign" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
       assert_difference('Campaign.count',1) do
         post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
@@ -93,7 +86,7 @@ class CampaignsControllerTest < ActionController::TestCase
            transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
            campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
            marketing_code: campaign.marketing_code, fulfillment_code: campaign.fulfillment_code,
-           club_id: campaign.club_id, terms_of_membership: campaign.terms_of_membership.id
+           club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
         }    
       end
       assert_redirected_to campaign_path(assigns(:campaign), partner_prefix: @partner_prefix, :club_prefix => @club.name)
@@ -104,8 +97,7 @@ class CampaignsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
       post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
           name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
@@ -113,7 +105,7 @@ class CampaignsControllerTest < ActionController::TestCase
           transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
           campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
           marketing_code: campaign.marketing_code, fulfillment_code: campaign.fulfillment_code,
-          club_id: campaign.club_id, terms_of_membership: campaign.terms_of_membership.id
+          club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
         } 
       assert_response :unauthorized
     end
@@ -121,8 +113,7 @@ class CampaignsControllerTest < ActionController::TestCase
 
   test "agents that should get edit" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       get :edit, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name      
       assert_response :success
     end
@@ -132,8 +123,7 @@ class CampaignsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       get :edit, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name      
       assert_response :unauthorized
     end
@@ -141,8 +131,7 @@ class CampaignsControllerTest < ActionController::TestCase
 
   test "agents that should update campaign" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
       put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
       assert_redirected_to campaigns_path     
@@ -153,8 +142,7 @@ class CampaignsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
+      sign_agent_with_global_role(agent)
       campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
       put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
       assert_response :unauthorized
@@ -165,8 +153,7 @@ class CampaignsControllerTest < ActionController::TestCase
     [:confirmed_admin_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent            
+      sign_agent_with_global_role(agent)          
       begin
         delete :destroy, club_id: @club.id, id: @campaign.id
       rescue Exception => error
@@ -180,10 +167,8 @@ class CampaignsControllerTest < ActionController::TestCase
   # CLUBS ROLES
   ##################################################### 
 
-  test "agent with club Admin role that should get index" do    
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
-    ClubRole.create(club_id: @club.id, agent_id: agent.id, role: 'admin')
-    sign_in agent
+  test "agent with club Admin role that should get index" do     
+    sign_agent_with_club_role(:agent,'admin')
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
     assert_response :success    
   end
@@ -204,53 +189,43 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agent with club roles that should not get index" do
-    sign_in(@agent)
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'admin'].each do |role|      
+      sign_agent_with_club_role(:agent, role)
       get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
       assert_response :unauthorized
     end
   end
 
   test "agents that should show campaigns with club roles" do
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
-    ClubRole.create(club_id: @club.id, agent_id: agent.id, role: 'admin')
-    sign_in agent
+    sign_agent_with_club_role(:agent, 'admin')
     get :show, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
     assert_response :success
-
   end
 
   test "agents that should not show campaigns with club roles" do
-    sign_in(@agent)
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
+      sign_agent_with_club_role(:agent, role)
       get :show, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
       assert_response :unauthorized
     end
   end
 
   test "agents that should get new with club roles" do
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
-    ClubRole.create(club_id: @club.id, agent_id: agent.id, role: 'admin')
-    sign_in agent
+    sign_agent_with_club_role(:agent, 'admin')
     get :new, partner_prefix: @partner_prefix, :club_prefix => @club.name
     assert_response :success
   end
 
   test "agents that should not get new with club roles" do
-    sign_in(@agent)
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
+      sign_agent_with_club_role(:agent, role)
       get :new, partner_prefix: @partner_prefix, :club_prefix => @club.name
       assert_response :unauthorized
     end
   end
 
   test "agents that should create campaign with club roles" do
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
-    ClubRole.create(club_id: @club.id, agent_id: agent.id, role: 'admin')
-    sign_in agent
+    sign_agent_with_club_role(:agent, 'admin')
     campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
     assert_difference('Campaign.count',1) do
       post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
@@ -259,17 +234,15 @@ class CampaignsControllerTest < ActionController::TestCase
          transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
          campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
          marketing_code: campaign.marketing_code, fulfillment_code: campaign.fulfillment_code,
-         club_id: campaign.club_id, terms_of_membership: campaign.terms_of_membership.id
+         club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
       } 
     end  
     assert_redirected_to campaign_path(assigns(:campaign), partner_prefix: @partner_prefix, :club_prefix => @club.name)    
   end
 
-  test "agents that should not create campaign with club roles" do
-    sign_in(@agent)
+  test "agents that should not create campaign with club roles" do    
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
-
+      sign_agent_with_club_role(:agent, role)
       campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
       post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
           name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
@@ -277,42 +250,36 @@ class CampaignsControllerTest < ActionController::TestCase
           transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
           campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
           marketing_code: campaign.marketing_code, fulfillment_code: campaign.fulfillment_code,
-          club_id: campaign.club_id, terms_of_membership: campaign.terms_of_membership.id
+          club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
         } 
       assert_response :unauthorized
     end
   end
 
   test "agents that should get edit with club role" do
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
-    ClubRole.create(club_id: @club.id, agent_id: agent.id, role: 'admin')
-    sign_in agent
+    sign_agent_with_club_role(:agent, 'admin')
     get :edit, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name      
     assert_response :success    
   end
 
   test "agents that should not get edit with club role" do
-    sign_in(@agent)
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
+      sign_agent_with_club_role(:agent, role)
       get :edit, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name      
       assert_response :unauthorized
     end
   end
 
   test "agents that should update campaign with club role" do
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
-    ClubRole.create(club_id: @club.id, agent_id: agent.id, role: 'admin')
-    sign_in agent
+    sign_agent_with_club_role(:agent, 'admin')
     campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
     put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
     assert_redirected_to campaigns_path  
   end
 
   test "agents that should not update campaign with club role" do
-    sign_in(@agent)
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
+      sign_agent_with_club_role(:agent, role)
       campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
       put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
       assert_response :unauthorized
@@ -320,9 +287,8 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agents should not delete campaigns with club roles" do
-     sign_in(@agent)
     ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)            
+      sign_agent_with_club_role(:agent, role)          
       begin
         delete :destroy, club_id: @club.id, id: @campaign.id
       rescue Exception => error
