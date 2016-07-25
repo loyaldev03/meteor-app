@@ -1,5 +1,5 @@
 class TransportSettingsController < ApplicationController
-  before_action :set_transport_setting, only: [:show, :edit, :update, :destroy]
+  before_action :set_transport, only: [:show, :edit, :update]
 
   def index
     # my_authorize! :list, TransportSetting, @current_club.id
@@ -13,41 +13,36 @@ class TransportSettingsController < ApplicationController
   end
 
   def new
-    @transport_setting = TransportSetting.new
+    @transport = TransportSetting.new
   end
 
   def edit
   end
 
   def create
-    @transport_setting = TransportSetting.new(transport_setting_params)
+    @transport = TransportSetting.new(transport_setting_params)
 
-    if @transport_setting.save
-      redirect_to @transport_setting, notice: 'Transport setting was successfully created.'
+    if @transport.save
+      redirect_to @transport, notice: 'Transport setting was successfully created.'
     else
       render :new
     end
   end
 
   def update
-    if @transport_setting.update(transport_setting_params)
-      redirect_to @transport_setting, notice: 'Transport setting was successfully updated.'
+    if @transport.update(transport_params)
+      redirect_to @transport, notice: 'Transport setting was successfully updated.'
     else
       render :edit
     end
   end
 
-  def destroy
-    @transport_setting.destroy
-    redirect_to transport_settings_url, notice: 'Transport setting was successfully destroyed.'
-  end
-
   private
-    def set_transport_setting
-      @transport_setting = TransportSetting.find(params[:id])
+    def set_transport
+      @transport = TransportSetting.find(params[:id])
     end
 
-    def transport_setting_params
+    def transport_params
       params[:transport_setting]
     end
 end
