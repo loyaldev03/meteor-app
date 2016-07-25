@@ -1,0 +1,17 @@
+<%= form_for(@transport_setting) do |f| %>
+  <% if @transport_setting.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@transport_setting.errors.count, "error") %> prohibited this transport_setting from being saved:</h2>
+
+      <ul>
+      <% @transport_setting.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
