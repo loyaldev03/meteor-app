@@ -6,8 +6,8 @@ class TransportSetting < ActiveRecord::Base
   enum transport: {
     facebook:   0,
     mailchimp:  1,
-    twitter:    2,
-    adwords:    3
+    # twitter:    2,
+    # adwords:    3
   }
 
   serialize :settings, JSON
