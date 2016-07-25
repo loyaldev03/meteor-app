@@ -17,8 +17,13 @@ class CampaignsController < ApplicationController
 
   def new
     my_authorize! :new, Campaign, current_club.id
-    @campaign = Campaign.new(club_id: current_club.id)
     @terms_of_memberships = current_club.terms_of_memberships
+    if @terms_of_memberships.count > 0
+      @campaign = Campaign.new(club_id: current_club.id)
+    else
+      flash[:error] = "Can not create a campaign without a Subscription plan.".html_safe
+      redirect_to campaigns_url
+    end
   end
 
   def create
