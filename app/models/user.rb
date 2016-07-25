@@ -1170,7 +1170,13 @@ class User < ActiveRecord::Base
     new_credit_card = CreditCard.new(number: new_number, expire_month: new_month, expire_year: new_year, token: credit_card["token"])
     new_credit_card.get_token(tom.payment_gateway_configuration, self)
 
-    credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:user).where(:token => new_credit_card.token, :users => { :club_id => club.id } )
+    credit_cards = if new_credit_card.token.nil?
+      []
+    elsif new_credit_card.token == CreditCard::BLANK_CREDIT_CARD_TOKEN
+      self.credit_cards.where(token: CreditCard::BLANK_CREDIT_CARD_TOKEN)
+    else
+      CreditCard.joins(:user).where(token: new_credit_card.token, users: { :club_id => club.id } )
+    end
 
     if credit_cards.empty? or allow_cc_blank
       unless only_validate
