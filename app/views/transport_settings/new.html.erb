@@ -1,5 +1,9 @@
-<h1>New Transport Setting</h1>
-
-<%= render 'form' %>
-
-<%= link_to 'Back', transport_settings_path %>
+<div class='row-fluid'>
+  <div class='span12'>
+    <h2>New Transport</h2>
+    <hr />
+  </div>
+</div>
+<%= form_for @transport, :html => { :class => 'form-horizontal', :id => 'new_transport' } do |f| %>
+  <%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>
