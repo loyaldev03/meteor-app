@@ -7,7 +7,7 @@ class Campaign < ActiveRecord::Base
   before_save :set_fulfillment_code
   before_update :custom_update
   
-  validates :name, :enrollment_price, :initial_date, :finish_date, :campaign_type, :transport, 
+  validates :name, :enrollment_price, :initial_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
 
