@@ -31,7 +31,7 @@ class Campaign < ActiveRecord::Base
   }
 
   def self.datatable_columns
-    [ 'id', 'name', 'name', 'transport', 'initial_date', 'finish_date' ]
+    [ 'id', 'name', 'campaign_type', 'transport', 'initial_date', 'finish_date' ]
   end
 
   def set_data(params)
