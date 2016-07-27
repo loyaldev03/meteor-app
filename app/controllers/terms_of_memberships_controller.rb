@@ -63,7 +63,7 @@ class TermsOfMembershipsController < ApplicationController
     if @tom.destroy
       flash[:notice] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
     else
-      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed."
+      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed: " + (@tom.errors.messages[:base].first ? @tom.errors.messages[:base].first : '')
     end
     redirect_to terms_of_memberships_url
   rescue ActiveRecord::RecordNotFound 
