@@ -43,6 +43,6 @@ class TransportSettingsController < ApplicationController
     end
 
     def transport_params
-      params[:transport_setting]
+      params.require(:transport_setting).permit(:transport, :fb_client_id, :fb_client_secret, :fb_access_token)
     end
 end
