@@ -20,10 +20,10 @@ class TransportSettingsController < ApplicationController
   end
 
   def create
-    @transport = TransportSetting.new(transport_setting_params)
+    @transport = TransportSetting.new(transport_params)
 
     if @transport.save
-      redirect_to @transport, notice: 'Transport setting was successfully created.'
+      redirect_to @transport, notice: 'Transport was successfully created.'
     else
       render :new
     end
@@ -31,7 +31,7 @@ class TransportSettingsController < ApplicationController
 
   def update
     if @transport.update(transport_params)
-      redirect_to @transport, notice: 'Transport setting was successfully updated.'
+      redirect_to @transport, notice: 'Transport was successfully updated.'
     else
       render :edit
     end
