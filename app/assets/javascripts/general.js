@@ -145,7 +145,7 @@ function partner_index_functions(column_count){
 function club_index_functions(column_count){
   $('#clubs_table').DataTable({
     "sPaginationType": "full_numbers",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -161,10 +161,30 @@ function club_index_functions(column_count){
   });
 }
 
+function campaign_days_functions(column_count){
+  oTable2 = $('#campaign_days_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"p>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 1, "desc" ]],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2,3,4,5 ] }],
+    "sAjaxSource": $('#campaign_days_table').data('source')
+  });
+
+  $('#campaign_days_table_wrapper .top').prepend($("#dataTableSelect"));
+  $("#search_transport").change( function () {
+      oTable2.search( $(this).val() ).draw();
+  });
+}
+
 function delay_jobs_index_functions(column_count){
   $('#delayed_jobs_table').DataTable({
     "sPaginationType": "full_numbers",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,

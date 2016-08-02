@@ -1,110 +1,29 @@
-<div class='row'>
-  <div class='span12'>
-    <div class='row'> 
-      <%= form_tag('#', class: 'form-inline', id: 'campaignDaySearch') do %>
-        <div class='span3'>
-          <%= select_tag(:q, options_for_select(Campaign.transports_i18n.invert, params[:transport]), { prompt: 'Select Transport', id: 'transportSelect', class: ''}) %>
-        </div>
-        <div class='span9 text-right'>
-          <div class="input-daterange input-group">
-            <%= text_field_tag :from_date, 1.week.ago.to_date, class: 'input-sm form-control date-picker', id: 'fromDateSelect', readonly: true %>
-            <span class="input-group-addon">to</span>
-            <%= text_field_tag :to_date, Time.current.yesterday.to_date, class: "input-sm form-control date-picker", id: "toDateSelect", readonly: true %>
-            <%= submit_tag 'Search', class: 'btn btn-primary' %>
-          </div>
-        </div>
-      <% end %>
-    </div>
-    <div>
-      <table id="manageCampaignDays" class="table table-striped">
-        <thead>
-          <tr>
-            <th class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></th>
-            <th class="span3"><%= I18n.t("activerecord.model.campaign") %></th>
-            <th class="span2"><%= I18n.t("activerecord.attributes.campaign_day.spent") %></th>
-            <th class="span2"><%= I18n.t("activerecord.attributes.campaign_day.reached") %></th>
-            <th class="span2"><%= I18n.t("activerecord.attributes.campaign_day.converted") %></th>
-            <th class="span1"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span3"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span1"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-          </tr>
-          <tr>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span3"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span1"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-          </tr>
-          <tr>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span3"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span1"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-          </tr>
-          <tr>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span3"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-            <td class="span1"><%= I18n.t("activerecord.attributes.campaign_day.date") %></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+<%- model_class = CampaignDay.new.class -%>
+
+<div class="page-header">
+  <h1> <%=t '.title', :default => model_class.model_name.human.pluralize %> </h1>
 </div>
 
-<!-- 
-<div class="row">
-  <div class="span12">
-    <div class="ibox float-e-margins">
-      <div class="ibox-content">
-        <div class="row">
-          <%= form_tag("#", class: "form-inline", id: "campaignDaySearch") do %>
-            <div class="col-sm-3 m-b-xs">
-              <%= select_tag(:q, options_for_select(Campaign.transports_i18n.invert, params[:q]), { prompt: 'Select Transport', id: "transportSelect", class: 'input-sm form-control input-s-sm inline', selected: params[:search_field]}) %>
-            </div>
-            <div class="col-sm-9 m-b-xs text-right">
-              <div class="input-daterange input-group">
-                <%= text_field_tag :from_date, 1.week.ago.to_date, class: "input-sm form-control date-picker", id: "fromDateSelect", readonly: true %>
-                <span class="input-group-addon">to</span>
-                <%= text_field_tag :to_date, Date.yesterday.to_date, class: "input-sm form-control date-picker", id: "toDateSelect", readonly: true %>
-              </div>
-              <div class="form-group">
-                <%= submit_tag "Search", class: 'btn btn-primary block' %>
-              </div>
-            </div>
-          <% end %>
-        </div>
-        <div class="table-responsive">
-          <table id="manageCampaignDays" class="table table-hover table-striped">
-            <thead>
-              <tr>
-                <th class="col-xs-2"><%= I18n.t("activerecord.attributes.campaign_day.date") %></th>
-                <th class="col-xs-3"><%= I18n.t("activerecord.models.campaign") %></th>
-                <th class="col-xs-2"><%= I18n.t("activerecord.attributes.campaign_day.spent") %></th>
-                <th class="col-xs-2"><%= I18n.t("activerecord.attributes.campaign_day.reached") %></th>
-                <th class="col-xs-2"><%= I18n.t("activerecord.attributes.campaign_day.converted") %></th>
-                <th class="col-xs-1"></th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
+<table id="campaign_days_table" class="table table-bordered table-condensed dataTable" data-source="<%= campaign_days_url(format: "json") %>">
+  <thead>
+    <tr>
+      <th><%= I18n.t("activerecord.attributes.campaign_day.date") %></th>
+      <th><%= I18n.t("activerecord.model.campaign") %></th>
+      <th><%= I18n.t("activerecord.attributes.campaign_day.spent") %></th>
+      <th><%= I18n.t("activerecord.attributes.campaign_day.reached") %></th>
+      <th><%= I18n.t("activerecord.attributes.campaign_day.converted") %></th>
+      <th><%= t(:actions) %></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<div id="dataTableSelect" class="in-front" >
+  Filter by:
+  <%= select_tag "select_transport", options_for_select({"Facebook"=>"facebook", "Mailchimp"=>"mailchimp", "Twitter"=>"twitter", "Google Adwords"=>"adwords"}) %>
+</div>
+
+<script>
+  $(document).ready(campaign_days_functions(<%= CampaignDay.datatable_columns.size %>));
+</script>
