@@ -176,25 +176,6 @@ module SacMailchimp
             "PREF3" => "car",
             "PREF4" => "track"
           }
-        when 5
-          {
-            "PREF1" => "rv_type",
-            "PREF2" => "rv_make",
-            "PREF3" => "rv_model",
-            "PREF4" => "rv_year"
-            # "pref_field_5" => "rv_miles",
-            # "pref_field_6" => "fav_dest",
-            # "pref_field_7" => "fav_use"
-          }
-        when 8
-          {
-            "PREF1" => "fav_team"
-          }
-        when 9
-          {
-            "PREF1" => "car_year",
-            "PREF2" => "car_made"
-          }
         when 15 # SCRF
           {
             "PREF1" => "driver_1",
