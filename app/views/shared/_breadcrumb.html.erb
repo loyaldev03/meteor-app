@@ -78,7 +78,9 @@
         <li><%= delimiter %><a href="<%= campaigns_path %>">Marketing Campaigns</a></li>
         <li><%= delimiter %><%= @campaign.name %></li>
       <% end %>
-
+      <% if params[:controller] == 'campaign_days' && params[:action] == 'index' %>
+        <li><%= delimiter %>Campaign Days</li>
+      <% end %>
     <% end %>
 
     <% if @current_user %>

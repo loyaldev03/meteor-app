@@ -28,7 +28,8 @@ private
         (link_to(I18n.t('activerecord.model.fulfillments'), @url_helpers.fulfillments_index_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'fulfillments') if @current_agent.can? :read, Fulfillment, club.id).to_s+
         (link_to(I18n.t('activerecord.model.fulfillment_files'), @url_helpers.list_fulfillment_files_path(club.partner.prefix, club.name), :class => 'btn btn-mini', :id =>'fulfillment_files') if @current_agent.can? :report, Fulfillment, club.id).to_s+
         (link_to(I18n.t('activerecord.model.suspected_fulfillments'), @url_helpers.suspected_fulfillments_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :manual_review, Fulfillment, club.id).to_s+
-        (link_to(I18n.t('activerecord.model.campaign'), @url_helpers.campaigns_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :read, Campaign, club.id).to_s+
+        (link_to(I18n.t('activerecord.model.campaigns'), @url_helpers.campaigns_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :read, Campaign, club.id).to_s+
+        (link_to(I18n.t('activerecord.model.campaign_days'), @url_helpers.campaign_days_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :read, CampaignDay, club.id).to_s+
         (link_to(I18n.t('activerecord.model.disposition_types'), @url_helpers.disposition_types_path(club.partner.prefix, club.name), :class => 'btn btn-mini') if @current_agent.can? :read, DispositionType, club.id).to_s
       ]
     end
