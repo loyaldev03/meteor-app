@@ -104,6 +104,13 @@ module SacMailchimp
             "PREF1" => "car_year",
             "PREF2" => "car_made"
           }
+        when 15 # SCRF
+          {
+            "PREF1" => "driver_1",
+            "PREF2" => "driver_2",
+            "PREF3" => "car",
+            "PREF4" => "track"
+          }
       end
     end
 
