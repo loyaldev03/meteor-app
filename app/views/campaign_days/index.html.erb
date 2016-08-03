@@ -21,7 +21,7 @@
 
 <div id="dataTableSelect" class="in-front" >
   Filter by:
-  <%= select_tag "select_transport", options_for_select({"Facebook"=>"facebook", "Mailchimp"=>"mailchimp", "Twitter"=>"twitter", "Google Adwords"=>"adwords"}) %>
+  <%= select_tag "search_transport", options_for_select(Campaign.transports_i18n.invert) %>
 </div>
 
 <script>

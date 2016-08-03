@@ -27,11 +27,9 @@ private
   end
 
   def fetch_campaigns
-    # campaign_days = @current_club.campaign_days.order("#{sort_column} #{sort_direction}")
-    
-    campaign_days = CampaignDay.includes(:campaign).where(campaigns: {club_id: @current_club.id}).order("#{sort_column} #{sort_direction}")
+    campaign_days = CampaignDay.includes(:campaign).where(campaigns: {club_id: @current_club.id}).missing.order("#{sort_column} #{sort_direction}")
     if params[:sSearch].present?
-      # campaign_days = campaign_days.where("name like :search", search: "%#{params[:sSearch]}%")
+      campaign_days = campaign_days.where(campaigns: {transport: Campaign.transports[params[:sSearch]]})
     end
     campaign_days.page(page).per_page(per_page)
   end

@@ -169,15 +169,15 @@ function campaign_days_functions(column_count){
     "bProcessing": true,
     "bServerSide": true,
     "bLengthChange": false,
-    "iDisplayLength": 25,
-    "aaSorting": [[ 1, "desc" ]],
+    "iDisplayLength": 15,
+    "aaSorting": [[ 1, "asc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2,3,4,5 ] }],
     "sAjaxSource": $('#campaign_days_table').data('source')
   });
 
   $('#campaign_days_table_wrapper .top').prepend($("#dataTableSelect"));
   $("#search_transport").change( function () {
-      oTable2.search( $(this).val() ).draw();
+    oTable2.search( $(this).val() ).draw();
   });
 }
 
