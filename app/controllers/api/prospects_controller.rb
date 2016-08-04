@@ -66,8 +66,9 @@ class Api::ProspectsController < ApplicationController
       my_authorize! :manage_prospects_api, Prospect, tom.club_id
       response = { :message => "Prospect data invalid", :code => Settings.error_codes.prospect_data_invalid }
       standarize_params(params[:prospect])
-      prospect = Prospect.new params.require(:prospect).permit(:first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, :phone_area_code ,:phone_local_number, :birth_date, :preferences, :gender, :ip_address, :referral_host, :referral_parameters, :cookie_value,:marketing_code, :product_sku, :visitor_id, :landing_url, :mega_channel, :user_agent, :joint,:campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description, :source)
+      prospect = Prospect.new params.require(:prospect).permit(:first_name, :last_name, :address, :city, :state, :zip, :email,:phone_country_code, :phone_area_code ,:phone_local_number, :birth_date, :gender, :ip_address, :referral_host, :referral_parameters, :cookie_value,:marketing_code, :product_sku, :visitor_id, :landing_url, :mega_channel, :user_agent, :joint,:campaign_medium, :campaign_description, :campaign_medium_version , :terms_of_membership_id, :country, :type_of_phone_number, :fulfillment_code, :referral_path, :cookie_set, :product_description, :source)
       prospect.club_id = tom.club_id
+      prospect.preferences = params[:prospect][:preferences]
       if prospect.save
         Auditory.audit(current_agent, prospect, "User visits checkout page.", nil, Settings.operation_types.checkout_page_visit)
         response[:message] = "Prospect was successfuly saved."
