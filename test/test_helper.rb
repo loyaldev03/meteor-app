@@ -182,6 +182,12 @@ class ActionController::TestCase
   end
 end
 
+def perform_call_as(agent)
+  sign_in agent
+  yield
+  sign_out agent
+end
+  
 module ActionDispatch
   class IntegrationTest
     include Capybara::DSL
