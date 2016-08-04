@@ -17,6 +17,7 @@ class CampaignDaysController < ApplicationController
 
   def update
     @campaign_day = CampaignDay.find(params[:id])
+    my_authorize! :update, CampaignDay, @campaign_day.campaign.club_id
     if @campaign_day.update_attributes params.require(:campaign_day).permit(:spent, :converted, :reached)
       render json: { success: true, message: 'Campaign day #{@campaign_day.date} for Campaign #{@campaign_day.name} was update successfuly.' }
     else
