@@ -1,10 +1,8 @@
-<%- model_class = CampaignDay.new.class -%>
-
 <div class="page-header">
-  <h1> <%=t '.title', :default => model_class.model_name.human.pluralize %> </h1>
+  <h1> Missing campaign days </h1>
 </div>
 
-<table id="campaign_days_table" class="table table-bordered table-condensed dataTable" data-source="<%= campaign_days_url(format: "json") %>">
+<table id="campaign_days_table" class="table table-bordered table-condensed dataTable" data-source="<%= missing_campaign_days_url(format: "json") %>">
   <thead>
     <tr>
       <th><%= I18n.t("activerecord.attributes.campaign_day.date") %></th>
@@ -20,8 +18,8 @@
 </table>
 
 <div id="dataTableSelect" class="in-front" >
-  Filter by:
-  <%= select_tag "search_transport", options_for_select(Campaign.transports_i18n.invert) %>
+  Transport:
+  <%= select_tag "search_transport", options_for_select(Campaign.transports_i18n.invert), include_blank: 'All' %>
 </div>
 
 <script>

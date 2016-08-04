@@ -37,6 +37,28 @@ class Campaign < ActiveRecord::Base
     where(transport: transport)
   }
  
+
+
+  def past_period(date = Date.current)
+    if mailchimp?
+      [ initial_date ]
+    else
+      initial_date .. ((finish_date.nil? || finish_date > date) ? date : finish_date)
+    end
+  end
+
+  def missing_days(date: Date.current, campaign_days_scope: campaign_days)
+    if mailchimp?
+      [CampaignDay.where(campaign: self, date: initial_date).first_or_create.tap(&:readonly!)]
+    else
+      all_days = past_period(date).to_a
+      present_days = campaign_days_scope.where(campaign_id: self).not_missing.pluck(:date)
+      (all_days - present_days).map { |missing_date|
+        CampaignDay.where(campaign: self, date: missing_date).first_or_create.tap(&:readonly!)
+      }
+    end
+  end
+
   def self.datatable_columns
     [ 'id', 'name', 'name', 'transport', 'initial_date', 'finish_date' ]
   end

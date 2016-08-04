@@ -140,7 +140,12 @@ SacPlatform::Application.routes.draw do
       get '/suspected_fulfillment/:id' => 'fulfillments#suspected_fulfillment_information', as: 'suspected_fulfillment_information'
     
       resources :campaigns, except: [:destroy]
-      get :campaign_days, to: "campaign_days#index", as:"campaign_days"
+      # get :campaign_days, to: "campaign_days#index", as: "campaign_days"
+      resources :campaign_days, only: [:edit, :update] do
+        collection do
+          get 'missing' => 'campaign_days#missing'
+        end
+      end
     end
 
     resources :domains
