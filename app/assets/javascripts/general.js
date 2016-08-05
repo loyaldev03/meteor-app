@@ -145,7 +145,7 @@ function partner_index_functions(column_count){
 function club_index_functions(column_count){
   $('#clubs_table').DataTable({
     "sPaginationType": "full_numbers",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,
@@ -161,10 +161,64 @@ function club_index_functions(column_count){
   });
 }
 
+function campaign_days_functions(column_count){
+  oTable2 = $('#campaign_days_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"p>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 15,
+    "bResetDisplay": false,
+    "aaSorting": [[ 1, "asc" ]],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2,3,4,5 ] }],
+    "sAjaxSource": $('#campaign_days_table').data('source')
+  });
+
+  $('#campaign_days_table_wrapper .top').prepend($("#dataTableSelect"));
+  $("#search_transport").change( function () {
+    oTable2.search( $(this).val() ).draw();
+  });
+
+  $('#campaign_days_table').on("click",'a[data-toggle="custom-remote-modal"]', function(event){
+    event.preventDefault();
+    var targetModal = '#myModal'+ $(this).data('target');
+    $(targetModal + ' .modal-body').load($(this).attr('href'), function(e) {
+      $(targetModal).modal('show');
+    });
+  });
+  $('#campaign_days_table').on('submit', '.modal-body form', function(event){
+    event.preventDefault();
+    startAjaxLoader(true);
+    var campaignDayId = $(this).data('target');
+    $.ajax({
+      type: 'put',
+      url: $(this).attr('action'),
+      data: $(this).serialize(),
+      success: function(data){
+        endAjaxLoader(true);
+        if(data.success == true){
+          $("#campaign_days_table").DataTable().ajax.reload(null, false);
+          $('#myModal'+campaignDayId).modal('hide');
+          flash_message(data.message, false)
+        }else{
+          $('#myModal'+campaignDayId).modal('hide');
+          flash_message(data.message, true)
+        }
+      },
+      error: function(jqXHR, exception){
+        endAjaxLoader(true);
+        alert(global_ajax_error_messages(jqXHR));
+      }
+    })
+  });
+}
+
 function delay_jobs_index_functions(column_count){
   $('#delayed_jobs_table').DataTable({
     "sPaginationType": "full_numbers",
-  "sDom": '<"top"fp>rt<"bottom"il>',
+    "sDom": '<"top"fp>rt<"bottom"il>',
     "bJQueryUI": false,
     "bProcessing": true,
     "bServerSide": true,

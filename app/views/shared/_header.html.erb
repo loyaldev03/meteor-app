@@ -56,7 +56,10 @@
                     <li><%= link_to t('activerecord.model.suspected_fulfillments'), suspected_fulfillments_path(current_club.partner.prefix, current_club.name) %></li>
                   <% end %>
                   <% if @current_agent.can? :read, Campaign, @current_club.id %>
-                    <li><%= link_to t('activerecord.model.campaign'), campaigns_path(@current_club.partner.prefix, @current_club.name) %></li>
+                    <li><%= link_to t('activerecord.model.campaigns'), campaigns_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, CampaignDay, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.campaign_days'), missing_campaign_days_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
                   <% if @current_agent.can? :read, DispositionType, @current_club.id %>
                     <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>

@@ -30,6 +30,13 @@ class Campaign < ActiveRecord::Base
     adwords:    3
   }
 
+  scope :by_transport, -> (transport) {
+    unless transport.kind_of? Integer
+      transport = Campaign.transports[transport.to_s]
+    end
+    where(transport: transport)
+  }
+ 
   def self.datatable_columns
     [ 'id', 'name', 'campaign_type', 'transport', 'initial_date', 'finish_date' ]
   end

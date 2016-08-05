@@ -22,6 +22,7 @@ class Ability
     cannot :manage, Transaction
     cannot :manage, PaymentGatewayConfiguration
     cannot :manage, Campaign
+    cannot :manage, CampaignDay
     cannot :manage_club_cash_api, ClubCashTransaction
     cannot :see_sync_status, User
     cannot :see_cc_token, CreditCard
@@ -74,6 +75,7 @@ class Ability
       can :manage, DispositionType
       can :manage, UserAdditionalData
       can :manage, Campaign
+      can :manage, CampaignDay
       can :manage_club_cash_api, ClubCashTransaction
       can :manage_prospects_api, Prospect
       can :manage_token_api, Agent

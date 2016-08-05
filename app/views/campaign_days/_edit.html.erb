@@ -1,0 +1,25 @@
+<%= form_for(@campaign_day, url: campaign_day_path(id: @campaign_day.id), :html => { :class => 'form-horizontal', 'data-target' => @campaign_day.id }) do |f| %>
+
+  <div class="control-group">
+    <%= f.label :spent, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.number_field :spent, :class => 'text_field', required: true, within: 0..99999999, step: 0.01 %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :reached, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.number_field :reached, :class => 'text_field', required: true %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :converted, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.number_field :converted, :class => 'text_field error', required: true %>
+    </div>
+  </div>
+
+  <div class="form-actions text-right">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+  </div>
+<% end %>
