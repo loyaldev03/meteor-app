@@ -3,7 +3,7 @@
   <div class="control-group">
     <%= f.label :spent, :class => 'control-label' %>
     <div class="controls">
-      <%= f.number_field :spent, :class => 'text_field', required: true, within: 0...9000, step: 0.01 %>
+      <%= f.number_field :spent, :class => 'text_field', required: true, within: 0..99999999, step: 0.01 %>
     </div>
   </div>
   <div class="control-group">
