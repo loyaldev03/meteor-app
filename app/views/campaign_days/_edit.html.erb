@@ -9,13 +9,13 @@
   <div class="control-group">
     <%= f.label :reached, :class => 'control-label' %>
     <div class="controls">
-      <%= f.number_field :reached, :class => 'text_field', required: true %>
+      <%= f.number_field :reached, :class => 'text_field', required: true, within: 0..99999999 %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :converted, :class => 'control-label' %>
     <div class="controls">
-      <%= f.number_field :converted, :class => 'text_field error', required: true %>
+      <%= f.number_field :converted, :class => 'text_field error', required: true, within: 0..99999999 %>
     </div>
   </div>
 
