@@ -44,18 +44,20 @@ class CampaignsController < ApplicationController
 
   def update
     my_authorize! :update, Campaign, current_club.id
-    if @campaign.update campaign_params
-      flash[:notice] = "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
-      redirect_to campaigns_url
+    if @campaign.update campaign_params_on_update
+      redirect_to campaigns_url, notice: "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
     else
-      flash[:error] = "Campaign <b>#{@campaign.name}</b> was not updated".html_safe
-      redirect_to campaigns_url
+      redirect_to campaigns_url, error: "Campaign <b>#{@campaign.name}</b> was not updated".html_safe
     end
   end
 
   private
     def campaign_params
       params.require(:campaign).permit(:name, :enrollment_price, :transport, :marketing_code, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :campaign_medium_version, :transport_campaign_id, :fulfillment_code)
+    end
+
+    def campaign_params_on_update
+      params.require(:campaign).permit(:name, :initial_date, :finish_date)
     end
 
     def set_campaign

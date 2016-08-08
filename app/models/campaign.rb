@@ -5,7 +5,6 @@ class Campaign < ActiveRecord::Base
   belongs_to :terms_of_membership
 
   before_save :set_fulfillment_code
-  before_update :custom_update
   
   validates :name, :enrollment_price, :initial_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
@@ -63,16 +62,6 @@ class Campaign < ActiveRecord::Base
   end
 
   private
-    def custom_update
-      name = self.name
-      initial_date = self.initial_date
-      finish_date = self.finish_date
-      self.restore_attributes
-      self.name = name
-      self.initial_date = initial_date
-      self.finish_date = finish_date
-    end
-
     def set_fulfillment_code
       self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join if self.fulfillment_code == 'New automatic code'
     end
