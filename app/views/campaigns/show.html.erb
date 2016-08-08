@@ -32,8 +32,7 @@
 <div class='row-fluid'>
   <div class='span12'>
     <div class="form-actions">
-      <%= link_to t(:campaigns_index), campaigns_path, :class => "btn", :id => 'return_btn' %>
-      <%= link_to(t(:edit), edit_campaign_path(partner_prefix: @current_partner.prefix, club_prefix: @current_club.name, :id => @campaign.id.to_s), :class => 'btn') if @current_agent.can? :edit, Campaign, @current_club.id %>
+      <%= link_to t('back', default: t('helpers.links.back')), campaigns_path, class: 'btn' %>
     </div>
   </div>
 </div>
