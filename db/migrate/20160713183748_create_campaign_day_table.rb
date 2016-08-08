@@ -10,7 +10,6 @@ class CreateCampaignDayTable < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    add_index :campaign_days, :campaign_id
     add_index :campaign_days, [:campaign_id, :date], :unique => true
   end
 end

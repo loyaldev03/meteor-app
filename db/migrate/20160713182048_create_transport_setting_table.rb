@@ -8,8 +8,6 @@ class CreateTransportSettingTable < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    add_index :transport_settings, :club_id
-    add_index :transport_settings, :transport
     add_index :transport_settings, [:club_id, :transport], unique: true
   end
 end
