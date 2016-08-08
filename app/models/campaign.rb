@@ -5,6 +5,7 @@ class Campaign < ActiveRecord::Base
   belongs_to :terms_of_membership
 
   before_save :set_fulfillment_code
+  before_save :set_campaign_medium
   before_save :set_campaign_medium_version
   
   validates :name, :enrollment_price, :initial_date, :campaign_type, :transport, 
@@ -51,20 +52,24 @@ class Campaign < ActiveRecord::Base
     self.fulfillment_code         = params[:fulfillment_code] unless params[:fulfillment_code].blank?
     self.transport_campaign_id    = params[:transport_campaign_id] unless params[:transport_campaign_id].blank?
     self.terms_of_membership_id   = params[:terms_of_membership_id] unless params[:terms_of_membership_id].blank?
+    set_campaign_medium
     self.campaign_medium_version  = params[:campaign_medium_version] unless params[:campaign_medium_version].blank?
-    self.campaign_medium = case transport
-      when 'facebook', 'twitter'
-        :display
-      when 'mailchimp'
-        :email
-      when 'adwords'
-        :search
-    end
   end
 
   private
     def set_fulfillment_code
       self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join if self.fulfillment_code == 'New automatic code'
+    end
+
+    def set_campaign_medium
+      self.campaign_medium = case transport
+        when 'facebook', 'twitter'
+          :display
+        when 'mailchimp'
+          :email
+        when 'adwords'
+          :search
+      end
     end
 
     def set_campaign_medium_version
