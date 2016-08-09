@@ -17,6 +17,7 @@ module SacMailchimp
               member.marketing_tool_mailchimp_sync_without_delay
             rescue Exception => e
               Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
+              Auditory.report_issue("User Mailchimp synchronization.", e, { :user_id => member.id })
             end
             Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
           end
