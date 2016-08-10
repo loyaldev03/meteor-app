@@ -1,4 +1,4 @@
-class AssignClubCash < ActiveJob::Base
+class AssignClubCashJob < ActiveJob::Base
   queue_as :club_cash_queue
 
   def perform(user_id, message, enroll = false)

@@ -974,7 +974,7 @@ class User < ActiveRecord::Base
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing", enroll = false)
-    AssignClubCash.set(wait: 5.minutes).perform_later(self.id, message, enroll)
+    AssignClubCashJob.set(wait: 5.minutes).perform_later(self.id, message, enroll)
   end
 
   # Adds club cash transaction. 
