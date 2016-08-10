@@ -881,7 +881,7 @@ class User < ActiveRecord::Base
       Auditory.report_issue("User:prorated_enroll -- user turned invalid while enrolling", e, { user: self.inspect, credit_card: credit_card.inspect, membership: membership.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       Auditory.audit(agent, self, "User:prorated_enroll", self, Settings.operation_types.tom_change_billing_with_error)
-      { message: I18n.t('error_messages.user_not_saved', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.member_not_saved }
+      { message: I18n.t('error_messages.user_not_saved', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.user_not_saved }
     end
   end
 
