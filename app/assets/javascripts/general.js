@@ -875,7 +875,6 @@ function campaignFormFunctions() {
     });
   }
 
-  
   $('#campaign_transport').change(function() {
     setCampaignMedium($('#campaign_transport').val());
   });
@@ -904,13 +903,24 @@ function campaignFormFunctions() {
   setCampaignMedium($('#campaign_transport').val());
 }
 
-function transportSettingsFormFunctions() {
-  $("#transport_setting_transport").change(function() {
-    $("#transport_settings_values").html("");
-  });
 
+function transportSettingsFormFunctions() {
   $("#transport_setting_transport").select2({ theme: "bootstrap" });
+
+  function showSettingsPane(transport) {
+    if(!transport) transport = $("#transport_setting_transport").val();
+    transport == "facebook" ? $("#transport_settings_values_facebook").show() : $("#transport_settings_values_facebook").hide();
+    transport == "mailchimp" ? $("#transport_settings_values_mailchimp").show() : $("#transport_settings_values_mailchimp").hide();
+    // transport == "twitter" ? $("#transport_settings_values_twitter").show() : $("#transport_settings_values_twitter").hide();
+    // transport == "adwords" ? $("#transport_settings_values_adwords").show() : $("#transport_settings_values_adwords").hide();
+  }
+
+  showSettingsPane(null);
+  $("#transport_setting_transport").change(function() {
+    showSettingsPane($("#transport_setting_transport").val());
+  });
 }
+
 
 function club_cash_transactions_functions(column_count){
   $('#club_cash_transactions_table').DataTable({
