@@ -24,7 +24,7 @@ class CampaignDataFetcher
         campaign_day = CampaignDay.find_or_initialize_by(
           campaign_id: report.campaign_id
         )
-        campaign_day.date = Campaign.find(report.campaign_id).starts_on unless campaign_day.date
+        campaign_day.date = Campaign.find(report.campaign_id).initial_date unless campaign_day.date
       else
         campaign_day = CampaignDay.find_or_initialize_by(
           campaign_id: report.campaign_id,
