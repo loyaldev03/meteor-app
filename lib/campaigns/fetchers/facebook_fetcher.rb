@@ -1,5 +1,9 @@
 class CampaignDataFetcher
   class FacebookFetcher < BaseFetcher
+    # API: https://developers.facebook.com/docs/marketing-api/insights/fields/v2.7
+    # reached = impressions
+    # converted = clicks
+    # spent = spend
 
     def fetch!(report)
       @report               = report.dup

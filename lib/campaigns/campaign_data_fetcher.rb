@@ -13,7 +13,7 @@ class CampaignDataFetcher
   
   autoload :BaseFetcher, File.expand_path('../fetchers/base_fetcher', __FILE__)
   autoload :FacebookFetcher, File.expand_path('../fetchers/facebook_fetcher', __FILE__)
-
+  autoload :MailchimpFetcher, File.expand_path('../fetchers/mailchimp_fetcher', __FILE__)
 
   def initialize(club_id:, transport:, date:)
     @club_id    = club_id
