@@ -19,7 +19,11 @@ class TransportSetting < ActiveRecord::Base
     def set_data
       case transport
       when 'facebook'
-        self.settings = { client_id: fb_client_id, client_secret: fb_client_secret, access_token: fb_access_token }
+        self.settings = { 
+          client_id: fb_client_id, 
+          client_secret: fb_client_secret, 
+          access_token: fb_access_token 
+        }
       when 'mailchimp'
         self.settings = { api_key: mc_api_key }
       when 'twitter', 'adwords'
