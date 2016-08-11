@@ -424,9 +424,9 @@ class User < ActiveRecord::Base
   ###############################################
 
   def change_terms_of_membership(tom, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil, schedule_date = nil, additional_actions = {})
+    agent = agent || Agent.find_by(email: Settings.batch_agent_email)
     if can_change_tom?
       new_tom = tom.kind_of?(TermsOfMembership) ? tom : TermsOfMembership.find_by(id: tom)
-
       if new_tom
         if new_tom.club_id == self.club_id
           if new_tom.id == terms_of_membership.id
@@ -436,7 +436,7 @@ class User < ActiveRecord::Base
             if schedule_date
               self.change_tom_date = schedule_date
               self.change_tom_attributes = additional_actions.merge(terms_of_membership_id: tom.id)
-              self.change_tom_attributes.merge!(agent_id: agent.id) if agent
+              self.change_tom_attributes.merge!(agent_id: agent.id)
               self.save(validate: false)
               Auditory.audit(agent, self, operation_message, self, operation_type)
               return { message: operation_message, code: Settings.error_codes.success }
