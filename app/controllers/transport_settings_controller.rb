@@ -21,7 +21,7 @@ class TransportSettingsController < ApplicationController
 
   def create
     @transport = TransportSetting.new(transport_params)
-
+    @transport.club_id = current_club.id
     if @transport.save
       redirect_to @transport, notice: 'Transport was successfully created.'
     else
@@ -43,6 +43,6 @@ class TransportSettingsController < ApplicationController
     end
 
     def transport_params
-      params.require(:transport_setting).permit(:transport, :fb_client_id, :fb_client_secret, :fb_access_token)
+      params.require(:transport_setting).permit(:transport, :fb_client_id, :fb_client_secret, :fb_access_token, :mc_api_key)
     end
 end
