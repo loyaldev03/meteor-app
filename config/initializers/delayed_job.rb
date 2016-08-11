@@ -7,6 +7,12 @@ Delayed::Worker.delay_jobs = !Rails.env.test?
 Delayed::Worker.logger = Logger.new("#{Rails.root}/log/delayed_job.log")
 Delayed::Worker.logger.level = Logger::DEBUG
 
+Delayed::Worker.queue_attributes = {
+  club_cash_queue: { priority: 18 },
+  elasticsearch_indexing: { priority: 10 },
+  mailchimp_sync: { priority: 30 }
+}
+
 Delayed::Worker.class_eval do
   def handle_failed_job_with_notification(job, error)
     handle_failed_job_without_notification(job, error)

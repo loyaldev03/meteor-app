@@ -151,6 +151,7 @@ class UserTest < ActiveSupport::TestCase
   test "Should reset club_cash when user is canceled" do
     user = create_active_user(@wordpress_terms_of_membership, :provisional_user_with_cc, nil, { :club_cash_amount => 200 })
     user.set_as_canceled
+    user.reload
     assert_equal 0, user.club_cash_amount, "The user is #{user.status} with #{user.club_cash_amount}"
   end
 
