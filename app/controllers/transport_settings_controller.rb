@@ -1,11 +1,12 @@
 class TransportSettingsController < ApplicationController
+  before_filter :validate_club_presence
   before_action :set_transport, only: [:show, :edit, :update]
 
   def index
-    # my_authorize! :list, TransportSetting, @current_club.id
+    my_authorize! :list, TransportSetting, current_club.id
     respond_to do |format|
       format.html
-      format.json { render json: TransportSetting.new(view_context, @current_partner, @current_club, @current_user, @current_agent)}
+      format.json { render json: TransportSetting.new(view_context, current_partner, current_club, current_user, current_agent)}
     end 
   end
 
