@@ -4,9 +4,9 @@ class Campaign < ActiveRecord::Base
   has_many :campaign_days
   belongs_to :terms_of_membership
 
-  before_save :set_fulfillment_code
-  before_save :set_campaign_medium
+  before_validation :set_campaign_medium
   before_save :set_campaign_medium_version
+  before_save :set_fulfillment_code
   
   validates :name, :enrollment_price, :initial_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
@@ -40,20 +40,6 @@ class Campaign < ActiveRecord::Base
  
   def self.datatable_columns
     [ 'id', 'name', 'campaign_type', 'transport', 'initial_date', 'finish_date' ]
-  end
-
-  def set_data(params)
-    self.name                     = params[:name] unless params[:name].blank?
-    self.transport                = params[:transport] unless params[:transport].blank?
-    self.campaign_type            = params[:campaign_type] unless params[:campaign_type].blank?
-    self.marketing_code           = params[:marketing_code] unless params[:marketing_code].blank?
-    self.initial_date             = params[:initial_date] unless params[:initial_date].blank?
-    self.finish_date              = params[:finish_date] unless params[:finish_date].blank?
-    self.fulfillment_code         = params[:fulfillment_code] unless params[:fulfillment_code].blank?
-    self.transport_campaign_id    = params[:transport_campaign_id] unless params[:transport_campaign_id].blank?
-    self.terms_of_membership_id   = params[:terms_of_membership_id] unless params[:terms_of_membership_id].blank?
-    set_campaign_medium
-    self.campaign_medium_version  = params[:campaign_medium_version] unless params[:campaign_medium_version].blank?
   end
 
   private
