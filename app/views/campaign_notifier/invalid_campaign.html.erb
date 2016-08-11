@@ -1,0 +1,30 @@
+<% content_for :header do %>
+  <tr>
+    <td class="alert alert-bad">
+      Alert: There has been an authentication error while fetching data from the following campaigns
+    </td>
+  </tr>
+<% end %>
+
+<table width="100%" cellpadding="0" cellspacing="0">
+  <% @campaigns.each do |campaign| %>
+    <tr>
+      <td class="alert alert-warning"> 
+        <%= campaign.transport_i18n %> campaign <%= campaign.id %>-<%= campaign.name %>
+      </td> 
+    </tr>
+    <tr>
+      <td class="content-block">
+        <p>Please, make sure that the campaign is correctly configured <%= link_to 'by clicking here', edit_campaign_url(partner_prefix: campaign.club.partner.prefix, club_prefix: campaign.club.name, id: campaign.id ) %>. </p>
+        <p> Campaign Days affected so far: </p>
+        <ul>
+          <% campaign.campaign_days.invalid_campaign.pluck(:date).each do |date| %>
+            <li>
+              <%= I18n.l(date) %>
+            </li>
+          <% end %>
+        </ul>
+      </td>
+    </tr>
+  <% end %>
+</table>

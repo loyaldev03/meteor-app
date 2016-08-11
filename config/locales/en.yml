@@ -659,3 +659,10 @@ en:
       dashed: "%Y-%m-%d %H:%M"
       only_date: "%Y-%m-%d"
       only_date_short: "%m/%y"
+  mailers:
+    missing_campaign_days:
+      subject: "Missing campaign days report"
+    invalid_credentials_email:
+      subject: "Authentication error while trying to get campaign information"
+    invalid_campaign_email:
+      subject: "Invalid campaign configuration"

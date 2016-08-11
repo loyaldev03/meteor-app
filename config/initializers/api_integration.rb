@@ -15,6 +15,7 @@ Drupal.enable_integration! unless Rails.env.test? or Rails.env.development?
 require 'sac_exact_target/exact_target'
 require 'sac_mailchimp/mailchimp'
 require 'sac_mandrill/mandrill'
+require 'campaigns/campaign_data_fetcher'
 
 SacExactTarget.logger = Logger.new("#{Rails.root}/log/exact_target_client.log")
 SacMailchimp.logger = Logger.new("#{Rails.root}/log/mailshimp_client.log")

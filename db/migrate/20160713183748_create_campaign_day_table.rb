@@ -6,6 +6,7 @@ class CreateCampaignDayTable < ActiveRecord::Migration
       t.decimal     :spent
       t.integer     :reached
       t.integer     :converted
+      t.integer     :meta, default: 0
 
       t.timestamps null: false
     end

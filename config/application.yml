@@ -11,6 +11,7 @@ defaults: &defaults
   fulfillment_naamma_report_emails: 'sonia@xagax.com'
   fulfillment_nfla_report_emails: 'sonia@xagax.com'
   hot_rod_cancellation_emails: 'sonia@xagax.com,clawler@fullcu.be'
+  campaign_manager_recipients: 'platform@xagax.com'
   batch_agent_email: 'batch@xagax.com'
   others_product: "SLOOPS"
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe']
@@ -404,6 +405,7 @@ production:
   hot_rod_cancellation_emails: 'jbrickman@zinio.com,clawler@fullcu.be'
   fulfillment_naamma_report_emails: ''
   fulfillment_nfla_report_emails: ''
+  campaign_manager_recipients: 'mbrossard@meteoraffinity.com,ndavid@meteoraffinity.com,lerrick@meteoraffinity.com'
   mes_report_service:
     user: Stoneacrereports
     password: do3!lAjo5

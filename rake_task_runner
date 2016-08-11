@@ -67,6 +67,10 @@ cd /var/www/$2/current && bundle exec rake users:process_club_cash  >> $LOGFILE 
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS
 
+# fetch data from campaigns
+echo "`date` rake campaigns:fetch_data"
+cd /var/www/$2/current && bundle exec rake campaigns:fetch_data >> $LOGFILE 2>&1
+
 # count members for each  club
 echo "`date` rake clubs:count_members_in_clubs"
 cd /var/www/$2/current && bundle exec rake clubs:count_members_in_clubs >> $LOGFILE 2>&1
