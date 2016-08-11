@@ -1,7 +1,10 @@
 class TransportSetting < ActiveRecord::Base
   belongs_to :club
 
-  before_update :custom_update
+  attr_accessor :fb_client_id, :fb_client_secret, :fb_access_token
+  attr_accessor :mc_api_key
+
+  before_validation :set_data
 
   enum transport: {
     facebook:   0,
