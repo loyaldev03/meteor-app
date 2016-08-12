@@ -1,19 +1,20 @@
 <section> 
   <div class="page-header">
     <h1>Transport Settings</h1>
-    <% # if can? :create, TransportSetting, @current_club.id %>
+    <% if can? :create, TransportSetting, current_club.id %>
       <%= link_to(new_transport_setting_path, :class => "btn btn-primary btn_on_header", :id => "new_transport_setting") do %> 
         <i class="icon-plus"></i> New Transport Setting
       <% end %>
-    <% # end %>
+    <% end %>
   </div>
 </section>
 
 <table id="transport_settings_table" class="table table-bordered table-condensed dataTable" data-source="<%= transport_settings_url(format: "json") %>">
   <thead>
     <tr>
-      <th> <%= t('activerecord.attributes.transport_setting_id') %> </th>
-      <th> <%= t('activerecord.attributes.transport_setting_transport') %> </th>
+      <th> <%= t('activerecord.attributes.id') %> </th>
+      <th> <%= t('activerecord.attributes.transport') %> </th>
+      <th> <%= t('activerecord.attributes.settings') %> </th>
       <th> <%= t('actions') %> </th>
     </tr>
   </thead>
@@ -22,5 +23,5 @@
 </table>
 
 <script>
-  $(document).ready(transport_settings_functions());
+  $(document).ready(transportSettingsIndexFunctions());
 </script>
