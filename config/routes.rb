@@ -139,9 +139,13 @@ SacPlatform::Application.routes.draw do
       get '/suspected_fulfillments' => 'fulfillments#suspected_fulfillments', as: 'suspected_fulfillments'
       get '/suspected_fulfillment/:id' => 'fulfillments#suspected_fulfillment_information', as: 'suspected_fulfillment_information'
     
-      resources :campaigns, except: [:destroy]
+      resources :campaigns, except: [:destroy] do
+        collection do 
+          get 'facebook/request_code', to: "campaign/facebook#request_code", as: :campaign_facebook_request_code 
+          get 'facebook/access_token', to: "campaign/facebook#generate_token", as: :campaign_facebook_access_token
+        end
+      end
 
-      # get :campaign_days, to: "campaign_days#index", as: "campaign_days"
       resources :campaign_days, only: [:edit, :update] do
         collection do
           get 'missing' => 'campaign_days#missing'

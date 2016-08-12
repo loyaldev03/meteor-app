@@ -76,29 +76,9 @@ class Notifier < ActionMailer::Base
          :subject => "#{I18n.l(Time.zone.now, :format => :default )} - Product Bulk Process Results"
   end
 
-  def fulfillment_naamma_report(fulfillment_xls_file, quantity)
-    @quantity = quantity
-    attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
-    mail :to => Settings.fulfillment_naamma_report_emails,
-         :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NAAMMA fulfillments report"
-  end
-
-  def fulfillment_nfla_report(fulfillment_xls_file, quantity)
-    @quantity = quantity
-    attachments["fulfillments_xls_file#{Date.today}.xlsx"] = File.read(fulfillment_xls_file)
-    mail :to => Settings.fulfillment_nfla_report_emails,
-         :subject => "#{I18n.l(Time.zone.now, :format => :default )} - NFLA kit-card fulfillments report"
-  end
-
   def manual_fulfillment_file(agent, fulfillment_file, file)
     attachments["fulfillments_xls_file_##{fulfillment_file.id}.xlsx"] = File.read(file)
     mail :to => agent.email, :subject => "Fulfillment file ##{fulfillment_file.id}"
-  end
-
-  def hot_rod_magazine_cancellation(users_csv_file, quantity)
-    @quantity = quantity
-    attachments["#{I18n.l(Time.zone.now, :format => :only_date)}_hotrod_magazine_cancellation.csv"] = { :mime_type => 'text/csv', :content => users_csv_file }
-    mail :to => Settings.hot_rod_cancellation_emails, :subject => "#{I18n.l(Time.zone.now, :format => :default )} - HOT ROD magazine cancellation"
   end
 
 end

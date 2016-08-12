@@ -32,4 +32,11 @@ class TransportSetting < ActiveRecord::Base
         self.settings = { api_key: mc_api_key }
       end
     end
+
+    scope :by_transport, -> (transport) {
+      unless transport.kind_of? Integer
+        transport = Campaign.transports[transport.to_s]
+      end
+      where(transport: transport)
+    }
 end

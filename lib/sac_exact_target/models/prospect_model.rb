@@ -146,24 +146,12 @@ module SacExactTarget
               "pref_field_3" => "car",
               "pref_field_4" => "track"
             }
-          when 5
+          when 15 # SCRF
             {
-              "pref_field_1" => "rv_type",
-              "pref_field_2" => "rv_make",
-              "pref_field_3" => "rv_model",
-              "pref_field_4" => "rv_year",
-              "pref_field_5" => "rv_miles",
-              "pref_field_6" => "fav_dest",
-              "pref_field_7" => "fav_use"
-            }
-          when 8
-            {
-              "pref_field_1" => "fav_team"
-            }
-          when 9
-            {
-              "pref_field_1" => "car_year",
-              "pref_field_2" => "car_made"
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
             }
         end
       end
