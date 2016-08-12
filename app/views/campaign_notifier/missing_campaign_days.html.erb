@@ -14,7 +14,7 @@
   </tr>
   <% @data.each do |campaign_id, missing_days| %>
     <tr>
-      <td class="alert alert-warning"> 
+      <td class="alert item"> 
         <%= Campaign.find(campaign_id.to_i).transport_i18n %> campaign <%= campaign_id %>-<%= link_to 'Campaign' + ' "'+Campaign.find(campaign_id.to_i).name+'"', '#' %>
       </td>
     </tr>
