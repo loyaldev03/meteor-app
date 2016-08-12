@@ -1,27 +1,26 @@
+<% if controller.action_name == 'new' %>
 <div class='row-fluid'>
   <div class='span6'>
     <div class="control-group">
-      <%= f.label :transport, :class => 'control-label' %>
+      <%= f.label :transport, class: 'control-label' %>
       <div class="controls">
-        <%= f.select :transport, options_for_select(TransportSetting.transports_i18n.invert, @transport.transport), { class: 'form-control' } %> 
+        <%= f.select :transport, options_for_select(current_club.available_transport_settings, @transport.transport), { class: 'form-control' } %> 
       </div>
     </div>
   </div>
 </div>
+<% else %>
+  <%= f.hidden_field :transport, value: @transport.transport %>
+<% end %>
 
 <div id="transport_settings_values">
-  <div class='row-fluid'>
-    <div class='span12'>
-      <h5>Transport Settings</h5>
-    </div>
-  </div>
-  <div id="transport_settings_values_facebook">
+  <div id="transport_settings_values_facebook" style="display: none;">
     <div class='row-fluid'>
       <div class='span12'>
         <div class="control-group">
           <%= f.label 'Client ID', class: 'control-label' %>
           <div class="controls">
-            <%= f.text_field :fb_client_id, class: 'text_field input-xxlarge' %>
+            <%= f.text_field :fb_client_id, value: @transport.fb_client_id, class: 'text_field input-xxlarge' %>
           </div>
         </div>
       </div>
@@ -31,7 +30,7 @@
         <div class="control-group">
           <%= f.label :client_secret, class: 'control-label' %>
           <div class="controls">
-            <%= f.text_field :fb_client_secret, class: 'text_field input-xxlarge' %>
+            <%= f.text_field :fb_client_secret, value: @transport.fb_client_secret, class: 'text_field input-xxlarge' %>
           </div>
         </div>
       </div>
@@ -41,45 +40,30 @@
         <div class="control-group">
           <%= f.label :access_token, class: 'control-label' %>
           <div class="controls">
-            <%= f.text_field :fb_access_token, class: 'text_field input-xxlarge' %>
+            <%= f.text_field :fb_access_token, value: @transport.fb_access_token, class: 'text_field input-xxlarge' %>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="transport_settings_values_mailchimp">
+  <div id="transport_settings_values_mailchimp" style="display: none;">
     <div class='row-fluid'>
       <div class='span12'>
         <div class="control-group">
           <%= f.label 'API Key', class: 'control-label' %>
           <div class="controls">
-            <%= f.text_field :mc_api_key, class: 'text_field input-xxlarge' %>
+            <%= f.text_field :mc_api_key, value: @transport.mc_api_key, class: 'text_field input-xxlarge' %>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!--
-  <div id="transport_settings_values_twitter"></div>
-  <div id="transport_settings_values_adwords"></div>
-  -->
 </div>
-
-<% if action_name == 'edit' %>
-<div class='row-fluid'>
-  <div class='span12'>
-    <p class="muted"><i class="icon-info-sign"></i> There are some fields that can not be updated.</p>
-  </div>
-</div>
-<% end %>
-
-<br>
 
 <div class="form-actions">
-  <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
-  <%= link_to t(:cancel), :back, :class => 'btn', :id => 'cancel_button' %>  
+  <%= f.submit nil, class: 'btn btn-primary', id: 'submit_button' %>
+  <%= link_to t(:cancel), :back, class: 'btn', id: 'cancel_button' %>  
 </div>
 
 <script>
