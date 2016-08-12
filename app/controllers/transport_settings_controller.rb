@@ -19,7 +19,7 @@ class TransportSettingsController < ApplicationController
     if current_club.available_transport_settings.count > 0
       @transport = TransportSetting.new
     else
-      flash[:error] = "No more options for settings available."
+      flash[:error] = "No more Transports available."
       redirect_to transport_settings_url
     end
   end
