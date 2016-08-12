@@ -875,7 +875,6 @@ function campaignFormFunctions() {
     });
   }
 
-  
   $('#campaign_transport').change(function() {
     setCampaignMedium($('#campaign_transport').val());
   });
@@ -903,6 +902,67 @@ function campaignFormFunctions() {
 
   setCampaignMedium($('#campaign_transport').val());
 }
+
+
+function transportSettingsIndexFunctions() {
+  $('#transport_settings_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 3 ] }],
+    "sAjaxSource": $('#transport_settings_table').data('source')
+  }); 
+}
+
+
+function transportSettingsFormFunctions() {
+  if ($('#new_transport_setting').length) {
+    $("#transport_setting_transport").select2({ theme: "bootstrap" }); // To avoid adding the class to the hidden field om edit
+  }
+
+  function showSettingsPane(transport) {
+    if(!transport) transport = $("#transport_setting_transport").val();
+    transport == "facebook" ? $("#transport_settings_values_facebook").show() : $("#transport_settings_values_facebook").hide();
+    transport == "mailchimp" ? $("#transport_settings_values_mailchimp").show() : $("#transport_settings_values_mailchimp").hide();
+  }
+
+  function assignRequiredTagToFields(transport) {
+    var fields = [
+      'fb_client_id', 
+      'fb_client_secret', 
+      'fb_access_token',
+      'mc_api_key'
+    ];
+    $.each(fields, function(index, field) {
+      $('#transport_setting_' + field).prop('required', false);
+    });
+    
+    switch(transport) {
+      case 'facebook':
+        $('#transport_setting_fb_client_id').prop('required', true);
+        $('#transport_setting_fb_client_secret').prop('required', true);
+        $('#transport_setting_fb_access_token').prop('required', true);
+        break;
+      case 'mailchimp':
+        $('#transport_setting_mc_api_key').prop('required', true);
+        break;
+    }
+  }
+
+  showSettingsPane($("#transport_setting_transport").val());
+  assignRequiredTagToFields($("#transport_setting_transport").val());
+
+  $("#transport_setting_transport").change(function() {
+    var transport = $("#transport_setting_transport").val();
+    assignRequiredTagToFields(transport);
+    showSettingsPane(transport);
+  });
+}
+
 
 function club_cash_transactions_functions(column_count){
   $('#club_cash_transactions_table').DataTable({

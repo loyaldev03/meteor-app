@@ -151,6 +151,8 @@ SacPlatform::Application.routes.draw do
           get 'missing' => 'campaign_days#missing'
         end
       end
+
+      resources :transport_settings, except: [:destroy]
     end
 
     resources :domains
