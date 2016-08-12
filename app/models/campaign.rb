@@ -54,19 +54,6 @@ class Campaign < ActiveRecord::Base
     [ 'id', 'name', 'campaign_type', 'transport', 'initial_date', 'finish_date' ]
   end
 
-  private
-    def set_fulfillment_code
-      self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join if self.fulfillment_code == 'New automatic code'
-    end
-
-  def past_period(date = Date.current)
-    if mailchimp?
-      [ initial_date ]
-    else
-      initial_date .. ((finish_date.nil? || finish_date > date) ? date : finish_date)
-    end
-  end
-
   def missing_days(date: Date.current, campaign_days_scope: campaign_days)
     if mailchimp?
       [CampaignDay.where(campaign: self, date: initial_date).first_or_create.tap(&:readonly!)]
@@ -80,6 +67,19 @@ class Campaign < ActiveRecord::Base
   end
 
   private
+
+    def set_fulfillment_code
+      self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join if self.fulfillment_code == 'New automatic code'
+    end
+
+    def past_period(date = Date.current)
+      if mailchimp?
+        [ initial_date ]
+      else
+        initial_date .. ((finish_date.nil? || finish_date > date) ? date : finish_date)
+      end
+    end
+
     def custom_update
       name = self.name
       initial_date = self.initial_date
@@ -88,17 +88,6 @@ class Campaign < ActiveRecord::Base
       self.name = name
       self.initial_date = initial_date
       self.finish_date = finish_date
-    end
-    
-    def set_campaign_medium
-      self.campaign_medium = case transport
-        when 'facebook', 'twitter'
-          :display
-        when 'mailchimp'
-          :email
-        when 'adwords'
-          :search
-      end
     end
 
     def set_campaign_medium_version
