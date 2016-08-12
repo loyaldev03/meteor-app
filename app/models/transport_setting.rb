@@ -23,17 +23,6 @@ class TransportSetting < ActiveRecord::Base
     [ 'id', 'transport', 'settings' ]
   end
 
-  def parse_settings!
-    case transport
-    when 'facebook'
-      self.fb_client_id = settings['client_id']
-      self.fb_client_secret = settings['client_secret']
-      self.fb_access_token = settings['access_token']
-    when 'mailchimp'
-      self.mc_api_key = settings['api_key']
-    end 
-  end
-
   private
     def set_data
       case transport

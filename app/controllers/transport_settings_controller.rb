@@ -26,7 +26,6 @@ class TransportSettingsController < ApplicationController
 
   def edit
     my_authorize! :edit, TransportSetting, current_club.id
-    @transport.parse_settings!
   end
 
   def create
