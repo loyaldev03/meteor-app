@@ -28,7 +28,7 @@ module SacMailchimp
       data = {}
       unless res.nil?
         data = if res.instance_of? Gibbon::MailChimpError
-          { marketing_client_sync_result: res.detail }
+          { marketing_client_sync_result: res.detail.truncate(255) }
         else
           { marketing_client_sync_result: 'Success' }
         end
