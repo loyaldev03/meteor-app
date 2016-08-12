@@ -204,18 +204,4 @@ namespace :users do
     end  
   end
 
-  desc "NO LONGER USED (https://www.pivotaltracker.com/story/show/104026972) - Magazine cancellation file generation for hot rod"
-  task :send_magazine_cancellation_email => :environment do
-    Rails.logger = Logger.new("#{Rails.root}/log/send_magazine_cancellation.log")
-    Rails.logger.level = Logger::DEBUG
-    ActiveRecord::Base.logger = Rails.logger
-    tall = Time.zone.now
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"
-    begin 
-      TasksHelpers.send_hot_rod_magazine_cancellation_email
-    ensure
-      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run task"        
-    end
-  end
-
 end

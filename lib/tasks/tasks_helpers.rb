@@ -287,48 +287,6 @@ module TasksHelpers
     Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
-  def self.send_hot_rod_magazine_cancellation_email
-    require 'csv'
-    if Rails.env=='prototype'
-      club = Club.find 48
-    elsif Rails.env=='production'
-      club = Club.find 9
-    elsif Rails.env=='staging'
-      club = Club.find 21
-    end
-    Time.zone = club.time_zone
-    initial_date = Time.zone.now - 1.month
-    end_date = Time.zone.now 
-    users = User.joins(:current_membership).where(["users.club_id = ? AND memberships.status = 'lapsed' AND
-      cancel_date BETWEEN ? and ? ", club.id, initial_date, end_date])
-    unless users.empty?
-      temp_file = "#{I18n.l(Time.zone.now, :format => :only_date)}_magazine_cancellation.csv"
-      CSV.open(temp_file, "w") do |csv|
-        csv << ["RecType", "FHID", "PubCode", "Email", "CustomerCode", "CheckDigit", 
-          "Keyline", "ISSN", "FirstName", "LastName", "JobTitle", "Company", "Address", "SupAddress", 
-          "City", "State", "Zip", "Country", "CountryCode", "BusPhone", "HomePhone", "FaxPhone", 
-          "ZFTerm", "AgentID", "AuditCode", "VersionCode", "PromoCode", "StartIssue", "EndIssue", 
-          "Term", "CurrencyCode", "GrossPrice", "NetPrice", "IssuesRemaining", "OrderNumber", 
-          "AutoRenew", "UMC", "Premium", "PayStatus","SubType", "TimesRenewed", "FutureUse"]
-        users.each do |user|
-          begin
-            tz = Time.zone.now
-            Rails.logger.info " *** Processing member #{user.id}"
-            csv << [ '', '', '', user.email, user.email, '', '', '', user.first_name, user.last_name, '', '',
-                  user.address, '', user.city, user.state, user.zip, user.country, '', '', '', '', '-8',
-                  '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'cancel', '', '', '' ]
-            Rails.logger.info " *** It took #{Time.zone.now - tz}seconds to process user #{user.id}"
-          rescue Exception => e
-            Auditory.report_issue("Users::HotRodMagazineCancellation", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-            Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
-          end
-        end
-      end
-      Notifier.hot_rod_magazine_cancellation(File.read(temp_file), users.count).deliver!
-      File.delete(temp_file)
-    end
-  end
-
   def self.delete_testing_accounts
     today = Time.zone.now.to_date
     base = User.where(testing_account: true)

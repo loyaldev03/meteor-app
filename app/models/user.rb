@@ -130,9 +130,8 @@ class User < ActiveRecord::Base
   end
   # Async indexing
   def asyn_elasticsearch_index
-    self.index.store self
+    AsynElasticSearchIndexJob.perform_later(self.id)
   end
-  handle_asynchronously :asyn_elasticsearch_index, queue: :elasticsearch_indexing, priority: 10
 
   def elasticsearch_asyn_call
     asyn_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'zip', 'city', 'country', 'state', 'address', 'email', 'status']).empty?
@@ -880,8 +879,8 @@ class User < ActiveRecord::Base
       logger.error e.inspect
       Auditory.report_issue("User:prorated_enroll -- user turned invalid while enrolling", e, { user: self.inspect, credit_card: credit_card.inspect, membership: membership.inspect })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
-      Auditory.audit(agent, self, "User:prorated_enroll", self, Settings.operation_types.error_on_prorated_enroll)
-      { message: I18n.t('error_messages.user_not_saved', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.member_not_saved }
+      Auditory.audit(agent, self, "User:prorated_enroll", self, Settings.operation_types.tom_change_billing_with_error)
+      { message: I18n.t('error_messages.user_not_saved', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.user_not_saved }
     end
   end
 
@@ -946,15 +945,8 @@ class User < ActiveRecord::Base
 
   # Resets user club cash in case of a cancelation.
   def nillify_club_cash(message = 'Removing club cash because of member cancellation')
-    if club.allow_club_cash_transaction?
-      add_club_cash(nil, -club_cash_amount, message)
-      if is_not_drupal?
-        self.club_cash_expire_date = nil
-        self.save(validate: false)
-      end
-    end
+    NillifyClubCashJob.perform_later(self.id, message)
   end
-  handle_asynchronously :nillify_club_cash, queue: :club_cash_queue, priority: 18
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
@@ -974,7 +966,7 @@ class User < ActiveRecord::Base
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing", enroll = false)
-    AssignClubCash.set(wait: 5.minutes).perform_later(self.id, message, enroll)
+    AssignClubCashJob.set(wait: 5.minutes).perform_later(self.id, message, enroll)
   end
 
   # Adds club cash transaction. 
@@ -1170,7 +1162,13 @@ class User < ActiveRecord::Base
     new_credit_card = CreditCard.new(number: new_number, expire_month: new_month, expire_year: new_year, token: credit_card["token"])
     new_credit_card.get_token(tom.payment_gateway_configuration, self)
 
-    credit_cards = new_credit_card.token.nil? ? [] : CreditCard.joins(:user).where(:token => new_credit_card.token, :users => { :club_id => club.id } )
+    credit_cards = if new_credit_card.token.nil?
+      []
+    elsif new_credit_card.token == CreditCard::BLANK_CREDIT_CARD_TOKEN
+      self.credit_cards.where(token: CreditCard::BLANK_CREDIT_CARD_TOKEN)
+    else
+      CreditCard.joins(:user).where(token: new_credit_card.token, users: { :club_id => club.id } )
+    end
 
     if credit_cards.empty? or allow_cc_blank
       unless only_validate
@@ -1290,7 +1288,7 @@ class User < ActiveRecord::Base
     when 'exact_target'
       marketing_tool_exact_target_sync if defined?(SacExactTarget::MemberModel)
     when 'mailchimp_mandrill'
-      marketing_tool_mailchimp_sync if defined?(SacMailchimp::MemberModel)
+      Mailchimp::UserSynchronizationJob.perform_later(self.id) if defined?(SacMailchimp::MemberModel)
     end
   end
 
@@ -1303,7 +1301,7 @@ class User < ActiveRecord::Base
       end
     when 'mailchimp_mandrill'
       if defined?(SacMailchimp::MemberModel)
-        with_delay ? mailchimp_unsubscribe : mailchimp_unsubscribe_without_delay
+        with_delay ? Mailchimp::UserUnsubscribeJob.perform_later(self.id) : Mailchimp::UserUnsubscribeJob.perform_now(self.id)
       end
     end
   rescue Exception => e
@@ -1317,7 +1315,7 @@ class User < ActiveRecord::Base
     when 'exact_target'
       exact_target_subscribe if defined?(SacExactTarget::MemberModel)
     when 'mailchimp_mandrill'
-      mailchimp_subscribe if defined?(SacMailchimp::MemberModel)
+      Mailchimp::UserSynchronizationJob.perform_later(self.id) if defined?(SacMailchimp::MemberModel)
     end
   end
 
@@ -1590,7 +1588,7 @@ class User < ActiveRecord::Base
     def mkt_tool_check_email_changed_for_sync
       if self.email_changed?
         if club.mailchimp_mandrill_client?
-          marketing_tool_update_email(self.email_change.first) if defined?(SacMailchimp::MemberModel)
+          Mailchimp::UserUpdateEmailJob.perform_later(self.id, self.email_change.first) if defined?(SacMailchimp::MemberModel)
         end
       end
     end
