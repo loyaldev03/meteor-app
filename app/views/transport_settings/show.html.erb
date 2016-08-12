@@ -11,8 +11,8 @@
     <tbody>
       <% @transport.settings.each do |key, value| %>
       <tr>
-        <td><b><%= key.humanize %></b></td>
-        <td><%= value %></td>
+        <td><%= key %></td>
+        <td><b><%= value %></b></td>
       </tr>
       <% end %>
     </tbody>
