@@ -913,7 +913,7 @@ function transportSettingsIndexFunctions() {
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 3 ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
     "sAjaxSource": $('#transport_settings_table').data('source')
   }); 
 }

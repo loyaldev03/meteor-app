@@ -1,6 +1,4 @@
 class TransportSettingsDatatable < Datatable
-  include TransportSettingsHelper
-
 private
   def total_records
     @current_club.transport_settings.count
@@ -15,7 +13,6 @@ private
       [ 
         transport_setting.id,
         transport_setting.transport.humanize,
-        nice_settings(transport_setting.settings),
         (link_to(I18n.t(:show), @url_helpers.transport_setting_path(partner_prefix: @current_partner.prefix, club_prefix: @current_club.name, :id => transport_setting.id), :class => 'btn btn-mini') if @current_agent.can? :read, TransportSetting, @current_club.id).to_s + 
         (link_to(I18n.t(:edit), @url_helpers.edit_transport_setting_path(partner_prefix: @current_partner.prefix, club_prefix: @current_club.name, :id => transport_setting.id.to_s), :class => 'btn btn-mini') if @current_agent.can? :edit, TransportSetting, @current_club.id).to_s
       ]

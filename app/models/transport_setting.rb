@@ -20,7 +20,7 @@ class TransportSetting < ActiveRecord::Base
   serialize :settings, JSON
 
   def self.datatable_columns
-    [ 'id', 'transport', 'settings' ]
+    ['id', 'transport']
   end
 
   private
