@@ -80,14 +80,15 @@ class Campaign < ActiveRecord::Base
       end
     end
 
-    def custom_update
-      name = self.name
-      initial_date = self.initial_date
-      finish_date = self.finish_date
-      self.restore_attributes
-      self.name = name
-      self.initial_date = initial_date
-      self.finish_date = finish_date
+    def set_campaign_medium
+      self.campaign_medium = case transport
+        when 'facebook', 'twitter'
+          :display
+        when 'mailchimp'
+          :email
+        when 'adwords'
+          :search
+      end
     end
 
     def set_campaign_medium_version
