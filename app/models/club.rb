@@ -159,6 +159,10 @@ class Club < ActiveRecord::Base
   end
   handle_asynchronously :resync_users_and_prospects, queue: :generic_queue
 
+  def available_transport_settings
+    ['facebook', 'mailchimp'] - transport_settings.map(&:transport)
+  end
+
   private
     def add_default_member_groups
       ['VIP', 'Celebrity', 'Notable', 'Charter Member'].each do |name|
