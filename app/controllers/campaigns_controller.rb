@@ -1,6 +1,7 @@
 class CampaignsController < ApplicationController
   before_filter :validate_club_presence
   before_action :set_campaign, only: [:show, :edit, :update]
+  before_action :set_toms, only: [:new, :edit]
   before_action :set_fulfillment_codes, except: [:index, :update]
 
   def index
@@ -17,7 +18,6 @@ class CampaignsController < ApplicationController
 
   def new
     my_authorize! :new, Campaign, current_club.id
-    @terms_of_memberships = current_club.terms_of_memberships
     if @terms_of_memberships.first.present?
       @campaign = Campaign.new(club_id: current_club.id)
     else
@@ -32,14 +32,12 @@ class CampaignsController < ApplicationController
     if @campaign.save
       redirect_to campaign_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @campaign), notice: "The campaign #{@campaign.name} was successfully created."
     else
-      @terms_of_memberships = current_club.terms_of_memberships
       render action: "new"
     end
   end
 
   def edit
     my_authorize! :edit, Campaign, current_club.id
-    @terms_of_memberships = current_club.terms_of_memberships
   end
 
   def update
@@ -62,6 +60,10 @@ class CampaignsController < ApplicationController
 
     def set_campaign
       @campaign = Campaign.find(params[:id])
+    end
+
+    def set_toms
+      @terms_of_memberships = current_club.terms_of_memberships.select(:id, :name)
     end
 
     def set_fulfillment_codes
