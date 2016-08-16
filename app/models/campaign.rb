@@ -15,7 +15,8 @@ class Campaign < ActiveRecord::Base
   validate :check_dates_range
 
   FACEBOOK_MARKETING_CODES = [ 'audience', 'interest', 'liz_interest' ]
-  
+  TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE = ['facebook', 'mailchimp']
+
   enum campaign_type: {
      sloop:           0,
      ptx:             1,

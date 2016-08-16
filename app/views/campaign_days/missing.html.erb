@@ -19,7 +19,7 @@
 
 <div id="dataTableSelect" class="in-front" >
   Transport:
-  <%= select_tag "search_transport", options_for_select(Campaign.transports_i18n.invert), include_blank: 'All' %>
+  <%= select_tag "search_transport", options_for_select(Campaign.transports_i18n.select{|x| Campaign::TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE.exclude? x}.invert), include_blank: 'All' %>
 </div>
 
 <script>

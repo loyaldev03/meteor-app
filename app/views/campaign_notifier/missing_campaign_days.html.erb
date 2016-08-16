@@ -21,12 +21,7 @@
     <tr>
       <td class="content-block">
         <ul>
-          Campaign Days affected:
-          <% missing_days.each do |missing_day_id| %>
-            <li>
-              <%= I18n.l(CampaignDay.find(missing_day_id.to_i).date) %>
-            </li>
-          <% end %>
+          Campaign Days affected so far: <%= missing_days.count.to_s %>
         </ul>
       </td>
     </tr>

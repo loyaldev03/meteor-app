@@ -27,7 +27,11 @@ private
   end
 
   def fetch_campaigns
-    campaign_days = CampaignDay.includes(:campaign).where(campaigns: {club_id: @current_club.id}).missing.order(sort_by)
+    campaign_days = CampaignDay.includes(:campaign).
+                                where(campaigns: {club_id: @current_club.id}).
+                                where.not(campaigns: {transport: Campaign.transports.select{|x| Campaign::TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE.include? x}.values}).
+                                missing.
+                                order(sort_by)
     if params[:sSearch].present?
       campaign_days = campaign_days.where(campaigns: {transport: Campaign.transports[params[:sSearch]]})
     end
