@@ -20,11 +20,11 @@ class Campaign::FacebookController < ApplicationController
     @transport_setting.save
     Campaigns::UnauthorizedDaysDataFetcherJob.perform_later(@transport_setting.id)
 
-    flash[:notice] = I18n.t('messages.campaigns.facebook.access_token_retrieved')
+    flash[:notice] = 'Facebook access token retrieved successfully.'
   rescue Rack::OAuth2::Client::Error
-    flash[:error] = I18n.t('activerecord.errors.models.transport_setting.access_token_not_retrieved')
+    flash[:error] = 'Unable to retrieve Facebook access token. Make sure the client id and client secret are the correct ones.'
   ensure
-    redirect_to edit_club_transport_setting_path(club_id: current_club.id, id: @transport_setting.id)
+    redirect_to transport_setting_path(partner_prefix: current_partner.prefix, club_id: current_club.id, id: @transport_setting.id)
   end
 
   private 

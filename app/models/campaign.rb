@@ -13,7 +13,9 @@ class Campaign < ActiveRecord::Base
             :terms_of_membership_id, presence: true
 
   validate :check_dates_range
-  
+
+  TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE = ['facebook', 'mailchimp']
+
   enum campaign_type: {
      sloop:           0,
      ptx:             1,

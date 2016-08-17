@@ -16,14 +16,7 @@
     <tr>
       <td class="content-block">
         <p>Please, make sure that the campaign is correctly configured <%= link_to 'by clicking here', edit_campaign_url(partner_prefix: campaign.club.partner.prefix, club_prefix: campaign.club.name, id: campaign.id ) %>. </p>
-        <p> Campaign Days affected so far: </p>
-        <ul>
-          <% campaign.campaign_days.invalid_campaign.pluck(:date).each do |date| %>
-            <li>
-              <%= I18n.l(date) %>
-            </li>
-          <% end %>
-        </ul>
+        <p> Campaign Days affected so far: <%= campaign.campaign_days.invalid_campaign.count.to_s %> </p>
       </td>
     </tr>
   <% end %>
