@@ -10,10 +10,12 @@
   <table class="table table-bordered table-striped">
     <tbody>
       <% @transport.settings.each do |key, value| %>
-      <tr>
-        <td><%= key %></td>
-        <td><b><%= value %></b></td>
-      </tr>
+        <% if value.present? %>
+        <tr>
+          <td><%= key %></td>
+          <td><b><%= value %></b></td>
+        </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>
