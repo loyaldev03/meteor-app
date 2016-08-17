@@ -10,7 +10,7 @@
     <div class="control-group">
       <%= f.label :subscription_plan, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name"), { class: 'form-control' } %> 
+        <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name", nil), { prompt: 'Choose one...' }, { class: 'form-control', required: true }%> 
       </div>
     </div>
 
