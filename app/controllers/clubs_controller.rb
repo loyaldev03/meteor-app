@@ -116,6 +116,13 @@ class ClubsController < ApplicationController
     false
   end
 
+
+  def get_fulfillment_codes
+    query = params[:query]
+    response = { results: 'OK' }
+    render json: response
+  end
+
   private 
     def prepare_marketing_tool_attributes(marketing_tool_attributes, marketing_tool_client)
       unless marketing_tool_attributes.nil?
