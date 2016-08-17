@@ -21,7 +21,8 @@ class CampaignsController < ApplicationController
     if @terms_of_memberships.first.present?
       @campaign = Campaign.new(club_id: current_club.id)
     else
-      redirect_to campaigns_url, error: "Can not create a campaign without a Subscription plan."
+      flash[:error] = "Can not create a campaign without a Subscription plan."
+      redirect_to campaigns_url
     end
   end
 
