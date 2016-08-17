@@ -10,9 +10,9 @@ class CampaignDataFetcher
       @report.date          = (report.date || Time.current.yesterday).to_date
       report_data           = data
       if report_data
-        if report_data[:impressions] and report_data[:clicks] and report_data[:spend]
+        if report_data[:impressions] and report_data[:website_clicks] and report_data[:spend]
           @report.reached   = report_data.impressions
-          @report.converted = report_data.clicks
+          @report.converted = report_data.website_clicks
           @report.spent     = report_data.spend
         end
         @report.meta        = report_data["meta"] || :no_error
@@ -36,7 +36,7 @@ class CampaignDataFetcher
 
       def url
         params = ["time_range={'since':'#{date}','until':'#{date}'}",
-          "fields=spend,impressions,clicks",
+          "fields=spend,impressions,website_clicks",
           "access_token=#{access_token}"].join('&')
         [ "v2.7",
           @report.campaign_foreign_id.to_s,
