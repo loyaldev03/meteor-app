@@ -69,9 +69,6 @@ class CampaignsController < ApplicationController
 
     def set_fulfillment_codes
       @fulfillment_codes = ['New automatic code']
-      current_club.campaigns.each do |c|
-        @fulfillment_codes << c.fulfillment_code
-      end
-      @fulfillment_codes.uniq!
+      @fulfillment_codes << current_club.campaigns.pluck(:fulfillment_code).uniq! if current_club.campaigns.first.present?
     end
 end
