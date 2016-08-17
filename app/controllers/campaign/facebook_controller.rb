@@ -24,7 +24,7 @@ class Campaign::FacebookController < ApplicationController
   rescue Rack::OAuth2::Client::Error
     flash[:error] = I18n.t('activerecord.errors.models.transport_setting.access_token_not_retrieved')
   ensure
-    redirect_to edit_club_transport_setting_path(club_id: current_club.id, id: @transport_setting.id)
+    redirect_to edit_transport_setting_path(partner_prefix: current_partner.prefix, club_id: current_club.id, id: @transport_setting.id)
   end
 
   private 
