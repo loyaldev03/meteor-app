@@ -162,7 +162,7 @@ class Club < ActiveRecord::Base
   handle_asynchronously :resync_users_and_prospects, queue: :generic_queue
 
   def available_transport_settings
-    ['facebook', 'mailchimp'] - transport_settings.map(&:transport)
+    ['facebook', 'mailchimp'] - transport_settings.select(:transport).map(&:transport)
   end
 
   private
