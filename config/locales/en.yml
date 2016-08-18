@@ -208,9 +208,10 @@ en:
       payment_gateway_configuration: 'Payment Gateway Configuration'
       terms_of_membership: 'Subscription Plan'
       suspected_fulfillments: 'Suspected Fulfillments'
-      campaign: 'Marketing Campaign'
-      campaigns: 'Marketing Campaigns'
+      campaign: 'Campaign'
+      campaigns: 'Campaigns'
       campaign_days: 'Campaign Days'
+      transport_settings: 'Transport Settings'
     gateway:
       mes: 'Merchant e Solutions'
       litle: Litle
