@@ -153,7 +153,7 @@ class User < ActiveRecord::Base
     ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
-                        :lapsed, :do => [:cancellation, 'nillify_club_cash']
+                        :lapsed, :do => :cancellation
     after_transition applied:                         :lapsed, do: [:set_user_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
     after_transition all => all, :do => :propagate_membership_data
@@ -944,7 +944,7 @@ class User < ActiveRecord::Base
   delegate :is_not_drupal?, to: :club
 
   # Resets user club cash in case of a cancelation.
-  def nillify_club_cash(message = 'Removing club cash because of member cancellation')
+  def nillify_club_cash(message = 'Removing club cash')
     NillifyClubCashJob.perform_later(self.id, message)
   end
 
@@ -1458,6 +1458,7 @@ class User < ActiveRecord::Base
       self.recycled_times = 0
       self.change_tom_attributes = nil
       self.change_tom_date = nil
+      self.club_cash_amount = 0
       self.save(validate: false)
       Communication.deliver!(:cancellation, self)
       Auditory.audit(nil, current_membership, "Member canceled", self, Settings.operation_types.cancel)
