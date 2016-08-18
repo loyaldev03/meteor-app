@@ -162,7 +162,7 @@ function club_index_functions(column_count){
 }
 
 function campaign_days_functions(column_count){
-  oTable2 = $('#campaign_days_table').DataTable({
+  var oTable2 = $('#campaign_days_table').DataTable({
     "sPaginationType": "full_numbers",
     "sDom": '<"top"p>rt<"bottom"il>',
     "bJQueryUI": false,
