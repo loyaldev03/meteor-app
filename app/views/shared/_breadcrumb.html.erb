@@ -71,11 +71,11 @@
         <li class="active"><%= delimiter %><%= @et.name %></li>
       <% end %>
       <% if params[:controller] == 'campaigns' && params[:action] == 'new' %>
-        <li><%= delimiter %><a href="<%= campaigns_path %>">Marketing Campaigns</a></li>
+        <li><%= delimiter %><a href="<%= campaigns_path %>"><%= t('activerecord.model.campaigns') %></a></li>
         <li class="active"><%= delimiter %>New Campaign</li>
       <% end %>
       <% if params[:controller] == 'campaigns' and ['show','edit'].include? params[:action]  %>
-        <li><%= delimiter %><a href="<%= campaigns_path %>">Marketing Campaigns</a></li>
+        <li><%= delimiter %><a href="<%= campaigns_path %>"><%= t('activerecord.model.campaigns') %></a></li>
         <li class="active"><%= delimiter %><%= @campaign.name %></li>
       <% end %>
       <% if params[:controller] == 'campaign_days' && params[:action] == 'index' %>
