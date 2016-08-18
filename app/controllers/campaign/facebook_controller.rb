@@ -18,7 +18,7 @@ class Campaign::FacebookController < ApplicationController
     access_token = client.access_token!
     @transport_setting.settings["access_token"] = access_token.to_s
     @transport_setting.save
-    Campaigns::UnauthorizedDaysDataFetcherJob.perform_later(@transport_setting.id)
+    Campaigns::UnauthorizedDaysDataFetcherJob.perform_later(@transport_setting)
 
     flash[:notice] = 'Facebook access token retrieved successfully.'
   rescue Rack::OAuth2::Client::Error
