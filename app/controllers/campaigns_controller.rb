@@ -2,7 +2,7 @@ class CampaignsController < ApplicationController
   before_filter :validate_club_presence
   before_action :set_campaign, only: [:show, :edit, :update]
   before_action :set_toms, only: [:new, :create, :edit]
-  before_action :set_fulfillment_codes, only: [:new, :show, :edit, :update]
+  before_action :set_fulfillment_codes, only: [:new, :create, :show, :edit, :update]
 
   def index
     my_authorize! :list, Campaign, current_club.id
