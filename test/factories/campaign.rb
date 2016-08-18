@@ -12,5 +12,10 @@ FactoryGirl.define do
     campaign_medium_version "banner"
     marketing_code { Faker::Lorem.characters(10) }
     fulfillment_code { Faker::Lorem.characters(20) }
+
+    factory :campaign_twitter do
+        transport 2
+    end
+
   end  
 end
