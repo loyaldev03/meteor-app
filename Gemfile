@@ -123,3 +123,5 @@ gem 'encryptor'
 
 gem 'bureaucrat'
 gem 'rake', '10.4.2'
+
+gem 'validates_timeliness', '~> 4.0'

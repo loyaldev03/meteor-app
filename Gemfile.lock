@@ -435,6 +435,7 @@ GEM
     thread_safe (0.3.5)
     tilt (1.4.1)
     timecop (0.6.1)
+    timeliness (0.3.8)
     tinder (1.4.1)
       activesupport
       eventmachine
@@ -472,6 +473,8 @@ GEM
     unicode_utils (1.4.0)
     url_safe_base64 (0.2.2)
     uuidtools (2.1.4)
+    validates_timeliness (4.0.2)
+      timeliness (~> 0.3.7)
     warden (1.2.3)
       rack (>= 1.0)
     wasabi (3.5.0)
@@ -562,6 +565,7 @@ DEPENDENCIES
   twitter-bootstrap-rails (= 2.2.7)
   uglifier
   uuidtools
+  validates_timeliness (~> 4.0)
   wirble
   yard!
   yard-rest
