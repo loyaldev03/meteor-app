@@ -1,6 +1,6 @@
 <section> 
   <div class="page-header">
-    <h1>Marketing Campaigns</h1>
+    <h1><%= t('activerecord.model.campaigns') %></h1>
     <% if can? :create, Campaign, current_club.id %>
       <%= link_to(new_campaign_path, :class => "btn btn-primary btn_on_header", :id => "new_campaign") do %> 
         <i class="icon-plus"></i> New Campaign
