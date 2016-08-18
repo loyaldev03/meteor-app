@@ -2,7 +2,7 @@ class CampaignDataFetcher
   class FacebookFetcher < BaseFetcher
     # API: https://developers.facebook.com/docs/marketing-api/insights/fields/v2.7
     # reached = impressions
-    # converted = clicks
+    # converted = website_clicks. Unfortunately the only way to get that data is through the actions field.
     # spent = spend
 
     def fetch!(report)
@@ -10,10 +10,10 @@ class CampaignDataFetcher
       @report.date          = (report.date || Time.current.yesterday).to_date
       report_data           = data
       if report_data
-        if report_data[:impressions] and report_data[:website_clicks] and report_data[:spend]
+        if report_data[:impressions] and report_data[:actions] and report_data[:spend]
           @report.reached   = report_data.impressions
-          @report.converted = report_data.website_clicks
-          @report.spent     = report_data.spend
+          @report.converted = report_data.actions.select{|x| x.action_type == 'link_click'}.first.value # we want to retrieve the website_clicks
+          @report.spent     = report_data.spend.to_f
         end
         @report.meta        = report_data["meta"] || :no_error
       end
@@ -36,7 +36,7 @@ class CampaignDataFetcher
 
       def url
         params = ["time_range={'since':'#{date}','until':'#{date}'}",
-          "fields=spend,impressions,website_clicks",
+          "fields=spend,impressions,actions",
           "access_token=#{access_token}"].join('&')
         [ "v2.7",
           @report.campaign_foreign_id.to_s,
