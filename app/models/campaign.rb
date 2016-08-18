@@ -54,12 +54,12 @@ class Campaign < ActiveRecord::Base
     [ 'id', 'name', 'campaign_type', 'transport', 'initial_date', 'finish_date' ]
   end
 
-  def missing_days(date: Date.current, campaign_days_scope: campaign_days)
+  def missing_days(date: Date.current)
     if mailchimp?
       [CampaignDay.where(campaign: self, date: initial_date).first_or_create.tap(&:readonly!)]
     else
       all_days = past_period(date).to_a
-      present_days = campaign_days_scope.where(campaign_id: self).not_missing.pluck(:date)
+      present_days = campaign_days.where(campaign_id: self).not_missing.pluck(:date)
       (all_days - present_days).map { |missing_date|
         CampaignDay.where(campaign: self, date: missing_date).first_or_create.tap(&:readonly!)
       }

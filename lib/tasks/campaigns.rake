@@ -6,13 +6,16 @@ namespace :campaigns do
     tall = Time.zone.now
     begin
       date = Date.current.yesterday
-      Club.is_enabled.ids.each do |club_id|
+      club_ids = Club.is_enabled.ids
+      club_ids.each do |club_id|
         ['facebook', 'mailchimp'].each do |transport|
           Campaigns::DataFetcherJob.perform_later(club_id, transport, date.to_s)
         end
       end
       Campaigns::NotifyMissingCampaignDaysJob.perform_later((date -1.day).to_s)
       Campaigns::NotifyCampaignDaysWithErrorJob.perform_later
+      # creates missing campaign days for yesterday.
+      Campaign.by_transport(transport).where(club_id: club_ids).map{|c| &:missing_days(date: date)}
     rescue Exception => e
       Auditory.report_issue("Campaigns::fetch_data", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"      
