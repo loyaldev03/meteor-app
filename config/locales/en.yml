@@ -211,6 +211,7 @@ en:
       campaign: 'Campaign'
       campaigns: 'Campaigns'
       campaign_days: 'Campaign Days'
+      transport_setting: 'Transport Setting'
       transport_settings: 'Transport Settings'
     gateway:
       mes: 'Merchant e Solutions'
