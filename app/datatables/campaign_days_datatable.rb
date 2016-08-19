@@ -17,7 +17,7 @@ private
         campaign_day.spent,
         campaign_day.reached,
         campaign_day.converted,
-        ((link_to(I18n.t(:edit), @url_helpers.edit_campaign_day_path(@current_partner.prefix, @current_club.name, campaign_day.id), :class => 'btn btn-mini', :id => 'edit', 'data-toggle' => 'custom-remote-modal', 'data-target' => campaign_day.id.to_s) + edit_modal(campaign_day)) if @current_agent.can? :edit, CampaignDay, @current_club.id).to_s
+        ((link_to(I18n.t(:edit), @url_helpers.edit_campaign_day_path(@current_partner.prefix, @current_club.name, campaign_day.id), :class => 'btn btn-mini', :id => 'edit', 'data-toggle' => 'custom-remote-modal', 'data-target' => '#campaignDayEditModal')) if @current_agent.can? :edit, CampaignDay, @current_club.id).to_s
       ]
     end
   end
@@ -43,13 +43,4 @@ private
     sort_column == 'campaign' ? "name #{sort_direction}, date asc" : "#{sort_column} #{sort_direction}"
   end
 
-  def edit_modal(campaign_day)
-    "<div id='myModal#{campaign_day.id}' class='well modal hide' style='border: none; width:750px; margin-left:-375px'>
-      <div class='modal-header'>
-        <a href='#' class='close' data-dismiss='modal'>&times;</a>
-        <h3>Campaign day #{campaign_day.date}</h3>
-      </div>
-      <div class='modal-body'></div>
-    </div>".html_safe
-  end
 end

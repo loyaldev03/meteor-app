@@ -208,8 +208,8 @@ en:
       payment_gateway_configuration: 'Payment Gateway Configuration'
       terms_of_membership: 'Subscription Plan'
       suspected_fulfillments: 'Suspected Fulfillments'
-      campaign: 'Marketing Campaign'
-      campaigns: 'Marketing Campaigns'
+      campaign: 'Campaign'
+      campaigns: 'Campaigns'
       campaign_days: 'Campaign Days'
     gateway:
       mes: 'Merchant e Solutions'
@@ -661,8 +661,8 @@ en:
       only_date_short: "%m/%y"
   mailers:
     missing_campaign_days:
-      subject: "Missing campaign days report"
+      subject: "Missing campaign days report for Club %{club_name}"
     invalid_credentials_email:
-      subject: "Authentication error while trying to get campaign information"
+      subject: "Authentication error while trying to get campaign information on Club %{club_name}"
     invalid_campaign_email:
       subject: "Invalid campaign configuration"

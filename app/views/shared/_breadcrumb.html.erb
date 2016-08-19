@@ -84,11 +84,11 @@
 
       <% if params[:controller] == 'transport_settings' && params[:action] == 'new' %>
         <li><%= delimiter %><a href="<%= transport_settings_path %>">Transport Settings</a></li>
-        <li><%= delimiter %>New Transport Setting</li>
+        <li class="active"><%= delimiter %>New Transport Setting</li>
       <% end %>
       <% if params[:controller] == 'transport_settings' and ['show','edit'].include? params[:action]  %>
         <li><%= delimiter %><a href="<%= transport_settings_path %>">Transport Settings</a></li>
-        <li><%= delimiter %><%= @transport.transport %></li>
+        <li class="active"><%= delimiter %><%= @transport.transport %></li>
       <% end %>
 
     <% end %>

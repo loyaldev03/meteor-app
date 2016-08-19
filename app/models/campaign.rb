@@ -36,12 +36,6 @@ class Campaign < ActiveRecord::Base
   scope :active, -> (date = nil) {
     where("initial_date <= :current_date AND (finish_date >= :current_date OR finish_date IS NULL)", current_date: (date||Date.current).to_date)
   }
-  scope :by_transport, -> (transport) {
-    unless transport.kind_of? Integer
-      transport = Campaign.transports[transport.to_s]
-    end
-    where(transport: transport)
-  }
 
   scope :by_transport, -> (transport) {
     unless transport.kind_of? Integer

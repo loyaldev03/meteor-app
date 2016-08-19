@@ -122,14 +122,6 @@ div.dataTables_filter input {
   white-space:nowrap;
 }
 
-.datepicker_for_search_nbd {
-  width: 80px;
-}
-
-.datepicker_for_search_billed_date{
-  width: 80px;
-}
-
 .btn-large-w {
   width: 160px !important;
 }

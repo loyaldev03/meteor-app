@@ -22,6 +22,14 @@
   <%= select_tag "search_transport", options_for_select(Campaign.transports_i18n.select{|x| Campaign::TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE.exclude? x}.invert), include_blank: 'All' %>
 </div>
 
+<div id='campaignDayEditModal' class='well modal hide' style='border: none; width:750px; margin-left:-375px'>
+  <div class='modal-header'>
+    <a href='#' class='close' data-dismiss='modal'>&times;</a>
+    <h3>Campaign day XXXXXX</h3>
+  </div>
+  <div class='modal-body'></div>
+</div>
+
 <script>
   $(document).ready(campaign_days_functions(<%= CampaignDay.datatable_columns.size %>));
 </script>

@@ -23,6 +23,8 @@ $(document).ready( function() {
 
   $(".alert").alert();
 
+  $(".datepicker").datepicker('option', { buttonImage: "/icon-calendar.png", showOn: "both", buttonImageOnly: true })
+
   // taken fom https://makandracards.com/makandra/1383
   $(function() {
     $('[data-remote][data-replace]')
@@ -183,12 +185,13 @@ function campaign_days_functions(column_count){
 
   $('#campaign_days_table').on("click",'a[data-toggle="custom-remote-modal"]', function(event){
     event.preventDefault();
-    var targetModal = '#myModal'+ $(this).data('target');
+
+    var targetModal = '#campaignDayEditModal';
     $(targetModal + ' .modal-body').load($(this).attr('href'), function(e) {
       $(targetModal).modal('show');
     });
   });
-  $('#campaign_days_table').on('submit', '.modal-body form', function(event){
+  $('#campaignDayEditModal').on('submit', '.modal-body form', function(event){
     event.preventDefault();
     startAjaxLoader(true);
     var campaignDayId = $(this).data('target');
@@ -200,10 +203,10 @@ function campaign_days_functions(column_count){
         endAjaxLoader(true);
         if(data.success == true){
           $("#campaign_days_table").DataTable().ajax.reload(null, false);
-          $('#myModal'+campaignDayId).modal('hide');
+          $('#campaignDayEditModal').modal('hide');
           flash_message(data.message, false)
         }else{
-          $('#myModal'+campaignDayId).modal('hide');
+          $('#campaignDayEditModal').modal('hide');
           flash_message(data.message, true)
         }
       },
@@ -399,12 +402,6 @@ function user_index_functions(){
     }
   });
 
-  $(".datepicker_for_search_nbd").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", 
-                                           showOn: "both", buttonImage: "/icon-calendar.png", 
-                                           buttonImageOnly: true});
-  $(".datepicker_for_search_billed_date").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd", 
-                                           showOn: "both", buttonImage: "/icon-calendar.png", 
-                                           buttonImageOnly: true});
   $('#users .pagination a').on('click', function () {  
     update_select_only = false;
     $.getScript(this.href);  
@@ -561,12 +558,9 @@ function new_user_functions(){
   $(".datepicker").datepicker({ constrainInput: true, 
                                 maxDate: 0,
                                 dateFormat: "yy-mm-dd", 
-                                showOn: "both",
-                                buttonImage: "/icon-calendar.png", 
                                 changeMonth: true,
                                 changeYear: true,
-                                yearRange: 'c-100:c',
-                                buttonImageOnly: true});
+                                yearRange: 'c-100:c'});
   $('#new_user').submit( function(event) {
     startAjaxLoader(true);
     $('#error_explanation').hide();
@@ -655,12 +649,9 @@ function edit_user_functions(){
   $(".datepicker").datepicker({ constrainInput: true, 
                                 maxDate: 0, 
                                 dateFormat: "yy-mm-dd",
-                                showOn: "both", 
-                                buttonImage: "/icon-calendar.png", 
                                 changeMonth: true,
                                 changeYear: true,
-                                yearRange: 'c-100:c',
-                                buttonImageOnly: true});    
+                                yearRange: 'c-100:c'});    
 
   $('form').submit( function(event) {
     startAjaxLoader(true);
@@ -855,8 +846,8 @@ function campaigns_functions(){
 }
 
 
-function campaignFormFunctions() {
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+function campaignFormFunctions(){
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
 
   if ($('#edit_campaign').length) { disableFields(); }
   function disableFields() {
@@ -1028,17 +1019,17 @@ function show_user_functions(){
 
 function user_cancellation_functions(){
   disable_form_buttons_upon_submition('user_cancelation_form');
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
 };
 
 function user_change_next_bill_date(){
   disable_form_buttons_upon_submition('user_change_next_bill_date_form');
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
 };
 
 function user_save_the_sale_functions(){
   disable_form_buttons_upon_submition('save_the_sale_form')  
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd", showOn: "both", buttonImage: "/icon-calendar.png", buttonImageOnly: true});
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd" });
 }
 
 function chargeback_user_functions(){
@@ -1054,12 +1045,9 @@ function chargeback_user_functions(){
   $("#adjudication_date").datepicker({ constrainInput: true, 
                                 maxDate: 0, 
                                 dateFormat: "yy-mm-dd",
-                                showOn: "both", 
-                                buttonImage: "/icon-calendar.png", 
                                 changeMonth: true,
                                 changeYear: true,
-                                yearRange: 'c-100:c',
-                                buttonImageOnly: true});
+                                yearRange: 'c-100:c'});
 }
 
 function fulfillments_not_processed_function(){
@@ -1126,10 +1114,7 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
   }); 
 
   $(".datepicker").datepicker({ constrainInput: true, 
-                                dateFormat: "yy-mm-dd", 
-                                showOn: "both", 
-                                buttonImage: "/icon-calendar.png", 
-                                buttonImageOnly: true });
+                                dateFormat: "yy-mm-dd" });
   
   if ($("#initial_date").val() == ""){
     $("#initial_date").datepicker( "setDate", '-1w' );
@@ -1551,12 +1536,9 @@ function suspected_fulfillments_functions(){
     $(".datepicker").datepicker({ constrainInput: true,
                                 maxDate: 0,
                                 dateFormat: "yy-mm-dd", 
-                                showOn: "both",
-                                buttonImage: "/icon-calendar.png", 
                                 changeMonth: true,
                                 changeYear: true,
-                                yearRange: 'c-100:c',
-                                buttonImageOnly: true});
+                                yearRange: 'c-100:c' });
 }
 
 function suspected_fulfillment_information_functions(){
