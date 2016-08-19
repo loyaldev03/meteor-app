@@ -32,7 +32,7 @@ class CampaignDaysControllerTest < ActionController::TestCase
 
   test "agents that should not get missing campaign_days" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do   
