@@ -12,6 +12,6 @@ class CampaignDay < ActiveRecord::Base
   scope :missing, -> {where('converted IS NULL OR spent IS NULL OR reached IS NULL')}
 
   def self.datatable_columns
-    ['date', 'campaign', 'spent', 'reached', 'converted']
+    ['date', 'campaign', 'transport', 'spent', 'reached', 'converted']
   end
 end
