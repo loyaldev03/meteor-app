@@ -11,7 +11,7 @@ class TransportSettingsController < ApplicationController
   end
 
   def show
-    my_authorize! :read, TransportSetting, current_club.id
+    my_authorize! :read, TransportSetting, @transport.club.id
   end
 
   def new
@@ -25,7 +25,7 @@ class TransportSettingsController < ApplicationController
   end
 
   def edit
-    my_authorize! :edit, TransportSetting, current_club.id
+    my_authorize! :edit, TransportSetting, @transport.club.id
   end
 
   def create
@@ -42,7 +42,7 @@ class TransportSettingsController < ApplicationController
   end
 
   def update
-    my_authorize! :update, TransportSetting, current_club.id
+    my_authorize! :update, TransportSetting, @transport.club.id
     if @transport.update(transport_params_on_update)
       redirect_to transport_setting_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @transport), 
         notice: "The transport setting for <b>#{@transport.transport}</b> was successfully updated.".html_safe
