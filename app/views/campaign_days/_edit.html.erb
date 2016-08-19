@@ -1,3 +1,5 @@
+<h5>Campaign <%= @campaign.name %> - <%= @campaign.transport %></h5>
+
 <%= form_for(@campaign_day, url: campaign_day_path(id: @campaign_day.id), :html => { :class => 'form-horizontal', 'data-target' => @campaign_day.id }) do |f| %>
 
   <div class="control-group">

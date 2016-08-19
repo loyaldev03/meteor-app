@@ -14,10 +14,11 @@ private
       [ 
         campaign_day.date,
         campaign_day.campaign.name,
+        campaign_day.campaign.transport,
         campaign_day.spent,
         campaign_day.reached,
         campaign_day.converted,
-        ((link_to(I18n.t(:edit), @url_helpers.edit_campaign_day_path(@current_partner.prefix, @current_club.name, campaign_day.id), :class => 'btn btn-mini', :id => 'edit', 'data-toggle' => 'custom-remote-modal', 'data-target' => '#campaignDayEditModal')) if @current_agent.can? :edit, CampaignDay, @current_club.id).to_s
+        ((link_to(I18n.t(:edit), @url_helpers.edit_campaign_day_path(@current_partner.prefix, @current_club.name, campaign_day.id), :class => 'btn btn-mini', :id => 'edit', 'data-toggle' => 'custom-remote-modal', 'data-target' => '#campaignDayEditModal', 'data-date' => "#{campaign_day.date}")) if @current_agent.can? :edit, CampaignDay, @current_club.id).to_s
       ]
     end
   end

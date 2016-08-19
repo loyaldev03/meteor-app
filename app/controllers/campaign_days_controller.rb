@@ -12,6 +12,7 @@ class CampaignDaysController < ApplicationController
   def edit
     my_authorize! :manage, CampaignDay, current_club.id
     @campaign_day = CampaignDay.find(params[:id])
+    @campaign = @campaign_day.campaign
     render partial: 'edit'
   end
 

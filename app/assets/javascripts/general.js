@@ -174,7 +174,7 @@ function campaign_days_functions(column_count){
     "iDisplayLength": 15,
     "bResetDisplay": false,
     "aaSorting": [[ 1, "asc" ]],
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2,3,4,5 ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 3,4,5,6 ] }],
     "sAjaxSource": $('#campaign_days_table').data('source')
   });
 
@@ -187,8 +187,10 @@ function campaign_days_functions(column_count){
     event.preventDefault();
 
     var targetModal = '#campaignDayEditModal';
-    $(targetModal + ' .modal-body').load($(this).attr('href'), function(e) {
-      $(targetModal).modal('show');
+    $('#campaignDayEditModal .modal-header h3').remove();
+    $('#campaignDayEditModal .modal-header').append("<h3> Update Campaign Day "+$(this).data('date')+"</h3>");
+    $('#campaignDayEditModal .modal-body').load($(this).attr('href'), function(e) {
+      $('#campaignDayEditModal').modal('show');
     });
   });
   $('#campaignDayEditModal').on('submit', '.modal-body form', function(event){

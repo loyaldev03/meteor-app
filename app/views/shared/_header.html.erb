@@ -67,6 +67,7 @@
                   <% if current_agent.can? :manual_review, Fulfillment, current_club.id %>
                     <li><%= link_to t('activerecord.model.suspected_fulfillments'), suspected_fulfillments_path(current_club.partner.prefix, current_club.name) %></li>
                   <% end %>
+                  <li class="divider"></li>
                   <li class="nav-header">Marketing</li>
                   <% if @current_agent.can? :read, Campaign, @current_club.id %>
                     <li><%= link_to t('activerecord.model.campaigns'), campaigns_path(@current_club.partner.prefix, @current_club.name) %></li>
