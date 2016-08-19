@@ -254,3 +254,5 @@ table.evidences tbody {
 }
 
 form#new_campaign i#generate_fulfillment_code { cursor: pointer; }
+
+.error .help-inline { color: red; }

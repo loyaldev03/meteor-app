@@ -1,8 +1,8 @@
 class CampaignsController < ApplicationController
   before_filter :validate_club_presence
   before_action :set_campaign, only: [:show, :edit, :update]
-  before_action :set_toms, only: [:new, :edit]
-  before_action :set_fulfillment_codes, except: [:index, :update]
+  before_action :set_toms, only: [:new, :create, :edit]
+  before_action :set_fulfillment_codes, only: [:new, :create, :show, :edit, :update]
 
   def index
     my_authorize! :list, Campaign, current_club.id
@@ -69,6 +69,9 @@ class CampaignsController < ApplicationController
 
     def set_fulfillment_codes
       @fulfillment_codes = ['New automatic code']
-      @fulfillment_codes << current_club.campaigns.pluck(:fulfillment_code).uniq! if current_club.campaigns.first.present?
+      current_club.campaigns.pluck(:fulfillment_code).each do |code|
+        @fulfillment_codes << code
+      end
+      @fulfillment_codes.uniq!
     end
 end

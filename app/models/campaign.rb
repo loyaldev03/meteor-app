@@ -12,7 +12,7 @@ class Campaign < ActiveRecord::Base
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
 
-  validate :check_dates_range
+  validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? } 
 
   TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE = ['facebook', 'mailchimp']
 
@@ -87,13 +87,5 @@ class Campaign < ActiveRecord::Base
 
     def set_campaign_medium_version
       self.campaign_medium_version = (mailchimp? ? 'email' : 'banner') + '_' + campaign_medium_version
-    end
-
-    def check_dates_range
-      if finish_date and initial_date
-        if finish_date.to_date < initial_date.to_date
-          errors.add(:finish_date, "Must be greater or equal than initial date.")
-        end
-      end
     end
 end

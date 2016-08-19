@@ -17,7 +17,7 @@ private
         campaign.campaign_type,
         campaign.transport,
         I18n.l(campaign.initial_date.to_date),
-        I18n.l(campaign.finish_date.to_date),
+        (I18n.l(campaign.finish_date.to_date) if campaign.finish_date.present?),
         (link_to(I18n.t(:show), @url_helpers.campaign_path(partner_prefix: @current_partner.prefix, club_prefix: @current_club.name, :id => campaign.id), :class => 'btn btn-mini') if @current_agent.can? :read, Campaign, @current_club.id).to_s + 
         (link_to(I18n.t(:edit), @url_helpers.edit_campaign_path(partner_prefix: @current_partner.prefix, club_prefix: @current_club.name, :id => campaign.id.to_s), :class => 'btn btn-mini') if @current_agent.can? :edit, Campaign, @current_club.id).to_s
       ]

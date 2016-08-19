@@ -40,22 +40,20 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @current_club.name %><b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li class="nav-header">General</li>
+                  <li class="nav-header">Club managment</li>
                   <% if @current_agent.can? :read, User, @current_club.id %>
                     <li><%= link_to t('activerecord.model.users'), users_path(@current_club.partner.prefix, @current_club.name) %></li>
-                  <% end %>
-                  <% if @current_agent.can? :read, TransportSetting, @current_club.id %>
-                    <li><%= link_to t('activerecord.model.transport_settings'), transport_settings_path(@current_club.partner.prefix, @current_club.name) %></li>
-                  <% end %>
-                  <% if @current_agent.can? :read, DispositionType, @current_club.id %>
-                    <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>
-                  <% end %>                  
-                  <% if @current_agent.can? :read, TermsOfMembership, @current_club.id %>
-                    <li><%= link_to t('activerecord.model.subscription_plans'), terms_of_memberships_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
                   <% if @current_agent.can? :edit, Club, @current_club.id %>
                     <li><%= link_to t('buttons.club_show'), club_path(@current_club.partner.prefix, @current_club.id) %></li>
                   <% end %>
+                  <% if @current_agent.can? :read, TermsOfMembership, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.subscription_plans'), terms_of_memberships_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, DispositionType, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <li class="divider"></li>
                   <li class="nav-header">Fulfillment</li>
                   <% if @current_agent.can? :read, Product, @current_club.id %>
                     <li><%= link_to t('activerecord.model.products'), products_path(@current_club.partner.prefix, @current_club.name) %></li>
@@ -75,6 +73,9 @@
                   <% end %>
                   <% if @current_agent.can? :read, CampaignDay, @current_club.id %>
                     <li><%= link_to t('activerecord.model.campaign_days'), missing_campaign_days_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
+                  <% if @current_agent.can? :read, TransportSetting, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.transport_settings'), transport_settings_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
                 </ul>
               </li>

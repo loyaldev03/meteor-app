@@ -1,7 +1,7 @@
 <div class='row-fluid'>
   <div class='span12'>
     <h2><%= @campaign.name %></h2>
-    <h4>Marketing Campaign</h4>
+    <h4><%= t('activerecord.model.campaign') %></h4>
     <hr />
   </div>
 </div>
@@ -13,7 +13,10 @@
         <td><b>Campaign Type:</b> <%= @campaign.campaign_type %></td>
         <td><b>Subscription Plan:</b> <%= @campaign.terms_of_membership.name %></td>
         <td><b>Enrollment Price:</b> <%= number_to_currency(@campaign.enrollment_price) %></td>
-        <td><b>Running from:</b> <%= @campaign.initial_date %> <b>to</b> <%= @campaign.finish_date %></td>
+        <td><b>Running from:</b> <%= @campaign.initial_date %>
+        <% if @campaign.finish_date.present? %>
+          <b>to</b> <%= @campaign.finish_date %></td>
+        <% end %>
       </tr>
       <tr>
         <td><b>Source:</b> <%= @campaign.transport %></td>
