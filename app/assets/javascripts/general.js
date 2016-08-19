@@ -913,9 +913,11 @@ function transportSettingsIndexFunctions() {
 
 
 function transportSettingsFormFunctions() {
-  if ($('#new_transport_setting').length) {
-    $("#transport_setting_transport").select2({ theme: "bootstrap" }); // To avoid adding the class to the hidden field om edit
-  }
+  $("#transport_setting_transport").change(function() {
+    var transport = $("#transport_setting_transport").val();
+    assignRequiredTagToFields(transport);
+    showSettingsPane(transport);
+  });
 
   function showSettingsPane(transport) {
     if(!transport) transport = $("#transport_setting_transport").val();
@@ -936,24 +938,22 @@ function transportSettingsFormFunctions() {
     
     switch(transport) {
       case 'facebook':
-        $('#transport_setting_fb_client_id').prop('required', true);
-        $('#transport_setting_fb_client_secret').prop('required', true);
-        $('#transport_setting_fb_access_token').prop('required', true);
+        $('#transport_setting_client_id').prop('required', true);
+        $('#transport_setting_client_secret').prop('required', true);
+        $('#transport_setting_access_token').prop('required', true);
         break;
       case 'mailchimp':
-        $('#transport_setting_mc_api_key').prop('required', true);
+        $('#transport_setting_api_key').prop('required', true);
         break;
     }
   }
 
-  showSettingsPane($("#transport_setting_transport").val());
-  assignRequiredTagToFields($("#transport_setting_transport").val());
+  if(!transport && $("#transport_setting_transport").length > 0) {
+    transport = $("#transport_setting_transport").val();
+  }
 
-  $("#transport_setting_transport").change(function() {
-    var transport = $("#transport_setting_transport").val();
-    assignRequiredTagToFields(transport);
-    showSettingsPane(transport);
-  });
+  showSettingsPane(transport);
+  assignRequiredTagToFields(transport);
 }
 
 
