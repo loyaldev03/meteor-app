@@ -927,10 +927,10 @@ function transportSettingsFormFunctions() {
 
   function assignRequiredTagToFields(transport) {
     var fields = [
-      'fb_client_id', 
-      'fb_client_secret', 
-      'fb_access_token',
-      'mc_api_key'
+      'client_id', 
+      'client_secret', 
+      'access_token',
+      'api_key'
     ];
     $.each(fields, function(index, field) {
       $('#transport_setting_' + field).prop('required', false);
