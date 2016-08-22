@@ -941,7 +941,9 @@ class User < ActiveRecord::Base
 
   ##################### Club cash ####################################
 
-  delegate :is_not_drupal?, to: :club
+  def is_not_drupal?
+    @is_not_drupal ||= club.is_not_drupal?
+  end
 
   # Resets user club cash in case of a cancelation.
   def nillify_club_cash(message = 'Removing club cash because of member cancellation')
@@ -950,12 +952,12 @@ class User < ActiveRecord::Base
   
   def nillify_club_cash_upon_cancellation
     message = 'Removing club cash because of member cancellation'
-    unless is_not_drupal?
-      nillify_club_cash
-    else
+    if is_not_drupal?
       self.club_cash_amount = 0
       self.save
       Auditory.audit(nil, self, message, self, Settings.operation_types.reset_club_cash)
+    else
+      nillify_club_cash
     end
   end
 
