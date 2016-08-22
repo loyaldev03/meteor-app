@@ -10,7 +10,7 @@
     <div class="control-group">
       <%= f.label :subscription_plan, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name", nil), { prompt: 'Choose one...' }, { class: 'form-control', required: true }%> 
+        <%= f.select :terms_of_membership_id, [], { class: 'form-control', required: true }%> 
       </div>
     </div>
 
@@ -82,13 +82,17 @@
     <div class="control-group">
       <%= f.label :fulfillment_code, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :fulfillment_code, options_for_select(@fulfillment_codes, @campaign.fulfillment_code), { class: 'form-control' } %> 
+        <% if @campaign.new_record? %>
+          <%= f.select :fulfillment_code, [], { class: 'form-control' } %> 
+        <% else %>
+          <%= f.text_field :fulfillment_code, required: true %>
+        <% end %>
       </div>
     </div>
   </div>
 </div>
 
-<% if action_name == 'edit' %>
+<% unless @campaign.new_record? %>
 <div class='row-fluid'>
   <div class='span12'>
     <p class="muted"><i class="icon-info-sign"></i> There are some fields that can not be updated.</p>
@@ -104,31 +108,12 @@
 </div>
 
 <script>
-  var get_fulfillment_codes_url = "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
-  var club_id = "<%= current_club.id %>";
+  var clubId = "<%= current_club.id %>";
+
+  var getSubscriptionPlansUrl = "<%= get_subscription_plans_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var getFulfillmentCodesUrl = "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  
+  var placeholderText = "New automatic code";
+
   $(document).ready( campaignFormFunctions() );
-
-
-  $("#campaign_fulfillment_code").select2({
-    minimumInputLength: 2,
-    tags: [],
-    ajax: {
-        url: "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>",
-        dataType: 'json',
-        type: "POST",
-        quietMillis: 50,
-        data: function (params) {
-            return {
-              q: params.term,
-              page: params.page
-            };
-        },
-        processResults: function (data, page) {
-          // parse the results into the format expected by Select2.
-          // since we are using custom formatting functions we do not need to
-          // alter the remote JSON data
-          return data.items;
-        },
-    }
-});
 </script>

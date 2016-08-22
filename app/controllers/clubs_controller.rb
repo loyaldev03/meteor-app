@@ -120,13 +120,25 @@ class ClubsController < ApplicationController
   def get_fulfillment_codes
     club = Club.find(params[:club_id])
     query = params[:query]
-    fc = club.campaigns.select('fulfillment_code').where("fulfillment_code LIKE '%#{query}%'").pluck('fulfillment_code')
+    fc = club.campaigns.select(:fulfillment_code).where("fulfillment_code LIKE '%#{query}%'").pluck(:fulfillment_code)
     values = []
-    x = 0
+    x = 1
     fc.each do |f|
       values << { id: x.to_s, text: f }
       x += 1
     end
+    render json: values
+  end
+
+  def get_subscription_plans
+    club = Club.find(params[:club_id])
+    query = params[:query]
+    sp = club.terms_of_memberships.select(:id, :name).where("name LIKE '%#{query}%'").pluck(:id, :name)
+    values = []
+    sp.each do |f|
+      values << { id: f.id, text: f.name }
+    end
+    byebug
     render json: values
   end
 

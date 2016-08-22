@@ -851,7 +851,43 @@ function campaigns_functions(){
 function campaignFormFunctions(){
   $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
 
-  if ($('#edit_campaign').length) { disableFields(); }
+  if ($('#edit_campaign').length) { 
+    disableFields(); 
+  }
+  else {
+    $("#campaign_terms_of_membership_id").select2({
+      ajax: {
+        url: getSubscriptionPlansUrl,
+        dataType: 'json',
+        type: "POST",
+        delay: 250,
+        quietMillis: 50,
+        data: function(params) { return { club_id: clubId, query: params.term, }; },
+        processResults: function(data) { return { results: data }; }
+      },
+      minimumInputLength: 2,
+      placeholder: placeholderText,
+      allowClear: true,
+      theme: "bootstrap"
+    });
+    
+    $("#campaign_fulfillment_code").select2({
+      ajax: {
+        url: getFulfillmentCodesUrl,
+        dataType: 'json',
+        type: "POST",
+        delay: 250,
+        quietMillis: 50,
+        data: function(params) { return { club_id: clubId, query: params.term, }; },
+        processResults: function(data) { return { results: data }; }
+      },
+      minimumInputLength: 2,
+      placeholder: placeholderText,
+      allowClear: true,
+      theme: "bootstrap"
+    });
+  }
+  
   function disableFields() {
     var fieldsToDisable = [
       'terms_of_membership_id', 
@@ -891,25 +927,7 @@ function campaignFormFunctions(){
   $("#campaign_terms_of_membership_id").select2({ theme: "bootstrap" });
   $("#campaign_campaign_type").select2({ theme: "bootstrap" });
   $("#campaign_transport").select2({ theme: "bootstrap" });
-  $("#campaign_fulfillment_code").select2({ theme: "bootstrap" });
-
-  $("#campaign_fulfillment_code").select2({
-    ajax: {
-      url: get_fulfillment_codes_url,
-      dataType: 'json',
-      type: "POST",
-      delay: 250,
-      quietMillis: 50,
-      data: function(params) {
-        return { club_id: club_id, query: params.term, };
-      },
-      processResults: function (data) {
-        return { results: data };
-      }
-    },
-    minimumInputLength: 2
-  });
-
+  
   setCampaignMedium($('#campaign_transport').val());
 }
 
