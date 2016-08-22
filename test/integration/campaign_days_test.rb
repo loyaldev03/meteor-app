@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CampaignTest < ActionDispatch::IntegrationTest
+class CampaignDaysTest < ActionDispatch::IntegrationTest
  
   setup do
     @partner = FactoryGirl.create(:partner)
