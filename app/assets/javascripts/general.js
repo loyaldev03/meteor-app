@@ -906,6 +906,8 @@ function transportSettingsIndexFunctions() {
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
+    "bFilter": false,
+    "bInfo": false,
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
     "sAjaxSource": $('#transport_settings_table').data('source')
   }); 
