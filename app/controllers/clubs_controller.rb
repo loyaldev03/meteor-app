@@ -118,9 +118,17 @@ class ClubsController < ApplicationController
 
 
   def get_fulfillment_codes
+    club = Club.find(params[:club_id])
     query = params[:query]
-    response = { results: 'OK' }
-    render json: response
+    fc = club.campaigns.select('fulfillment_code').where("fulfillment_code LIKE '%#{query}%'").pluck('fulfillment_code')
+    values = []
+    x = 0
+    fc.each do |f|
+      values << { id: x.to_s, text: f }
+      x += 1
+    end
+    # byebug
+    render json: values
   end
 
   private 
