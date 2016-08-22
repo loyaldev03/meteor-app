@@ -104,29 +104,7 @@
 </div>
 
 <script>
+  var get_fulfillment_codes_url = "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var club_id = "<%= current_club.id %>";
   $(document).ready( campaignFormFunctions() );
-
-
-  $("#campaign_fulfillment_code").select2({
-    minimumInputLength: 2,
-    tags: [],
-    ajax: {
-        url: "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>",
-        dataType: 'json',
-        type: "POST",
-        quietMillis: 50,
-        data: function (params) {
-            return {
-              q: params.term,
-              page: params.page
-            };
-        },
-        processResults: function (data, page) {
-          // parse the results into the format expected by Select2.
-          // since we are using custom formatting functions we do not need to
-          // alter the remote JSON data
-          return data.items;
-        },
-    }
-});
 </script>

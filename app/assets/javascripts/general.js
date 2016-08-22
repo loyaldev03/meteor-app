@@ -893,6 +893,23 @@ function campaignFormFunctions(){
   $("#campaign_transport").select2({ theme: "bootstrap" });
   $("#campaign_fulfillment_code").select2({ theme: "bootstrap" });
 
+  $("#campaign_fulfillment_code").select2({
+    ajax: {
+      url: get_fulfillment_codes_url,
+      dataType: 'json',
+      type: "POST",
+      delay: 250,
+      quietMillis: 50,
+      data: function(params) {
+        return { club_id: club_id, query: params.term, };
+      },
+      processResults: function (data) {
+        return { results: data };
+      }
+    },
+    minimumInputLength: 2
+  });
+
   setCampaignMedium($('#campaign_transport').val());
 }
 
