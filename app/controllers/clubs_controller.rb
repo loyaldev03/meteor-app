@@ -127,7 +127,6 @@ class ClubsController < ApplicationController
       values << { id: x.to_s, text: f }
       x += 1
     end
-    # byebug
     render json: values
   end
 
