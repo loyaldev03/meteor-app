@@ -121,6 +121,7 @@ class ClubsController < ApplicationController
     club = Club.find(params[:club_id])
     query = params[:query]
     fc = club.campaigns.select(:fulfillment_code).where("fulfillment_code LIKE '%#{query}%'").pluck(:fulfillment_code)
+    fc.uniq!
     values = []
     x = 1
     fc.each do |f|
