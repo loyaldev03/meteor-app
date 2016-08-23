@@ -123,7 +123,7 @@ class ClubsController < ApplicationController
     fc = club.campaigns.select(:fulfillment_code).where("fulfillment_code LIKE '%#{query}%'").pluck(:fulfillment_code)
     fc.uniq!
     values = []
-    x = 1
+    x = 0
     fc.each do |f|
       values << { id: x.to_s, text: f }
       x += 1
@@ -134,12 +134,11 @@ class ClubsController < ApplicationController
   def get_subscription_plans
     club = Club.find(params[:club_id])
     query = params[:query]
-    sp = club.terms_of_memberships.select(:id, :name).where("name LIKE '%#{query}%'").pluck(:id, :name)
+    sp = club.terms_of_memberships.select(:id, :name).where("name LIKE '%#{query}%'")
     values = []
     sp.each do |f|
-      values << { id: f.id, text: f.name }
+      values << { id: f.id.to_s, text: f.name }
     end
-    byebug
     render json: values
   end
 
