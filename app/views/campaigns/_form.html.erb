@@ -26,11 +26,11 @@
 <div class='row-fluid'>
   <div class='span12'>
     <div class="control-group">
-      <%= f.label :enrollment_price, :class => 'control-label' %>
+      <%= f.label :enrollment_price, :class => 'control-label required_asterisk' %>
       <div class="controls">
         <div class=" input-prepend">
           <span class="add-on">$</span>
-          <%= f.number_field :enrollment_price, required: true, within: 0...1000, step: 0.01, class: 'input-small required_asterisk' %>
+          <%= f.number_field :enrollment_price, required: true, within: 0...1000, step: 0.01, class: 'input-small' %>
         </div>
       </div>
     </div>
