@@ -46,7 +46,8 @@ class CampaignsController < ApplicationController
     if @campaign.update campaign_params_on_update
       redirect_to campaigns_url, notice: "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
     else
-      redirect_to campaigns_url, error: "Campaign <b>#{@campaign.name}</b> was not updated".html_safe
+      flash[:error] = "Campaign <b>#{@campaign.name}</b> was not updated".html_safe
+      render action: "edit"
     end
   end
 
