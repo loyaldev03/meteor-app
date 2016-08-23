@@ -9,7 +9,7 @@ module Campaigns
         campaign.campaign_days.each do |campaign_day| 
           CampaignDataFetcher.new(club_id: club_id, transport: transport, date: campaign_day.date, campaign_id: campaign_id).fetch!
         end
-        CampaignNotifier.campaign_all_days_fetcher_result(campaign_id: campaign.id).deliver_now
+        CampaignNotifier.campaign_all_days_fetcher_result(campaign_id: campaign.id).deliver_later
       end
     end
   end
