@@ -859,7 +859,7 @@ function campaignFormFunctions(){
       ajax: {
         url: getSubscriptionPlansUrl,
         dataType: 'json',
-        type: "POST",
+        type: "GET",
         delay: 250,
         quietMillis: 50,
         data: function(params) { return { club_id: clubId, query: params.term, }; },
@@ -867,23 +867,27 @@ function campaignFormFunctions(){
       },
       minimumInputLength: 2,
       placeholder: placeholderText,
-      allowClear: true,
       theme: "bootstrap"
     });
-    
     $("#campaign_fulfillment_code").select2({
       ajax: {
         url: getFulfillmentCodesUrl,
         dataType: 'json',
-        type: "POST",
+        type: "GET",
         delay: 250,
         quietMillis: 50,
         data: function(params) { return { club_id: clubId, query: params.term, }; },
         processResults: function(data) { return { results: data }; }
       },
       minimumInputLength: 2,
-      placeholder: placeholderText,
+      placeholder: placeholderTextFulfillmentCodes,
       allowClear: true,
+      theme: "bootstrap"
+    });
+    $("#campaign_campaign_type").select2({
+      theme: "bootstrap"
+    });
+    $("#campaign_transport").select2({
       theme: "bootstrap"
     });
   }
@@ -923,12 +927,6 @@ function campaignFormFunctions(){
     }
     $('#campaign_campaign_medium').val(medium);
   }
-
-  $("#campaign_terms_of_membership_id").select2({ theme: "bootstrap" });
-  $("#campaign_campaign_type").select2({ theme: "bootstrap" });
-  $("#campaign_transport").select2({ theme: "bootstrap" });
-  
-  setCampaignMedium($('#campaign_transport').val());
 }
 
 
