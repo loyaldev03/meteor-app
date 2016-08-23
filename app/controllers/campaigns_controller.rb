@@ -2,7 +2,6 @@ class CampaignsController < ApplicationController
   before_filter :validate_club_presence
   before_action :set_campaign, only: [:show, :edit, :update]
   before_action :set_toms, only: [:new, :create, :edit]
-  before_action :set_fulfillment_codes, only: [:new, :create, :show, :edit, :update]
 
   def index
     my_authorize! :list, Campaign, current_club.id
@@ -29,6 +28,7 @@ class CampaignsController < ApplicationController
   def create
     my_authorize! :create, Campaign, current_club.id
     @campaign = Campaign.new(campaign_params)
+    @campaign.set_fulfillment_code unless @campaign.fulfillment_code
     @campaign.club_id = current_club.id
     if @campaign.save
       redirect_to campaign_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @campaign), notice: "The campaign #{@campaign.name} was successfully created."

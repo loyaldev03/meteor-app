@@ -6,7 +6,6 @@ class Campaign < ActiveRecord::Base
 
   before_validation :set_campaign_medium
   before_save :set_campaign_medium_version
-  before_save :set_fulfillment_code
   
   validates :name, :enrollment_price, :initial_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
@@ -60,12 +59,11 @@ class Campaign < ActiveRecord::Base
     end
   end
 
+  def set_fulfillment_code
+    self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join
+  end
+
   private
-
-    def set_fulfillment_code
-      self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join if self.fulfillment_code == 'New automatic code'
-    end
-
     def past_period(date = Date.current)
       if mailchimp?
         [ initial_date ]
