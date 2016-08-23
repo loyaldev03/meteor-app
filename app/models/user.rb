@@ -952,7 +952,7 @@ class User < ActiveRecord::Base
   
   def nillify_club_cash_upon_cancellation
     message = 'Removing club cash because of member cancellation'
-    if is_not_drupal?
+    if not is_not_drupal?
       self.club_cash_amount = 0
       self.save
       Auditory.audit(nil, self, message, self, Settings.operation_types.reset_club_cash)
