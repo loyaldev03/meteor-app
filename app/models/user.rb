@@ -153,7 +153,7 @@ class User < ActiveRecord::Base
     ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
-                        :lapsed, :do => [:cancellation, 'nillify_club_cash']
+                        :lapsed, :do => [:cancellation, :nillify_club_cash_upon_cancellation]
     after_transition applied:                         :lapsed, do: [:set_user_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
     after_transition all => all, :do => :propagate_membership_data
@@ -941,11 +941,24 @@ class User < ActiveRecord::Base
 
   ##################### Club cash ####################################
 
-  delegate :is_not_drupal?, to: :club
+  def is_not_drupal?
+    @is_not_drupal ||= club.is_not_drupal?
+  end
 
   # Resets user club cash in case of a cancelation.
   def nillify_club_cash(message = 'Removing club cash because of member cancellation')
     NillifyClubCashJob.perform_later(self.id, message)
+  end
+  
+  def nillify_club_cash_upon_cancellation
+    message = 'Removing club cash because of member cancellation'
+    if not is_not_drupal?
+      self.club_cash_amount = 0
+      self.save
+      Auditory.audit(nil, self, message, self, Settings.operation_types.reset_club_cash)
+    else
+      nillify_club_cash
+    end
   end
 
   # Resets member club cash in case the club cash has expired.
