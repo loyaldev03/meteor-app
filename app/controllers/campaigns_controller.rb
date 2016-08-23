@@ -1,7 +1,6 @@
 class CampaignsController < ApplicationController
   before_filter :validate_club_presence
   before_action :set_campaign, only: [:show, :edit, :update]
-  before_action :set_toms, only: [:new, :create, :edit]
 
   def index
     my_authorize! :list, Campaign, current_club.id
@@ -17,7 +16,7 @@ class CampaignsController < ApplicationController
 
   def new
     my_authorize! :new, Campaign, current_club.id
-    if @terms_of_memberships.first.present?
+    if current_club.terms_of_memberships.first.present?
       @campaign = Campaign.new(club_id: current_club.id)
     else
       flash[:error] = "Can not create a campaign without a Subscription plan."
@@ -62,17 +61,5 @@ class CampaignsController < ApplicationController
 
     def set_campaign
       @campaign = Campaign.find(params[:id])
-    end
-
-    def set_toms
-      @terms_of_memberships = current_club.terms_of_memberships.select(:id, :name)
-    end
-
-    def set_fulfillment_codes
-      @fulfillment_codes = ['New automatic code']
-      current_club.campaigns.pluck(:fulfillment_code).each do |code|
-        @fulfillment_codes << code
-      end
-      @fulfillment_codes.uniq!
     end
 end
