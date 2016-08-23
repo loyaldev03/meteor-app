@@ -2,7 +2,7 @@ module Campaigns
   class DataFetcherJob < ActiveJob::Base
     queue_as :campaigns
 
-    def perform(club_id, transport, date = nil, campaign_id = nil)
+    def perform(club_id:, transport:, date: nil, campaign_id: nil)
       if date
         CampaignDataFetcher.new(club_id: club_id, transport: transport, date: date, campaign_id: campaign_id).fetch!
       elsif campaign_id

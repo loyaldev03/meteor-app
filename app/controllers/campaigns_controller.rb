@@ -49,7 +49,7 @@ class CampaignsController < ApplicationController
     if @campaign.update campaign_params_on_update
       message = "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
       if campaign_day_created and source_id_changed
-        Campaigns::CampaignAllDaysDataFetcherJob.perform_later(@campaign.id)
+        Campaigns::DataFetcherJob.perform_later(club_id: current_club.id, transport: @campaign.transport, campaign_id: @campaign.id)
         message.concat(" An email will be send with result from fetching data for campaign days with new #{I18n.t('activerecord.attributes.campaign.transport_campaign_id')} provided.")
       end
       redirect_to campaigns_url, notice: message

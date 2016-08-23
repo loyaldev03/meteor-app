@@ -9,7 +9,7 @@ namespace :campaigns do
       club_ids = Club.is_enabled.ids
       club_ids.each do |club_id|
         ['facebook', 'mailchimp'].each do |transport|
-          Campaigns::DataFetcherJob.perform_later(club_id, transport, date.to_s)
+          Campaigns::DataFetcherJob.perform_later(club_id: club_id, transport: transport, date: date.to_s)
         end
       end
       # send communications
@@ -20,7 +20,7 @@ namespace :campaigns do
         Campaign.by_transport(transport).where(club_id: club_ids).map{|c| c.missing_days(date: date)}
       end
       # re-try those campaign days with unexpected error
-      
+      UnexpectedErrorDaysDataFetcherJob.perform_later
     rescue Exception => e
       Auditory.report_issue("Campaigns::fetch_data", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"      
