@@ -849,12 +849,12 @@ function campaigns_functions(){
 
 
 function campaignFormFunctions(){
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
-
   if ($('#edit_campaign').length) { 
+    $(".datepicker").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd" });
     disableFields(); 
   }
   else {
+    $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
     $("#campaign_terms_of_membership_id").select2({
       ajax: {
         url: getSubscriptionPlansUrl,
