@@ -52,8 +52,8 @@ SacPlatform::Application.routes.draw do
       match '/users' => 'users#index', as: 'users', :via => [:get, :post]
       match '/users/search_result' => 'users#search_result', as: 'users_search_result', :via => [:get]
 
-      post 'get_subscription_plans' => 'clubs#get_subscription_plans'
-      post 'get_fulfillment_codes' => 'clubs#get_fulfillment_codes'
+      get 'get_subscription_plans' => 'clubs#get_subscription_plans'
+      get 'get_fulfillment_codes' => 'clubs#get_fulfillment_codes'
       
       resources :terms_of_memberships, :path => 'subscription_plans' do
         get :resumed_information
