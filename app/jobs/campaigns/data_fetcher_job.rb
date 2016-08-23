@@ -6,10 +6,10 @@ module Campaigns
       if date
         CampaignDataFetcher.new(club_id: club_id, transport: transport, date: date, campaign_id: campaign_id).fetch!
       elsif campaign_id
-        campaign.campaign_days.each do |campaign_day| 
-          CampaignDataFetcher.new(club_id: club_id, transport: transport, date: campaign_day.date, campaign_id: campaign_id).fetch!
+        CampaignDay.where(campaign_id: campaign_id).pluck(:date).each do |day|
+          CampaignDataFetcher.new(club_id: club_id, transport: transport, date: day, campaign_id: campaign_id).fetch!
         end
-        CampaignNotifier.campaign_all_days_fetcher_result(campaign_id: campaign.id).deliver_later
+        CampaignNotifier.campaign_all_days_fetcher_result(campaign_id: campaign_id).deliver_later
       end
     end
   end

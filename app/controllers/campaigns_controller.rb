@@ -47,14 +47,15 @@ class CampaignsController < ApplicationController
     campaign_day_created = @campaign.campaign_days.first
     source_id_changed = @campaign.transport_campaign_id != params[:campaign][:transport_campaign_id] if campaign_day_created
     if @campaign.update campaign_params_on_update
-      message = "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
-      if campaign_day_created and source_id_changed
+      message = if campaign_day_created and source_id_changed
         Campaigns::DataFetcherJob.perform_later(club_id: current_club.id, transport: @campaign.transport, campaign_id: @campaign.id)
-        message.concat(" An email will be send with result from fetching data for campaign days with new #{I18n.t('activerecord.attributes.campaign.transport_campaign_id')} provided.")
+        "Campaign <b>#{@campaign.name}</b> was updated succesfully. An email will be send with result from fetching data for campaign days with new #{I18n.t('activerecord.attributes.campaign.transport_campaign_id')} provided."
+      else
+        "Campaign <b>#{@campaign.name}</b> was updated succesfully.".html_safe
       end
       redirect_to campaigns_url, notice: message
     else
-      redirect_to campaigns_url, :flash => { error: "Campaign <b>#{@campaign.name}</b> was not updated. Errors: #{@campaign.errors.to_s} ".html_safe }
+      redirect_to campaigns_url, :flash => { error: "Campaign <b>#{@campaign.name}</b> was not updated.".html_safe }
     end
   end
 
@@ -64,7 +65,7 @@ class CampaignsController < ApplicationController
     end
 
     def campaign_params_on_update
-      params.require(:campaign).permit(:name, :initial_date, :finish_date)
+      params.require(:campaign).permit(:name, :initial_date, :finish_date, :transport_campaign_id)
     end
 
     def set_campaign
