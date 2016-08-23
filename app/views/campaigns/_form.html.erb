@@ -10,7 +10,11 @@
     <div class="control-group">
       <%= f.label :subscription_plan, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name", nil), { prompt: 'Choose one...' }, { class: 'form-control', required: true }%> 
+        <% if @campaign.new_record? %>
+          <%= f.select :terms_of_membership_id, [], { class: 'form-control' }, required: true %> 
+        <% else %>
+          <%= text_field_tag :terms_of_membership, @campaign.terms_of_membership.name, readonly: true %>
+        <% end %>
       </div>
     </div>
 
@@ -38,7 +42,11 @@
     <div class="control-group">
       <%= f.label :campaign_type, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :campaign_type, options_for_select(Campaign.campaign_types_i18n.invert, @campaign.campaign_type), { class: 'form-control' } %> 
+        <% if @campaign.new_record? %>
+          <%= f.select :campaign_type, options_for_select(Campaign.campaign_types_i18n.invert, @campaign.campaign_type), { class: 'form-control', prompt: 'Choose one...' }, required: true %>
+        <% else %>
+          <%= text_field_tag :campaign_type, @campaign.campaign_type, readonly: true %>
+        <% end %>
       </div>
     </div>
   </div>
@@ -47,7 +55,11 @@
     <div class="control-group">
       <%= f.label :source, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :transport, options_for_select(Campaign.transports_i18n.invert, @campaign.transport), { class: 'form-control' } %> 
+        <% if @campaign.new_record? %>
+          <%= f.select :transport, options_for_select(Campaign.transports_i18n.invert, @campaign.transport), { class: 'form-control', prompt: 'Choose one...' }, required: true %>
+        <% else %>
+          <%= text_field_tag :transport, @campaign.transport, readonly: true %>
+        <% end %>
       </div>
     </div>
 
@@ -61,7 +73,7 @@
     <div class="control-group">
       <%= f.label :campaign_medium, 'Campaign medium', :class => 'control-label' %>
       <div class="controls">
-        <%= f.text_field :campaign_medium, :class => 'text_field', disabled: true %>
+        <%= f.text_field :campaign_medium, :class => 'text_field', readonly: true %>
       </div>
     </div>
 
@@ -82,13 +94,17 @@
     <div class="control-group">
       <%= f.label :fulfillment_code, :class => 'control-label' %>
       <div class="controls">
-        <%= f.select :fulfillment_code, options_for_select(@fulfillment_codes, @campaign.fulfillment_code), { class: 'form-control' } %> 
+        <% if @campaign.new_record? %>
+          <%= f.select :fulfillment_code, [], { class: 'form-control' } %>
+        <% else %>
+          <%= f.text_field :fulfillment_code, readonly: true %>
+        <% end %>
       </div>
     </div>
   </div>
 </div>
 
-<% if action_name == 'edit' %>
+<% unless @campaign.new_record? %>
 <div class='row-fluid'>
   <div class='span12'>
     <p class="muted"><i class="icon-info-sign"></i> There are some fields that can not be updated.</p>
@@ -104,5 +120,11 @@
 </div>
 
 <script>
+  var clubId = "<%= current_club.id %>";
+  var getSubscriptionPlansUrl = "<%= get_subscription_plans_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var getFulfillmentCodesUrl = "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var placeholderText = "Choose one...";
+  var placeholderTextFulfillmentCodes = "New automatic code";
+
   $(document).ready( campaignFormFunctions() );
 </script>

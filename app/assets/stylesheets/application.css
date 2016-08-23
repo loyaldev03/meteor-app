@@ -254,5 +254,6 @@ table.evidences tbody {
 }
 
 form#new_campaign i#generate_fulfillment_code { cursor: pointer; }
+form#new_campaign .select2-selection__placeholder { color: black !important; }
 
 .error .help-inline { color: red; }
