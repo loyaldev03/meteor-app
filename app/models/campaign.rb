@@ -84,6 +84,8 @@ class Campaign < ActiveRecord::Base
     end
 
     def set_campaign_medium_version
-      self.campaign_medium_version = (mailchimp? ? 'email' : 'banner') + '_' + campaign_medium_version
+      unless (self.campaign_medium_version.start_with?('email_') || self.campaign_medium_version.start_with?('banner_'))
+        self.campaign_medium_version = (mailchimp? ? 'email' : 'banner') + '_' + campaign_medium_version
+      end
     end
 end
