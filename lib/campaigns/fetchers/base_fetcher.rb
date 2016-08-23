@@ -2,9 +2,11 @@ class CampaignDataFetcher
   class BaseFetcher
 
     attr :settings
+    attr :logger
 
     def initialize(settings: nil)
       @settings = settings || {}
+      @logger   = Logger.new("#{Rails.root}/log/fetch_data.log")
     end
 
     # @param [CampaignReport] blank report

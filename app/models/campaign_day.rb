@@ -6,7 +6,8 @@ class CampaignDay < ActiveRecord::Base
   enum meta: {
     no_error: 0,
     unauthorized: 1,
-    invalid_campaign: 2
+    invalid_campaign: 2,
+    unexpected_error: 3
   }
 
   scope :missing, -> {where('converted IS NULL OR spent IS NULL OR reached IS NULL')}

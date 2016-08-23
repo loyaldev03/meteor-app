@@ -20,4 +20,10 @@ class CampaignNotifier < ActionMailer::Base
     mail to: Settings.campaign_manager_recipients, subject: I18n.t('mailers.invalid_campaign_email.subject')
   end
 
+  def campaign_all_days_fetcher_result(campaign_id:)
+    @campaign = Campaign.find(campaign_id)
+    @success  = @campaign.campaign_days.where.not(meta: CampaignDay.meta[:no_error]).empty?
+    mail to: Settings.campaign_manager_recipients, subject: I18n.t('mailers.invalid_campaign_fetcher_result.subject', campaign_name: @campaign.name)
+  end
+
 end

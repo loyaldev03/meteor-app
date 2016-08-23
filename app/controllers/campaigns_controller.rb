@@ -43,10 +43,18 @@ class CampaignsController < ApplicationController
 
   def update
     my_authorize! :update, Campaign, current_club.id
+    
+    campaign_day_created = @campaign.campaign_days.first
+    source_id_changed = @campaign.transport_campaign_id != params[:campaign][:transport_campaign_id] if campaign_day_created
     if @campaign.update campaign_params_on_update
-      redirect_to campaigns_url, notice: "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
+      message = "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
+      if campaign_day_created and source_id_changed
+        Campaigns::CampaignAllDaysDataFetcherJob.perform_later(@campaign.id)
+        message.concat(" An email will be send with result from fetching data for campaign days with new #{I18n.t('activerecord.attributes.campaign.transport_campaign_id')} provided.")
+      end
+      redirect_to campaigns_url, notice: message
     else
-      redirect_to campaigns_url, error: "Campaign <b>#{@campaign.name}</b> was not updated".html_safe
+      redirect_to campaigns_url, :flash => { error: "Campaign <b>#{@campaign.name}</b> was not updated. Errors: #{@campaign.errors.to_s} ".html_safe }
     end
   end
 

@@ -1,0 +1,13 @@
+<% content_for :header do %>
+  <tr>
+    <% if @success %>
+      <td class="alert alert-good">
+        Successfully fetched data for current campaign days.
+      </td>    
+    <% else %>
+      <td class="alert alert-bad">
+        Alert: There has been an error while fetching data from the following campaigns
+      </td>
+    <% end %>
+  </tr>
+<% end %>

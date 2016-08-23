@@ -14,7 +14,7 @@ class Campaign < ActiveRecord::Base
 
   validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? } 
 
-  TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE = ['facebook', 'mailchimp']
+  TRANSPORTS_FOR_MANUAL_UPDATE = ['mailchimp', 'twitter', 'adwords']
 
   enum campaign_type: {
      sloop:           0,

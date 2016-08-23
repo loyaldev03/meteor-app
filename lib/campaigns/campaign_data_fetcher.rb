@@ -15,10 +15,11 @@ class CampaignDataFetcher
   autoload :FacebookFetcher, File.expand_path('../fetchers/facebook_fetcher', __FILE__)
   autoload :MailchimpFetcher, File.expand_path('../fetchers/mailchimp_fetcher', __FILE__)
 
-  def initialize(club_id:, transport:, date:)
-    @club_id    = club_id
-    @transport  = transport
-    @date       = date
+  def initialize(club_id:, transport:, date:, campaign_id: nil)
+    @club_id      = club_id
+    @transport    = transport
+    @date         = date
+    @campaign_id  = campaign_id
   end
 
   def fetch!
@@ -28,6 +29,7 @@ class CampaignDataFetcher
     report_template           = CampaignReport.new
     report_template.transport = @transport
     report_template.date      = @date
+    
     campaigns.find_each do |campaign|
       report                     = report_template.dup
       report.campaign_id         = campaign.id
@@ -45,7 +47,9 @@ class CampaignDataFetcher
   private
 
   def campaigns
-    Campaign.where(club_id: @club_id).by_transport(@transport).active(@date)
+    campaigns_list = Campaign.where(club_id: @club_id).by_transport(@transport).active(@date)
+    campaigns_list = campaigns_list.where(id: @campaign_id) if @campaign_id
+    campaigns_list
   end
 
   def fetcher

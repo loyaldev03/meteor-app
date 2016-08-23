@@ -30,7 +30,7 @@ class Auditory
   end
   
   def self.report_issue(error = "Special Error", exception = '', params = {}, add_backtrace = true)
-    unless ["test"].include? Rails.env  
+    unless ['test', 'development'].include? Rails.env  
       backtrace = add_backtrace ? "**Backtrace**\n #{(exception.kind_of?(Exception) ? exception.backtrace.join("\n").to_s : caller.join("\n").to_s)}" : ''
       description = <<-EOF
         **Message:**

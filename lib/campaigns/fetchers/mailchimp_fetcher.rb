@@ -21,6 +21,11 @@ class CampaignDataFetcher
     rescue Gibbon::MailChimpError
       report.meta       = :invalid_campaign
       report
+    rescue Exception => e
+      Auditory.report_issue("MailchimpFetcher campaign retrieval error.", 'Mailchimp returned an unexpected error', {exception: e.to_s}, false)
+      @logger.error "MailchimpFetcher Error: #{e.to_s}"
+      report.meta       = :unexpected_error
+      report
     end
 
     private
