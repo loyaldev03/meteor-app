@@ -165,6 +165,10 @@
   var getFulfillmentCodesUrl = "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
   var placeholderText = "Choose one...";
   var placeholderTextFulfillmentCodes = "New automatic code";
+  
+  <% unless @campaign.new_record? %>
+  var can_edit_transport_id = <%= @can_edit_transport_id %>;
+  <% end %>
 
   $(document).ready( campaignFormFunctions() );
 </script>

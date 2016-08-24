@@ -851,7 +851,10 @@ function campaigns_functions(){
 function campaignFormFunctions(){
   if ($('#edit_campaign').length) { 
     $(".datepicker").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd" });
-    disableFields(); 
+    disableFields();
+    if(can_edit_transport_id) {
+      $('#campaign_transport_campaign_id').prop('disabled', false);
+    } 
   }
   else {
     $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
