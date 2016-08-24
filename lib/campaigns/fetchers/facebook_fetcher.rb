@@ -79,6 +79,7 @@ class CampaignDataFetcher
           Hashie::Mash.new('meta' => :unauthorized)
         else
           response = connection.get(url)
+          @logger.error "SUCCESS CALL"
           response.status == 200 ? response.body.data.first : proceed_with_error_logic(response)
         end
       end

@@ -668,5 +668,5 @@ en:
       subject: "[%{club_name}] Authentication error while trying to get campaign information"
     invalid_campaign_email:
       subject: "[%{club_name}] Invalid campaign configuration"
-    invalid_campaign_fetcher_result:
-      subject: "[%{campaign_name}] Source ID update result"
+    campaign_all_days_fetcher_result:
+      subject: "[%{campaign_name}] Campaign days data fetch."

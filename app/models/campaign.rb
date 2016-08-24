@@ -7,7 +7,8 @@ class Campaign < ActiveRecord::Base
   before_validation :set_campaign_medium
   before_save :set_campaign_medium_version
   before_save :set_fulfillment_code
-  
+  after_update :fetch_campaign_days_data
+
   validates :name, :enrollment_price, :initial_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
@@ -87,5 +88,11 @@ class Campaign < ActiveRecord::Base
 
     def set_campaign_medium_version
       self.campaign_medium_version = (mailchimp? ? 'email' : 'banner') + '_' + campaign_medium_version
+    end
+
+    def fetch_campaign_days_data
+      if transport_campaign_id_changed?
+        Campaigns::DataFetcherJob.perform_later(club_id: club_id, transport: transport, campaign_id: self.id)
+      end
     end
 end

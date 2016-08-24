@@ -1,6 +1,6 @@
 <% content_for :header do %>
   <tr>
-    <% if @success %>
+    <% if @days_with_error.empty? %>
       <td class="alert alert-good">
         Successfully fetched data for current campaign days.
       </td>    
@@ -10,4 +10,25 @@
       </td>
     <% end %>
   </tr>
+<% end %>
+
+ <% content_for :body do %>
+  <% if @days_with_error.any? %>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <% @days_with_error.group_by{|x| x.meta }.each do |error, campaign_days| %>
+        <tr>
+          <td class="alert item"> 
+            <% case error %>
+              <% when 'invalid_campaign' %>
+                There has been an error related to the Source ID configured within the campaign while fetching data. Please re-check if that value is correctly set.
+              <% when 'unauthorized' %>
+                There has been an authentication error while fetching data. Please re-check TransportSetting credentials.
+              <% when 'unexpected_error' %>
+                There has been an unexpected error while fetching data. Please try again and in case it keeps showing up, contact support team.
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  <% end %>
 <% end %>

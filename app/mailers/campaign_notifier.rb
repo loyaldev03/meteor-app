@@ -21,9 +21,9 @@ class CampaignNotifier < ActionMailer::Base
   end
 
   def campaign_all_days_fetcher_result(campaign_id:)
-    @campaign = Campaign.find(campaign_id)
-    @success  = @campaign.campaign_days.where.not(meta: CampaignDay.meta[:no_error]).empty?
-    mail to: Settings.campaign_manager_recipients, subject: I18n.t('mailers.invalid_campaign_fetcher_result.subject', campaign_name: @campaign.name)
+    @campaign         = Campaign.find(campaign_id)
+    @days_with_error  = @campaign.campaign_days.where.not(meta: CampaignDay.meta[:no_error])
+    mail to: Settings.campaign_manager_recipients, subject: I18n.t('mailers.campaign_all_days_fetcher_result.subject', campaign_name: @campaign.name)
   end
 
 end
