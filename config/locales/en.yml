@@ -669,4 +669,4 @@ en:
     invalid_campaign_email:
       subject: "[%{club_name}] Invalid campaign configuration"
     campaign_all_days_fetcher_result:
-      subject: "[%{campaign_name}] Campaign days data fetch."
+      subject: "[%{campaign_name}] Campaign days data fetch result"
