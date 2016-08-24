@@ -63,6 +63,10 @@ class Campaign < ActiveRecord::Base
     self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join
   end
 
+  def can_edit_transport_id?
+    campaign_days.invalid_campaign.first.present?
+  end
+
   private
     def past_period(date = Date.current)
       if mailchimp?

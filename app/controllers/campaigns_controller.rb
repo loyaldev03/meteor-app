@@ -38,7 +38,6 @@ class CampaignsController < ApplicationController
 
   def edit
     my_authorize! :edit, Campaign, @campaign.club.id
-    @can_edit_transport_id = can_edit_transport_id?
   end
 
   def update
@@ -57,7 +56,7 @@ class CampaignsController < ApplicationController
     end
 
     def campaign_params_on_update
-      if can_edit_transport_id?
+      if @campaign.can_edit_transport_id?
         params.require(:campaign).permit(:name, :initial_date, :finish_date, :transport_campaign_id)
       else
         params.require(:campaign).permit(:name, :initial_date, :finish_date)
@@ -66,9 +65,5 @@ class CampaignsController < ApplicationController
 
     def set_campaign
       @campaign = Campaign.find(params[:id])
-    end
-
-    def can_edit_transport_id?
-      @campaign.campaign_days.invalid_campaign.first.present?
     end
 end

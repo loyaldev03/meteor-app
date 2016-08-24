@@ -167,7 +167,7 @@
   var placeholderTextFulfillmentCodes = "New automatic code";
   
   <% unless @campaign.new_record? %>
-  var can_edit_transport_id = <%= @can_edit_transport_id %>;
+  var can_edit_transport_id = <%= @campaign.can_edit_transport_id? %>;
   <% end %>
 
   $(document).ready( campaignFormFunctions() );
