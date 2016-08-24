@@ -1,12 +1,14 @@
 FactoryGirl.define do
 
-  factory :transport_settings_facebook do
+  factory :transport_settings_facebook, class: TransportSetting do
     transport { TransportSetting.transports['facebook'] } 
-    settings '{"client_id":"994106","client_secret":"f54adccaae4e24","access_token":"hYNzoPqguM6qHWuQp5hM6ZChVSZAoZCcgixXbIQZDZD"}'    
+    client_id { Faker::Number.decimal(6) }
+    client_secret {Faker::Lorem.characters(20)}  
+    access_token {Faker::Lorem.characters(60)} 
   end
 
-  factory :transport_settings_mailchimp do    
-    transport { TransportSetting.transports['mailchimp'] }     
-    settings '{"api_key":"a76496027e5e-us8"}'        
+  factory :transport_settings_mailchimp, class: TransportSetting do    
+    transport { TransportSetting.transports['mailchimp'] } 
+    api_key {Faker::Lorem.characters(40)}      
   end
 end
