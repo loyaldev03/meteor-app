@@ -69,6 +69,6 @@ class CampaignsController < ApplicationController
     end
 
     def can_edit_transport_id?
-      @campaign.campaign_days.missing.first.present?
+      @campaign.campaign_days.invalid_campaign.first.present?
     end
 end
