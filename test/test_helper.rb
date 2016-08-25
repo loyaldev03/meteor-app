@@ -183,7 +183,7 @@ class ActionController::TestCase
 end
 
 def perform_call_as(agent)
-  sign_in agent
+  #sign_in agent
   yield
   sign_out agent
 end
