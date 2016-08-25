@@ -40,12 +40,11 @@ class TransportSettingTest < ActiveSupport::TestCase
     assert !@tsmailchimp.save, "Transport settings was saved without api_key"
   end
 
-  # test 'Should not create more than 1 transport settings for the same transport' do
-  #   @club = FactoryGirl.create(:simple_club_with_gateway)
-  #   @transportsetting1 = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)
-  #   @transportsetting2 = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)
-  #   byebug
-  #   assert !@transportsetting2.save
-  #   assert @transportsetting2.errors.messages[:settings].include? "XXXXXXX"    
-  # end
+  test 'Should not create more than 1 transport for the same club' do
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @transportsetting1 = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)
+    @transportsetting2 = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)
+    assert !@transportsetting2.save        
+    assert @transportsetting2.errors.messages[:transport].include? "has already been taken"   
+  end
 end
