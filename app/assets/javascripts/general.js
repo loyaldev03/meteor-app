@@ -860,6 +860,7 @@ function campaignFormFunctions(){
       'transport',
       'marketing_code',
       'campaign_medium_version',
+      'transport_campaign_id',
       'fulfillment_code'
     ];
     $.each(fieldsToDisable, function(index, field) {

@@ -56,7 +56,7 @@ class CampaignsController < ApplicationController
     end
 
     def campaign_params_on_update
-      params.require(:campaign).permit(:name, :initial_date, :finish_date, :transport_campaign_id)
+      params.require(:campaign).permit(:name, :initial_date, :finish_date)
     end
 
     def set_campaign
