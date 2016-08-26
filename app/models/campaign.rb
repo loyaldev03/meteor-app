@@ -7,7 +7,7 @@ class Campaign < ActiveRecord::Base
   before_validation :set_campaign_medium
   before_save :set_campaign_medium_version
   
-  validates :name, :enrollment_price, :initial_date, :campaign_type, :transport, 
+  validates :name, :landing_name, :enrollment_price, :initial_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
 
