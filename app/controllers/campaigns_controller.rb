@@ -52,7 +52,7 @@ class CampaignsController < ApplicationController
 
   private
     def campaign_params
-      params.require(:campaign).permit(:name, :enrollment_price, :transport, :marketing_code, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :campaign_medium_version, :transport_campaign_id, :fulfillment_code)
+      params.require(:campaign).permit(:name, :landing_name, :enrollment_price, :transport, :marketing_code, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :campaign_medium_version, :transport_campaign_id, :fulfillment_code)
     end
 
     def campaign_params_on_update

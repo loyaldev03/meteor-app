@@ -897,6 +897,7 @@ function campaignFormFunctions(){
   
   function disableFields() {
     var fieldsToDisable = [
+      'landing_name',
       'terms_of_membership_id', 
       'enrollment_price', 
       'campaign_type',

@@ -67,6 +67,20 @@ class Campaign < ActiveRecord::Base
     campaign_days.invalid_campaign.first.present?
   end
 
+  def landing_url
+    return @landing_url if @landing_url
+    url = club.member_landing_url + '/' + landing_name
+    parameters = [
+      "utm_campaign=#{campaign_type}",
+      "utm_source=#{transport}",
+      "utm_medium=#{campaign_medium}",
+      "utm_content=#{campaign_medium_version}",
+      "audience=#{marketing_code}",
+      "campaign_id=#{fulfillment_code}"
+      ]
+    @landing_url = url + '?' + parameters.join('&')
+  end
+
   private
     def past_period(date = Date.current)
       if mailchimp?

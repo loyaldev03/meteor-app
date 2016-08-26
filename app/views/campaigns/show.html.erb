@@ -26,7 +26,9 @@
       </tr>
       <tr>
         <td><b>Fulfillment Code:</b> <%= @campaign.fulfillment_code %></td>
-        <td colspan="3">&nbsp;</td>
+        <td><b>Landing name:</b> <%= @campaign.landing_name %></td>
+        <td colspan='2'><b>Landing url:</b> <%= text_field_tag('landing_url', @campaign.landing_url, class: 'text_field input-xxlarge', readonly: true) %> </td>
+
       </tr>
     </tbody>
   </table>
