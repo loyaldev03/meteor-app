@@ -171,7 +171,7 @@ function campaign_days_functions(column_count){
     "bProcessing": true,
     "bServerSide": true,
     "bLengthChange": false,
-    "iDisplayLength": 15,
+    "iDisplayLength": 25,
     "bResetDisplay": false,
     "aaSorting": [[ 1, "asc" ]],
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 3,4,5,6 ] }],
