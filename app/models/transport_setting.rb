@@ -8,6 +8,7 @@ class TransportSetting < ActiveRecord::Base
 
   validates_presence_of :club
   validates_presence_of :transport
+  validates_uniqueness_of :transport, scope: :club
   validates :client_id, :client_secret, :access_token, presence: true, if: -> { facebook? }
   validates :api_key, presence: true, if: -> { mailchimp? }
 
