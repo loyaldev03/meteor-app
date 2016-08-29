@@ -25,6 +25,7 @@ FactoryGirl.define do
 
   factory :simple_club_with_gateway, class: Club do
     sequence(:name) {|n| "simple_club_with_gateway_#{Faker::Lorem.characters(10)}" }
+    member_landing_url "products.onmc.com"
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true
@@ -37,7 +38,7 @@ FactoryGirl.define do
   end  
 
   factory :simple_club_with_litle_gateway, class: Club do
-    sequence(:name) {|n| "simple_club_with_litle_gateway_#{Faker::Lorem.characters(10)}" }
+    sequence(:name) {|n| "simple_club_with_litle_gateway_#{Faker::Lorem.characters(10)}" }   
     description "My description"
     cs_phone_number "123 456 7891"
     billing_enable true

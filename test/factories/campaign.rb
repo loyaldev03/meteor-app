@@ -2,7 +2,7 @@ FactoryGirl.define do
 
   factory :campaign do
     sequence(:name) {|n| "Campaign_#{Faker::Commerce.product_name}" }
-    landing_name {Faker::Lorem.characters(10)}
+    landing_name "flag"
     initial_date Time.zone.now
     finish_date Time.zone.now + 7.days    
     enrollment_price { Faker::Number.decimal(2) }
