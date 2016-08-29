@@ -69,7 +69,7 @@ class Campaign < ActiveRecord::Base
 
   def landing_url
     return @landing_url if @landing_url
-    url = club.member_landing_url + '/' + landing_name
+    url = club.member_landing_url.to_s + '/' + landing_name.to_s
     parameters = [
       "utm_campaign=#{campaign_type}",
       "utm_source=#{transport}",
