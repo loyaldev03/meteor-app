@@ -15,7 +15,7 @@ class CampaignNotifier < ActionMailer::Base
     mail to: Settings.campaign_manager_recipients, subject: I18n.t('mailers.invalid_credentials_email.subject', club_name: @club.name)
   end
 
-  def invalid_campaign(campaign_ids:)
+  def invalid_campaign(club_id:, campaign_ids:)
     @club = Club.find club_id
     @campaigns = Campaign.where(id: campaign_ids)
     mail to: Settings.campaign_manager_recipients, subject: I18n.t('mailers.invalid_campaign_email.subject', club_name: @club.name)
