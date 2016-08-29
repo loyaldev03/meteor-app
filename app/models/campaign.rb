@@ -6,7 +6,6 @@ class Campaign < ActiveRecord::Base
 
   before_validation :set_campaign_medium
   before_save :set_campaign_medium_version
-  before_save :set_fulfillment_code
   after_update :fetch_campaign_days_data
 
   validates :name, :landing_name, :enrollment_price, :initial_date, :campaign_type, :transport, 
