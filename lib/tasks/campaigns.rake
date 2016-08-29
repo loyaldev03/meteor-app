@@ -18,7 +18,7 @@ namespace :campaigns do
       Campaigns::NotifyMissingCampaignDaysJob.perform_later((date -1.day).to_s)
       Campaigns::NotifyCampaignDaysWithErrorJob.perform_later
       # creates missing campaign days for yesterday for those campaigns that are not automatically updated.
-      Campaign::TRANSPORTS_FOR_MANUAL_UPDATE].each do |transport|
+      Campaign::TRANSPORTS_FOR_MANUAL_UPDATE.each do |transport|
         Campaign.by_transport(transport).where(club_id: club_ids).map{|c| c.missing_days(date: date)}
       end
     rescue Exception => e
