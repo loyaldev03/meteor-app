@@ -6,33 +6,53 @@
   </div>
 </div>
 
-<div>
-  <table class="table table-bordered">
-    <tbody>
-      <tr>
-        <td><b>Campaign Type:</b> <%= @campaign.campaign_type %></td>
-        <td><b>Subscription Plan:</b> <%= @campaign.terms_of_membership.name %></td>
-        <td><b>Enrollment Price:</b> <%= number_to_currency(@campaign.enrollment_price) %></td>
-        <td><b>Running from:</b> <%= @campaign.initial_date %>
-        <% if @campaign.finish_date.present? %>
-          <b>to</b> <%= @campaign.finish_date %></td>
-        <% end %>
-      </tr>
-      <tr>
-        <td><b>Source:</b> <%= @campaign.transport %></td>
-        <td><b>Campaign Medium:</b> <%= @campaign.campaign_medium %></td>
-        <td><b>Campaign Medium Version:</b> <%= @campaign.campaign_medium_version %></td>
-        <td><b>Marketing Code:</b> <%= @campaign.marketing_code %></td>
-      </tr>
-      <tr>
-        <td><b>Fulfillment Code:</b> <%= @campaign.fulfillment_code %></td>
-        <td><b>Landing name:</b> <%= @campaign.landing_name %></td>
-        <td colspan='2'><b>Landing url:</b> <%= text_field_tag('landing_url', @campaign.landing_url, class: 'text_field input-xxlarge', readonly: true) %> </td>
-
-      </tr>
-    </tbody>
-  </table>
-</div>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.type') %>:</strong>
+  <%= @campaign.campaign_type %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.model.terms_of_membership') %>:</strong>
+  <%= @campaign.terms_of_membership.name %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.enrollment_price') %>:</strong>
+  <%= number_to_currency(@campaign.enrollment_price) %>
+</p>
+<p>
+  <strong>Running from:</strong>
+  <%= @campaign.initial_date %>
+  <% if @campaign.finish_date.present? %>
+    <b>to</b> <%= @campaign.finish_date %></td>
+  <% end %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.transport') %>:</strong>
+  <%= @campaign.transport %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.campaign_medium') %>:</strong>
+  <%= @campaign.campaign_medium %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.campaign_medium_version') %>:</strong>
+  <%= @campaign.campaign_medium_version %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.marketing_code') %>:</strong>
+  <%= @campaign.marketing_code %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.fulfillment_code') %>:</strong>
+  <%= @campaign.fulfillment_code %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.landing_name') %>:</strong>
+  <%= @campaign.landing_name %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.landing_url') %>:</strong>
+  <%= text_field_tag('landing_url', @campaign.landing_url, class: 'text_field input-xxlarge', readonly: true) %>
+</p>
 
 <div class='row-fluid'>
   <div class='span12'>
