@@ -85,9 +85,10 @@ class CampaignsControllerTest < ActionController::TestCase
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
       campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+
       assert_difference('Campaign.count',1) do
         post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-          name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
+          name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
            enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
            transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
            campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
@@ -107,7 +108,7 @@ class CampaignsControllerTest < ActionController::TestCase
       perform_call_as(@agent) do 
         campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-            name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
+            name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
             enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
             transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
             campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
@@ -250,7 +251,7 @@ class CampaignsControllerTest < ActionController::TestCase
     campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
     assert_difference('Campaign.count',1) do
       post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-        name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
+        name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
          enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
          transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
          campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
@@ -267,7 +268,7 @@ class CampaignsControllerTest < ActionController::TestCase
       perform_call_as(@agent) do
         campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-            name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
+            name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
             enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
             transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
             campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
