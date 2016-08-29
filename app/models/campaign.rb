@@ -9,7 +9,7 @@ class Campaign < ActiveRecord::Base
   before_save :set_fulfillment_code
   after_update :fetch_campaign_days_data
 
-  validates :name, :enrollment_price, :initial_date, :campaign_type, :transport, 
+  validates :name, :landing_name, :enrollment_price, :initial_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
 
@@ -61,12 +61,29 @@ class Campaign < ActiveRecord::Base
     end
   end
 
+  def set_fulfillment_code
+    self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join
+  end
+
+  def can_edit_transport_id?
+    campaign_days.invalid_campaign.first.present?
+  end
+
+  def landing_url
+    return @landing_url if @landing_url
+    url = club.member_landing_url + '/' + landing_name
+    parameters = [
+      "utm_campaign=#{campaign_type}",
+      "utm_source=#{transport}",
+      "utm_medium=#{campaign_medium}",
+      "utm_content=#{campaign_medium_version}",
+      "audience=#{marketing_code}",
+      "campaign_id=#{fulfillment_code}"
+      ]
+    @landing_url = url + '?' + parameters.join('&')
+  end
+
   private
-
-    def set_fulfillment_code
-      self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join if self.fulfillment_code == 'New automatic code'
-    end
-
     def past_period(date = Date.current)
       if mailchimp?
         [ initial_date ]
@@ -87,7 +104,9 @@ class Campaign < ActiveRecord::Base
     end
 
     def set_campaign_medium_version
-      self.campaign_medium_version = (mailchimp? ? 'email' : 'banner') + '_' + campaign_medium_version
+      unless (self.campaign_medium_version.start_with?('email_') || self.campaign_medium_version.start_with?('banner_'))
+        self.campaign_medium_version = (mailchimp? ? 'email' : 'banner') + '_' + campaign_medium_version
+      end
     end
 
     def fetch_campaign_days_data

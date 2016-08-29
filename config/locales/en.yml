@@ -211,6 +211,7 @@ en:
       campaign: 'Campaign'
       campaigns: 'Campaigns'
       campaign_days: 'Campaign Days'
+      transport_setting: 'Transport Setting'
       transport_settings: 'Transport Settings'
     gateway:
       mes: 'Merchant e Solutions'
@@ -642,6 +643,13 @@ en:
         start_date: 'Start Date'
         finish_date: 'Finish Date'
         transport_campaign_id: 'Source ID'
+        enrollment_price: 'Enrollment Price'
+        campaign_medium: 'Campaign Medium'
+        campaign_medium_version: 'Campaign Medium Version'
+        marketing_code: 'Marketing Code'
+        fulfillment_code: 'Fulfillment Code'
+        landing_name: 'Landing Name'
+        landing_url: 'Landing Url'
       campaign_day:
         date: 'Date'
         spent: 'Spent'

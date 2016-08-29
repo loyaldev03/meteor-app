@@ -9,8 +9,6 @@
     </div>
   </div>
 </div>
-<% else %>
-  <%= f.hidden_field :transport, value: @transport.transport %>
 <% end %>
 
 <div id="transport_settings_values">
@@ -67,5 +65,6 @@
 </div>
 
 <script>
+  var transport = "<%= @transport.transport %>";
   $(document).ready( transportSettingsFormFunctions() );
 </script>

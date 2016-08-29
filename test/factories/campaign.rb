@@ -6,7 +6,7 @@ FactoryGirl.define do
     finish_date Time.zone.now + 7.days    
     enrollment_price { Faker::Number.decimal(2) }
     campaign_type 0
-    transport 0
+    transport { Campaign.transports['facebook'] }    
     transport_campaign_id  {Faker::Lorem.characters(20)}   
     campaign_medium "display"
     campaign_medium_version "banner"
@@ -14,8 +14,7 @@ FactoryGirl.define do
     fulfillment_code { Faker::Lorem.characters(20) }
 
     factory :campaign_twitter do
-        transport 2
+      transport { Campaign.transports['twitter'] }
     end
-
   end  
 end

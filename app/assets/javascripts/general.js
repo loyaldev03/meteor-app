@@ -849,11 +849,55 @@ function campaigns_functions(){
 
 
 function campaignFormFunctions(){
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
-
-  if ($('#edit_campaign').length) { disableFields(); }
+  if ($('#edit_campaign').length) { 
+    $(".datepicker").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd" });
+    disableFields();
+    if(can_edit_transport_id) {
+      $('#campaign_transport_campaign_id').prop('disabled', false);
+    } 
+  }
+  else {
+    $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
+    $("#campaign_terms_of_membership_id").select2({
+      ajax: {
+        url: getSubscriptionPlansUrl,
+        dataType: 'json',
+        type: "GET",
+        delay: 250,
+        quietMillis: 50,
+        data: function(params) { return { club_id: clubId, query: params.term, }; },
+        processResults: function(data) { return { results: data }; }
+      },
+      minimumInputLength: 2,
+      placeholder: placeholderText,
+      theme: "bootstrap"
+    });
+    $("#campaign_fulfillment_code").select2({
+      ajax: {
+        url: getFulfillmentCodesUrl,
+        dataType: 'json',
+        type: "GET",
+        delay: 250,
+        quietMillis: 50,
+        data: function(params) { return { club_id: clubId, query: params.term, }; },
+        processResults: function(data) { return { results: data }; }
+      },
+      minimumInputLength: 2,
+      placeholder: placeholderTextFulfillmentCodes,
+      allowClear: true,
+      theme: "bootstrap"
+    });
+    $("#campaign_campaign_type").select2({
+      theme: "bootstrap"
+    });
+    $("#campaign_transport").select2({
+      theme: "bootstrap"
+    });
+  }
+  
   function disableFields() {
     var fieldsToDisable = [
+      'landing_name',
       'terms_of_membership_id', 
       'enrollment_price', 
       'campaign_type',
@@ -887,13 +931,6 @@ function campaignFormFunctions(){
     }
     $('#campaign_campaign_medium').val(medium);
   }
-
-  $("#campaign_terms_of_membership_id").select2({ theme: "bootstrap" });
-  $("#campaign_campaign_type").select2({ theme: "bootstrap" });
-  $("#campaign_transport").select2({ theme: "bootstrap" });
-  $("#campaign_fulfillment_code").select2({ theme: "bootstrap" });
-
-  setCampaignMedium($('#campaign_transport').val());
 }
 
 
@@ -906,6 +943,8 @@ function transportSettingsIndexFunctions() {
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
+    "bFilter": false,
+    "bInfo": false,
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
     "sAjaxSource": $('#transport_settings_table').data('source')
   }); 
@@ -913,9 +952,11 @@ function transportSettingsIndexFunctions() {
 
 
 function transportSettingsFormFunctions() {
-  if ($('#new_transport_setting').length) {
-    $("#transport_setting_transport").select2({ theme: "bootstrap" }); // To avoid adding the class to the hidden field om edit
-  }
+  $("#transport_setting_transport").change(function() {
+    var transport = $("#transport_setting_transport").val();
+    assignRequiredTagToFields(transport);
+    showSettingsPane(transport);
+  });
 
   function showSettingsPane(transport) {
     if(!transport) transport = $("#transport_setting_transport").val();
@@ -925,10 +966,10 @@ function transportSettingsFormFunctions() {
 
   function assignRequiredTagToFields(transport) {
     var fields = [
-      'fb_client_id', 
-      'fb_client_secret', 
-      'fb_access_token',
-      'mc_api_key'
+      'client_id', 
+      'client_secret', 
+      'access_token',
+      'api_key'
     ];
     $.each(fields, function(index, field) {
       $('#transport_setting_' + field).prop('required', false);
@@ -936,24 +977,22 @@ function transportSettingsFormFunctions() {
     
     switch(transport) {
       case 'facebook':
-        $('#transport_setting_fb_client_id').prop('required', true);
-        $('#transport_setting_fb_client_secret').prop('required', true);
-        $('#transport_setting_fb_access_token').prop('required', true);
+        $('#transport_setting_client_id').prop('required', true);
+        $('#transport_setting_client_secret').prop('required', true);
+        $('#transport_setting_access_token').prop('required', true);
         break;
       case 'mailchimp':
-        $('#transport_setting_mc_api_key').prop('required', true);
+        $('#transport_setting_api_key').prop('required', true);
         break;
     }
   }
 
-  showSettingsPane($("#transport_setting_transport").val());
-  assignRequiredTagToFields($("#transport_setting_transport").val());
+  if(!transport && $("#transport_setting_transport").length > 0) {
+    transport = $("#transport_setting_transport").val();
+  }
 
-  $("#transport_setting_transport").change(function() {
-    var transport = $("#transport_setting_transport").val();
-    assignRequiredTagToFields(transport);
-    showSettingsPane(transport);
-  });
+  showSettingsPane(transport);
+  assignRequiredTagToFields(transport);
 }
 
 

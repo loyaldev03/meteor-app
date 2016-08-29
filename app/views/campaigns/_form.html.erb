@@ -1,94 +1,160 @@
 <div class='row-fluid'>
-  <div class='span6'>
+  <div class='span12'>
     <div class="control-group">
-      <%= f.label :name, :class => 'control-label' %>
+      <%= f.label :name, :class => 'control-label required_asterisk' %>
       <div class="controls">
-        <%= f.text_field :name, :class => 'text_field', required: true %>
+        <%= f.text_field :name, :class => 'text_field input-xxlarge', required: true %>
       </div>
     </div>
-
+  </div>
+</div>
+<div class='row-fluid'>
+  <div class='span12'>
     <div class="control-group">
-      <%= f.label :subscription_plan, :class => 'control-label' %>
+      <%= f.label :landing_name, :class => 'control-label required_asterisk' %>
       <div class="controls">
-        <%= f.select :terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name", nil), { prompt: 'Choose one...' }, { class: 'form-control', required: true }%> 
+        <%= f.text_field :landing_name, :class => 'text_field input-xxlarge', required: true %>
       </div>
     </div>
-
+  </div>
+</div>
+<div class='row-fluid'>
+  <div class='span12'>
     <div class="control-group">
-      <%= f.label :enrollment_price, :class => 'control-label' %>
+      <%= f.label :subscription_plan, :class => 'control-label required_asterisk' %>
       <div class="controls">
-        <%= f.number_field :enrollment_price, required: true, within: 0...1000, step: 0.01 %>
+        <% if @campaign.new_record? %>
+          <%= f.select :terms_of_membership_id, [], { class: 'form-control' }, required: true %>
+        <% else %>
+          <%= text_field_tag :terms_of_membership, @campaign.terms_of_membership.name, readonly: true %>
+        <% end %>
       </div>
     </div>
+  </div>
+</div>
 
+<div class='row-fluid'>
+  <div class='span12'>
     <div class="control-group">
-      <%= f.label :initial_date, :class => 'control-label' %>
+      <%= f.label :enrollment_price, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <div class=" input-prepend">
+          <span class="add-on">$</span>
+          <%= f.number_field :enrollment_price, required: true, within: 0...1000, step: 0.01, class: 'input-small' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class='row-fluid'>
+  <div class='span4'>
+    <div class="control-group">
+      <%= f.label :initial_date, :class => 'control-label required_asterisk' %>
       <div class="controls">
         <%= f.text_field :initial_date, :class => 'datepicker input-small readonly', required: true %>
       </div>
     </div>
+  </div>
 
+  <div class='span4'>
     <div class="control-group">
       <%= f.label :finish_date, :class => 'control-label' %>
       <div class="controls">
         <%= f.text_field :finish_date, :class => 'datepicker input-small readonly' %>
       </div>
     </div>
-
-    <div class="control-group">
-      <%= f.label :campaign_type, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.select :campaign_type, options_for_select(Campaign.campaign_types_i18n.invert, @campaign.campaign_type), { class: 'form-control' } %> 
-      </div>
-    </div>
   </div>
+</div>
 
-  <div class='span6'>
+<div class='row-fluid'>
+  <div class='span12'>
     <div class="control-group">
-      <%= f.label :source, :class => 'control-label' %>
+      <%= f.label :campaign_type, :class => 'control-label required_asterisk' %>
       <div class="controls">
-        <%= f.select :transport, options_for_select(Campaign.transports_i18n.invert, @campaign.transport), { class: 'form-control' } %> 
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :transport_campaign_id, 'Source ID', :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :transport_campaign_id, :class => 'text_field', required: true %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :campaign_medium, 'Campaign medium', :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :campaign_medium, :class => 'text_field', disabled: true %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :campaign_medium_version, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :campaign_medium_version, required: true %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :marketing_code, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :marketing_code, required: true %>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <%= f.label :fulfillment_code, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.select :fulfillment_code, options_for_select(@fulfillment_codes, @campaign.fulfillment_code), { class: 'form-control' } %> 
+        <% if @campaign.new_record? %>
+          <%= f.select :campaign_type, options_for_select(Campaign.campaign_types_i18n.invert, @campaign.campaign_type), { class: 'form-control', prompt: 'Choose one...' }, required: true %>
+        <% else %>
+          <%= text_field_tag :campaign_type, @campaign.campaign_type, readonly: true %>
+        <% end %>
       </div>
     </div>
   </div>
 </div>
 
-<% if action_name == 'edit' %>
+<div class='row-fluid'>
+  <div class='span4'>
+    <div class="control-group">
+      <%= f.label :source, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <% if @campaign.new_record? %>
+          <%= f.select :transport, options_for_select(Campaign.transports_i18n.invert, @campaign.transport), { class: 'form-control', prompt: 'Choose one...' }, required: true %>
+        <% else %>
+          <%= text_field_tag :transport, @campaign.transport, readonly: true %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class='span4'>
+    <div class="control-group">
+      <%= f.label :campaign_medium, 'Campaign medium', :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :campaign_medium, :class => 'text_field  input-small', readonly: true %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <div class="control-group">
+      <%= f.label :transport_campaign_id, 'Source ID', :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <%= f.text_field :transport_campaign_id, :class => 'text_field', required: true %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <div class="control-group">
+      <%= f.label :campaign_medium_version, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <%= f.text_field :campaign_medium_version, required: true %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <div class="control-group">
+      <%= f.label :marketing_code, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <%= f.text_field :marketing_code, required: true %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <div class="control-group">
+      <%= f.label :fulfillment_code, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <% if @campaign.new_record? %>
+          <%= f.select :fulfillment_code, [], { class: 'form-control' } %>
+        <% else %>
+          <%= f.text_field :fulfillment_code, readonly: true %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% unless @campaign.new_record? %>
 <div class='row-fluid'>
   <div class='span12'>
     <p class="muted"><i class="icon-info-sign"></i> There are some fields that can not be updated.</p>
@@ -104,5 +170,15 @@
 </div>
 
 <script>
+  var clubId = "<%= current_club.id %>";
+  var getSubscriptionPlansUrl = "<%= get_subscription_plans_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var getFulfillmentCodesUrl = "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var placeholderText = "Choose one...";
+  var placeholderTextFulfillmentCodes = "New automatic code";
+  
+  <% unless @campaign.new_record? %>
+  var can_edit_transport_id = <%= @campaign.can_edit_transport_id? %>;
+  <% end %>
+
   $(document).ready( campaignFormFunctions() );
 </script>
