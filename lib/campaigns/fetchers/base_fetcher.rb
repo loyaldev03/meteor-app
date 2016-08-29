@@ -33,9 +33,9 @@ class CampaignDataFetcher
           date:        report.date
         )
       end
-      campaign_day.spent      = report.spent
-      campaign_day.reached    = report.reached
-      campaign_day.converted  = report.converted
+      campaign_day.spent      = report.spent if report.spent
+      campaign_day.reached    = report.reached if report.reached
+      campaign_day.converted  = report.converted if report.converted
       campaign_day.meta       = report.meta
       campaign_day.save!
     end

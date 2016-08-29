@@ -2,7 +2,7 @@ class CampaignDataFetcher
   class FacebookFetcher < BaseFetcher
     # API: https://developers.facebook.com/docs/marketing-api/insights/fields/v2.7
     # reached = impressions
-    # converted = website_clicks. Unfortunately the only way to get that data is through the actions field.
+    # converted = website_clicks. Unfortunately the only way to get that data is through the actions field as link_clicks.
     # spent = spend
 
     def fetch!(report)
@@ -12,8 +12,8 @@ class CampaignDataFetcher
         report_data           = data!
         if report_data
           if report_data[:impressions] and report_data[:actions] and report_data[:spend]
-            @report.reached   = report_data.impressions
-            @report.converted = report_data.actions.select{|x| x.action_type == 'link_click'}.first.value # we want to retrieve the website_clicks
+            @report.reached   = report_data.impressions.to_i
+            @report.converted = report_data.actions.select{|x| x.action_type == 'link_click'}.first.value.to_i # we want to retrieve the website_clicks
             @report.spent     = report_data.spend.to_f
           end
           @report.meta        = report_data["meta"] || :no_error
@@ -79,7 +79,6 @@ class CampaignDataFetcher
           Hashie::Mash.new('meta' => :unauthorized)
         else
           response = connection.get(url)
-          @logger.error "SUCCESS CALL"
           response.status == 200 ? response.body.data.first : proceed_with_error_logic(response)
         end
       end

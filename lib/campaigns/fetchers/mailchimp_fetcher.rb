@@ -11,8 +11,8 @@ class CampaignDataFetcher
       report            = report.dup
       report.date       = :summary
       data              = client.reports(report.campaign_foreign_id).retrieve
-      report.reached    = data['emails_sent']
-      report.converted  = data['clicks']['unique_subscriber_clicks']
+      report.reached    = data['emails_sent'].to_i
+      report.converted  = data['clicks']['unique_subscriber_clicks'].to_i
       report.meta       = :no_error
       report
     rescue Gibbon::GibbonError
