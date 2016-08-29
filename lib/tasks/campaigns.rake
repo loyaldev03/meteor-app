@@ -13,7 +13,7 @@ namespace :campaigns do
         end
       end
       # re-try those campaign days with unexpected error
-      UnexpectedErrorDaysDataFetcherJob.perform_later
+      Campaigns::UnexpectedErrorDaysDataFetcherJob.perform_later
       # send communications
       Campaigns::NotifyMissingCampaignDaysJob.perform_later((date -1.day).to_s)
       Campaigns::NotifyCampaignDaysWithErrorJob.perform_later
