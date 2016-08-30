@@ -196,7 +196,6 @@ class UsersController < ApplicationController
         end
       end
       flash[:notice] = "User is no longer set as testing account." unless @current_user.testing_account
-      create_operation_on_testing_account_toggle
     else
       flash[:error] = "User could not be updated"
     end
@@ -499,17 +498,6 @@ class UsersController < ApplicationController
       quote_count = value.count '"'
       value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1 
       field == :id ? "#{value}".gsub(/[^\d]/,"") : "*#{value}*".gsub(" ","* *")
-    end
-
-    def create_operation_on_testing_account_toggle
-      if @current_user.testing_account
-        operation_type = Settings.operation_types.testing_account_marked
-        message = t('activerecord.attributes.user.testing_account_marked')
-      else
-        operation_type = Settings.operation_types.testing_account_unmarked
-        message = t('activerecord.attributes.user.testing_account_unmarked')
-      end
-      Auditory.audit(current_agent, @current_user, message, @current_user, operation_type)
     end
 end
 
