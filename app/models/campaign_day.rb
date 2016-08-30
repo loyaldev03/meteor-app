@@ -12,7 +12,7 @@ class CampaignDay < ActiveRecord::Base
   }
 
   def is_missing?
-    spent.nil? and reached.nil? and converted.nil?
+    spent.nil? or reached.nil? or converted.nil?
   end
 
   def self.datatable_columns
