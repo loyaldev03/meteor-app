@@ -119,3 +119,4 @@ gem 'encryptor'
 ###################
 
 gem 'bureaucrat'
+gem 'request_store'
