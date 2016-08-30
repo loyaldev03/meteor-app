@@ -188,6 +188,7 @@ class UsersController < ApplicationController
   end
 
   def toggle_testing_account
+    RequestStore.store[:current_agent] = current_agent
     @current_user.toggle :testing_account
     if @current_user.save
       if current_user.testing_account
