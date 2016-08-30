@@ -1616,7 +1616,7 @@ class User < ActiveRecord::Base
           operation_type = Settings.operation_types.testing_account_unmarked
           message = I18n.t('activerecord.attributes.user.testing_account_unmarked')
         end
-        current_agent = RequestStore.store[:current_agent] ||= Agent.find(1)
+        current_agent = RequestStore.store[:current_agent]
         Auditory.audit(current_agent, self, message, self, operation_type)
       end
     end
