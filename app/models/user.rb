@@ -827,6 +827,7 @@ class User < ActiveRecord::Base
       message = "Membership prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{tom.id}) -#{tom.name}-. Final amount #{trans.transaction_type=='sale' ? 'billed' : 'refunded'} $#{trans.amount}."
     else
       days_already_in_provisional = (Time.zone.now.to_date - join_date.to_date ).to_i
+      club_cash_to_deduct = 0.0
       if days_already_in_provisional >= tom.provisional_days
         trans, answer = proceed_to_bill_prorated_amount(agent, tom, 0.0, credit_card, nil, operation_type) 
         message = "Membership reached end of provisional period after Subscription Plan change to TOM(#{tom.id}) -#{tom.name}-. Billing $#{trans.amount} according to new installment amount."
