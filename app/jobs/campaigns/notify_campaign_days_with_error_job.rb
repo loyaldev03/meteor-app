@@ -17,7 +17,7 @@ module Campaigns
         Campaign.includes(:club).where(id: campaign_days_list).
           group_by{ |campaign| campaign.club_id }.
           each do |club_id, campaigns|
-            CampaignNotifier.invalid_campaign(campaign_ids: campaigns.collect(&:id)).deliver_later
+            CampaignNotifier.invalid_campaign(club_id: club_id, campaign_ids: campaigns.collect(&:id)).deliver_later
           end
       end
     end
