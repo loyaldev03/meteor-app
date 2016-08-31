@@ -3,6 +3,7 @@ class CampaignDataFetcher
     # API: https://apidocs.mailchimp.com/api/2.0/reports/summary.php
     # reached = emails_sent,
     # converted = unique_clicks
+    # spent = 0 (since there is no need to track this field automatically or manually).
 
     # campaign_foreign_id is not the id shown in the web, but a different one (which is alphanumeric)
     # This is because Mailchimp works with two different IDs, one for the web and another one for api calls
@@ -13,6 +14,7 @@ class CampaignDataFetcher
       data              = client.reports(report.campaign_foreign_id).retrieve
       report.reached    = data['emails_sent'].to_i
       report.converted  = data['clicks']['unique_subscriber_clicks'].to_i
+      report.spent      = 0
       report.meta       = :no_error
       report
     rescue Gibbon::GibbonError

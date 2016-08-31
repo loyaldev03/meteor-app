@@ -14,7 +14,7 @@ class Campaign < ActiveRecord::Base
 
   validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? } 
 
-  TRANSPORTS_FOR_MANUAL_UPDATE = ['mailchimp', 'twitter', 'adwords']
+  TRANSPORTS_FOR_MANUAL_UPDATE = ['twitter', 'adwords']
 
   enum campaign_type: {
      sloop:           0,
