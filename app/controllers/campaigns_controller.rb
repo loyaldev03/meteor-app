@@ -43,10 +43,9 @@ class CampaignsController < ApplicationController
   def update
     my_authorize! :update, Campaign, @campaign.club.id
     if @campaign.update campaign_params_on_update
-      redirect_to campaigns_url, notice: "Campaign <b>#{@campaign.name}</b> was updated succesfully".html_safe
+      redirect_to campaigns_url, notice: "Campaign <b>#{@campaign.name}</b> was updated succesfully.".html_safe
     else
-      flash[:error] = "Campaign <b>#{@campaign.name}</b> was not updated".html_safe
-      render action: "edit"
+      redirect_to campaigns_url, alert: "Campaign <b>#{@campaign.name}</b> was not updated.".html_safe
     end
   end
 

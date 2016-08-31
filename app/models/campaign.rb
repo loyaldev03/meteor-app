@@ -6,14 +6,15 @@ class Campaign < ActiveRecord::Base
 
   before_validation :set_campaign_medium
   before_save :set_campaign_medium_version
-  
+  after_update :fetch_campaign_days_data
+
   validates :name, :landing_name, :enrollment_price, :initial_date, :campaign_type, :transport, 
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
 
   validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? } 
 
-  TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE = ['facebook', 'mailchimp']
+  TRANSPORTS_FOR_MANUAL_UPDATE = ['mailchimp', 'twitter', 'adwords']
 
   enum campaign_type: {
      sloop:           0,
@@ -49,7 +50,12 @@ class Campaign < ActiveRecord::Base
 
   def missing_days(date: Date.current)
     if mailchimp?
-      [CampaignDay.where(campaign: self, date: initial_date).first_or_create.tap(&:readonly!)]
+      campaign_day = CampaignDay.where(campaign: self, date: initial_date).first
+      if campaign_day 
+        campaign_day.is_missing? ? [campaign_day] : []
+      else
+        CampaignDay.create(campaign: self, date: initial_date).tap(&:readonly!)
+      end
     else
       all_days = past_period(date).to_a
       present_days = campaign_days.where(campaign_id: self).not_missing.pluck(:date)
@@ -104,6 +110,12 @@ class Campaign < ActiveRecord::Base
     def set_campaign_medium_version
       unless (self.campaign_medium_version.start_with?('email_') || self.campaign_medium_version.start_with?('banner_'))
         self.campaign_medium_version = (mailchimp? ? 'email' : 'banner') + '_' + campaign_medium_version
+      end
+    end
+
+    def fetch_campaign_days_data
+      if transport_campaign_id_changed?
+        Campaigns::DataFetcherJob.perform_later(club_id: club_id, transport: transport, campaign_id: self.id)
       end
     end
 end

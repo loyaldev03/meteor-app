@@ -9,13 +9,16 @@ namespace :campaigns do
       club_ids = Club.is_enabled.ids
       club_ids.each do |club_id|
         ['facebook', 'mailchimp'].each do |transport|
-          Campaigns::DataFetcherJob.perform_later(club_id, transport, date.to_s)
+          Campaigns::DataFetcherJob.perform_later(club_id: club_id, transport: transport, date: date.to_s)
         end
       end
+      # re-try those campaign days with unexpected error
+      Campaigns::UnexpectedErrorDaysDataFetcherJob.perform_later
+      # send communications
       Campaigns::NotifyMissingCampaignDaysJob.perform_later((date -1.day).to_s)
       Campaigns::NotifyCampaignDaysWithErrorJob.perform_later
       # creates missing campaign days for yesterday for those campaigns that are not automatically updated.
-      [Campaign.transports.keys - Campaign::TRANSPORT_WHERE_NOT_ALLOWED_MANUAL_UPDATE].each do |transport|
+      Campaign::TRANSPORTS_FOR_MANUAL_UPDATE.each do |transport|
         Campaign.by_transport(transport).where(club_id: club_ids).map{|c| c.missing_days(date: date)}
       end
     rescue Exception => e
