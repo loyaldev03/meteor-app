@@ -12,7 +12,8 @@ class Campaign < ActiveRecord::Base
             :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
             :terms_of_membership_id, presence: true
 
-  validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? } 
+  validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? }
+  validates_date :initial_date, after: lambda { Time.zone.now }, if: -> { !can_set_dates_in_the_past? }
 
   TRANSPORTS_FOR_MANUAL_UPDATE = ['twitter', 'adwords']
 
@@ -71,6 +72,11 @@ class Campaign < ActiveRecord::Base
 
   def can_edit_transport_id?
     campaign_days.invalid_campaign.first.present?
+  end
+
+  def can_set_dates_in_the_past?
+    # https://www.pivotaltracker.com/story/show/118308773/comments/148110267
+    !campaign_days.first.present?
   end
 
   def landing_url
