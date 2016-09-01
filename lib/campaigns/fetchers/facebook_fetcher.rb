@@ -59,13 +59,13 @@ class CampaignDataFetcher
       end
 
       def proceed_with_error_logic(response)
-        case(response.body.error.code)
+        case(response.body['error'].code)
           when 100, 803
             Hashie::Mash.new('meta' => :invalid_campaign)
           when 104, 190
             Hashie::Mash.new('meta' => :unauthorized)
           when 2635
-            raise FbGraph2::Exception::InvalidRequest.new(response.body.error.message)
+            raise FbGraph2::Exception::InvalidRequest.new(response.body['error'].message)
           else
             Auditory.report_issue("FacebookFetcher campaign retrieval error.", 'Facebook returned an unexpected code', {unexpected_error_code: response.body.error.code, unexpected_error_message: response.body.error.message}, false)
             raise "Unexpected error code. Response: #{response}"
@@ -79,7 +79,7 @@ class CampaignDataFetcher
           Hashie::Mash.new('meta' => :unauthorized)
         else
           response = connection.get(url)
-          response.status == 200 ? response.body.data.first : proceed_with_error_logic(response)
+          response.status == 200 ? response.body['data'].first : proceed_with_error_logic(response)
         end
       end
   end
