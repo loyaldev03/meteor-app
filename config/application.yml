@@ -397,7 +397,7 @@ test:
 
 production:
   <<: *defaults
-  email_to_send_product_list: 'tbrady@meteoraffinity.com'
+  email_to_send_product_list: 'tbrady@meteoraffinity.com,ckincheloe@meteoraffinity.com'
   mes_report_service:
     user: Stoneacrereports
     password: do3!lAjo5
