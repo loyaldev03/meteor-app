@@ -31,7 +31,10 @@ class CampaignTest < ActiveSupport::TestCase
     @campaign.campaign_type = nil
     assert !@campaign.save, "Campaign was saved without campaign type"
   end
-  test 'Should not save campaign without transport' do  #   @campaign.transport = nil  #   assert !@campaign.save, "Campaign was saved without transport"
+
+  test 'Should not save campaign without transport' do  
+     @campaign.transport = nil  
+     assert !@campaign.save, "Campaign was saved without transport"
   end
 
   test 'Should not save campaign without transport_campaign_id' do
