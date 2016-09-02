@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   before_save :set_marketing_client_sync_as_needed
   after_create :elasticsearch_asyn_call
   after_create 'asyn_desnormalize_preferences(force: true)'
+  after_save :create_operation_on_testing_account_toggle
   after_update :elasticsearch_asyn_call
   after_update :mkt_tool_check_email_changed_for_sync
   after_update :after_save_sync_to_remote_domain
@@ -1604,6 +1605,20 @@ class User < ActiveRecord::Base
         if club.mailchimp_mandrill_client?
           Mailchimp::UserUpdateEmailJob.perform_later(self.id, self.email_change.first) if defined?(SacMailchimp::MemberModel)
         end
+      end
+    end
+
+    def create_operation_on_testing_account_toggle
+      if testing_account_was != testing_account
+        if testing_account
+          operation_type = Settings.operation_types.testing_account_marked
+          message = I18n.t('activerecord.attributes.user.testing_account_marked')
+        else
+          operation_type = Settings.operation_types.testing_account_unmarked
+          message = I18n.t('activerecord.attributes.user.testing_account_unmarked')
+        end
+        current_agent = RequestStore.store[:current_agent]
+        Auditory.audit(current_agent, self, message, self, operation_type)
       end
     end
 end

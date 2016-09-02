@@ -4,6 +4,7 @@ class UsersController < ApplicationController
   before_filter :validate_club_presence, :except => [ :quick_search ]
   skip_before_filter :validate_partner_presence, :only => [ :quick_search ]
   before_filter :validate_user_presence, :except => [ :index, :new, :search_result, :quick_search ]
+  before_filter lambda { RequestStore.store[:current_agent] = current_agent }
   before_filter :check_permissions, :except => [ :additional_data, :transactions_content, :notes_content, 
                                                  :fulfillments_content, :communications_content, 
                                                  :operations_content, :credit_cards_content, 
