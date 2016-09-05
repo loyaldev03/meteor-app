@@ -154,12 +154,12 @@ class CampaignTest < ActiveSupport::TestCase
 
   def stubsmailchimp_invalid_transport_campaign_id    
     answer = Gibbon::MailChimpError.new({}, {status_code:404, body: {"type"=>"http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/", "title"=>"Resource Not Found", 'status' => 404, "detail"=>"The requested resource could not be found.", "instance"=>""}})
-    Gibbon::Request.any_instance.stubs(:retrieve).returns(answer)
+    Gibbon::Request.any_instance.stubs(:retrieve).raises(answer)
   end
 
   def stubsmailchimp_invalid_api_key
     answer = Gibbon::MailChimpError.new({}, {status_code:401, body: {'type'=>'http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/', 'title'=>'API Key Invalid', 'status' => 401, 'detail'=>"Your API key may be invalid, or you've attempted to access the wrong datacenter.", "instance"=>""}})
-    Gibbon::Request.any_instance.stubs(:retrieve).returns(answer)
+    Gibbon::Request.any_instance.stubs(:retrieve).raises(answer)
   end
 
   test 'Should fetch campaign data from mailchimp' do
@@ -193,7 +193,7 @@ class CampaignTest < ActiveSupport::TestCase
     stubsmailchimp_invalid_api_key 
     TasksHelpers.fetch_campaigns_data   
     assert_difference('CampaignDay.count', 0) do
-      @campaign_day = CampaignDay.first    
+      @campaign_day = CampaignDay.first  
       assert_equal(@campaign_day.meta, "unauthorized")
       assert_equal(@campaign_day.spent, nil)
       assert_equal(@campaign_day.reached, nil)
