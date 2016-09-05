@@ -13,6 +13,13 @@ class CampaignTest < ActiveSupport::TestCase
     @campaign1 = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id, :initial_date => Time.zone.yesterday)
   end
 
+  def mailchimpsetup
+    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @tsmailchimp = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club.id) 
+    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign2 = FactoryGirl.create(:campaign_mailchimp, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id, :initial_date => Time.zone.yesterday)
+  end
+
   test 'Should save campaign when filling all data' do
     assert !@campaign.save, "The campaign #{@campaign.name} was not created."
   end
@@ -134,5 +141,63 @@ class CampaignTest < ActiveSupport::TestCase
       assert_equal(@campaign_day.reached, nil)
       assert_equal(@campaign_day.converted, nil)
     end
-  end  
+  end
+
+  ################################################
+  ##############MAILCHIMP#########################
+  ################################################  
+
+  def stubsmailchimp
+    answer = {'emails_sent' => 3305, 'clicks' => {'unique_subscriber_clicks' => 104}}    
+    Gibbon::Request.any_instance.stubs(:retrieve).returns(answer)
+  end
+
+  def stubsmailchimp_invalid_transport_campaign_id    
+    answer = Gibbon::MailChimpError.new({}, {status_code:404, body: {"type"=>"http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/", "title"=>"Resource Not Found", 'status' => 404, "detail"=>"The requested resource could not be found.", "instance"=>""}})
+    Gibbon::Request.any_instance.stubs(:retrieve).returns(answer)
+  end
+
+  def stubsmailchimp_invalid_api_key
+    answer = Gibbon::MailChimpError.new({}, {status_code:401, body: {'type'=>'http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/', 'title'=>'API Key Invalid', 'status' => 401, 'detail'=>"Your API key may be invalid, or you've attempted to access the wrong datacenter.", "instance"=>""}})
+    Gibbon::Request.any_instance.stubs(:retrieve).returns(answer)
+  end
+
+  test 'Should fetch campaign data from mailchimp' do
+    mailchimpsetup  
+    stubsmailchimp
+    TasksHelpers.fetch_campaigns_data        
+    assert_difference('CampaignDay.count', 0) do
+      @campaign_day = CampaignDay.first    
+      assert_equal(@campaign_day.meta, "no_error")
+      assert_equal(@campaign_day.spent, 0)
+      assert_equal(@campaign_day.reached, 3305)
+      assert_equal(@campaign_day.converted, 104)
+    end
+  end
+
+  test 'Should not fetch campaign data from mailchimp when transport_campaign_id is invalid' do
+    mailchimpsetup  
+    stubsmailchimp_invalid_transport_campaign_id  
+    TasksHelpers.fetch_campaigns_data   
+    assert_difference('CampaignDay.count', 0) do
+      @campaign_day = CampaignDay.first 
+      assert_equal(@campaign_day.meta, "invalid_campaign")
+      assert_equal(@campaign_day.spent, nil)
+      assert_equal(@campaign_day.reached, nil)
+      assert_equal(@campaign_day.converted, nil)
+    end
+  end
+
+  test 'Should not fetch campaign data from mailchimp when it has invalid access token' do
+    mailchimpsetup  
+    stubsmailchimp_invalid_api_key 
+    TasksHelpers.fetch_campaigns_data   
+    assert_difference('CampaignDay.count', 0) do
+      @campaign_day = CampaignDay.first    
+      assert_equal(@campaign_day.meta, "unauthorized")
+      assert_equal(@campaign_day.spent, nil)
+      assert_equal(@campaign_day.reached, nil)
+      assert_equal(@campaign_day.converted, nil)
+    end
+  end
 end

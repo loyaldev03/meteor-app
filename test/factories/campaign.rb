@@ -17,5 +17,11 @@ FactoryGirl.define do
     factory :campaign_twitter do
       transport { Campaign.transports['twitter'] }
     end
+
+    factory :campaign_mailchimp do
+      transport { Campaign.transports['mailchimp'] }
+      campaign_medium "email"
+      campaign_medium_version "email_medium"
+    end
   end  
 end
