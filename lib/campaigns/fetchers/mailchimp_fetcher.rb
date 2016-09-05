@@ -18,10 +18,10 @@ class CampaignDataFetcher
       report.meta       = :no_error
       report
     rescue Gibbon::MailChimpError
-      when @response.body['status']
-      case 401
+      case @response.body['status']
+      when 401
         report.meta = :unauthorized
-      case 404
+      when 404
         report.meta = :invalid_campaign
       else
         Auditory.report_issue("MailchimpFetcher campaign retrieval error.", 'Mailchimp returned an unexpected code', { response: response.body }, false)
