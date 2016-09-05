@@ -17,8 +17,8 @@ class CampaignDataFetcher
       report.spent      = 0
       report.meta       = :no_error
       report
-    rescue Gibbon::MailChimpError
-      case data.body['status']
+    rescue Gibbon::MailChimpError => e
+      case e.body['status']
       when 401
         report.meta = :unauthorized
       when 404
