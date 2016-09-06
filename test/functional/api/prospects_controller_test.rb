@@ -28,12 +28,12 @@ class Api::ProspectsControllerTest < ActionController::TestCase
                                 :terms_of_membership_id => @terms_of_membership.id,
                                 :birth_date => @user.birth_date,
                                 :product_description => @enrollment_info.product_description,
-                                :marketing_code => @enrollment_info.marketing_code,
-                                :campaign_medium => @enrollment_info.campaign_medium,
+                                :audience => @enrollment_info.audience,
+                                :utm_medium => @enrollment_info.utm_medium,
                                 :campaign_description => @enrollment_info.campaign_description,
-                                :campaign_medium_version => @enrollment_info.campaign_medium_version,
-                                :fulfillment_code => @enrollment_info.fulfillment_code,
-                                :mega_channel => @enrollment_info.mega_channel,
+                                :utm_content => @enrollment_info.utm_content,
+                                :campaign_id => @enrollment_info.campaign_code,
+                                :utm_campaign => @enrollment_info.utm_campaign,
                                 :ip_address => @enrollment_info.ip_address,
                                 :referral_host => @enrollment_info.referral_host,
                                 :referral_path => @enrollment_info.referral_path,
@@ -42,7 +42,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
                                 :preferences => @enrollment_info.preferences,
                                 :cookie_set => @enrollment_info.cookie_set,
                                 :cookie_value => @enrollment_info.cookie_value,
-                                :source => @enrollment_info.source,
+                                :utm_source => @enrollment_info.utm_source,
                                 :joint => @enrollment_info.joint,
                               },:format => :json})
   end
@@ -71,7 +71,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
         response = do_post
         prospect = Prospect.find JSON.parse(response.body)["prospect_id"]
         assert_response :success
-        assert_equal prospect.source, @enrollment_info.source
+        assert_equal prospect.utm_source, @enrollment_info.utm_source
       end
     end
   end

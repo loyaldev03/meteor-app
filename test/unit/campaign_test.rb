@@ -49,9 +49,9 @@ class CampaignTest < ActiveSupport::TestCase
     assert !@campaign.save, "Campaign was saved without transport_campaign_id"
   end
   
-  test 'Should not save campaign without campaign_medium' do
-    @campaign.campaign_medium = nil
-    assert !@campaign.save, "Campaign was saved without campaign_medium"
+  test 'Should not save campaign without utm_medium' do
+    @campaign.utm_medium = nil
+    assert !@campaign.save, "Campaign was saved without utm_medium"
   end
   
   test 'Should not save campaign without initial_date date.' do
@@ -59,19 +59,19 @@ class CampaignTest < ActiveSupport::TestCase
     assert !@campaign.save, "Campaign was saved without initial_date"
   end
  
-  test 'Should not save campaign without campaign_medium_version.' do
-    @campaign.campaign_medium_version = nil
-    assert !@campaign.save, "Campaign was saved without campaign_medium_version"
+  test 'Should not save campaign without utm_content.' do
+    @campaign.utm_content = nil
+    assert !@campaign.save, "Campaign was saved without utm_content"
   end
 
-  test 'Should not save campaign without marketing_code' do
-    @campaign.marketing_code = nil
-    assert !@campaign.save, "Campaign was saved without marketing_code"
+  test 'Should not save campaign without audience' do
+    @campaign.audience = nil
+    assert !@campaign.save, "Campaign was saved without audience"
   end
 
-  test 'Should not save campaign without fulfillment_code' do
-    @campaign.fulfillment_code = nil
-    assert !@campaign.save, "Campaign was saved without   fulfillment_code"
+  test 'Should not save campaign without campaign_code' do
+    @campaign.campaign_code = nil
+    assert !@campaign.save, "Campaign was saved without campaign_code"
   end
 
   test 'Should not save campaign with initial_date before today.' do

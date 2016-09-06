@@ -484,8 +484,8 @@ function retrieve_information(){
       external_id: $("#user_external_id").val()=="" ? null : $("#user_external_id").val(),
       product_sku: $('#user_product_sku').val(),
       enrollment_amount: $("#user_enrollment_amount").val(),
-      mega_channel: $("#user_mega_channel").val(),
-      campaign_medium: $("#user_campaign_medium").val(),
+      utm_campaign: $("#user_utm_campaign").val(),
+      utm_medium: $("#user_utm_medium").val(),
       landing_url: $("#user_landing_url").val(),
       referral_path: $("#user_referral_path").val(),
       ip_address: $("#user_ip_address").val(),
@@ -872,7 +872,7 @@ function campaignFormFunctions(){
       placeholder: placeholderText,
       theme: "bootstrap"
     });
-    $("#campaign_fulfillment_code").select2({
+    $("#campaign_campaign_code").select2({
       ajax: {
         url: getFulfillmentCodesUrl,
         dataType: 'json',
@@ -902,10 +902,10 @@ function campaignFormFunctions(){
       'enrollment_price', 
       'campaign_type',
       'transport',
-      'marketing_code',
-      'campaign_medium_version',
+      'audience',
+      'utm_content',
       'transport_campaign_id',
-      'fulfillment_code'
+      'campaign_code'
     ];
     $.each(fieldsToDisable, function(index, field) {
       $('#campaign_' + field).prop('disabled', true);
@@ -929,7 +929,7 @@ function campaignFormFunctions(){
         medium = 'search';
         break;
     }
-    $('#campaign_campaign_medium').val(medium);
+    $('#campaign_utm_medium').val(medium);
   }
 }
 

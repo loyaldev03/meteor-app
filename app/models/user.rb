@@ -477,7 +477,7 @@ class User < ActiveRecord::Base
       message = "User scheduled to be changed to TOM(#{new_tom.id}) -#{new_tom.name}- at #{date}."
       operation_type = Settings.operation_types.terms_of_membership_change_scheduled
     end
-    answer = change_terms_of_membership(new_tom, message, operation_type, agent, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM }, date, additional_actions)
+    answer = change_terms_of_membership(new_tom, message, operation_type, agent, false, nil, { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM }, date, additional_actions)
 
     nillify_club_cash("Removing club cash upon tom change.") if date.nil? and answer[:code] == Settings.error_codes.success and additional_actions[:remove_club_cash]
     answer
@@ -486,7 +486,7 @@ class User < ActiveRecord::Base
   def downgrade_user
     new_tom = self.terms_of_membership.downgrade_tom
     message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom.id})"
-    answer = change_terms_of_membership(new_tom, message, Settings.operation_types.downgrade_user, nil, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_DOWNGRADE })
+    answer = change_terms_of_membership(new_tom, message, Settings.operation_types.downgrade_user, nil, false, nil, { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM_DOWNGRADE })
     if answer[:code] != Settings.error_codes.success
       Auditory.report_issue("DowngradeUser::Error", answer[:message], { user: self.inspect, answer: answer })
     else
@@ -500,8 +500,8 @@ class User < ActiveRecord::Base
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom, agent = nil, options = {})
     membership_params = options.merge({
-      mega_channel: Membership::CS_MEGA_CHANNEL,
-      campaign_medium: Membership::CS_CAMPAIGN_MEDIUM,
+      utm_campaign: Membership::CS_UTM_CAMPAIGN,
+      utm_medium: Membership::CS_UTM_MEDIUM,
       campaign_description: Membership::CS_CAMPAIGN_DESCRIPTION
     })
     enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, membership_params, true, false)
@@ -1341,7 +1341,7 @@ class User < ActiveRecord::Base
     def check_upgradable
       if terms_of_membership.upgradable?
         if join_date.to_date + terms_of_membership.upgrade_tom_period.days <= Time.new.getlocal(self.get_offset_related).to_date
-          change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade, nil, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_UPGRADE })
+          change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade, nil, false, nil, { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM_UPGRADE })
           return false
         end
       end

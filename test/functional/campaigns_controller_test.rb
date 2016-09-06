@@ -21,6 +21,17 @@ class CampaignsControllerTest < ActionController::TestCase
     sign_in @agent
   end
 
+  def post_create_campaign(campaign)
+    post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
+      name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
+       enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
+       transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
+       utm_medium: campaign.utm_medium, utm_content: campaign.utm_content,
+       audience: campaign.audience, campaign_code: campaign.campaign_code,
+       club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
+    }
+  end
+
   test "agents that should get index" do
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
@@ -87,14 +98,7 @@ class CampaignsControllerTest < ActionController::TestCase
       campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
 
       assert_difference('Campaign.count',1) do
-        post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-          name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
-           enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
-           transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
-           campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
-           marketing_code: campaign.marketing_code, fulfillment_code: campaign.fulfillment_code,
-           club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
-        }    
+        post_create_campaign(campaign)
       end
       assert_redirected_to campaign_path(assigns(:campaign), partner_prefix: @partner_prefix, :club_prefix => @club.name)
     end
@@ -107,14 +111,7 @@ class CampaignsControllerTest < ActionController::TestCase
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
-        post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-            name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
-            enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
-            transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
-            campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
-            marketing_code: campaign.marketing_code, fulfillment_code: campaign.fulfillment_code,
-            club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
-          } 
+        post_create_campaign(campaign)
         assert_response :unauthorized, "Agent #{agent} can access to this page." 
       end
     end
@@ -250,15 +247,8 @@ class CampaignsControllerTest < ActionController::TestCase
     sign_agent_with_club_role(:agent, 'admin')
     campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
     assert_difference('Campaign.count',1) do
-      post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-        name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
-         enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
-         transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
-         campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
-         marketing_code: campaign.marketing_code, fulfillment_code: campaign.fulfillment_code,
-         club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
-      } 
-    end  
+      post_create_campaign(campaign)
+    end
     assert_redirected_to campaign_path(assigns(:campaign), partner_prefix: @partner_prefix, :club_prefix => @club.name)    
   end
 
@@ -267,14 +257,7 @@ class CampaignsControllerTest < ActionController::TestCase
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
         campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
-        post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-            name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
-            enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
-            transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
-            campaign_medium: campaign.campaign_medium, campaign_medium_version: campaign.campaign_medium_version,
-            marketing_code: campaign.marketing_code, fulfillment_code: campaign.fulfillment_code,
-            club_id: campaign.club_id, terms_of_membership_id: campaign.terms_of_membership.id
-          } 
+        post_create_campaign(campaign)
         assert_response :unauthorized, "Agent #{role} can access to this page."
       end
     end

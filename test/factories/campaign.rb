@@ -9,10 +9,10 @@ FactoryGirl.define do
     campaign_type { Campaign.campaign_types['sloop'] } 
     transport { Campaign.transports['facebook'] }    
     transport_campaign_id  {Faker::Lorem.characters(20)}   
-    campaign_medium "display"
-    campaign_medium_version "banner"
-    marketing_code { Faker::Lorem.characters(10) }
-    fulfillment_code { Faker::Lorem.characters(20) }
+    utm_medium "display"
+    utm_content "banner"
+    audience { Faker::Lorem.characters(10) }
+    campaign_code { Faker::Lorem.characters(20) }
 
     factory :campaign_twitter do
       transport { Campaign.transports['twitter'] }
@@ -20,8 +20,8 @@ FactoryGirl.define do
 
     factory :campaign_mailchimp do
       transport { Campaign.transports['mailchimp'] }
-      campaign_medium "email"
-      campaign_medium_version "email_medium"
+      utm_medium "email"
+      utm_content "email_medium"
     end
   end  
 end

@@ -7,7 +7,7 @@
 </div>
 
 <p>
-  <strong><%= I18n.t('activerecord.attributes.campaign.type') %>:</strong>
+  <strong><%= I18n.t('activerecord.attributes.campaign.campaign_type') %>:</strong>
   <%= @campaign.campaign_type %>
 </p>
 <p>
@@ -30,24 +30,24 @@
   <%= @campaign.transport %>
 </p>
 <p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.utm_medium') %>:</strong>
+  <%= @campaign.utm_medium %>
+</p>
+<p>
   <strong><%= I18n.t('activerecord.attributes.campaign.transport_campaign_id') %>:</strong>
   <%= @campaign.transport_campaign_id %>
 </p>
 <p>
-  <strong><%= I18n.t('activerecord.attributes.campaign.campaign_medium') %>:</strong>
-  <%= @campaign.campaign_medium %>
+  <strong><%= I18n.t('activerecord.attributes.campaign.utm_content') %>:</strong>
+  <%= @campaign.utm_content %>
 </p>
 <p>
-  <strong><%= I18n.t('activerecord.attributes.campaign.campaign_medium_version') %>:</strong>
-  <%= @campaign.campaign_medium_version %>
+  <strong><%= I18n.t('activerecord.attributes.campaign.audience') %>:</strong>
+  <%= @campaign.audience %>
 </p>
 <p>
-  <strong><%= I18n.t('activerecord.attributes.campaign.marketing_code') %>:</strong>
-  <%= @campaign.marketing_code %>
-</p>
-<p>
-  <strong><%= I18n.t('activerecord.attributes.campaign.fulfillment_code') %>:</strong>
-  <%= @campaign.fulfillment_code %>
+  <strong><%= I18n.t('activerecord.attributes.campaign.campaign_code') %>:</strong>
+  <%= @campaign.campaign_code %>
 </p>
 <p>
   <strong><%= I18n.t('activerecord.attributes.campaign.landing_name') %>:</strong>

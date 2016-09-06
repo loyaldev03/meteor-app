@@ -98,9 +98,9 @@
 
   <div class='span4'>
     <div class="control-group">
-      <%= f.label :campaign_medium, 'Campaign medium', :class => 'control-label' %>
+      <%= f.label :utm_medium, :class => 'control-label' %>
       <div class="controls">
-        <%= f.text_field :campaign_medium, :class => 'text_field  input-small', readonly: true %>
+        <%= f.text_field :utm_medium, :class => 'text_field  input-small', readonly: true %>
       </div>
     </div>
   </div>
@@ -109,9 +109,10 @@
 <div class='row-fluid'>
   <div class='span12'>
     <div class="control-group">
-      <%= f.label :transport_campaign_id, 'Source ID', :class => 'control-label required_asterisk' %>
+      <%= f.label :transport_campaign_id, :class => 'control-label required_asterisk' %>
       <div class="controls">
         <%= f.text_field :transport_campaign_id, :class => 'text_field', required: true %>
+        <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.attributes.campaign.transport_campaign_id'), :content => t('activerecord.attributes.campaign.transport_campaign_id_help')} %>
       </div>
     </div>
   </div>
@@ -120,9 +121,9 @@
 <div class='row-fluid'>
   <div class='span12'>
     <div class="control-group">
-      <%= f.label :campaign_medium_version, :class => 'control-label required_asterisk' %>
+      <%= f.label :utm_content, :class => 'control-label required_asterisk' %>
       <div class="controls">
-        <%= f.text_field :campaign_medium_version, required: true %>
+        <%= f.text_field :utm_content, required: true %>
       </div>
     </div>
   </div>
@@ -131,9 +132,9 @@
 <div class='row-fluid'>
   <div class='span12'>
     <div class="control-group">
-      <%= f.label :marketing_code, :class => 'control-label required_asterisk' %>
+      <%= f.label :audience, :class => 'control-label required_asterisk' %>
       <div class="controls">
-        <%= f.text_field :marketing_code, required: true %>
+        <%= f.text_field :audience, required: true %>
       </div>
     </div>
   </div>
@@ -142,13 +143,14 @@
 <div class='row-fluid'>
   <div class='span12'>
     <div class="control-group">
-      <%= f.label :fulfillment_code, :class => 'control-label required_asterisk' %>
+      <%= f.label :campaign_code, :class => 'control-label required_asterisk' %>
       <div class="controls">
         <% if @campaign.new_record? %>
-          <%= f.select :fulfillment_code, [], { class: 'form-control' } %>
+          <%= f.select :campaign_code, [], { class: 'form-control' } %>
         <% else %>
-          <%= f.text_field :fulfillment_code, readonly: true %>
+          <%= f.text_field :campaign_code, readonly: true %>
         <% end %>
+        <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.attributes.campaign.campaign_code'), :content => t('activerecord.attributes.campaign.campaign_code_help')} %>
       </div>
     </div>
   </div>

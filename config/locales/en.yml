@@ -638,18 +638,20 @@ en:
         aus_password_update_help: "Account Updater Service service password. Leaving this field empty will not change current password."
       campaign:
         id: 'ID'
-        type: 'Campaign Type'
+        campaign_type: 'Campaign Type'
         transport: 'Source'
         start_date: 'Start Date'
         finish_date: 'Finish Date'
-        transport_campaign_id: 'Source ID'
         enrollment_price: 'Enrollment Price'
-        campaign_medium: 'Campaign Medium'
-        campaign_medium_version: 'Campaign Medium Version'
-        marketing_code: 'Marketing Code'
-        fulfillment_code: 'Fulfillment Code'
+        utm_medium: 'Medium'
+        utm_content: 'Content'
+        audience: 'Audience'
         landing_name: 'Landing Name'
         landing_url: 'Landing Url'
+        campaign_code: 'Campaign Code'
+        campaign_code_help: 'This value is used to fill in the campaign_id value within the Landing Url.'
+        transport_campaign_id: 'Source Campaign ID'
+        transport_campaign_id_help: "The campaign's ID within the selected Source, used to identify the campaign within the selected Source." 
       campaign_day:
         date: 'Date'
         spent: 'Spent'

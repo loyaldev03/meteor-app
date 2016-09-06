@@ -442,8 +442,8 @@ class UserTest < ActiveSupport::TestCase
     saved_user.reload
       
     assert_equal saved_user.current_membership.parent_membership_id, old_membership_id
-    assert_equal saved_user.current_membership.campaign_medium, Membership::CS_CAMPAIGN_MEDIUM_DOWNGRADE
-    assert_equal saved_user.current_membership.mega_channel, Membership::CS_MEGA_CHANNEL
+    assert_equal saved_user.current_membership.utm_medium, Membership::CS_UTM_MEDIUM_DOWNGRADE
+    assert_equal saved_user.current_membership.utm_campaign, Membership::CS_UTM_CAMPAIGN
   end
 
   test "Downgrade user should be done even when the user has invalid information" do
@@ -472,8 +472,8 @@ class UserTest < ActiveSupport::TestCase
       saved_user.bill_membership
     end
     assert_equal saved_user.current_membership.parent_membership_id, old_membership_id
-    assert_equal saved_user.current_membership.campaign_medium, Membership::CS_CAMPAIGN_MEDIUM_UPGRADE
-    assert_equal saved_user.current_membership.mega_channel, Membership::CS_MEGA_CHANNEL
+    assert_equal saved_user.current_membership.utm_medium, Membership::CS_UTM_MEDIUM_UPGRADE
+    assert_equal saved_user.current_membership.utm_campaign, Membership::CS_UTM_CAMPAIGN
   end
 
   test "manual payment user should be canceled when its billing date is overdue" do

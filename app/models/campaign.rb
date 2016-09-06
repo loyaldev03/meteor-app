@@ -4,12 +4,12 @@ class Campaign < ActiveRecord::Base
   has_many :campaign_days
   belongs_to :terms_of_membership
 
-  before_validation :set_campaign_medium
-  before_save :set_campaign_medium_version
+  before_validation :set_utm_medium
+  before_save :set_utm_content
   after_update :fetch_campaign_days_data
 
   validates :name, :landing_name, :enrollment_price, :initial_date, :campaign_type, :transport, 
-            :campaign_medium, :campaign_medium_version, :marketing_code, :fulfillment_code,
+            :utm_medium, :utm_content, :audience, :campaign_code,
             :terms_of_membership_id, presence: true
 
   validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? }
@@ -66,8 +66,8 @@ class Campaign < ActiveRecord::Base
     end
   end
 
-  def set_fulfillment_code
-    self.fulfillment_code = Array.new(16){ rand(36).to_s(36) }.join
+  def set_campaign_code
+    self.campaign_code = Array.new(16){ rand(36).to_s(36) }.join
   end
 
   def can_edit_transport_id?
@@ -85,10 +85,10 @@ class Campaign < ActiveRecord::Base
     parameters = [
       "utm_campaign=#{campaign_type}",
       "utm_source=#{transport}",
-      "utm_medium=#{campaign_medium}",
-      "utm_content=#{campaign_medium_version}",
-      "audience=#{marketing_code}",
-      "campaign_id=#{fulfillment_code}"
+      "utm_medium=#{utm_medium}",
+      "utm_content=#{utm_content}",
+      "audience=#{audience}",
+      "campaign_id=#{campaign_code}"
       ]
     @landing_url = url + '?' + parameters.join('&')
   end
@@ -102,8 +102,8 @@ class Campaign < ActiveRecord::Base
       end
     end
 
-    def set_campaign_medium
-      self.campaign_medium = case transport
+    def set_utm_medium
+      self.utm_medium = case transport
         when 'facebook', 'twitter'
           :display
         when 'mailchimp'
@@ -113,9 +113,9 @@ class Campaign < ActiveRecord::Base
       end
     end
 
-    def set_campaign_medium_version
-      unless (self.campaign_medium_version.start_with?('email_') || self.campaign_medium_version.start_with?('banner_'))
-        self.campaign_medium_version = (mailchimp? ? 'email' : 'banner') + '_' + campaign_medium_version
+    def set_utm_content
+      unless (self.utm_content.start_with?('email_') || self.utm_content.start_with?('banner_'))
+        self.utm_content = (mailchimp? ? 'email' : 'banner') + '_' + utm_content
       end
     end
 
