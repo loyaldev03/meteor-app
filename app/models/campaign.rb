@@ -13,7 +13,7 @@ class Campaign < ActiveRecord::Base
             :terms_of_membership_id, presence: true
 
   validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? }
-  validates_date :initial_date, after: lambda { Time.zone.now }, if: -> { !can_set_dates_in_the_past? }
+  validates_date :initial_date, after: lambda { Time.zone.now }, if: -> { (initial_date_changed? || finish_date_changed?) && !can_set_dates_in_the_past? }
 
   TRANSPORTS_FOR_MANUAL_UPDATE = ['twitter', 'adwords']
 
