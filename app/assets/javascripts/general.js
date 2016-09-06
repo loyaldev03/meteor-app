@@ -931,6 +931,7 @@ function campaignFormFunctions(){
     }
     $('#campaign_utm_medium').val(medium);
   }
+  $(".select2-container").css('display', 'inline-block');
 }
 
 

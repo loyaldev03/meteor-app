@@ -146,7 +146,7 @@
       <%= f.label :campaign_code, :class => 'control-label required_asterisk' %>
       <div class="controls">
         <% if @campaign.new_record? %>
-          <%= f.select :campaign_code, [], { class: 'form-control' } %>
+          <%= f.select :campaign_code, [], {style: 'display: inline-block important!'} %>
         <% else %>
           <%= f.text_field :campaign_code, readonly: true %>
         <% end %>
@@ -174,7 +174,7 @@
 <script>
   var clubId = "<%= current_club.id %>";
   var getSubscriptionPlansUrl = "<%= get_subscription_plans_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
-  var getFulfillmentCodesUrl = "<%= get_fulfillment_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var getFulfillmentCodesUrl = "<%= get_campaign_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
   var placeholderText = "Choose one...";
   var placeholderTextFulfillmentCodes = "New automatic code";
   <% unless @campaign.new_record? %>

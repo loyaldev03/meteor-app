@@ -117,13 +117,13 @@ class ClubsController < ApplicationController
   end
 
 
-  def get_fulfillment_codes
+  def get_campaign_codes
     club = Club.find(params[:club_id])
     query = params[:query]
-    fulfillment_codes = club.campaigns.select(:fulfillment_code).distinct.where("fulfillment_code LIKE '%#{query}%'").pluck(:fulfillment_code)
+    campaign_codes = club.campaigns.select(:campaign_code).distinct.where("campaign_code LIKE '%#{query}%'").pluck(:campaign_code)
     values = []
     code_id = 0
-    fulfillment_codes.each do |code|
+    campaign_codes.each do |code|
       values << { id: code_id.to_s, text: code }
       code_id += 1
     end
