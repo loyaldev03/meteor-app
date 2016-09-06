@@ -850,12 +850,7 @@ function campaigns_functions(){
 
 function campaignFormFunctions(){
   if ($('#edit_campaign').length) {
-    if(canSetDatesInThePast) {
-      $(".datepicker").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd" });
-    }
-    else {
-      $(".datepicker").datepicker({ constrainInput: true, minDate: 1, dateFormat: "yy-mm-dd" });
-    }
+    $(".datepicker").datepicker({ constrainInput: true, dateFormat: "yy-mm-dd" });
     disableFields();
     if(canEditTransportId) {
       $('#campaign_transport_campaign_id').prop('disabled', false);
