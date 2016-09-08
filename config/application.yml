@@ -114,6 +114,8 @@ defaults: &defaults
     enrollment: 250
     terms_of_membership_change_scheduled: 251
     unschedule_save_the_sale: 252
+    testing_account_marked: 253
+    testing_account_unmarked: 254
     #communication
     active_email: 300     
     prebill_email: 301    
@@ -399,7 +401,7 @@ test:
 production:
   <<: *defaults
   campaign_manager_recipients: 'mbrossard@meteoraffinity.com,ndavid@meteoraffinity.com,lerrick@meteoraffinity.com'
-  email_to_send_product_list: 'tbrady@meteoraffinity.com'
+  email_to_send_product_list: 'tbrady@meteoraffinity.com,ckincheloe@meteoraffinity.com'
   mes_report_service:
     user: Stoneacrereports
     password: do3!lAjo5

@@ -78,7 +78,7 @@ module SacMailchimp
       elsif res.instance_of? Gibbon::MailChimpError 
         { 
           marketing_client_synced_status: 'error',
-          marketing_client_last_sync_error: "#{res.title}: #{res.detail}",
+          marketing_client_last_sync_error: "#{res.title}: #{res.detail}".truncate(255),
           marketing_client_last_sync_error_at: Time.zone.now
         }
       else

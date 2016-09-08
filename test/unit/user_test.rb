@@ -383,16 +383,17 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Scheduled save the sale (do not remove club cash)" do
+    agent = FactoryGirl.create(:confirmed_admin_agent)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
     @saved_user.update_attribute :club_cash_amount, 100
     scheduled_date = (Time.current.to_date + 2.days).to_date
     assert_difference('Membership.count',0) do
-      @saved_user.save_the_sale(@terms_of_membership2.id, nil, scheduled_date, {remove_club_cash: false})
+      @saved_user.save_the_sale(@terms_of_membership2.id, agent, scheduled_date, {remove_club_cash: false})
     end
     assert_equal @saved_user.change_tom_date, scheduled_date
-    assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => false, 'terms_of_membership_id' => @terms_of_membership2.id}
+    assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => false, 'terms_of_membership_id' => @terms_of_membership2.id, :agent_id => agent.id}
     
     Timecop.travel(@saved_user.change_tom_date) do
       assert_difference('Membership.count', 1) do
@@ -402,11 +403,13 @@ class UserTest < ActiveSupport::TestCase
       assert_equal @saved_user.club_cash_amount, 100
       assert_equal @saved_user.change_tom_date, nil
       assert_equal @saved_user.change_tom_attributes, nil
+      assert_equal @saved_user.current_membership.created_by_id, agent.id
       assert_equal @saved_user.terms_of_membership_id, @terms_of_membership2.id
     end
   end
 
   test "Scheduled save the sale (remove club cash)" do
+    agent = FactoryGirl.create(:confirmed_admin_agent)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
@@ -414,10 +417,10 @@ class UserTest < ActiveSupport::TestCase
     scheduled_date = (Time.current.to_date + 2.days).to_date
 
     assert_difference('Membership.count',0) do
-      @saved_user.save_the_sale(@terms_of_membership2.id, nil, scheduled_date, {remove_club_cash: true})
+      @saved_user.save_the_sale(@terms_of_membership2.id, agent, scheduled_date, {remove_club_cash: true})
     end
     assert_equal @saved_user.change_tom_date, scheduled_date
-    assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => true, 'terms_of_membership_id' => @terms_of_membership2.id}
+    assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => true, 'terms_of_membership_id' => @terms_of_membership2.id, :agent_id => agent.id}
     assert_equal @saved_user.club_cash_amount, 100
     
     Timecop.travel(@saved_user.change_tom_date) do
@@ -429,6 +432,7 @@ class UserTest < ActiveSupport::TestCase
       assert_equal @saved_user.change_tom_date, nil
       assert_equal @saved_user.change_tom_attributes, nil
       assert_equal @saved_user.terms_of_membership_id, @terms_of_membership2.id
+      assert_equal @saved_user.current_membership.created_by_id, agent.id
     end
   end
 

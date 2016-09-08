@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
   before_save :set_marketing_client_sync_as_needed
   after_create :elasticsearch_asyn_call
   after_create 'asyn_desnormalize_preferences(force: true)'
+  after_save :create_operation_on_testing_account_toggle
   after_update :elasticsearch_asyn_call
   after_update :mkt_tool_check_email_changed_for_sync
   after_update :after_save_sync_to_remote_domain
@@ -153,7 +154,7 @@ class User < ActiveRecord::Base
     ###### <<<<<<========
     ###### Cancellation =====>>>>
     after_transition [:provisional, :active ] => 
-                        :lapsed, :do => [:cancellation, 'nillify_club_cash']
+                        :lapsed, :do => [:cancellation, :nillify_club_cash_upon_cancellation]
     after_transition applied:                         :lapsed, do: [:set_user_as_rejected, :send_rejection_communication]
     ###### <<<<<<========
     after_transition all => all, :do => :propagate_membership_data
@@ -424,9 +425,9 @@ class User < ActiveRecord::Base
   ###############################################
 
   def change_terms_of_membership(tom, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil, schedule_date = nil, additional_actions = {})
+    agent = agent || Agent.find_by(email: Settings.batch_agent_email)
     if can_change_tom?
       new_tom = tom.kind_of?(TermsOfMembership) ? tom : TermsOfMembership.find_by(id: tom)
-
       if new_tom
         if new_tom.club_id == self.club_id
           if new_tom.id == terms_of_membership.id
@@ -436,7 +437,7 @@ class User < ActiveRecord::Base
             if schedule_date
               self.change_tom_date = schedule_date
               self.change_tom_attributes = additional_actions.merge(terms_of_membership_id: tom.id)
-              self.change_tom_attributes.merge!(agent_id: agent.id) if agent
+              self.change_tom_attributes.merge!(agent_id: agent.id)
               self.save(validate: false)
               Auditory.audit(agent, self, operation_message, self, operation_type)
               return { message: operation_message, code: Settings.error_codes.success }
@@ -827,6 +828,7 @@ class User < ActiveRecord::Base
       message = "Membership prorated successfully. Billing $#{tom.installment_amount} minus $#{amount_in_favor} that had in favor related for TOM(#{tom.id}) -#{tom.name}-. Final amount #{trans.transaction_type=='sale' ? 'billed' : 'refunded'} $#{trans.amount}."
     else
       days_already_in_provisional = (Time.zone.now.to_date - join_date.to_date ).to_i
+      club_cash_to_deduct = 0.0
       if days_already_in_provisional >= tom.provisional_days
         trans, answer = proceed_to_bill_prorated_amount(agent, tom, 0.0, credit_card, nil, operation_type) 
         message = "Membership reached end of provisional period after Subscription Plan change to TOM(#{tom.id}) -#{tom.name}-. Billing $#{trans.amount} according to new installment amount."
@@ -941,11 +943,24 @@ class User < ActiveRecord::Base
 
   ##################### Club cash ####################################
 
-  delegate :is_not_drupal?, to: :club
+  def is_not_drupal?
+    @is_not_drupal ||= club.is_not_drupal?
+  end
 
   # Resets user club cash in case of a cancelation.
   def nillify_club_cash(message = 'Removing club cash because of member cancellation')
     NillifyClubCashJob.perform_later(self.id, message)
+  end
+  
+  def nillify_club_cash_upon_cancellation
+    message = 'Removing club cash because of member cancellation'
+    if not is_not_drupal?
+      self.club_cash_amount = 0
+      self.save
+      Auditory.audit(nil, self, message, self, Settings.operation_types.reset_club_cash)
+    else
+      nillify_club_cash
+    end
   end
 
   # Resets member club cash in case the club cash has expired.
@@ -1590,6 +1605,20 @@ class User < ActiveRecord::Base
         if club.mailchimp_mandrill_client?
           Mailchimp::UserUpdateEmailJob.perform_later(self.id, self.email_change.first) if defined?(SacMailchimp::MemberModel)
         end
+      end
+    end
+
+    def create_operation_on_testing_account_toggle
+      if testing_account_was != testing_account
+        if testing_account
+          operation_type = Settings.operation_types.testing_account_marked
+          message = I18n.t('activerecord.attributes.user.testing_account_marked')
+        else
+          operation_type = Settings.operation_types.testing_account_unmarked
+          message = I18n.t('activerecord.attributes.user.testing_account_unmarked')
+        end
+        current_agent = RequestStore.store[:current_agent]
+        Auditory.audit(current_agent, self, message, self, operation_type)
       end
     end
 end
