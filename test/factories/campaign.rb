@@ -1,5 +1,4 @@
 FactoryGirl.define do
-
   factory :campaign do
     sequence(:name) {|n| "Campaign_#{Faker::Commerce.product_name}" }
     landing_name "flag"

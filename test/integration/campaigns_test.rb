@@ -1,3 +1,4 @@
+
 require 'test_helper' 
 
 class CampaignTest < ActionDispatch::IntegrationTest
