@@ -24,12 +24,12 @@ class CampaignDataFetcher
       when 404
         report.meta = :invalid_campaign
       else
-        Auditory.report_issue("MailchimpFetcher campaign retrieval error.", 'Mailchimp returned an unexpected code', { response: e.body }, false)
+        Auditory.report_issue("MailchimpFetcher campaign retrieval error.", 'Mailchimp returned an unexpected code', { response: e.body, campaign_id: report.campaign_id }, false)
         report.meta = :unexpected_error
       end
       report
     rescue Exception => e
-      Auditory.report_issue("MailchimpFetcher campaign retrieval error.", 'Mailchimp returned an unexpected error', { exception: e.to_s }, false)
+      Auditory.report_issue("MailchimpFetcher campaign retrieval error.", 'Mailchimp returned an unexpected error', { exception: e.to_s, campaign_id: report.campaign_id }, false)
       @logger.error "MailchimpFetcher Error: #{e.to_s}"
       report.meta = :unexpected_error
       report
