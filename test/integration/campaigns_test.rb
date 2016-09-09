@@ -1,4 +1,3 @@
-
 require 'test_helper' 
 
 class CampaignTest < ActionDispatch::IntegrationTest
@@ -7,7 +6,6 @@ class CampaignTest < ActionDispatch::IntegrationTest
     @partner = FactoryGirl.create(:partner)    
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
   end
 
   def login_general_admin(type)
@@ -41,23 +39,25 @@ class CampaignTest < ActionDispatch::IntegrationTest
   end
 
   test "should show campaign" do
+    campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
     login_general_admin(:confirmed_admin_agent)
     visit campaigns_path(@partner.prefix, @club.name)
     within("#campaigns_table") do
       click_link_or_button 'Show'
     end
-    assert page.has_content?(@campaign.name)
-    assert page.has_content?(@campaign.campaign_type)
+    assert page.has_content?(campaign.name)
+    assert page.has_content?(campaign.campaign_type)
     assert page.has_content?(@terms_of_membership.name)
-    assert page.has_content?(@campaign.enrollment_price)
-    assert page.has_content?(@campaign.transport)
-    assert page.has_content?(@campaign.transport_campaign_id)
-    assert page.has_content?(@campaign.utm_medium)
-    assert page.has_content?(@campaign.utm_content)
-    assert page.has_content?(@campaign.audience)   
+    assert page.has_content?(campaign.enrollment_price)
+    assert page.has_content?(campaign.transport)
+    assert page.has_content?(campaign.transport_campaign_id)
+    assert page.has_content?(campaign.utm_medium)
+    assert page.has_content?(campaign.utm_content)
+    assert page.has_content?(campaign.audience)   
   end
 
   test "should update campaign" do
+    campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
     login_general_admin(:confirmed_admin_agent)
     visit campaigns_path(@partner.prefix, @club.name)
     within("#campaigns_table") do
@@ -65,7 +65,23 @@ class CampaignTest < ActionDispatch::IntegrationTest
     end
     unsaved_campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
     fill_in 'campaign[name]', with: unsaved_campaign.name
+    select_from_datepicker("campaign_initial_date", unsaved_campaign.initial_date + 3.days)
+    select_from_datepicker("campaign_finish_date", unsaved_campaign.finish_date + 10.days)
     click_link_or_button 'Update Campaign'
     assert page.has_content?("Campaign #{unsaved_campaign.name} was updated succesfully.")
+  end
+
+  test "should not update campaign when it has campaign_days created" do
+    campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id, :initial_date => Time.zone.yesterday)  
+    campaign_days = FactoryGirl.create(:campaign_day, :campaign_id => campaign.id)
+    login_general_admin(:confirmed_admin_agent)
+    visit campaigns_path(@partner.prefix, @club.name)
+    within("#campaigns_table") do
+      click_link_or_button 'Edit'
+    end
+    select_from_datepicker("campaign_initial_date", campaign.initial_date - 3.days)
+    select_from_datepicker("campaign_finish_date", campaign.finish_date - 5.days)
+    click_link_or_button 'Update Campaign'
+    assert page.has_content?("Campaign #{campaign.name} was not updated.")    
   end
 end
