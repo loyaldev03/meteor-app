@@ -8,7 +8,7 @@ FactoryGirl.define do
     enrollment_price { Faker::Number.decimal(2) }
     campaign_type { Campaign.campaign_types['sloop'] } 
     transport { Campaign.transports['facebook'] }    
-    transport_campaign_id  {Faker::Lorem.characters(20)}   
+    transport_campaign_id {Faker::Lorem.characters(20)}   
     utm_medium "display"
     utm_content "banner"
     audience { Faker::Lorem.characters(10) }
