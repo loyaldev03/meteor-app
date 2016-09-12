@@ -71,7 +71,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     assert page.has_content?("Campaign #{unsaved_campaign.name} was updated succesfully.")
   end
 
-  test "should not update campaign when it has campaign_days created" do
+  test "should not update campaigns in the past when it has campaign_days created" do
     campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id, :initial_date => Time.zone.yesterday)  
     campaign_days = FactoryGirl.create(:campaign_day, :campaign_id => campaign.id)
     login_general_admin(:confirmed_admin_agent)
