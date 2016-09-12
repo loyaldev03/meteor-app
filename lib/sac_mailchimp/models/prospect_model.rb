@@ -43,7 +43,7 @@ module SacMailchimp
     	fieldmap.each do |api_field, our_field| 
         attributes.merge!(SacMailchimp.format_attribute(self.prospect, api_field, our_field))
       end
-      if Rails.env.production? and self.prospect.preferences and preferences_fieldmap
+      if self.prospect.preferences and preferences_fieldmap
         preferences_fieldmap.each do |api_field, our_field|
           attributes.merge!({ api_field => self.prospect.preferences[our_field].to_s })
         end
@@ -77,21 +77,40 @@ module SacMailchimp
     end
 
 		def preferences_fieldmap
-      case self.prospect.club_id
-        when 1
-          {
-            "PREF1" => "driver_1",
-            "PREF2" => "driver_2",
-            "PREF3" => "car",
-            "PREF4" => "track"
-          }
-        when 15 # SCRF
-          {
-            "PREF1" => "driver_1",
-            "PREF2" => "driver_2",
-            "PREF3" => "car",
-            "PREF4" => "track"
-          }
+      if Rails.env.production?
+        case self.prospect.club_id
+          when 1 # ONMC
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+          when 15 # SCRF
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+        end
+      elsif Rails.env.prototype?
+        case self.prospect.club_id
+          when 39 # ONMC
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+          when 100 # SCRF
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+        end
       end
     end
 
