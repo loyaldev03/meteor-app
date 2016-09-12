@@ -51,20 +51,20 @@ module SacMailchimp
         attributes.merge!({ "PREF1" => self.prospect.preferences["example_color"].to_s })
         attributes.merge!({ "PREF2" => self.prospect.preferences["example_team"].to_s })
       end
-			attributes
+      attributes
     end
 
-		def fieldmap
-		  { 
+    def fieldmap
+      { 
         'EMAIL' => 'email',
-		    'FNAME' => 'first_name',
-		    'LNAME' => 'last_name',
-		    'CITY' => 'city',
-		    'STATE' => 'state',
-		    'ZIP' => 'zip',
-		    'BIRTHDATE' => 'birth_date',
-		    'GENDER' => 'gender',
-		    'PHONE' => 'full_phone_number',
+        'FNAME' => 'first_name',
+        'LNAME' => 'last_name',
+        'CITY' => 'city',
+        'STATE' => 'state',
+        'ZIP' => 'zip',
+        'BIRTHDATE' => 'birth_date',
+        'GENDER' => 'gender',
+        'PHONE' => 'full_phone_number',
         'TOMID' => 'terms_of_membership_id',
         'JOINDATE' => 'created_at',
         'MKTCODE' => 'marketing_code',
@@ -76,7 +76,7 @@ module SacMailchimp
       }
     end
 
-		def preferences_fieldmap
+    def preferences_fieldmap
       if Rails.env.production?
         case self.prospect.club_id
           when 1 # ONMC

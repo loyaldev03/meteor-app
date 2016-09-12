@@ -126,24 +126,24 @@ module SacMailchimp
     end
 
     #If any of these variables are changed, please check Mandrill's variable too.
-		def fieldmap
-		  { 
+    def fieldmap
+      { 
         'MEMBERID' => 'id',
         'EMAIL' => 'email',
-		    'FNAME' => 'first_name',
-		    'LNAME' => 'last_name',
-		    'CITY' => 'city',
-		    'STATE' => 'state',
-		    'ZIP' => 'zip',
-		    'BIRTHDATE' => 'birth_date',
-		    'MSINCEDATE' => 'member_since_date',
-		    'BILLDATE' => 'next_retry_bill_date',
-		    'EXTERNALID' => 'external_id',
-		    'GENDER' => 'gender',
-		    'PHONE' => 'full_phone_number',
+        'FNAME' => 'first_name',
+        'LNAME' => 'last_name',
+        'CITY' => 'city',
+        'STATE' => 'state',
+        'ZIP' => 'zip',
+        'BIRTHDATE' => 'birth_date',
+        'MSINCEDATE' => 'member_since_date',
+        'BILLDATE' => 'next_retry_bill_date',
+        'EXTERNALID' => 'external_id',
+        'GENDER' => 'gender',
+        'PHONE' => 'full_phone_number',
         'CJOINDATE' => 'current_join_date'
-		  }
-		end
+      }
+    end
 
     def membership_fieldmap
       {
@@ -167,7 +167,7 @@ module SacMailchimp
       }
     end
 
-		def preferences_fieldmap
+    def preferences_fieldmap
       if Rails.env.production?
         case self.user.club_id
           when 1 # ONMC
