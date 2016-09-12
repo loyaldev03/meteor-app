@@ -66,7 +66,7 @@
         'JOINDATE' => 'join_date',
         'CANCELDATE' => 'cancel_date',
         'AUDIENCE' => 'audience',
-        'CAMPAIGNTYPE' => 'utm_campaign',
+        'CTYPE' => 'utm_campaign',
         'CAMPAIGNID' => 'campaign_code',
         'MEDIUM' => 'utm_medium',
         'PRODUCTSKU' => 'product_sku',

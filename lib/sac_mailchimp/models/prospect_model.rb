@@ -68,7 +68,7 @@ module SacMailchimp
         'TOMID' => 'terms_of_membership_id',
         'JOINDATE' => 'created_at',
         'AUDIENCE' => 'audience',
-        'CAMPAIGNTYPE' => 'utm_campaign',
+        'CTYPE' => 'utm_campaign',
         'CAMPAIGNID' => 'campaign_code',
         'MEDIUM' => 'utm_medium',
         'PRODUCTSKU' => 'product_sku',
