@@ -48,7 +48,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?("File created succesfully.")
       fulfillment_file = FulfillmentFile.last
       visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-      
+
       within("#fulfillment_files_table") do
         assert page.has_content?(fulfillment_file.id.to_s)
         assert page.has_content?(fulfillment_file.status)
@@ -338,8 +338,8 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(I18n.l fulfillment.renewable_at, :format => :only_date)
       assert page.has_content?(@product.sku)
       assert page.has_content?('not_processed')
-      confirm_ok_js
       click_link_or_button('Cancel')
+      confirm_ok_js
     end
     assert find_field('input_first_name').value == @saved_user.first_name
     assert page.has_content? "Changed status on Fulfillment ##{fulfillment.id} #{@product.sku} from not_processed to canceled"
@@ -377,8 +377,8 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(@product.sku)
       assert page.has_no_content?('not_processed')
       assert page.has_content?('manual_review_required')
-      confirm_ok_js
       click_link_or_button('Do not honor')
+      confirm_ok_js
     end
     assert find_field('input_first_name').value == @saved_user.first_name
     assert page.has_content? "Changed status on Fulfillment ##{fulfillment.id} #{@product.sku} from manual_review_required to do_not_honor"
@@ -549,6 +549,8 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #     assert page.has_selector?('#set_as_wrong_address')
 
   #     click_link_or_button('Mark as sent')
+      confirm_ok_js
+
   #     assert page.has_content?("Fulfillment #{@product.sku} was set as sent.")
   #   end
   #   visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -2441,10 +2443,9 @@ test "Update the status of all the fulfillments - In process using individual ch
     generate_fulfillment_files(false, @saved_user.fulfillments, nil, nil, 'not_processed', false)
     
     visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-
     within("#fulfillment_files_table")do
-      confirm_ok_js
       click_link_or_button 'Mark as sent'
+      confirm_ok_js
     end
     assert page.has_content?("Fulfillment file marked as sent successfully")
 
@@ -2562,8 +2563,8 @@ test "Update the status of all the fulfillments - In process using individual ch
       assert page.has_no_content?( I18n.l(fulfillment_file2.first.created_at.to_date) )     
       assert page.has_no_content?( I18n.l(fulfillment_file2.last.created_at.to_date) )
     
-      confirm_ok_js
       first(:link, 'Mark as sent').click
+      confirm_ok_js
     end
     assert page.has_content?("Fulfillment file marked as sent successfully")
 

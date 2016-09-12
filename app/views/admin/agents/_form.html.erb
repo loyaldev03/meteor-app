@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <% if @agent.club_roles.empty? and not @current_agent.roles.empty? %>
+  <% if @agent.club_roles.empty? and not current_agent.roles.empty? %>
     <div class="control-group" id="div_agent_roles">
       &nbsp; &nbsp; &nbsp;<%= link_to "clear", "#", :class => "btn btn-mini", :style => "display: #{@agent.roles.blank? ? 'none' : true}", :id => "clear_global_role"%>
       <label class='control-label'> Global Roles </label>
@@ -54,13 +54,13 @@
         <% unless @agent.new_record? %>
           <% @club_roles.each do |club_role| %>
           <tr id=<%="tr_club_role_#{club_role.id}"%>>
-            <% if @current_agent.club_roles.empty? or @current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
+            <% if current_agent.club_roles.empty? or current_agent.clubs.each.collect(&:id).include? club_role.club_id %>
               <td id=<%="td_club_role_role_#{club_role.id}"%>> <%= club_role.role %> </td>
               <td> <%= club_role.club.name %> </td>
               <td id=<%="td_club_role_buttons_#{club_role.id}"%>>
-                <% unless @current_agent==@agent %>
+                <% unless current_agent==@agent %>
                     <%= link_to("Edit", "#" , :class => 'btn btn-mini', :id => "club_role_edit", :name => club_role.id)%>
-                    <%= link_to("Delete", "#" , :class => 'btn btn-mini', :id => "club_role_delete", :name => "#{club_role.id};#{club_role.club_id};#{club_role.club.name}")%>
+                    <%= link_to("Delete", "#" , :class => 'btn btn-mini btn-danger', :id => "club_role_delete", :name => "#{club_role.id};#{club_role.club_id};#{club_role.club.name}", data: {confirm: 'Are you sure you want to delete this club role?'})%>
                 <% end %>
               </td>
             <% end %>

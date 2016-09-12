@@ -47,8 +47,8 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     if product
       select(product.name, :from => 'product_sku')
     end
-    confirm_ok_js
     click_on 'Recover'
+    confirm_ok_js
     @saved_user.reload
   end
 
@@ -62,8 +62,8 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
       click_on("#{date_time.day}")
     end
     select(@member_cancel_reason.name, :from => 'reason')
-    confirm_ok_js
     click_on 'Cancel user'
+    confirm_ok_js
     user.set_as_canceled!
   end
 

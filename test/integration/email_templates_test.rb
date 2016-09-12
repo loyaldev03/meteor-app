@@ -258,8 +258,8 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
     first_email_template = @tom.email_templates.first
     within("tr", text: first_email_template.name) do
       assert_difference("EmailTemplate.count",-1) do
-        confirm_ok_js
         click_link_or_button "Destroy"
+        confirm_ok_js        
       end
     end
     assert page.has_content? first_email_template.name
@@ -277,8 +277,8 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
     first_email_template = @tom.email_templates.first
     within("tr", text: first_email_template.name) do
       assert_difference("EmailTemplate.count",-1) do
-        confirm_ok_js
         click_link_or_button "Destroy"
+        confirm_ok_js
       end
     end
     assert page.has_content? first_email_template.name

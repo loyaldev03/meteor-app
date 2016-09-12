@@ -44,8 +44,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     within("#unreachable_table"){
       select(reason, :from => 'reason')
     }
-    confirm_ok_js
     click_link_or_button 'Set wrong phone number'
+    confirm_ok_js
   end
 
   ###########################################################
@@ -163,8 +163,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     setup_user
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     click_link_or_button 'Set undeliverable'
-    confirm_ok_js
     click_link_or_button 'Set wrong address'
+    confirm_ok_js
     within("#table_demographic_information") {
       assert page.has_content?("This address is undeliverable")
     }
@@ -217,8 +217,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
         assert page.has_content?("active")
       }
     }
-    confirm_ok_js
     within("#credit_cards"){ click_link_or_button 'Activate' }
+    confirm_ok_js
     within('.nav-tabs'){ click_on 'Credit Cards'}
     within("#credit_cards") {
       within(".ligthgreen") {
@@ -235,9 +235,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     
     click_link_or_button 'Set undeliverable'
-    confirm_ok_js
     click_link_or_button 'Set wrong address'
-
+    confirm_ok_js
     operation = @saved_user.operations.first
     
     within(".nav-tabs"){ click_on("Operations") }
@@ -276,10 +275,9 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     within("#unreachable_table") do
       select('Unreachable', :from => 'reason')
     end
-    confirm_ok_js
     click_link_or_button 'Set wrong phone number'
-   
-   within("#table_contact_information")do
+    confirm_ok_js
+    within("#table_contact_information")do
       assert page.has_css?('tr.yellow')
     end 
     @saved_user.reload
@@ -545,8 +543,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     end 
     within("#credit_cards")do
       assert page.has_selector?("#destroy")
-      confirm_ok_js
       click_link_or_button("Destroy")
+      confirm_ok_js
     end
     assert page.has_content?("Credit Card #{second_credit_card.last_digits} was successfully destroyed")
   end

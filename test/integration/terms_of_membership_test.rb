@@ -885,8 +885,8 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
       within("tr", :text => the_tom.name) do
-        confirm_ok_js
         click_link_or_button "Edit"
+        confirm_ok_js
       end
     end
     assert page.has_content?("can not be edited")
@@ -901,8 +901,8 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
       within("tr", :text => the_tom.name) do
-        confirm_ok_js
         click_link_or_button "Edit"
+        confirm_ok_js
       end
     end
     assert page.has_content?("can not be edited")
@@ -998,8 +998,8 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
       within("tr", :text => the_tom.name) do
-        confirm_ok_js
         click_link_or_button "Destroy"
+        confirm_ok_js
       end
     end
     assert page.has_content?("was successfully destroyed.")
@@ -1014,8 +1014,8 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
       within("tr", :text => the_tom.name) do
-        confirm_ok_js
         click_link_or_button "Destroy"
+        confirm_ok_js
       end
     end
     assert page.has_content?("was not destroyed.")
@@ -1030,8 +1030,8 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
       within("tr", :text => the_tom.name) do
-        confirm_ok_js
         click_link_or_button "Destroy"
+        confirm_ok_js
       end
     end
     assert page.has_content?("was not destroyed.")
@@ -1119,8 +1119,8 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
       within("tr", :text => the_tom.name) do
-        confirm_ok_js
         click_link_or_button "Destroy"
+        confirm_ok_js
       end
     end
     assert page.has_content?("was successfully destroyed.")

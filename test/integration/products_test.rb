@@ -68,10 +68,9 @@ class ProductsTest < ActionDispatch::IntegrationTest
     assert page.has_content?("was updated successfully.")
     assert page.has_content?(saved_product.stock.to_s)
 
-    confirm_ok_js
-
     assert_difference('Product.count', -1) do
       first(:link, "Destroy").click
+      confirm_ok_js
     end
     assert page.has_content?("was successfully destroyed")
   end
@@ -83,8 +82,8 @@ class ProductsTest < ActionDispatch::IntegrationTest
     click_link_or_button 'Back'
     assert page.has_content?('Search')
     visit product_path(@partner.prefix, @club.name, saved_product.id)
-    confirm_ok_js
     click_link_or_button 'Destroy'
+    confirm_ok_js
     assert page.has_content?('Search')    
   end
 

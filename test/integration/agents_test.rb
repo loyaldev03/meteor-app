@@ -154,11 +154,11 @@ class AgentsTest < ActionDispatch::IntegrationTest
     setup_environment
     confirmed_agent = FactoryGirl.create(:confirmed_agent)
     visit admin_agents_path
-    confirm_ok_js
 
     within("#agents_table") do 
       within("tr", :text => confirmed_agent.email) do 
         click_link_or_button 'Destroy'
+        confirm_ok_js
       end
     end
 
@@ -363,9 +363,9 @@ class AgentsTest < ActionDispatch::IntegrationTest
   end
 
 
-  # #####################################################
-  # # CLUBS ROLES
-  # ##################################################### 
+  # # #####################################################
+  # # # CLUBS ROLES
+  # # ##################################################### 
 
   def prepare_agents_with_club_roles
     club = FactoryGirl.create(:simple_club_with_gateway)
@@ -426,7 +426,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
     within("#club_role_table") do
       click_link_or_button "Edit"
       select "supervisor", :from => "select_club_role_#{@agent_club_role_representative.club_roles.first.id}"
-      confirm_ok_js
+      confirm_javascript_ok
       click_link_or_button "Update"
       assert page.has_content? "Club Role for #{@agent_club_role_representative.clubs.first.name} updated successfully."
     end
@@ -483,17 +483,18 @@ class AgentsTest < ActionDispatch::IntegrationTest
 
     club_role_to_delete_first = @agent_club_role_representative.club_roles.first
     club_name_deleted = club_role_to_delete_first.club.name
+    confirm_javascript_ok
 
     within("#club_role_table") do
-      confirm_ok_js
       within("#tr_club_role_#{@agent_club_role_representative.club_roles.first.id}") do
-        confirm_ok_js
         click_link_or_button "Delete"
+        confirm_ok_js
       end
       assert page.has_content?("Club Role deleted successfully")
       assert page.has_no_content?(club_name_deleted)
       within("#tr_club_role_#{@agent_club_role_representative.club_roles.last.id}") do
         click_link_or_button "Delete"
+        confirm_ok_js
       end
       assert page.has_content?(@agent_club_role_representative.club_roles.last.club.name)
       

@@ -226,6 +226,10 @@ module ActionDispatch
     end
 
     def confirm_ok_js
+      page.execute_script("$('.modal .commit').click();")
+    end
+
+    def confirm_javascript_ok
       evaluate_script("window.confirm = function(msg) { return true; }")
     end
 
@@ -537,8 +541,8 @@ module ActionDispatch
         select(new_terms_of_membership.name, from: 'terms_of_membership_id')
         select_from_datepicker('change_tom_date', schedule_date) if schedule_date
         check 'remove_club_cash' if remove_club_cash
-        confirm_ok_js
         click_on 'Save the sale'
+        confirm_ok_js
         if validate
           assert page.has_content?("Save the sale succesfully applied")
           user.reload
@@ -558,8 +562,8 @@ module ActionDispatch
       wait_until{ assert find_field('input_first_name').value == user.first_name }
       click_link_or_button "Recover"
       select(new_tom.name, :from => 'terms_of_membership_id')
-      confirm_ok_js
       click_on "Recover"
+      confirm_ok_js
       if validate
         wait_until{ assert find_field('input_first_name').value == user.first_name }
         assert page.has_content? 'Member recovered successfully'
@@ -572,9 +576,8 @@ module ActionDispatch
       within("#undeliverable_table"){
         fill_in reason, :with => reason
       }
-      confirm_ok_js
       click_link_or_button 'Set wrong address'
-
+      confirm_ok_js
       if validate
         user.reload
         within('.nav-tabs'){ click_on 'Operations' }

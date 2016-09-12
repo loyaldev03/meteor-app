@@ -110,9 +110,9 @@ class ClubTest < ActionDispatch::IntegrationTest
   test "should delete club" do
     saved_club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
     visit clubs_path(@partner.prefix)
-    confirm_ok_js
     within("#clubs_table") do
       click_link_or_button 'Destroy'
+      confirm_ok_js
     end
     assert page.has_content?("Club #{saved_club.name} was successfully destroyed")
     assert Club.with_deleted.where(id: saved_club.id).first
