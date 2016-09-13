@@ -299,10 +299,10 @@
                       </table>
                     </div>
                     <div class='modal-footer'>
+                      <a href='#' class='btn' data-dismiss='modal' >Close</a>
                       <%= link_to(user_unschedule_future_tom_update_path, method: 'put', :class => "btn btn-danger #{'disabled' unless (can?(:save_the_sale, User) and @current_user.can_change_tom?)}", id: 'remove_future_tom_change', data: {:confirm => t('are_you_sure')}) do %> 
                         <i class="icon-pencil"></i> Unschedule
                       <% end %>
-                      <a href='#' class='btn' data-dismiss='modal' >Close</a>
                     </div>
                   </div>
                 </td>

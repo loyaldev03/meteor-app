@@ -194,8 +194,7 @@
 </div>
 
 <div id="" class="form-actions">
-  <%= link_to t('cancel', :default => t("helpers.links.cancel")), terms_of_memberships_path, :class => 'btn', 
-    data: {:confirm => t('activerecord.attributes.terms_of_membership.wizard.cancel_button_caption')} %>
+  <%= link_to t("helpers.links.cancel"), terms_of_memberships_path, id: 'cancel_button', :class => 'btn', data: {:confirm => t('activerecord.attributes.terms_of_membership.wizard.cancel_button_caption')} %>
   <div style = "float: right;">
     <%= f.submit "clear", :id => 'back', :class => 'btn', :type => "reset" %>
     <%= f.submit nil, :id => 'next', :class => 'btn btn-primary' %>
@@ -411,6 +410,11 @@
           break;
       }
     });
+
+    $('.form-actions').on('confirm:complete', '#cancel_button', function(event){
+      window.location.href = $(this).attr('href');
+    });
+
 
     new_tom_functions();
     set_button_next_label($("#tom_wizard_form").formwizard("state").currentStep);

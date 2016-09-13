@@ -844,10 +844,15 @@ function show_user_functions(){
     $(".tab-content .active").removeClass("active");
     $(".tab-content #"+objects_to_search+"").addClass("active");
   });
-  $("#sync_to_remote").click(function(){
-    if(confirm("Are you sure?")){
-      startAjaxLoader(false);
-    }
+  $('#marketing_sync_table').on('confirm:complete', '#sync_to_remote', function(event){
+    startAjaxLoader(true);
+  });
+  $('#td_mi_future_tom_change').on('click', '#remove_future_tom_change', function(event){
+    $('#myModalFutureTomChange').modal('toggle');
+  });
+  $('#td_mi_future_tom_change').on('confirm:action', '#remove_future_tom_change', function(event, response, response2){
+    if(response)
+      startAjaxLoader(true);
   });
 };
 
@@ -1206,7 +1211,7 @@ function admin_form_functions(){
   $('#club_role_table').on('confirm:complete', '#club_role_delete', function(event){
     event.preventDefault();
     array = $(this).attr('name').split(";");
-    club_role_id = array[0]
+    club_role_id = array[0];
     $.ajax({
       type: "PUT",
       url: "/admin/agents/"+agent_id+"/delete_club_role",
