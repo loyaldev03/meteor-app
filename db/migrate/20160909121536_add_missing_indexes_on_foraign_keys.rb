@@ -10,7 +10,5 @@ class AddMissingIndexesOnForaignKeys < ActiveRecord::Migration
     add_index :operations, :club_id
     add_index :operations, :created_by_id
     add_index :prospects, :club_id
-
-    remove_index :users, :club_id
   end
 end
