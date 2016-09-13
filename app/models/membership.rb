@@ -32,7 +32,7 @@ class Membership < ActiveRecord::Base
       self.product_description = params[:product_description]
       self.utm_campaign = params[:utm_campaign].downcase if params[:utm_campaign]
       self.audience = params[:audience].downcase if params[:audience]
-      self.campaign_code = params[:camapign_id].downcase if params[:campaign_id]
+      self.campaign_code = params[:campaign_id].downcase if params[:campaign_id]
       self.ip_address = params[:ip_address]
       self.product_sku = params[:product_sku]
       self.user_agent = params[:user_agent]
