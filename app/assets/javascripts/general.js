@@ -848,9 +848,9 @@ function show_user_functions(){
     startAjaxLoader(true);
   });
   $('#td_mi_future_tom_change').on('click', '#remove_future_tom_change', function(event){
-    $('#myModalFutureTomChange').modal('toggle');
+    $('#myModalFutureTomChange').modal('hide');
   });
-  $('#td_mi_future_tom_change').on('confirm:action', '#remove_future_tom_change', function(event, response, response2){
+  $('#td_mi_future_tom_change').on('confirm:complete', '#remove_future_tom_change', function(event, response, response2){
     if(response)
       startAjaxLoader(true);
   });
