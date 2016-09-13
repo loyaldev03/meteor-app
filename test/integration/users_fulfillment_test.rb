@@ -549,7 +549,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #     assert page.has_selector?('#set_as_wrong_address')
 
   #     click_link_or_button('Mark as sent')
-      confirm_ok_js
+      # confirm_ok_js
 
   #     assert page.has_content?("Fulfillment #{@product.sku} was set as sent.")
   #   end
