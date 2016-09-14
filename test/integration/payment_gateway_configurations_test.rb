@@ -26,8 +26,9 @@ class PaymentGatewayConfigurationTest < ActionDispatch::IntegrationTest
     new_pgc = FactoryGirl.build(:payment_gateway_configuration)
     
     fill_in_payment_gateway_configuration(new_pgc)
+    confirm_javascript_ok
     click_link_or_button "Create Payment gateway configuration"
-    confirm_ok_js
+    
     assert page.has_content? "Payment Gateway Configuration created successfully"
 
     visit club_path(@partner.prefix, @club.id)
@@ -43,8 +44,8 @@ class PaymentGatewayConfigurationTest < ActionDispatch::IntegrationTest
                                 aus_login: "newAusLogin" )
 
     fill_in_payment_gateway_configuration(new_pgc, false)
+    confirm_javascript_ok
     click_link_or_button "Update Payment gateway configuration"
-    confirm_ok_js
     wait_until{ page.has_content? "Payment gateway configuration" }
     assert page.has_content? new_pgc.gateway
     assert page.has_content? "newLogin"
@@ -61,8 +62,8 @@ class PaymentGatewayConfigurationTest < ActionDispatch::IntegrationTest
     click_link_or_button "New Payment Gateway"
     new_pgc = FactoryGirl.build(:payment_gateway_configuration)
     fill_in_payment_gateway_configuration(new_pgc)
+    confirm_javascript_ok
     click_link_or_button "Create Payment gateway configuration"
-    confirm_ok_js
     assert page.has_content? "Payment Gateway Configuration created successfully"
     
     visit club_path(@partner.prefix, @club.id)
