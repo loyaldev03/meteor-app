@@ -57,6 +57,32 @@
       </div>
     </div>
   </div>
+
+  <div id="transport_settings_values_google_analytics" style="display: none;">
+    <div class='row-fluid'>
+      <div class='span12'>
+        <div class="control-group">
+          <%= f.label 'Tracking ID', class: 'control-label' %>
+          <div class="controls">
+            <%= f.text_field :tracking_id, value: @transport.tracking_id, class: 'text_field' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="transport_settings_values_google_tag_manager" style="display: none;">
+    <div class='row-fluid'>
+      <div class='span12'>
+        <div class="control-group">
+          <%= f.label 'Container ID', class: 'control-label' %>
+          <div class="controls">
+            <%= f.text_field :container_id, value: @transport.container_id, class: 'text_field' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="form-actions">
