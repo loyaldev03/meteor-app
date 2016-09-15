@@ -157,7 +157,12 @@ class Club < ActiveRecord::Base
   end
 
   def available_transport_settings
-    ['facebook', 'mailchimp'] - transport_settings.select(:transport).map(&:transport)
+    [
+      'facebook',
+      'mailchimp',
+      'google_analytics',
+      'google_tag_manager'
+    ] - transport_settings.select(:transport).map(&:transport)
   end
 
   private
