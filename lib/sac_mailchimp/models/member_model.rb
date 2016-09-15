@@ -117,11 +117,7 @@ module SacMailchimp
         preferences_fieldmap.each do |api_field, our_field|
           attributes.merge!({ api_field => self.user.preferences[our_field].to_s })
         end
-      elsif Rails.env.prototype? and self.user.preferences
-        attributes.merge!({ "PREF1" => self.user.preferences["example_color"].to_s })
-        attributes.merge!({ "PREF2" => self.user.preferences["example_team"].to_s })
       end
-
 			attributes
     end
 

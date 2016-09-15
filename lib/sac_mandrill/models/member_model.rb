@@ -31,9 +31,6 @@
         preferences_fieldmap.each do |api_field, our_field|
           attributes << {"name" => api_field, "content" => self.user.preferences[our_field].to_s}
         end
-      elsif Rails.env.prototype? and self.user.preferences
-        attributes << {"name" => "PREF1", "content" => self.user.preferences["example_color"].to_s}
-        attributes << {"name" => "PREF1", "content" => self.user.preferences["example_team"].to_s}
       end
       attributes
     end
