@@ -112,38 +112,34 @@ module SacMailchimp
       terms_of_membership_fieldmap.each do |api_field, our_field| 
         attributes.merge!(SacMailchimp.format_attribute(terms_of_membership, api_field, our_field))
       end
-      if Rails.env.production? and self.user.preferences and preferences_fieldmap
+      if self.user.preferences and preferences_fieldmap
         member_preferences = self.user.user_preferences
         preferences_fieldmap.each do |api_field, our_field|
           attributes.merge!({ api_field => self.user.preferences[our_field].to_s })
         end
-      elsif Rails.env.prototype? and self.user.preferences
-        attributes.merge!({ "PREF1" => self.user.preferences["example_color"].to_s })
-        attributes.merge!({ "PREF2" => self.user.preferences["example_team"].to_s })
       end
-
 			attributes
     end
 
     #If any of these variables are changed, please check Mandrill's variable too.
-		def fieldmap
-		  { 
+    def fieldmap
+      { 
         'MEMBERID' => 'id',
         'EMAIL' => 'email',
-		    'FNAME' => 'first_name',
-		    'LNAME' => 'last_name',
-		    'CITY' => 'city',
-		    'STATE' => 'state',
-		    'ZIP' => 'zip',
-		    'BIRTHDATE' => 'birth_date',
-		    'MSINCEDATE' => 'member_since_date',
-		    'BILLDATE' => 'next_retry_bill_date',
-		    'EXTERNALID' => 'external_id',
-		    'GENDER' => 'gender',
-		    'PHONE' => 'full_phone_number',
+        'FNAME' => 'first_name',
+        'LNAME' => 'last_name',
+        'CITY' => 'city',
+        'STATE' => 'state',
+        'ZIP' => 'zip',
+        'BIRTHDATE' => 'birth_date',
+        'MSINCEDATE' => 'member_since_date',
+        'BILLDATE' => 'next_retry_bill_date',
+        'EXTERNALID' => 'external_id',
+        'GENDER' => 'gender',
+        'PHONE' => 'full_phone_number',
         'CJOINDATE' => 'current_join_date'
-		  }
-		end
+      }
+    end
 
     def membership_fieldmap
       {
@@ -167,22 +163,41 @@ module SacMailchimp
       }
     end
 
-		def preferences_fieldmap
-      case self.user.club_id
-        when 1
-          {
-            "PREF1" => "driver_1",
-            "PREF2" => "driver_2",
-            "PREF3" => "car",
-            "PREF4" => "track"
-          }
-        when 15 # SCRF
-          {
-            "PREF1" => "driver_1",
-            "PREF2" => "driver_2",
-            "PREF3" => "car",
-            "PREF4" => "track"
-          }
+    def preferences_fieldmap
+      if Rails.env.production?
+        case self.user.club_id
+          when 1 # ONMC
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+          when 15 # SCRF
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+        end
+      elsif Rails.env.prototype?
+        case self.user.club_id
+          when 39 # ONMC
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+          when 100 # SCRF
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+        end
       end
     end
 

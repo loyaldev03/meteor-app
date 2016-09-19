@@ -43,28 +43,25 @@ module SacMailchimp
     	fieldmap.each do |api_field, our_field| 
         attributes.merge!(SacMailchimp.format_attribute(self.prospect, api_field, our_field))
       end
-      if Rails.env.production? and self.prospect.preferences and preferences_fieldmap
+      if self.prospect.preferences and preferences_fieldmap
         preferences_fieldmap.each do |api_field, our_field|
           attributes.merge!({ api_field => self.prospect.preferences[our_field].to_s })
         end
-      elsif Rails.env.prototype? and self.prospect.preferences
-        attributes.merge!({ "PREF1" => self.prospect.preferences["example_color"].to_s })
-        attributes.merge!({ "PREF2" => self.prospect.preferences["example_team"].to_s })
       end
-			attributes
+      attributes
     end
 
-		def fieldmap
-		  { 
+    def fieldmap
+      { 
         'EMAIL' => 'email',
-		    'FNAME' => 'first_name',
-		    'LNAME' => 'last_name',
-		    'CITY' => 'city',
-		    'STATE' => 'state',
-		    'ZIP' => 'zip',
-		    'BIRTHDATE' => 'birth_date',
-		    'GENDER' => 'gender',
-		    'PHONE' => 'full_phone_number',
+        'FNAME' => 'first_name',
+        'LNAME' => 'last_name',
+        'CITY' => 'city',
+        'STATE' => 'state',
+        'ZIP' => 'zip',
+        'BIRTHDATE' => 'birth_date',
+        'GENDER' => 'gender',
+        'PHONE' => 'full_phone_number',
         'TOMID' => 'terms_of_membership_id',
         'JOINDATE' => 'created_at',
         'MKTCODE' => 'marketing_code',
@@ -76,22 +73,41 @@ module SacMailchimp
       }
     end
 
-		def preferences_fieldmap
-      case self.prospect.club_id
-        when 1
-          {
-            "PREF1" => "driver_1",
-            "PREF2" => "driver_2",
-            "PREF3" => "car",
-            "PREF4" => "track"
-          }
-        when 15 # SCRF
-          {
-            "PREF1" => "driver_1",
-            "PREF2" => "driver_2",
-            "PREF3" => "car",
-            "PREF4" => "track"
-          }
+    def preferences_fieldmap
+      if Rails.env.production?
+        case self.prospect.club_id
+          when 1 # ONMC
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+          when 15 # SCRF
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+        end
+      elsif Rails.env.prototype?
+        case self.prospect.club_id
+          when 39 # ONMC
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+          when 100 # SCRF
+            {
+              "PREF1" => "driver_1",
+              "PREF2" => "driver_2",
+              "PREF3" => "car",
+              "PREF4" => "track"
+            }
+        end
       end
     end
 
