@@ -51,6 +51,9 @@ SacPlatform::Application.routes.draw do
       match '/users/new' => 'users#new', as: 'new_user', :via => :get
       match '/users' => 'users#index', as: 'users', :via => [:get, :post]
       match '/users/search_result' => 'users#search_result', as: 'users_search_result', :via => [:get]
+
+      get 'get_subscription_plans' => 'clubs#get_subscription_plans'
+      get 'get_campaign_codes' => 'clubs#get_campaign_codes'
       
       resources :terms_of_memberships, :path => 'subscription_plans' do
         get :resumed_information
@@ -138,6 +141,21 @@ SacPlatform::Application.routes.draw do
 
       get '/suspected_fulfillments' => 'fulfillments#suspected_fulfillments', as: 'suspected_fulfillments'
       get '/suspected_fulfillment/:id' => 'fulfillments#suspected_fulfillment_information', as: 'suspected_fulfillment_information'
+    
+      resources :campaigns, except: [:destroy] do
+        collection do 
+          get 'facebook/request_code', to: "campaign/facebook#request_code", as: :campaign_facebook_request_code 
+          get 'facebook/access_token', to: "campaign/facebook#generate_token", as: :campaign_facebook_access_token
+        end
+      end
+
+      resources :campaign_days, only: [:edit, :update] do
+        collection do
+          get 'missing' => 'campaign_days#missing'
+        end
+      end
+
+      resources :transport_settings, except: [:destroy]
     end
 
     resources :domains

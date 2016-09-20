@@ -70,6 +70,27 @@
       <% if params[:controller] == 'email_templates' and ['show', 'edit'].include? params[:action] %>
         <li class="active"><%= delimiter %><%= @et.name %></li>
       <% end %>
+      <% if params[:controller] == 'campaigns' && params[:action] == 'new' %>
+        <li><%= delimiter %><a href="<%= campaigns_path %>"><%= t('activerecord.model.campaigns') %></a></li>
+        <li class="active"><%= delimiter %>New Campaign</li>
+      <% end %>
+      <% if params[:controller] == 'campaigns' and ['show','edit'].include? params[:action]  %>
+        <li><%= delimiter %><a href="<%= campaigns_path %>"><%= t('activerecord.model.campaigns') %></a></li>
+        <li class="active"><%= delimiter %><%= @campaign.name %></li>
+      <% end %>
+      <% if params[:controller] == 'campaign_days' && params[:action] == 'index' %>
+        <li class="active"><%= delimiter %>Campaign Days</li>
+      <% end %>
+
+      <% if params[:controller] == 'transport_settings' && params[:action] == 'new' %>
+        <li><%= delimiter %><a href="<%= transport_settings_path %>">Transport Settings</a></li>
+        <li class="active"><%= delimiter %>New Transport Setting</li>
+      <% end %>
+      <% if params[:controller] == 'transport_settings' and ['show','edit'].include? params[:action]  %>
+        <li><%= delimiter %><a href="<%= transport_settings_path %>">Transport Settings</a></li>
+        <li class="active"><%= delimiter %><%= @transport.transport %></li>
+      <% end %>
+
     <% end %>
 
     <% if @current_user %>

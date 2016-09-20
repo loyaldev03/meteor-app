@@ -25,6 +25,10 @@ class ApplicationController < ActionController::Base
     @current_user
   end
 
+  def current_partner
+    @current_partner
+  end
+
   def current_club
     @current_club
   end

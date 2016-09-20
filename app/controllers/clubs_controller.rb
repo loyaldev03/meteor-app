@@ -116,6 +116,31 @@ class ClubsController < ApplicationController
     false
   end
 
+
+  def get_campaign_codes
+    club = Club.find(params[:club_id])
+    query = params[:query]
+    campaign_codes = club.campaigns.select(:campaign_code).distinct.where("campaign_code LIKE '%#{query}%'").pluck(:campaign_code)
+    values = []
+    code_id = 0
+    campaign_codes.each do |code|
+      values << { id: code_id.to_s, text: code }
+      code_id += 1
+    end
+    render json: values
+  end
+
+  def get_subscription_plans
+    club = Club.find(params[:club_id])
+    query = params[:query]
+    subscription_plans = club.terms_of_memberships.select(:id, :name).where("name LIKE '%#{query}%'")
+    values = []
+    subscription_plans.each do |plan|
+      values << { id: plan.id.to_s, text: plan.name }
+    end
+    render json: values
+  end
+
   private 
     def prepare_marketing_tool_attributes(marketing_tool_attributes, marketing_tool_client)
       unless marketing_tool_attributes.nil?

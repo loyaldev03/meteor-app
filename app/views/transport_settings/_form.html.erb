@@ -1,0 +1,70 @@
+<% if @transport.new_record? %>
+<div class='row-fluid'>
+  <div class='span6'>
+    <div class="control-group">
+      <%= f.label :transport, class: 'control-label' %>
+      <div class="controls">
+        <%= f.select :transport, options_for_select(current_club.available_transport_settings, @transport.transport), { class: 'form-control' } %> 
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<div id="transport_settings_values">
+  <div id="transport_settings_values_facebook" style="display: none;">
+    <div class='row-fluid'>
+      <div class='span12'>
+        <div class="control-group">
+          <%= f.label 'Client ID', class: 'control-label' %>
+          <div class="controls">
+            <%= f.text_field :client_id, value: @transport.client_id, class: 'text_field input-xxlarge' %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='row-fluid'>
+      <div class='span12'>
+        <div class="control-group">
+          <%= f.label :client_secret, class: 'control-label' %>
+          <div class="controls">
+            <%= f.text_field :client_secret, value: @transport.client_secret, class: 'text_field input-xxlarge' %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='row-fluid'>  
+      <div class='span12'>
+        <div class="control-group">
+          <%= f.label :access_token, class: 'control-label' %>
+          <div class="controls">
+            <%= f.text_field :access_token, value: @transport.access_token, class: 'text_field input-xxlarge' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="transport_settings_values_mailchimp" style="display: none;">
+    <div class='row-fluid'>
+      <div class='span12'>
+        <div class="control-group">
+          <%= f.label 'API Key', class: 'control-label' %>
+          <div class="controls">
+            <%= f.text_field :api_key, value: @transport.api_key, class: 'text_field input-xxlarge' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="form-actions">
+  <%= f.submit nil, class: 'btn btn-primary', id: 'submit_button' %>
+  <%= link_to t(:cancel), :back, class: 'btn', id: 'cancel_button' %>  
+</div>
+
+<script>
+  var transport = "<%= @transport.transport %>";
+  $(document).ready( transportSettingsFormFunctions() );
+</script>

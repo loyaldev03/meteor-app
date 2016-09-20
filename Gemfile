@@ -58,11 +58,14 @@ gem 'twitter-bootstrap-rails', '2.2.7'
 gem 'jquery-rails'
 
 gem "paranoia", "~> 2.0"
-
 gem 'exception_notification', github: 'stoneacre/exception_notification'
 gem 'pivotal-tracker'
 
 gem "newrelic_rpm"
+gem 'premailer-rails'
+gem "enum_help"
+gem "fb_graph2"
+gem "select2-rails"
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
@@ -97,7 +100,7 @@ gem 'data-confirm-modal', github: 'ifad/data-confirm-modal', branch: 'bootstrap2
 
 group :test do
   gem 'factory_girl_rails'
-  gem 'faker'
+  gem 'faker', github: 'stympy/faker'
   gem 'mocha', require: false
   gem 'capybara'
   gem 'selenium-webdriver', '>=2.53.0'
@@ -120,4 +123,6 @@ gem 'encryptor'
 ###################
 
 gem 'bureaucrat'
+gem 'rake', '10.4.2'
+gem 'validates_timeliness', '~> 4.0'
 gem 'request_store'

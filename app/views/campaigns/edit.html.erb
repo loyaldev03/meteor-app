@@ -1,0 +1,9 @@
+<div class='row-fluid'>
+  <div class='span12'>
+    <h2>Edit <%= t('activerecord.model.campaign') %></h2>
+    <hr />
+  </div>
+</div>
+<%= form_for @campaign, :as => :campaign, :url => campaign_path(:id => @campaign), :html => { :class => 'form-horizontal' } do |f| %>
+  <%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>

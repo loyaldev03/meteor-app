@@ -34,7 +34,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   end
 
 
-  # # # NEW
+  # # NEW
 
   test "Create subcription plan with Initial Fee distinct of 0" do
     sign_in_as(@admin_agent)
@@ -1018,7 +1018,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
         confirm_ok_js
       end
     end
-    assert page.has_content?("was not destroyed.")
+    assert page.has_content?("was not destroyed")
   end
 
   test "Do not delete a TOM with active memberships" do
@@ -1034,7 +1034,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
         confirm_ok_js
       end
     end
-    assert page.has_content?("was not destroyed.")
+    assert page.has_content?("was not destroyed")
   end
 
   test "Create a TOM that Requires Approval" do

@@ -50,6 +50,21 @@ en:
   future_save_the_sale: "Schedule save the sale to be done at"
   remove_club_cash: "Remove club cash when proceesing scheduled TOM change"
   cancel_confirm_when_tom_change_scheduled: "The member you are about to cancel has a future subscription plan scheduled. If the cancelation date you will choose is before the one for the future subscription plan update then that scheduled subscription plan will have no effect."
+  enums:
+    campaign:
+      transport:
+        facebook: Facebook
+        twitter: Twitter
+        mailchimp: Mailchimp
+        adwords: Google Adwords
+      campaign_type:
+        sloop: Sloop
+        ptx: Ptx
+        sweeptake: Sweeptake
+        store_promotion: Store promotion
+        newsletter: Newsletter
+        daily_candy: Daily candy
+        freemium: Freemium
   menu: 
     admin_menu: 'Admin Menu'
     logout: 'Logout'
@@ -193,6 +208,11 @@ en:
       payment_gateway_configuration: 'Payment Gateway Configuration'
       terms_of_membership: 'Subscription Plan'
       suspected_fulfillments: 'Suspected Fulfillments'
+      campaign: 'Campaign'
+      campaigns: 'Campaigns'
+      campaign_days: 'Campaign Days'
+      transport_setting: 'Transport Setting'
+      transport_settings: 'Transport Settings'
     gateway:
       mes: 'Merchant e Solutions'
       litle: Litle
@@ -618,6 +638,27 @@ en:
         aus_password: 'AUS password'
         aus_password_help: 'Account Updater Service service password'
         aus_password_update_help: "Account Updater Service service password. Leaving this field empty will not change current password."
+      campaign:
+        id: 'ID'
+        campaign_type: 'Campaign Type'
+        transport: 'Source'
+        start_date: 'Start Date'
+        finish_date: 'Finish Date'
+        enrollment_price: 'Enrollment Price'
+        utm_medium: 'Medium'
+        utm_content: 'Content'
+        audience: 'Audience'
+        landing_name: 'Landing Name'
+        landing_url: 'Landing Url'
+        campaign_code: 'Campaign Code'
+        campaign_code_help: 'This value is used to fill in the campaign_id value within the Landing Url.'
+        transport_campaign_id: 'Source Campaign ID'
+        transport_campaign_id_help: "The campaign's ID within the selected Source, used to identify the campaign within the selected Source." 
+      campaign_day:
+        date: 'Date'
+        spent: 'Spent'
+        reached: 'Reached'
+        converted: 'Converted'
   date: 
     formats:
       default: "%m/%d/%Y"
@@ -632,3 +673,12 @@ en:
       dashed: "%Y-%m-%d %H:%M"
       only_date: "%Y-%m-%d"
       only_date_short: "%m/%y"
+  mailers:
+    missing_campaign_days:
+      subject: "[%{club_name}] Missing campaign days report"
+    invalid_credentials_email:
+      subject: "[%{club_name}] Authentication error while trying to get campaign information"
+    invalid_campaign_email:
+      subject: "[%{club_name}] Invalid campaign configuration"
+    campaign_all_days_fetcher_result:
+      subject: "[%{campaign_name}] Campaign days data fetch result"

@@ -14,6 +14,8 @@
  *= require scaffolds
  *= require jquery-ui
  *= require table_sorter_style
+ *= require select2
+ *= require select2-bootstrap
  */
 
 
@@ -118,14 +120,6 @@ div.dataTables_filter input {
 
 .nowrap{
   white-space:nowrap;
-}
-
-.datepicker_for_search_nbd {
-  width: 80px;
-}
-
-.datepicker_for_search_billed_date{
-  width: 80px;
 }
 
 .btn-large-w {
@@ -258,3 +252,8 @@ table.evidences tbody {
     height: 25vw;
     overflow-y: auto;
 }
+
+form#new_campaign i#generate_fulfillment_code { cursor: pointer; }
+form#new_campaign .select2-selection__placeholder { color: black !important; }
+
+.error .help-inline { color: red; }

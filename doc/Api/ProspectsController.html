@@ -338,23 +338,23 @@
    <li><strong>terms_of_membership_id</strong> This is the id of the term of membership the member is enrolling with. With this param we will set some features such as provisional days or amount of club cash the member will start with. It is present at prospect level. </li> 
    <li><strong>birth_date</strong> Birth date of the member. This date is stored with format "yyyy-mm-dd"[optional]</li>
    <li><strong>product_sku</strong> Freeform text that is representative of the SKU. This will be passed with format string, each product separated with ',' (comma). (Example: "kit-card,circlet") [optional]</li>
-   <li><strong>mega_channel</strong>[optional]</li>
-   <li><strong>marketing_code</strong> multi-team[optional]</li>
-   <li><strong>fulfillment_code</strong> Id of the fulfillment we are sending to our member. (car-flag).[optional]</li>
+   <li><strong>utm_campaign</strong>[optional]</li>
+   <li><strong>audience</strong> multi-team[optional]</li>
+   <li><strong>campaign_id</strong> Id of the fulfillment we are sending to our member. (car-flag).[optional]</li>
    <li><strong>ip_address</strong> Ip address from where the enrollment is being submitted.[optional]</li>
    <li><strong>user_agent</strong> Information related to the browser and computer from where the enrollment is being submitted.[optional]</li>
    <li><strong>referral_host</strong> Link where is being redirect when after subimiting the enroll. (It shows the params in it).[optional]</li>
    <li><strong>referral_parameters</strong> [optional]</li>
    <li><strong>referral_path</strong> [optional]</li>
-   <li><strong>user_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information.[optional]</li>
+   <li><strong>visitor_id</strong> User ID alias UID is an md5 hash of the user's IP address and user-agent information.[optional]</li>
    <li><strong>landing_url</strong> Url from where the submit comes from.[optional]</li>
    <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json. [optional]</li>
    <li><strong>cookie_value</strong> Cookie from where the enrollment is being submitted.[optional]</li>
    <li><strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side.[optional]</li>
-   <li><strong>source</strong> [optional]</li>
-   <li><strong>campaign_medium</strong> [optional]</li>
+   <li><strong>utm_source</strong> [optional]</li>
+   <li><strong>utm_medium</strong> [optional]</li>
    <li><strong>campaign_description</strong> The name of the campaign.[optional]</li>
-   <li><strong>campaign_medium_version</strong> [optional]</li>
+   <li><strong>utm_content</strong> [optional]</li>
    <li><strong>joint</strong> It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level. [optional]</li> 
 </ul></span>
 								</li>
@@ -460,7 +460,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Mon Feb 22 10:08:27 2016 with ruby-2.2.0
+  Generated on Fri Sep  2 12:54:19 2016 with ruby-2.2.0
 </div>
 
   </body>
