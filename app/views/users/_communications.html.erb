@@ -18,7 +18,7 @@
   	<% @communications.each do |communication| %>
   	<tr>
   	  <td> 
-  	  	<% if communication.sent_success %> 
+  	  	<% if communication.sent_success %>
   	      <i class ="icon-ok help" rel= "popover" data-toggle="modal" href="#myModal<%=communication.id%>" style="cursor: pointer"></i>
         <% elsif not communication.sent_success and communication.processed_at %>
           <i class ="icon-remove help" rel= "popover" data-toggle="modal" href="#myModal<%=communication.id%>" style="cursor: pointer"></i>
@@ -37,7 +37,10 @@
   	  <td> <%= I18n.l communication.scheduled_at, :format => :only_date if communication.scheduled_at %> </td>
   	  <td> <%= I18n.l communication.processed_at, :format => :only_date if communication.processed_at %> </td>
   	  <td> <%= communication.template_type %> </td>
-      <td>&nbsp;</td>
+      <td>
+        <% unless communication.sent_success %>
+        <% end %>
+      </td>
     <tr>
 	 <% end %>
   	
