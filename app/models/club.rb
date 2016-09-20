@@ -148,14 +148,8 @@ class Club < ActiveRecord::Base
   end
 
   def resync_users_and_prospects
-    subscribers_count = self.members_count.to_i
-    if subscribers_count > Settings.maximum_number_of_subscribers_to_automatically_resync
-      Auditory.report_club_changed_marketing_client(self, subscribers_count)
-    end
-    self.users.update_all(need_sync_to_marketing_client: 1, marketing_client_synced_status: "not_synced", marketing_client_last_synced_at: nil, marketing_client_last_sync_error: nil, marketing_client_last_sync_error_at: nil, marketing_client_id: nil)
-    self.prospects.update_all(need_sync_to_marketing_client: 1)
+    Clubs::ResyncUsersAndProspectsJob.perform_later(club_id: self.id)
   end
-  handle_asynchronously :resync_users_and_prospects, queue: :generic_queue
 
   private
     def add_default_member_groups

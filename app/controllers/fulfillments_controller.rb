@@ -128,8 +128,7 @@ class FulfillmentsController < ApplicationController
 
   def download_xls
     my_authorize! :report, Fulfillment, @current_club.id
-    fulfillment_file = FulfillmentFile.find(params[:fulfillment_file_id])
-    fulfillment_file.send_email_with_file(params[:only_in_progress])
+    FulfillmentFiles::SendEmailWithFileJob.perform_later(fulfillment_file_id: params[:fulfillment_file_id], only_in_progress: params[:only_in_progress])
 
     flash[:notice] = "We are generating the Fulfillment File requested, and it will be delivered to your configured email as soon as it is ready. Have in mind this could take up to 15 minutes depending on the amount of users and fulfillments involved."
 

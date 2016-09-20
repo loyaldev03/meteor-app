@@ -61,6 +61,5 @@ class FulfillmentFile < ActiveRecord::Base
     Notifier.manual_fulfillment_file(self.agent,self,temp_file).deliver_now!
     temp_file.unlink
   end
-  handle_asynchronously :send_email_with_file, queue: :email_queue, priority: 5
 
 end
