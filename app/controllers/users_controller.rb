@@ -407,6 +407,17 @@ class UsersController < ApplicationController
     redirect_to show_user_path
   end
 
+  def resend_communication
+    comm = Communication.find(params[:communication_id])
+    comm.deliver_mandrill
+    Auditory.audit(@current_agent, @current_user, I18n.t('activerecord.attributes.communication.resent_success'), @current_user, Settings.operation_types.resend_communication)
+    redirect_to show_user_path, notice: I18n.t('activerecord.attributes.communication.resent_success')
+  rescue Exception => e
+    flash[:error] = t('error_messages.airbrake_error_message')
+    Auditory.report_issue("User:resend_communication", e, { user: @current_user.id, commuication_id: params[:commuication_id] })
+    redirect_to show_user_path
+  end
+
   def no_recurrent_billing
     if request.post?
       answer = @current_user.no_recurrent_billing(params[:amount], params[:description], params[:type])

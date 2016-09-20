@@ -568,6 +568,7 @@ en:
         template_type: 'Template type'
         sent_success: 'Sent success'
         not_found: 'No communications were found.'
+        resent_success: 'Communication resent requested'
       club_cash_transaction: 
         id: 'ID'
         created_at: 'Created at'

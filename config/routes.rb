@@ -101,6 +101,7 @@ SacPlatform::Application.routes.draw do
         post '/mailchimp_sync' => 'users#mailchimp_sync', as: 'user_mailchimp_sync'
         post '/reset_password' => 'users#reset_password', as: 'user_reset_password'
         post '/resend_welcome' => 'users#resend_welcome', as: 'user_resend_welcome'
+        post '/resend_communication' => 'users#resend_communication', as: 'user_resend_communication'
         get  '/login_as_user' => 'users#login_as_user', as: 'login_as_user'
 
         get  '/transactions_content' => 'users#transactions_content', as: 'transactions_content'

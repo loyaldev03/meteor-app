@@ -115,6 +115,8 @@ defaults: &defaults
     unschedule_save_the_sale: 252
     testing_account_marked: 253
     testing_account_unmarked: 254
+    resend_communication: 255
+    resend_communication_error: 256
     #communication
     active_email: 300     
     prebill_email: 301    
