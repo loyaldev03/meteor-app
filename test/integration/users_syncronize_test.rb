@@ -39,8 +39,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     within("#sync_status")do
         click_link_or_button 'Edit'
         fill_in "user[api_id]", :with => api_id
-        confirm_ok_js
         click_on 'Update'
+        confirm_ok_js
     end
   end
 
@@ -116,8 +116,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
 
   #     click_link_or_button 'Edit'
   #     fill_in "user[api_id]", :with => "1234"
-  #     confirm_ok_js
   #     click_on 'Update'
+  #     confirm_ok_js
   #   end
   #   assert page.has_content?("Sync data updated")
 
@@ -145,8 +145,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   #   within("#sync_status")do
   #       click_link_or_button 'Edit'
   #       fill_in "user[api_id]", :with => "5678"
-  #       confirm_ok_js
   #       click_on 'Update'
+  #       confirm_ok_js
   #   end
   #   assert page.has_content?("Sync data cannot be updated. Api id already exists")
 
@@ -155,8 +155,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   #   within("#sync_status")do
   #       click_link_or_button 'Edit'
   #       fill_in "user[api_id]", :with => ""
-  #       confirm_ok_js
   #       click_on 'Update'
+  #       confirm_ok_js
   #   end
   #   within(".nav-tabs"){ click_on "Operations"}
   #   within("#operations_table") do
@@ -169,8 +169,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   #   within("#sync_status")do
   #       click_link_or_button 'Edit'
   #       fill_in "user[api_id]", :with => "asdr"
-  #       confirm_ok_js
   #       click_on 'Update'
+  #       confirm_ok_js
   #   end
   #   page.has_content?('Sync data cannot be updated {:api_id=>["is not a number"]}')
 
@@ -179,8 +179,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   #   page.has_content?("Sync data updated")
   #   within(".nav-tabs"){ click_on("Sync Status") }
   #   within("#sync_status")do
-  #       confirm_ok_js
   #       click_link_or_button 'Unset'
+  #       confirm_ok_js
   #   end
   #   page.has_content?("Sync data updated")
 

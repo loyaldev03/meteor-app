@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource)
     return session[:agent_return_to] if session[:agent_return_to]
     sign_in_url = url_for(:action => 'new', :controller => 'sessions', :only_path => false, :protocol => 'http')    
-    if @current_agent and @current_agent.has_role? 'admin'
+    if current_agent and current_agent.has_role? 'admin'
       return admin_partners_path
     end
     root_path
@@ -58,11 +58,11 @@ class ApplicationController < ActionController::Base
     #TODO: Merge this method with 'my_authorize'
     #Used to check if the agent is allowed to make any of these actions within a given list of clubs or it's own.
     def my_authorize_action_within_clubs!(action, model, club_id_list=nil)
-      allowed = @current_agent.can? action, model
+      allowed = current_agent.can? action, model
       unless allowed
-        club_id_list ||= @current_agent.clubs_related_id_list
+        club_id_list ||= current_agent.clubs_related_id_list
         club_id_list.each do |club_id|
-          allowed = true if @current_agent.can? action, model, club_id
+          allowed = true if current_agent.can? action, model, club_id
         end
       end
       raise CanCan::AccessDenied unless allowed

@@ -7,17 +7,17 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 # Clear any existing tables
-DeclineStrategy.delete_all!
-Agent.delete_all!
-Partner.delete_all!
-Club.delete_all!
-Domain.delete_all!
-PaymentGatewayConfiguration.delete_all!
-TermsOfMembership.delete_all!
-CommunicationType.delete_all!
-DispositionType.delete_all!
-MemberCancelReason.delete_all!
-MemberBlacklistReason.delete_all!
+DeclineStrategy.delete_all
+Agent.delete_all
+Partner.delete_all
+Club.delete_all
+Domain.delete_all
+PaymentGatewayConfiguration.delete_all
+TermsOfMembership.delete_all
+CommunicationType.delete_all
+DispositionType.delete_all
+MemberCancelReason.delete_all
+MemberBlacklistReason.delete_all
 
 
 File.open("#{Rails.root}/db/decline_strategies.sql", 'r') do |file|

@@ -96,6 +96,7 @@ end
 
 gem 'tire'
 gem 'progress_bar'
+gem 'data-confirm-modal', github: 'ifad/data-confirm-modal', branch: 'bootstrap2'
 
 group :test do
   gem 'factory_girl_rails'

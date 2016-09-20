@@ -338,8 +338,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
 
-    confirm_ok_js
     click_link_or_button 'Approve'
+    confirm_ok_js
     assert find_field('input_first_name').value == @saved_user.first_name
  
     within("#table_membership_information") do  
@@ -362,8 +362,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
   
-    confirm_ok_js
     click_link_or_button 'Reject'
+    confirm_ok_js
 
     assert find_field('input_first_name').value == @saved_user.first_name
 
@@ -389,8 +389,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       click_on("#{date.day}")
     end
     select(cancel_reason.name, :from => 'reason')
-    confirm_ok_js
     click_link_or_button 'Cancel user'
+    confirm_ok_js
     
     @saved_user.reload
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -406,8 +406,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       click_on("#{date.day}")
     end
     select(cancel_reason.name, :from => 'reason')
-    confirm_ok_js
     click_link_or_button 'Cancel user'
+    confirm_ok_js
     @saved_user.reload
     find(".alert", :text => "Member cancellation scheduled to #{I18n.l(@saved_user.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}" )
     assert page.has_content? "Member cancellation scheduled to #{I18n.l(@saved_user.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}"

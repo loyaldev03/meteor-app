@@ -9,7 +9,8 @@
               link_to user_exact_target_sync_path, 
                 method: :post, 
                 class: 'btn btn-mini btn-warning', 
-                id: "sync_to_remote" do %>
+                id: "sync_to_remote",
+                data: {confirm: t('are_you_sure')} do %>
               <i class='icon-retweet'></i>
               <%= t('buttons.sync_to_remote') %>
             <% end %>
@@ -18,7 +19,8 @@
               link_to user_mailchimp_sync_path, 
                 method: :post, 
                 class: 'btn btn-mini btn-warning', 
-                id: "sync_to_remote" do %>
+                id: "sync_to_remote",
+                data: {confirm: t('are_you_sure')} do %>
               <i class='icon-retweet'></i>
               <%= t('buttons.sync_to_remote') %>
             <% end %>

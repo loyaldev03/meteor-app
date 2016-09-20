@@ -25,6 +25,7 @@
 //= require twitter/bootstrap/bootstrap-dropdown
 //= require twitter/bootstrap/bootstrap-alert
 //= require select2-full
+//= require data-confirm-modal
 //= require general
 
 //= require formwizard/jquery.form.js

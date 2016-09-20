@@ -79,9 +79,10 @@ class DomainTest < ActionDispatch::IntegrationTest
     saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
     second_saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
     visit domains_path(@partner.prefix)
-    confirm_ok_js
+
     within("#domains_table") do
       first(:link, 'Destroy').click
+      confirm_ok_js
     end
     assert page.has_content?("Domain #{saved_domain.url} was successfully destroyed")
     assert Domain.with_deleted.where(id: saved_domain.id).first

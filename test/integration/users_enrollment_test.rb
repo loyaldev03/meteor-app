@@ -695,8 +695,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
     validate_view_user_base(@saved_user,'applied')
 
-    confirm_ok_js
     click_link_or_button 'Approve'
+    confirm_ok_js
     page.has_content?("user approved")
     @saved_user.reload
 
@@ -716,8 +716,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button "Recover"
     select(@terms_of_membership_with_approval.name, :from => 'terms_of_membership_id')
-    confirm_ok_js
     click_on "Recover"
+    confirm_ok_js
 
     assert find_field('input_first_name').value == unsaved_user.first_name
   end
@@ -766,8 +766,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?('applied')
     end
 
-    confirm_ok_js
     click_link_or_button 'Reject'
+    confirm_ok_js
     page.has_content?("user was rejected and now its lapsed.")
     @saved_user.reload
 

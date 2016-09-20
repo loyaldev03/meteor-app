@@ -20,7 +20,7 @@ private
         file.product,
         file.dates,
         file.fulfillments_processed,
-        (file.sent? ? '' : link_to("Mark as sent", @url_helpers.fulfillment_file_mark_as_sent_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn btn-warning", :id=>'mark_as_sent'))
+        (file.sent? ? '' : link_to("Mark as sent", @url_helpers.fulfillment_file_mark_as_sent_path(@current_partner.prefix,@current_club.name,file.id), :class => "btn btn-warning", :id=>'mark_as_sent', data: {confirm: 'Are you sure you want to mark all the fulfillments that are in progress as sent?'}))
       ]
     end
   end

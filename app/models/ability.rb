@@ -109,6 +109,7 @@ class Ability
       cannot :api_get_banner_by_email, User
       cannot :no_recurrent_billing, User
       cannot :api_sale, User
+      cannot :add_club_cash, User
       can :manage, Operation
       can :manage, CreditCard
       cannot :destroy, CreditCard
@@ -196,6 +197,7 @@ class Ability
       cannot :api_get_banner_by_email, User
       cannot :manual_billing, User
       cannot :api_sale, User
+      cannot :add_club_cash, User
       can :manage, Operation
       can :manage, CreditCard
       cannot :destroy, CreditCard

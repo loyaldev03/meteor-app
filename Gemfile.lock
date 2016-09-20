@@ -17,6 +17,14 @@ GIT
       savon (~> 2.4)
 
 GIT
+  remote: git://github.com/ifad/data-confirm-modal.git
+  revision: 009c7204267e02e1029ade2421e9083522008547
+  branch: bootstrap2
+  specs:
+    data-confirm-modal (1.0.1)
+      railties (>= 3.0)
+
+GIT
   remote: git://github.com/rweng/jquery-datatables-rails.git
   revision: 9eee0a1975b5a22e50bdc73fcca7db7f8a12c143
   specs:
@@ -511,6 +519,7 @@ DEPENDENCIES
   connection_pool
   country_code_select (~> 1.0.0)
   daemons
+  data-confirm-modal!
   delayed_job_active_record
   delayed_job_web
   devise

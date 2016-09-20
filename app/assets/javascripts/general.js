@@ -1,6 +1,12 @@
 $(document).ready( function() {
   $('.help').popover({offset: 10, trigger: 'hover', html: true });
 
+  dataConfirmModal.setDefaults({
+    title: 'Confirm your action',
+    commit: 'Confirm',
+    cancel: 'Cancel'
+  });
+
   $('.datatable').DataTable({
     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
     "sPaginationType": "full_numbers"
@@ -824,12 +830,9 @@ function fulfillment_files_functions() {
   });
   $(".dataTables_paginate").css({ float: "left" });
 
-  $("#fulfillment_files_table").on('click', '#mark_as_sent', function(event){
-    if(confirm("Are you sure you want to mark all the fulfillments that are in progress as sent?")){
-      startAjaxLoader(true);
-    }else{
-      event.preventDefault();
-    }
+  $("#fulfillment_files_table").on('confirm:complete', '#mark_as_sent', function(event){
+    startAjaxLoader(true);
+    window.location.href = $(this).attr('href');
   });
 }  
 
@@ -1052,10 +1055,15 @@ function show_user_functions(){
     $(".tab-content .active").removeClass("active");
     $(".tab-content #"+objects_to_search+"").addClass("active");
   });
-  $("#sync_to_remote").click(function(){
-    if(confirm("Are you sure?")){
-      startAjaxLoader(false);
-    }
+  $('#marketing_sync_table').on('confirm:complete', '#sync_to_remote', function(event){
+    startAjaxLoader(true);
+  });
+  $('#td_mi_future_tom_change').on('click', '#remove_future_tom_change', function(event){
+    $('#myModalFutureTomChange').modal('hide');
+  });
+  $('#td_mi_future_tom_change').on('confirm:complete', '#remove_future_tom_change', function(event, response, response2){
+    if(response)
+      startAjaxLoader(true);
   });
 };
 
@@ -1317,7 +1325,7 @@ function admin_form_functions(){
         club = club_list[i].split(',');
         options_for_club_id = options_for_club_id+"<option value='"+club[1]+"'>"+club[0]+"</option>"
       };
-      $('#club_role_table').append("<tr id='tr_new_club_rol_["+count+"]'><td><select id='select_club_role_"+count+"' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='select_club_role_"+count+"_club_id' name='[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td><input type='button' id='new_club_role_delete' name='"+count+"' class='btn btn-mini' value='Delete'></td></tr>")
+      $('#club_role_table').append("<tr id='tr_new_club_rol_["+count+"]'><td><select id='select_club_role_"+count+"' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select></td><td><select id='select_club_role_"+count+"_club_id' name='[club_roles_attributes]["+count+"][club_id]'>"+options_for_club_id+"</select></td><td><input type='button' id='new_club_role_delete' name='"+count+"' class='btn btn-mini btn-danger' value='Delete'></td></tr>")
     };
 
     $("*[id$='_club_id']").each(function() {
@@ -1405,31 +1413,29 @@ function admin_form_functions(){
     } 
   });
 
-  $('#club_role_table').on('click', '#club_role_delete', function(event){
+  $('#club_role_table').on('confirm:complete', '#club_role_delete', function(event){
     event.preventDefault();
-    if (confirm("Are you sure you want to delete this club role?")) {
-      array = $(this).attr('name').split(";");
-      club_role_id = array[0]
-      $.ajax({
-        type: "PUT",
-        url: "/admin/agents/"+agent_id+"/delete_club_role",
-        data: { id:$(this).attr("name") },
-        success: function(data){
-          if(data.code == "000"){
-            $("#club_role_table tr[id='tr_club_role_"+club_role_id+"']").remove();
-            if(clubs.length == 0)
-              clubs = array[2]+","+array[1];  
-            else
-              clubs = clubs+";"+array[2]+","+array[1];
-            $("#td_notice").children().remove();
-            $("#td_notice").append("<div class='alert-info alert'>"+data.message+"</div>");
-          }else{
-            $("#td_notice").children().remove();
-            $("#td_notice").append("<div class='error-info alert'>"+data.message+"</div>");
-          }
-        },
-      });
-    }
+    array = $(this).attr('name').split(";");
+    club_role_id = array[0];
+    $.ajax({
+      type: "PUT",
+      url: "/admin/agents/"+agent_id+"/delete_club_role",
+      data: { id:$(this).attr("name") },
+      success: function(data){
+        if(data.code == "000"){
+          $("#club_role_table tr[id='tr_club_role_"+club_role_id+"']").remove();
+          if(clubs.length == 0)
+            clubs = array[2]+","+array[1];  
+          else
+            clubs = clubs+";"+array[2]+","+array[1];
+          $("#td_notice").children().remove();
+          $("#td_notice").append("<div class='alert-info alert'>"+data.message+"</div>");
+        }else{
+          $("#td_notice").children().remove();
+          $("#td_notice").append("<div class='error-info alert'>"+data.message+"</div>");
+        }
+      },
+    });
   });
 
   $("input[name='commit']").click(function(event){

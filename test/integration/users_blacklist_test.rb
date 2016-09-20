@@ -27,8 +27,8 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
     visit show_user_path(:partner_prefix => user.club.partner.prefix, :club_prefix => user.club.name, :user_prefix => user.id)
     click_on 'Blacklist'
     select(reason, :from => 'reason')
-    confirm_ok_js
     click_on 'Blacklist user'
+    confirm_ok_js
   end
 
   def validate_blacklisted_user(user, validate_cancel_date = false)

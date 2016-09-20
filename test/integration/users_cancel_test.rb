@@ -123,8 +123,8 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     cancel_date = select_from_datepicker("cancel_date", cancel_date)
     select(@member_cancel_reason.name, :from => 'reason')
 
-    confirm_ok_js
     click_link_or_button 'Cancel user'
+    confirm_ok_js
     @saved_user.reload
     assert_equal I18n.l(@saved_user.cancel_date, :format => :only_date), I18n.l(cancel_date, :format => :only_date)
     cancel_date = Time.zone.now + 2.day
@@ -132,8 +132,8 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     click_link_or_button 'cancel'
     cancel_date = select_from_datepicker("cancel_date", cancel_date)
     select(@member_cancel_reason.name, :from => 'reason')
-    confirm_ok_js
     click_link_or_button 'Cancel user'
+    confirm_ok_js
     @saved_user.reload
     assert_equal @saved_user.cancel_date.to_date, cancel_date.to_date
   end
@@ -147,9 +147,9 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
 
     date_time = select_from_datepicker("cancel_date", date_time)
     select(@member_cancel_reason.name, :from => 'reason')
-    confirm_ok_js
+    
     click_on 'Cancel user'
-
+    confirm_ok_js
     @saved_user.reload
 
     within("#td_mi_cancel_date") do
@@ -181,9 +181,9 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card_master_card)
     
     @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_approval.name)
-    confirm_ok_js
+    
     click_link_or_button 'Reject'
-
+    confirm_ok_js
     within("#td_mi_cancel_date")do
       assert page.has_content?(I18n.l(Time.zone.now, :format => :only_date))
     end
