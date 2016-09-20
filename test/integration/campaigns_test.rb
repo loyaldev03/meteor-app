@@ -13,14 +13,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     sign_in_as(@admin_agent)
   end
 
-  test "create campaign" do    
-    unsaved_campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
-    campaign_type = unsaved_campaign.campaign_type
-    transport = unsaved_campaign.transport
-
-    login_general_admin(:confirmed_admin_agent)
-    visit campaigns_path(@partner.prefix, @club.name)
-    click_link_or_button 'New Campaign'    
+  def fill_in_form(unsaved_campaign, campaign_type, transport)
     fill_in 'campaign[name]', with: unsaved_campaign.name
     fill_in 'campaign[landing_name]', with: unsaved_campaign.landing_name   
     first("#select2-campaign_terms_of_membership_id-container").click 
@@ -33,7 +26,18 @@ class CampaignTest < ActionDispatch::IntegrationTest
     select(transport.capitalize, from: 'campaign[transport]')
     fill_in 'campaign[transport_campaign_id]', with: unsaved_campaign.transport_campaign_id
     fill_in 'campaign[utm_content]', with: unsaved_campaign.utm_content
-    fill_in 'campaign[audience]', with: unsaved_campaign.audience    
+    fill_in 'campaign[audience]', with: unsaved_campaign.audience   
+  end
+
+  test "create campaign" do    
+    unsaved_campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
+    campaign_type = unsaved_campaign.campaign_type
+    transport = unsaved_campaign.transport
+
+    login_general_admin(:confirmed_admin_agent)
+    visit campaigns_path(@partner.prefix, @club.name)
+    click_link_or_button 'New Campaign'   
+    fill_in_form(unsaved_campaign, campaign_type, transport)    
     click_link_or_button 'Create Campaign'
     assert page.has_content?("The campaign #{unsaved_campaign.name} was successfully created.")
   end
@@ -56,21 +60,6 @@ class CampaignTest < ActionDispatch::IntegrationTest
     assert page.has_content?(campaign.audience)   
   end
 
-  test "should update campaign" do
-    campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
-    login_general_admin(:confirmed_admin_agent)
-    visit campaigns_path(@partner.prefix, @club.name)
-    within("#campaigns_table") do
-      click_link_or_button 'Edit'
-    end
-    unsaved_campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
-    fill_in 'campaign[name]', with: unsaved_campaign.name
-    select_from_datepicker("campaign_initial_date", unsaved_campaign.initial_date + 3.days)
-    select_from_datepicker("campaign_finish_date", unsaved_campaign.finish_date + 10.days)
-    click_link_or_button 'Update Campaign'
-    assert page.has_content?("Campaign #{unsaved_campaign.name} was updated succesfully.")
-  end
-
   test "should not update campaigns in the past when it has campaign_days created" do
     campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id, :initial_date => Time.zone.yesterday)  
     campaign_days = FactoryGirl.create(:campaign_day, :campaign_id => campaign.id)
@@ -80,8 +69,34 @@ class CampaignTest < ActionDispatch::IntegrationTest
       click_link_or_button 'Edit'
     end
     select_from_datepicker("campaign_initial_date", campaign.initial_date - 3.days)
-    select_from_datepicker("campaign_finish_date", campaign.finish_date - 5.days)
+    select_from_datepicker("campaign_finish_date", campaign.finish_date - 1.days)
     click_link_or_button 'Update Campaign'
     assert page.has_content?("Campaign #{campaign.name} was not updated.")    
+  end
+
+  test "should only update name, initial_date and finish_date fields on campaign" do
+    campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
+    login_general_admin(:confirmed_admin_agent)
+    visit campaigns_path(@partner.prefix, @club.name)
+    within("#campaigns_table") do
+      click_link_or_button 'Edit'
+    end   
+    assert page.has_css?("#campaign_landing_name[disabled]")
+    assert page.has_css?("#terms_of_membership[readonly]")
+    assert page.has_css?("#campaign_enrollment_price[disabled]")
+    assert page.has_css?("#campaign_type[readonly]")
+    assert page.has_css?("#transport[readonly]")
+    assert page.has_css?("#campaign_utm_medium[readonly]")
+    assert page.has_css?("#campaign_transport_campaign_id[disabled]")
+    assert page.has_css?("#campaign_utm_content[disabled]")
+    assert page.has_css?("#campaign_audience[disabled]")
+    assert page.has_css?("#campaign_campaign_code[disabled]")   
+
+    unsaved_campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
+    fill_in 'campaign[name]', with: unsaved_campaign.name
+    select_from_datepicker("campaign_initial_date", unsaved_campaign.initial_date + 3.days)
+    select_from_datepicker("campaign_finish_date", unsaved_campaign.finish_date + 10.days)
+    click_link_or_button 'Update Campaign'
+    assert page.has_content?("Campaign #{unsaved_campaign.name} was updated succesfully.")
   end
 end
