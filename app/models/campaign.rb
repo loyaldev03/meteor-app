@@ -5,6 +5,7 @@ class Campaign < ActiveRecord::Base
   belongs_to :terms_of_membership
 
   before_validation :set_utm_medium
+  before_validation :set_campaign_code
   before_save :set_utm_content
   after_update :fetch_campaign_days_data
 
@@ -67,7 +68,7 @@ class Campaign < ActiveRecord::Base
   end
 
   def set_campaign_code
-    self.campaign_code = Array.new(16){ rand(36).to_s(36) }.join
+    self.campaign_code = Array.new(16){ rand(36).to_s(36) }.join unless campaign_code
   end
 
   def can_edit_transport_id?
