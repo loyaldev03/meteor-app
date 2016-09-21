@@ -26,7 +26,6 @@ class CampaignsController < ApplicationController
   def create
     my_authorize! :create, Campaign, current_club.id
     @campaign = Campaign.new(campaign_params)
-    @campaign.set_campaign_code unless @campaign.campaign_code
     @campaign.club_id = current_club.id
     if @campaign.save
       redirect_to campaign_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @campaign), notice: "The campaign #{@campaign.name} was successfully created."
