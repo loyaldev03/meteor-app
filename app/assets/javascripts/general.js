@@ -31,6 +31,9 @@ $(document).ready( function() {
 
   $(".datepicker").datepicker('option', { buttonImage: "/icon-calendar.png", showOn: "both", buttonImageOnly: true })
 
+  // https://select2.github.io/options.html
+  $.fn.select2.defaults.set("theme", "bootstrap");
+
   // taken fom https://makandracards.com/makandra/1383
   $(function() {
     $('[data-remote][data-replace]')
@@ -870,8 +873,7 @@ function campaignFormFunctions(){
         processResults: function(data) { return { results: data }; }
       },
       minimumInputLength: 2,
-      placeholder: placeholderText,
-      theme: "bootstrap"
+      placeholder: placeholderText
     });
     $("#campaign_campaign_code").select2({
       ajax: {
@@ -883,15 +885,10 @@ function campaignFormFunctions(){
       },
       minimumInputLength: 2,
       placeholder: placeholderTextFulfillmentCodes,
-      allowClear: true,
-      theme: "bootstrap"
+      allowClear: true
     });
-    $("#campaign_campaign_type").select2({
-      theme: "bootstrap"
-    });
-    $("#campaign_transport").select2({
-      theme: "bootstrap"
-    });
+    $("#campaign_campaign_type").select2();
+    $("#campaign_transport").select2();
   }
   
   function disableFields() {
