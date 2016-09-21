@@ -120,20 +120,16 @@ class ClubsController < ApplicationController
   def get_campaign_codes
     club = Club.find(params[:club_id])
     query = params[:query]
-    campaign_codes = club.campaigns.select(:campaign_code).distinct.where("campaign_code LIKE '%#{query}%'").pluck(:campaign_code)
+    campaign_codes = club.campaigns.select(:campaign_code).distinct.where('campaign_code LIKE ?', "%#{query}%").pluck(:campaign_code)
     values = []
-    code_id = 0
-    campaign_codes.each do |code|
-      values << { id: code_id.to_s, text: code }
-      code_id += 1
-    end
+    campaign_codes.each_with_index { |code, index| values << { id: index.to_s, text: code } }
     render json: values
   end
 
   def get_subscription_plans
     club = Club.find(params[:club_id])
     query = params[:query]
-    subscription_plans = club.terms_of_memberships.select(:id, :name).where("name LIKE '%#{query}%'")
+    subscription_plans = club.terms_of_memberships.select(:id, :name).where('name LIKE ?', "%#{query}%")
     values = []
     subscription_plans.each do |plan|
       values << { id: plan.id.to_s, text: plan.name }
