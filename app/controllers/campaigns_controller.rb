@@ -11,7 +11,7 @@ class CampaignsController < ApplicationController
   end
 
   def show
-    my_authorize! :read, Campaign, @campaign.club.id
+    my_authorize! :read, Campaign, @campaign.club_id
   end
 
   def new
@@ -37,11 +37,11 @@ class CampaignsController < ApplicationController
   end
 
   def edit
-    my_authorize! :edit, Campaign, @campaign.club.id
+    my_authorize! :edit, Campaign, @campaign.club_id
   end
 
   def update
-    my_authorize! :update, Campaign, @campaign.club.id
+    my_authorize! :update, Campaign, @campaign.club_id
     if @campaign.update campaign_params_on_update
       redirect_to campaigns_url, notice: "Campaign <b>#{@campaign.name}</b> was updated succesfully.".html_safe
     else
