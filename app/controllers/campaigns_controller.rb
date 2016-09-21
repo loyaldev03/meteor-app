@@ -19,8 +19,7 @@ class CampaignsController < ApplicationController
     if current_club.terms_of_memberships.first.present?
       @campaign = Campaign.new(club_id: current_club.id)
     else
-      flash[:error] = "Can not create a campaign without a Subscription plan."
-      redirect_to campaigns_url
+      redirect_to campaigns_url, alert: 'Can not create a campaign without a Subscription plan.'
     end
   end
 
@@ -45,8 +44,7 @@ class CampaignsController < ApplicationController
     if @campaign.update campaign_params_on_update
       redirect_to campaigns_url, notice: "Campaign <b>#{@campaign.name}</b> was updated succesfully.".html_safe
     else
-      flash.now[:error] = "Campaign <b>#{@campaign.name}</b> was not updated.".html_safe
-      render action: "edit"
+      render action: "edit", alert: "Campaign <b>#{@campaign.name}</b> was not updated.".html_safe
     end
   end
 

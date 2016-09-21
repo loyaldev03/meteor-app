@@ -19,8 +19,7 @@ class TransportSettingsController < ApplicationController
     if current_club.available_transport_settings.count > 0
       @transport = TransportSetting.new
     else
-      flash[:error] = "No more Transports available."
-      redirect_to transport_settings_url
+      redirect_to transport_settings_url, alert: 'No more Transports available.'
     end
   end
 
@@ -36,8 +35,7 @@ class TransportSettingsController < ApplicationController
       redirect_to transport_setting_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @transport), 
         notice: "The transport setting for <b>#{@transport.transport}</b> was successfully created.".html_safe
     else
-      flash[:error] = 'Couldn\'t create transport setting.'
-      render :new
+      render :new, alert: 'Couldn\'t create transport setting.'
     end
   end
 
@@ -47,8 +45,7 @@ class TransportSettingsController < ApplicationController
       redirect_to transport_setting_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @transport), 
         notice: "The transport setting for <b>#{@transport.transport}</b> was successfully updated.".html_safe
     else
-      flash[:error] = 'Couldn\'t update transport setting.'
-      render :edit
+      render :edit, alert: 'Couldn\'t update transport setting.'
     end
   end
 
