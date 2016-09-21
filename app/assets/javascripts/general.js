@@ -866,8 +866,6 @@ function campaignFormFunctions(){
         url: getSubscriptionPlansUrl,
         dataType: 'json',
         type: "GET",
-        delay: 250,
-        quietMillis: 50,
         data: function(params) { return { club_id: clubId, query: params.term, }; },
         processResults: function(data) { return { results: data }; }
       },
@@ -880,8 +878,6 @@ function campaignFormFunctions(){
         url: getFulfillmentCodesUrl,
         dataType: 'json',
         type: "GET",
-        delay: 250,
-        quietMillis: 50,
         data: function(params) { return { club_id: clubId, query: params.term, }; },
         processResults: function(data) { return { results: data }; }
       },
