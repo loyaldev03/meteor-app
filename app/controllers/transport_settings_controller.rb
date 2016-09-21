@@ -16,7 +16,7 @@ class TransportSettingsController < ApplicationController
 
   def new
     my_authorize! :new, TransportSetting, current_club.id
-    if current_club.available_transport_settings.count > 0
+    if current_club.available_transport_settings.first.present?
       @transport = TransportSetting.new
     else
       redirect_to transport_settings_url, alert: 'No more Transports available.'
