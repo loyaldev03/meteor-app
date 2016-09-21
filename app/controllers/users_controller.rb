@@ -409,7 +409,7 @@ class UsersController < ApplicationController
 
   def resend_communication
     comm = Communication.find(params[:communication_id])
-    comm.deliver_mandrill
+    Communication.deliver!(comm.template_type, @current_user)
     Auditory.audit(@current_agent, @current_user, I18n.t('activerecord.attributes.communication.resent_success'), @current_user, Settings.operation_types.resend_communication)
     redirect_to show_user_path, notice: I18n.t('activerecord.attributes.communication.resent_success')
   rescue Exception => e
