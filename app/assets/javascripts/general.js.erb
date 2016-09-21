@@ -34,9 +34,6 @@ $(document).ready( function() {
   // https://select2.github.io/options.html
   $.fn.select2.defaults.set("theme", "bootstrap");
 
-  // https://select2.github.io/options.html
-  $.fn.select2.defaults.set("theme", "bootstrap");
-
   // taken fom https://makandracards.com/makandra/1383
   $(function() {
     $('[data-remote][data-replace]')
@@ -1085,7 +1082,7 @@ function user_change_next_bill_date(){
 
 function user_save_the_sale_functions(){
   disable_form_buttons_upon_submition('save_the_sale_form')  
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd" });
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 0 });
 }
 
 function chargeback_user_functions(){
