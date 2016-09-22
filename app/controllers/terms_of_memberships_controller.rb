@@ -22,7 +22,8 @@ class TermsOfMembershipsController < ApplicationController
     if @tom.save
       redirect_to terms_of_memberships_url, :notice => "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
     else
-      render action: "new", alert: 'There was an error while trying to save this subscription plan.'
+      flash[:error] = 'There was an error while trying to save this subscription plan.'
+      render action: "new"
     end
   end
 
@@ -44,7 +45,8 @@ class TermsOfMembershipsController < ApplicationController
       if @tom.save
         redirect_to terms_of_memberships_url, notice: "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
       else
-        render action: "edit", alert: 'Your Subscription Plan was not updated.'
+        flash[:error] = 'Your Subscription Plan was not updated.'
+        render action: "edit"
       end
     else
       redirect_to terms_of_memberships_url, alert: "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
