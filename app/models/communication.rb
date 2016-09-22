@@ -48,7 +48,7 @@ class Communication < ActiveRecord::Base
       self.deliver_lyris
     when 'exact_target'
       self.deliver_exact_target
-    when 'mandrill'
+    when 'mailchimp_mandrill'
       self.deliver_mandrill
     when 'action_mailer'
       self.deliver_action_mailer
