@@ -38,7 +38,7 @@
   	  <td> <%= I18n.l communication.processed_at, :format => :only_date if communication.processed_at %> </td>
   	  <td> <%= communication.template_type %> </td>
       <td class="text-center">
-        <% unless communication.sent_success && communication.processed_at %>
+        <% if communication.processed_at && !communication.sent_success %>
           <%= link_to(I18n.t(:resend), user_resend_communication_path(communication_id: communication.id), method: :post, :id => "resend_" + communication.id.to_s, data: {:confirm => I18n.t("are_you_sure")}, :class => 'btn btn-mini btn-info') %>
         <% end %>
       </td>
