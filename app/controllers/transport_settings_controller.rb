@@ -35,7 +35,8 @@ class TransportSettingsController < ApplicationController
       redirect_to transport_setting_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @transport), 
         notice: "The transport setting for <b>#{@transport.transport}</b> was successfully created.".html_safe
     else
-      render :new, alert: 'Couldn\'t create transport setting.'
+      flash.now[:error] = 'Couldn\'t create transport setting.'
+      render :new
     end
   end
 
@@ -45,7 +46,8 @@ class TransportSettingsController < ApplicationController
       redirect_to transport_setting_path(partner_prefix: current_partner.prefix, club_prefix: current_club.name, id: @transport), 
         notice: "The transport setting for <b>#{@transport.transport}</b> was successfully updated.".html_safe
     else
-      render :edit, alert: 'Couldn\'t update transport setting.'
+      flash.now[:error] = 'Couldn\'t update transport setting.'
+      render :edit
     end
   end
 
