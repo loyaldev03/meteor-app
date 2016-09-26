@@ -118,6 +118,15 @@ function endAjaxLoader(enableButtons){
   };
 };
 
+function showCommunicationsFunctions() {
+  if(!agent_can_resend_communication) {
+    $('a').each(function() {
+      $(this).removeAttr("href");
+      $(this).addClass("disabled");
+    });
+  }
+}
+
 function agent_index_functions(column_count){
   $('#agents_table').DataTable({
     "bJQueryUI": false,
