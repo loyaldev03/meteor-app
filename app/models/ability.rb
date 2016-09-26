@@ -120,7 +120,6 @@ class Ability
       can :list, Transaction
       can :list, ClubCashTransaction
       can :list, Communication
-      cannot :send, Communication
       can :list, Fulfillment
     when 'supervisor' then
       can :manage, User
@@ -144,7 +143,6 @@ class Ability
       can :see_nice, Transaction
       can :list, Membership
       can :list, Communication
-      cannot :send, Communication
       can :list, Fulfillment
       can :manual_review, Fulfillment
     when 'api' then
@@ -182,7 +180,6 @@ class Ability
       can :list, CreditCard
       can :list, UserNote
       can :list, Communication
-      cannot :send, Communication
     # Fulfillment Managment role: Team de Fulfillment
     when 'fulfillment_managment' then
       can :manage, User
@@ -211,7 +208,6 @@ class Ability
       can :list, Transaction
       can :list, ClubCashTransaction
       can :list, Communication
-      cannot :send, Communication
       can :list, Membership
     end
 
