@@ -1,0 +1,67 @@
+<div class='row-fluid'>
+  <div class='span12'>
+    <h2><%= @campaign.name %></h2>
+    <h4><%= t('activerecord.model.campaign') %></h4>
+    <hr />
+  </div>
+</div>
+
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.campaign_type') %>:</strong>
+  <%= @campaign.campaign_type %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.model.terms_of_membership') %>:</strong>
+  <%= @campaign.terms_of_membership.name %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.enrollment_price') %>:</strong>
+  <%= number_to_currency(@campaign.enrollment_price) %>
+</p>
+<p>
+  <strong>Running from:</strong>
+  <%= @campaign.initial_date %>
+  <% if @campaign.finish_date.present? %>
+    <b>to</b> <%= @campaign.finish_date %></td>
+  <% end %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.transport') %>:</strong>
+  <%= @campaign.transport %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.utm_medium') %>:</strong>
+  <%= @campaign.utm_medium %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.transport_campaign_id') %>:</strong>
+  <%= @campaign.transport_campaign_id %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.utm_content') %>:</strong>
+  <%= @campaign.utm_content %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.audience') %>:</strong>
+  <%= @campaign.audience %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.campaign_code') %>:</strong>
+  <%= @campaign.campaign_code %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.landing_name') %>:</strong>
+  <%= @campaign.landing_name %>
+</p>
+<p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.landing_url') %>:</strong>
+  <%= text_field_tag('landing_url', @campaign.landing_url, class: 'text_field input-xxlarge', readonly: true) %>
+</p>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <div class="form-actions">
+      <%= link_to t('back', default: t('helpers.links.back')), campaigns_path, class: 'btn' %>
+    </div>
+  </div>
+</div>

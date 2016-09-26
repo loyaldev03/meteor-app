@@ -43,7 +43,7 @@ module SacExactTarget
             SacExactTarget::ProspectModel.new self
           end
         else
-          SacExactTarget::report_error('Prospect:exact_target_prospect', 'Exact Target not configured correctly', prospect, false)
+          SacExactTarget::report_error('Prospect:exact_target_prospect', 'Exact Target not configured correctly', self, false)
           nil
         end
       end

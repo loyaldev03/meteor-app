@@ -4,6 +4,7 @@ class TermsOfMembership < ActiveRecord::Base
   has_many :memberships
   has_many :prospects
   has_many :email_templates, dependent: :destroy
+  has_many :campaigns
   belongs_to :downgrade_tom, class_name: 'TermsOfMembership', foreign_key: 'downgrade_tom_id'
   belongs_to :upgrade_tom, class_name: 'TermsOfMembership', foreign_key: 'upgrade_tom_id'
   belongs_to :agent
@@ -63,6 +64,9 @@ class TermsOfMembership < ActiveRecord::Base
   def can_delete?
     if self.memberships.first or self.prospects.first
       errors.add(:base, 'There are users enrolled related to this Subscription Plan')
+      false
+    elsif self.campaigns.first
+      errors.add(:base, 'There are campaigns related to this Subscription Plan')
       false
     else
       true

@@ -838,8 +838,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     validate_view_user_base(@saved_user)
     
     membership = @saved_user.current_membership
-    
-  end 
+  end
 
   test "Update Birthday after 12 like a day" do
     setup_user(false)
@@ -855,6 +854,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button 'Edit'
     page.execute_script("window.jQuery('#user_birth_date').next().click()")
+    find("#ui-datepicker-div")
     within(".ui-datepicker-header")do
       find(".ui-datepicker-prev").click
     end

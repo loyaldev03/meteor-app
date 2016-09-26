@@ -1,0 +1,32 @@
+<% content_for :header do %>
+  <tr>
+    <td class="alert alert-warning">
+      Info: You need to fill in the following missing data
+    </td>
+  </tr>
+<% end %>
+
+<% content_for :body do %>
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td class="content-block">
+        You have <strong><%= @data.count %> campaigns</strong> that needs your action at Club <%= @club.name %>.
+      </td>
+    </tr>
+    <% @data.each do |campaign_id, missing_days| %>
+      <tr>
+        <td class="alert item">
+          <% @campaign = Campaign.find(campaign_id) %>
+          <%= @campaign.transport_i18n %> campaign <%= campaign_id %>-<%= link_to 'Campaign' + ' "'+@campaign.name+'"', '#' %>
+        </td>
+      </tr>
+      <tr>
+        <td class="content-block">
+          <ul>
+            Campaign Days affected so far: <%= missing_days.count.to_s %>
+          </ul>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>

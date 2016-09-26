@@ -26,13 +26,13 @@ class Communication < ActiveRecord::Base
         c.save
 
         if template.lyris?
-          c.deliver_lyris
+          Communications::DeliverLyrisJob.perform_later(communication_id: c.id)
         elsif template.exact_target?
-          c.deliver_exact_target
+          Communications::DeliverExactTargetJob.perform_later(communication_id: c.id)
         elsif template.mandrill?
-          c.deliver_mandrill
+          Communications::DeliverMandrillJob.perform_later(communication_id: c.id)
         elsif template.action_mailer?
-          c.deliver_action_mailer
+          Communications::DeliverActionMailerJob.perform_later(communication_id: c.id)
         else
           message = "Client not supported: Template does not exist type: '#{template_type}' and TOMID ##{user.terms_of_membership_id}"
           Auditory.report_issue("Communication Client", message)
@@ -79,7 +79,6 @@ class Communication < ActiveRecord::Base
       Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
     end
   end  
-  handle_asynchronously :deliver_exact_target, queue: :exact_target_email, priority: 15
 
   def self.test_deliver_exact_target(template, user)
     if user.exact_target_member
@@ -115,7 +114,6 @@ class Communication < ActiveRecord::Base
     Auditory.report_issue("Communication deliver_mandrill", e, { user: user.id, current_membership: user.current_membership.id, communication: self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
   end
-  handle_asynchronously :deliver_mandrill, queue: :mandrill_email, priority: 15
 
   def self.test_deliver_mandrill(template, user)
     if user.mandrill_member
@@ -154,7 +152,6 @@ class Communication < ActiveRecord::Base
       current_membership: user.current_membership.id, communication: self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
   end
-  handle_asynchronously :deliver_lyris, queue: :lyris_email, priority: 15
 
   def deliver_action_mailer
     response = case template_type.to_sym
@@ -189,7 +186,6 @@ class Communication < ActiveRecord::Base
     Auditory.report_issue("Communication deliver_action_mailer", e, { user: user.id, communication: self.inspect })
     Auditory.audit(nil, self, "Error while sending communication '#{template_name}'.", user, Settings.operation_types["#{template_type}_email"])
   end
-  handle_asynchronously :deliver_action_mailer, queue: :email_queue, priority: 15
 
   def self.test_deliver_action_mailer(template, user)
     success = true

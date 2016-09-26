@@ -71,9 +71,9 @@ class Api::MembersControllerTest < ActionController::TestCase
                                                :expire_year => @credit_card.expire_year },
                               :product_sku => @enrollment_info.product_sku,
                               :product_description => @enrollment_info.product_description,
-                              :mega_channel => @enrollment_info.mega_channel,
-                              :marketing_code => @enrollment_info.marketing_code,
-                              :fulfillment_code => @enrollment_info.fulfillment_code,
+                              :utm_campaign => @enrollment_info.utm_campaign,
+                              :audience => @enrollment_info.audience,
+                              :campaign_id => @enrollment_info.campaign_code,
                               :ip_address => @enrollment_info.ip_address
                               }.merge(options),:format => :json }.merge(options2) )
   end

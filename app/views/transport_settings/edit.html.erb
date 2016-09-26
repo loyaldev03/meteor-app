@@ -1,0 +1,10 @@
+<div class='row-fluid'>
+  <div class='span12'>
+    <h2><%= @transport.transport.humanize %></h2>
+    <h4>Editing <%= t('activerecord.model.transport_setting') %></h4>
+    <hr />
+  </div>
+</div>
+<%= form_for @transport, as: :transport_setting, url: transport_setting_path(id: @transport), html: { class: 'form-horizontal' } do |f| %>
+  <%= render partial: 'form', locals: { f: f } %>
+<% end %>

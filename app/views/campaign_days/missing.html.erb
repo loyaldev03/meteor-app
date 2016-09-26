@@ -1,0 +1,35 @@
+<div class="page-header">
+  <h1> Missing campaign days </h1>
+</div>
+
+<table id="campaign_days_table" class="table table-bordered table-condensed dataTable" data-source="<%= missing_campaign_days_url(format: "json") %>">
+  <thead>
+    <tr>
+      <th><%= I18n.t("activerecord.attributes.campaign_day.date") %></th>
+      <th><%= I18n.t("activerecord.model.campaign") %></th>
+      <th><%= I18n.t("activerecord.attributes.campaign.transport") %></th>
+      <th><%= I18n.t("activerecord.attributes.campaign_day.spent") %></th>
+      <th><%= I18n.t("activerecord.attributes.campaign_day.reached") %></th>
+      <th><%= I18n.t("activerecord.attributes.campaign_day.converted") %></th>
+      <th><%= t(:actions) %></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<div id="dataTableSelect" class="in-front" >
+  Transport:
+  <%= select_tag "search_transport", options_for_select(Campaign.transports_i18n.select{|x| Campaign::TRANSPORTS_FOR_MANUAL_UPDATE.include? x}.invert), include_blank: 'All' %>
+</div>
+
+<div id='campaignDayEditModal' class='well modal hide' style='border: none; width:750px; margin-left:-375px'>
+  <div class='modal-header'>
+    <a href='#' class='close' data-dismiss='modal'>&times;</a>
+  </div>
+  <div class='modal-body'></div>
+</div>
+
+<script>
+  $(document).ready(campaign_days_functions(<%= CampaignDay.datatable_columns.size %>));
+</script>

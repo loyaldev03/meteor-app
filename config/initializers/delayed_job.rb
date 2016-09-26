@@ -10,7 +10,13 @@ Delayed::Worker.logger.level = Logger::DEBUG
 Delayed::Worker.queue_attributes = {
   club_cash_queue: { priority: 18 },
   elasticsearch_indexing: { priority: 10 },
-  mailchimp_sync: { priority: 30 }
+  mailchimp_sync: { priority: 30 },
+  exact_target_email: { priority: 15 },
+  mandrill_email: { priority: 15 },
+  lyris_email: { priority: 15 },
+  email_queue: { priority: 20 },
+  drupal_queue: { priority: 15 },
+  generic_queue: { priority: 40 }
 }
 
 Delayed::Worker.class_eval do

@@ -22,7 +22,7 @@ class TermsOfMembershipsController < ApplicationController
     if @tom.save
       redirect_to terms_of_memberships_url, :notice => "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was created succesfully"
     else
-      flash.now[:error] = "There was an error while trying to save this subscription plan."
+      flash[:error] = 'There was an error while trying to save this subscription plan.'
       render action: "new"
     end
   end
@@ -31,12 +31,10 @@ class TermsOfMembershipsController < ApplicationController
     @tom = TermsOfMembership.find(params[:id])
     my_authorize! :edit, TermsOfMembership, @tom.club_id 
     if !@tom.can_update?
-      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
-      redirect_to terms_of_memberships_url
+      redirect_to terms_of_memberships_url, alert: "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
     end
   rescue ActiveRecord::RecordNotFound 
-    flash[:error] = "Subscription Plan not found."
-    redirect_to terms_of_memberships_url
+    redirect_to terms_of_memberships_url, alert: 'Subscription Plan not found.'
   end
 
   def update
@@ -45,15 +43,13 @@ class TermsOfMembershipsController < ApplicationController
     if @tom.can_update?
       prepare_tom_data_to_save(params)
       if @tom.save
-        flash[:notice] = "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
-        redirect_to terms_of_memberships_url
+        redirect_to terms_of_memberships_url, notice: "Your Subscription Plan #{@tom.name} (ID: #{@tom.id}) was updated succesfully"
       else
-        flash.now[:error] = "Your Subscription Plan was not updated."
+        flash[:error] = 'Your Subscription Plan was not updated.'
         render action: "edit"
       end
     else
-      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
-      redirect_to terms_of_memberships_url
+      redirect_to terms_of_memberships_url, alert: "Subscription Plan #{@tom.name} (ID: #{@tom.id}) can not be edited. It is being used"
     end
   end
 
@@ -63,12 +59,11 @@ class TermsOfMembershipsController < ApplicationController
     if @tom.destroy
       flash[:notice] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was successfully destroyed."
     else
-      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed."
+      flash[:error] = "Subscription Plan #{@tom.name} (ID: #{@tom.id}) was not destroyed: " + (@tom.errors.messages[:base].first ? @tom.errors.messages[:base].first : '')
     end
     redirect_to terms_of_memberships_url
   rescue ActiveRecord::RecordNotFound 
-    flash[:error] = "Subscription Plan not found."
-    redirect_to terms_of_memberships_url
+    redirect_to terms_of_memberships_url, alert: 'Subscription Plan not found.'
   end
 
   def show
@@ -77,8 +72,7 @@ class TermsOfMembershipsController < ApplicationController
     @email_templates = @tom.email_templates.where(client: @tom.club.marketing_tool_client)
     @payment_gateway_configuration = @tom.club.payment_gateway_configuration
   rescue ActiveRecord::RecordNotFound 
-    flash[:error] = "Subscription Plan not found."
-    redirect_to terms_of_memberships_url
+    redirect_to terms_of_memberships_url, alert: 'Subscription Plan not found.'
   end
 
   def resumed_information

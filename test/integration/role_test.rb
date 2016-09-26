@@ -829,7 +829,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
       assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
       assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].include? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
     
@@ -971,7 +971,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
       assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
       assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].include? 'disabled'
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
     

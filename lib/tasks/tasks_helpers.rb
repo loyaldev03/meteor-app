@@ -348,5 +348,32 @@ module TasksHelpers
   ################ FULFILLMENT ##########################
   #######################################################
 
+  #######################################################
+  ################ CAMPAIGN #############################
+  #######################################################
+
+  def self.fetch_campaigns_data
+    begin
+      date = Date.current.yesterday
+      club_ids = Club.is_enabled.ids
+      club_ids.each do |club_id|
+        ['facebook', 'mailchimp'].each do |transport|
+          Campaigns::DataFetcherJob.perform_later(club_id: club_id, transport: transport, date: date.to_s)
+        end
+      end
+      # re-try those campaign days with unexpected error
+      Campaigns::UnexpectedErrorDaysDataFetcherJob.perform_later
+      # send communications
+      Campaigns::NotifyMissingCampaignDaysJob.perform_later((date -1.day).to_s)
+      Campaigns::NotifyCampaignDaysWithErrorJob.perform_later
+      # creates missing campaign days for yesterday for those campaigns that are not automatically updated.
+      Campaign::TRANSPORTS_FOR_MANUAL_UPDATE.each do |transport|
+        Campaign.by_transport(transport).where(club_id: club_ids).map{|c| c.missing_days(date: date)}
+      end
+    rescue Exception => e
+      Auditory.report_issue("Campaigns::fetch_data", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+      Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"      
+    end
+  end
 
 end

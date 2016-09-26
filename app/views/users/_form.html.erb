@@ -293,8 +293,8 @@ Please, have in mind that fields with ' * ' are required.
 <% if @user.new_record? %>
   <%= f.hidden_field :enrollment_amount, :value => 0.0 %>
   <%= f.hidden_field :product_sku, :value => '' %>
-  <%= f.hidden_field :mega_channel, :value => Membership::CS_MEGA_CHANNEL %>
-  <%= f.hidden_field :campaign_medium, :value => Membership::CS_CAMPAIGN_MEDIUM %>
+  <%= f.hidden_field :utm_campaign, :value => Membership::CS_UTM_CAMPAIGN %>
+  <%= f.hidden_field :utm_medium, :value => Membership::CS_UTM_MEDIUM %>
   <%= f.hidden_field :landing_url, :value => request.env['HTTP_HOST'] %>
   <%= f.hidden_field :referral_path, :value => request.env['REQUEST_URI'] %>
   <%= f.hidden_field :ip_address, :value => request.env['REMOTE_ADDR'] %>

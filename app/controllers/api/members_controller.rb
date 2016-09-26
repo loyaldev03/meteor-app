@@ -33,9 +33,9 @@ class Api::MembersController < ApplicationController
   #     <li><strong>prospect_id</strong> Id of the prospect the enrollment info is related to. [optional] </li>
   #     <li><strong>product_sku</strong> Freeform text that is representative of the SKU. [optional]</li>
   #     <li><strong>product_description</strong> Description of the selected product. [optional]</li>
-  #     <li><strong>mega_channel</strong> [optional] </li>
-  #     <li><strong>marketing_code</strong> multi-team [optional] </li>
-  #     <li><strong>fulfillment_code</strong> Id of the fulfillment we are sending to our member. (car-flag). [optional]</li>
+  #     <li><strong>utm_campaign</strong> [optional] </li>
+  #     <li><strong>audience</strong> multi-team [optional] </li>
+  #     <li><strong>campaign_id</strong> Id of the fulfillment we are sending to our member. (car-flag). [optional]</li>
   #     <li><strong>ip_address</strong> Ip address from where the enrollment is being submitted. [optional] </li>
   #     <li><strong>user_agent</strong> Information related to the browser and computer from where the enrollment is being submitted. [optional] </li>
   #     <li><strong>referral_host</strong> Link where is being redirect when after subimiting the enroll. (It shows the params in it). [optional]</li>
@@ -46,9 +46,10 @@ class Api::MembersController < ApplicationController
   #     <li><strong>preferences</strong> Information about the preferences selected when enrolling. This will be use to know about the member likes. This information is selected by the member. This information is stored with format as hash encoded with json. [optional] </li>
   #     <li><strong>cookie_value</strong> Cookie from where the enrollment is being submitted.[optional]</li>
   #     <li><strong>cookie_set</strong> If the cookie_value is being recieved or not. It also informs if the client has setted a cookie on his side. [optional]</li>
-  #     <li><strong>campaign_medium</strong> [optional]</li>
+  #     <li><strong>utm_source</strong> [optional]</li>
+  #     <li><strong>utm_medium</strong> [optional]</li>
   #     <li><strong>campaign_description</strong> The name of the campaign. [optional]</li>
-  #     <li><strong>campaign_medium_version</strong> [optional]</li>
+  #     <li><strong>utm_content</strong> [optional]</li>
   #     <li><strong>joint</strong> It shows if it is set as type joint. It is use to see if at the end of the contract we have with the partner, we share the member's informatión with him. joint=1 means we will share this informatión. If it is null, we will automaticaly set it as 0. This is an exclusive value, it can be seted using 1 or 0, or true or false. It is present at member level.  [optional]</li>
   #     <li><strong>credit_card</strong> Hash with credit cards information. It must have the following information:</li>
   #     <ul>
@@ -64,7 +65,7 @@ class Api::MembersController < ApplicationController
   #   </ul>
   #
   # @example_request
-  #    curl -v -k -X POST --data-ascii '{"member":{"first_name":"alice", "last_name":"brennan", "address":"SomeSt", "city":"Dresden", "state":"AL", "gender":"", "zip":"12345", "phone_country_code":"1", "phone_area_code":"123", "phone_local_number":"1123", "birth_date":"1989-09-03", "email":"alice@brennan.com", "country":"US", "prospect_id":"deadbeef", "enrollment_amount":"0.0", "terms_of_membership_id":"1", "credit_card":{"number":"371449635398431", "expire_month":"2", "expire_year":"2014"}, "product_sku":"KIT-CARD", "landing_url":"http://www.google.com", "mega_channel":"super channel", "marketing_code":"marketing code", "fulfillment_code":"1", "ip_address":"192.168.1.1", "user_agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537..."}, "api_key":"3v5L15ovoJyee8mKh5DQ"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
+  #    curl -v -k -X POST --data-ascii '{"member":{"first_name":"alice", "last_name":"brennan", "address":"SomeSt", "city":"Dresden", "state":"AL", "gender":"", "zip":"12345", "phone_country_code":"1", "phone_area_code":"123", "phone_local_number":"1123", "birth_date":"1989-09-03", "email":"alice@brennan.com", "country":"US", "prospect_id":"deadbeef", "enrollment_amount":"0.0", "terms_of_membership_id":"1", "credit_card":{"number":"371449635398431", "expire_month":"2", "expire_year":"2014"}, "product_sku":"KIT-CARD", "landing_url":"http://www.google.com", "utm_campaign":"super channel", "audience":"marketing code", "campaign_id":"1", "ip_address":"192.168.1.1", "user_agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537..."}, "api_key":"3v5L15ovoJyee8mKh5DQ"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
   # @example_request_description Requesting enroll of a valid member, with params in json format.
   #
   # @example_response 
@@ -72,7 +73,7 @@ class Api::MembersController < ApplicationController
   # @example_response_description Example response to a valid request
   #
   # @example_request
-  #   curl -v -k -X POST --data-ascii '{"member":{"first_name":"", "last_name":"", "address":"", "city":"", "state":"", "gender":"", "zip":"", "phone_country_code":"", "phone_area_code":"", "phone_local_number":"", "birth_date":"1989-09-03", "email":"alice@brennan.com", "country":"US", "prospect_id":"", "enrollment_amount":"0.0", "terms_of_membership_id":"1", "product_sku":"KIT-CARD", "landing_url":"http://www.google.com", "mega_channel":"super channel", "marketing_code":"marketing code", "fulfillment_code":"1", "ip_address":"192.168.1.1", "user_agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537..."}, "api_key":"DyqgeuHrxmb9QA8gsU22"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
+  #   curl -v -k -X POST --data-ascii '{"member":{"first_name":"", "last_name":"", "address":"", "city":"", "state":"", "gender":"", "zip":"", "phone_country_code":"", "phone_area_code":"", "phone_local_number":"", "birth_date":"1989-09-03", "email":"alice@brennan.com", "country":"US", "prospect_id":"", "enrollment_amount":"0.0", "terms_of_membership_id":"1", "product_sku":"KIT-CARD", "landing_url":"http://www.google.com", "utm_campaign":"super channel", "audience":"marketing code", "campaign_id":"1", "ip_address":"192.168.1.1", "user_agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537..."}, "api_key":"DyqgeuHrxmb9QA8gsU22"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members
   # @example_request_description Requesting enroll sending some params as blank
   #
   # @example_response 
@@ -604,7 +605,7 @@ class Api::MembersController < ApplicationController
     end
     prorated = params[:prorated].nil? ? true : params[:prorated].to_s.to_bool
 
-    render json: user.change_terms_of_membership(new_tom, "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card], { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_API })
+    render json: user.change_terms_of_membership(new_tom, "Change of TOM from API from TOM(#{user.terms_of_membership_id}) to TOM(#{params[:terms_of_membership_id]})", Settings.operation_types.update_terms_of_membership, @current_agent, prorated, params[:credit_card], { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM_API })
   rescue ActiveRecord::RecordNotFound => e
     message = (e.to_s.include? "TermsOfMembership") ? "Subscription plan not found" : "Member not found"
     render json: { :message => message, :code => Settings.error_codes.not_found }

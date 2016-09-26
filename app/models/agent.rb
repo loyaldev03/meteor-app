@@ -142,7 +142,6 @@ class Agent < ActiveRecord::Base
     self.has_club_roles? and ClubRole.where("agent_id = ? and club_id in (?)", club_role.agent_id, self.clubs_related_id_list("admin")).count == 1
   end
 
-
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     if login = conditions.delete(:login)

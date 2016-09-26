@@ -182,6 +182,12 @@ class ActionController::TestCase
   end
 end
 
+def perform_call_as(agent)
+  sign_in agent
+  yield
+  sign_out agent
+end
+  
 module ActionDispatch
   class IntegrationTest
     include Capybara::DSL
@@ -310,9 +316,9 @@ module ActionDispatch
                                                  :expire_year => credit_card_to_load.expire_year },
                                 :product_sku => membership.product_sku,
                                 :product_description => membership.product_description,
-                                :mega_channel => membership.mega_channel,
-                                :marketing_code => membership.marketing_code,
-                                :fulfillment_code => membership.fulfillment_code,
+                                :utm_campaign => membership.utm_campaign,
+                                :audience => membership.audience,
+                                :campaign_id => membership.campaign_code,
                                 :ip_address => membership.ip_address
                                 }, :setter => { :cc_blank => cc_blank },
                                 :api_key => agent.authentication_token, :format => :json})
@@ -325,6 +331,7 @@ module ActionDispatch
 
     def select_from_datepicker(name, date)
       page.execute_script("window.jQuery('#"+name+"').next().click()")
+      find("#ui-datepicker-div")
       within("#ui-datepicker-div") do
         while( within(".ui-datepicker-year"){ page.has_no_content?(date.year)} )
           find(".ui-icon-circle-triangle-e").click

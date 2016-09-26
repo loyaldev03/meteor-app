@@ -12,11 +12,11 @@ class Membership < ActiveRecord::Base
   
   after_create :audit_creation_and_assign_default_created_by
 
-  CS_MEGA_CHANNEL = 'other'
-  CS_CAMPAIGN_MEDIUM = 'phone'
-  CS_CAMPAIGN_MEDIUM_API = 'api'
-  CS_CAMPAIGN_MEDIUM_UPGRADE = 'upgrade'
-  CS_CAMPAIGN_MEDIUM_DOWNGRADE = 'downgrade'
+  CS_UTM_CAMPAIGN = 'other'
+  CS_UTM_MEDIUM = 'phone'
+  CS_UTM_MEDIUM_API = 'api'
+  CS_UTM_MEDIUM_UPGRADE = 'upgrade'
+  CS_UTM_MEDIUM_DOWNGRADE = 'downgrade'
   CS_CAMPAIGN_DESCRIPTION = 'CS Join'
 
   def self.datatable_columns
@@ -30,9 +30,9 @@ class Membership < ActiveRecord::Base
   def update_membership_info_by_hash(params)
     unless params.nil?
       self.product_description = params[:product_description]
-      self.mega_channel = params[:mega_channel].downcase if params[:mega_channel]
-      self.marketing_code = params[:marketing_code].downcase if params[:marketing_code]
-      self.fulfillment_code = params[:fulfillment_code].downcase if params[:fulfillment_code]
+      self.utm_campaign = params[:utm_campaign].downcase if params[:utm_campaign]
+      self.audience = params[:audience].downcase if params[:audience]
+      self.campaign_code = params[:campaign_id].downcase if params[:campaign_id]
       self.ip_address = params[:ip_address]
       self.product_sku = params[:product_sku]
       self.user_agent = params[:user_agent]
@@ -44,10 +44,10 @@ class Membership < ActiveRecord::Base
       self.preferences = params[:preferences]
       self.cookie_value = params[:cookie_value]
       self.cookie_set = params[:cookie_set]
-      self.source = params[:source]
-      self.campaign_medium = params[:campaign_medium].downcase if params[:campaign_medium]
+      self.utm_source = params[:utm_source]
+      self.utm_medium = params[:utm_medium].downcase if params[:utm_medium]
       self.campaign_description = params[:campaign_description]
-      self.campaign_medium_version = params[:campaign_medium_version].downcase if params[:campaign_medium_version]
+      self.utm_content = params[:utm_content].downcase if params[:utm_content]
       self.prospect_id = params[:prospect_id]
       self.joint = params[:joint]
     end

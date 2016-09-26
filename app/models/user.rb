@@ -39,13 +39,12 @@ class User < ActiveRecord::Base
   after_update :mkt_tool_check_email_changed_for_sync
   after_update :after_save_sync_to_remote_domain
   after_update :asyn_desnormalize_preferences
-  after_destroy 'cancel_user_at_remote_domain'
+  after_destroy :cancel_user_at_remote_domain
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_user_at_remote_domain
-    api_user.destroy! unless api_user.nil? or api_id.nil? or not self.club.billing_enable
+    Users::CancelUserRemoteDomainJob.perform_later(user_id: self.id)    
   end
-  handle_asynchronously :cancel_user_at_remote_domain, queue: :drupal_queue, priority: 15
 
   def after_save_sync_to_remote_domain
     unless @skip_api_sync || api_user.nil?
@@ -130,12 +129,12 @@ class User < ActiveRecord::Base
     }.to_json
   end
   # Async indexing
-  def asyn_elasticsearch_index
-    AsynElasticSearchIndexJob.perform_later(self.id)
+  def async_elasticsearch_index
+    Users::AsyncElasticSearchIndexJob.perform_later(self.id)
   end
 
   def elasticsearch_asyn_call
-    asyn_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'zip', 'city', 'country', 'state', 'address', 'email', 'status']).empty?
+    async_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'zip', 'city', 'country', 'state', 'address', 'email', 'status']).empty?
   end
   ########### SEARCH ###############
 
@@ -197,25 +196,12 @@ class User < ActiveRecord::Base
 
   # Sends the request mail to every representative to accept/reject the member.
   def send_active_needs_approval_email
-    send_active_needs_approval_email_dj
+    Users::SendNeedsApprovalEmailJob.perform_later(user_id: self.id, active: true)
   end
-  def send_active_needs_approval_email_dj
-    representatives = ClubRole.where(club_id: self.club_id, role: 'representative')
-    emails = representatives.collect { |representative| representative.agent.email }.join(',')
-    Notifier.active_with_approval(emails,self).deliver_now!
-  end
-  handle_asynchronously :send_active_needs_approval_email_dj, queue: :email_queue, priority: 20
-
   # Sends the request mail to every representative to accept/reject the member.
   def send_recover_needs_approval_email
-    send_recover_needs_approval_email_dj
+    Users::SendNeedsApprovalEmailJob.perform_later(user_id: self.id, active: false)
   end
-  def send_recover_needs_approval_email_dj
-    representatives = ClubRole.where(club_id: self.club_id, role: 'representative')
-    emails = representatives.collect { |representative| representative.agent.email }.join(',')
-    Notifier.recover_with_approval(emails,self).deliver_now!
-  end
-  handle_asynchronously :send_recover_needs_approval_email_dj, queue: :email_queue, priority: 20
 
   def additional_data_form
     "Form#{club_id}".constantize rescue nil
@@ -243,7 +229,7 @@ class User < ActiveRecord::Base
       membership.update_attribute :join_date, Time.zone.now
     end
 
-    PostEnrollmentTasks.perform_later(self.id, skip_send_fulfillment)
+    Users::PostEnrollmentTasks.perform_later(self.id, skip_send_fulfillment)
     
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -478,7 +464,7 @@ class User < ActiveRecord::Base
       message = "User scheduled to be changed to TOM(#{new_tom.id}) -#{new_tom.name}- at #{date}."
       operation_type = Settings.operation_types.terms_of_membership_change_scheduled
     end
-    answer = change_terms_of_membership(new_tom, message, operation_type, agent, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM }, date, additional_actions)
+    answer = change_terms_of_membership(new_tom, message, operation_type, agent, false, nil, { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM }, date, additional_actions)
 
     nillify_club_cash("Removing club cash upon tom change.") if date.nil? and answer[:code] == Settings.error_codes.success and additional_actions[:remove_club_cash]
     answer
@@ -487,7 +473,7 @@ class User < ActiveRecord::Base
   def downgrade_user
     new_tom = self.terms_of_membership.downgrade_tom
     message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom.id})"
-    answer = change_terms_of_membership(new_tom, message, Settings.operation_types.downgrade_user, nil, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_DOWNGRADE })
+    answer = change_terms_of_membership(new_tom, message, Settings.operation_types.downgrade_user, nil, false, nil, { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM_DOWNGRADE })
     if answer[:code] != Settings.error_codes.success
       Auditory.report_issue("DowngradeUser::Error", answer[:message], { user: self.inspect, answer: answer })
     else
@@ -501,8 +487,8 @@ class User < ActiveRecord::Base
   # Recovers the member. Changes status from lapsed to applied or provisional (according to members term of membership.)
   def recover(new_tom, agent = nil, options = {})
     membership_params = options.merge({
-      mega_channel: Membership::CS_MEGA_CHANNEL,
-      campaign_medium: Membership::CS_CAMPAIGN_MEDIUM,
+      utm_campaign: Membership::CS_UTM_CAMPAIGN,
+      utm_medium: Membership::CS_UTM_MEDIUM,
       campaign_description: Membership::CS_CAMPAIGN_DESCRIPTION
     })
     enroll(new_tom, self.active_credit_card, 0.0, agent, true, 0, membership_params, true, false)
@@ -949,7 +935,7 @@ class User < ActiveRecord::Base
 
   # Resets user club cash in case of a cancelation.
   def nillify_club_cash(message = 'Removing club cash because of member cancellation')
-    NillifyClubCashJob.perform_later(self.id, message)
+    Users::NillifyClubCashJob.perform_later(self.id, message)
   end
   
   def nillify_club_cash_upon_cancellation
@@ -965,15 +951,8 @@ class User < ActiveRecord::Base
 
   # Resets member club cash in case the club cash has expired.
   def reset_club_cash
-    if club.allow_club_cash_transaction?
-      add_club_cash(nil, -club_cash_amount, 'Removing expired club cash.')
-      if is_not_drupal?
-        self.club_cash_expire_date = self.club_cash_expire_date + 12.months
-        self.save(:validate => false)
-      end
-    end
+    Users::ResetClubCashJob.perform_later(user_id: self.id)
   end
-  handle_asynchronously :reset_club_cash, queue: :club_cash_queue, priority: 18
 
   def assign_first_club_cash 
     assign_club_cash unless terms_of_membership.skip_first_club_cash
@@ -981,7 +960,7 @@ class User < ActiveRecord::Base
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
   def assign_club_cash(message = "Adding club cash after billing", enroll = false)
-    AssignClubCashJob.set(wait: 5.minutes).perform_later(self.id, message, enroll)
+    Users::AssignClubCashJob.set(wait: 5.minutes).perform_later(self.id, message, enroll)
   end
 
   # Adds club cash transaction. 
@@ -1277,26 +1256,12 @@ class User < ActiveRecord::Base
   end
 
   def desnormalize_additional_data
-    if self.additional_data.present?
-      self.additional_data.each do |key, value|
-        pref = UserAdditionalData.where(user_id: self.id, club_id: self.club_id, param: key).first_or_create
-        pref.value = value
-        pref.save
-      end
-    end
+    Users::DesnormalizeAdditionalDataJob.perform_later(user_id: self.id)
   end
-  handle_asynchronously :desnormalize_additional_data, queue: :generic_queue, priority: 40
 
   def desnormalize_preferences
-    if self.preferences.present?
-      self.preferences.each do |key, value|
-        pref = UserPreference.find_or_create_by(user_id: self.id, club_id: self.club_id, param: key)
-        pref.value = value
-        pref.save
-      end
-    end
+    Users::DesnormalizePreferencesJob.perform_later(user_id: self.id)
   end
-  handle_asynchronously :desnormalize_preferences, queue: :generic_queue, priority: 40
 
   def marketing_tool_sync
     case(club.marketing_tool_client)
@@ -1356,7 +1321,7 @@ class User < ActiveRecord::Base
     def check_upgradable
       if terms_of_membership.upgradable?
         if join_date.to_date + terms_of_membership.upgrade_tom_period.days <= Time.new.getlocal(self.get_offset_related).to_date
-          change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade, nil, false, nil, { mega_channel: Membership::CS_MEGA_CHANNEL, campaign_medium: Membership::CS_CAMPAIGN_MEDIUM_UPGRADE })
+          change_terms_of_membership(terms_of_membership.upgrade_tom_id, "Upgrade member from TOM(#{self.terms_of_membership_id}) to TOM(#{terms_of_membership.upgrade_tom_id})", Settings.operation_types.tom_upgrade, nil, false, nil, { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM_UPGRADE })
           return false
         end
       end

@@ -15,6 +15,8 @@ class Club < ActiveRecord::Base
   has_many :agents, -> {uniq}, through: :club_roles
   has_many :fulfillment_files
   has_many :disposition_types
+  has_many :campaigns
+  has_many :transport_settings
 
   belongs_to :api_domain,
     class_name:  'Domain',
@@ -36,7 +38,9 @@ class Club < ActiveRecord::Base
   
   scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' AND (marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes not like '%\"et_business_unit\":\"\"%') AND (marketing_tool_attributes like '%et_prospect_list%'AND marketing_tool_attributes not like '%\"et_prospect_list\":\"\"%') AND (marketing_tool_attributes like '%et_members_list%' AND marketing_tool_attributes not like '%\"et_members_list\":\"\"%') AND (marketing_tool_attributes like '%et_username%' AND marketing_tool_attributes not like '%\"et_username\":\"\"%') AND ( marketing_tool_attributes like '%et_password%' AND marketing_tool_attributes not like '%\"et_password\":\"\"%') AND (marketing_tool_attributes like '%et_endpoint%' AND marketing_tool_attributes not like '%\"et_endpoint\":\"\"%')") }
   scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' AND (marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes not like '%\"mailchimp_api_key\":\"\"%') AND (marketing_tool_attributes like '%mailchimp_list_id%'AND marketing_tool_attributes not like '%\"mailchimp_list_id\":\"\"%')") }
- 
+  scope :is_enabled, -> { where(billing_enable: true) }
+
+
   has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            url: "/system/:attachment/:id/:style/:filename",
                            styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
@@ -148,14 +152,12 @@ class Club < ActiveRecord::Base
   end
 
   def resync_users_and_prospects
-    subscribers_count = self.members_count.to_i
-    if subscribers_count > Settings.maximum_number_of_subscribers_to_automatically_resync
-      Auditory.report_club_changed_marketing_client(self, subscribers_count)
-    end
-    self.users.update_all(need_sync_to_marketing_client: 1, marketing_client_synced_status: "not_synced", marketing_client_last_synced_at: nil, marketing_client_last_sync_error: nil, marketing_client_last_sync_error_at: nil, marketing_client_id: nil)
-    self.prospects.update_all(need_sync_to_marketing_client: 1)
+    Clubs::ResyncUsersAndProspectsJob.perform_later(club_id: self.id)
   end
-  handle_asynchronously :resync_users_and_prospects, queue: :generic_queue
+
+  def available_transport_settings
+    ['facebook', 'mailchimp'] - transport_settings.select(:transport).map(&:transport)
+  end
 
   private
     def add_default_member_groups

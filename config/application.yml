@@ -8,6 +8,7 @@ defaults: &defaults
   email_to_use_on_action_mailer_as_recipient: platformadmins@xagax.com
   platform_email: 'platform@xagax.com'
   platform_admins_email: 'platformadmins@xagax.com'
+  campaign_manager_recipients: 'sonia@xagax.com,sebastian@xagax.com,platform@xagax.com'
   batch_agent_email: 'batch@xagax.com'
   others_product: "SLOOPS"
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe']
@@ -401,6 +402,7 @@ test:
 
 production:
   <<: *defaults
+  campaign_manager_recipients: 'mbrossard@meteoraffinity.com,ndavid@meteoraffinity.com,lerrick@meteoraffinity.com'
   email_to_send_product_list: 'tbrady@meteoraffinity.com,ckincheloe@meteoraffinity.com'
   mes_report_service:
     user: Stoneacrereports

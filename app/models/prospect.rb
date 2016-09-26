@@ -23,19 +23,14 @@ class Prospect < ActiveRecord::Base
     "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
   end
 
-  def marketing_tool_sync_without_dj
+  def marketing_tool_sync
     case(club.marketing_tool_client)
     when 'exact_target'
       exact_target_after_create_sync_to_remote_domain if defined?(SacExactTarget::ProspectModel) and exact_target_prospect
     when 'mailchimp_mandrill'
-      mailchimp_sync_to_remote_domain if defined?(SacMailchimp::ProspectModel) and mailchimp_prospect
+      Mailchimp::ProspectSynchronizationJob.perform_later(prospect_id: self.id) if defined?(SacMailchimp::ProspectModel) and mailchimp_prospect
     end
   end
-
-  def marketing_tool_sync
-    marketing_tool_sync_without_dj
-  end
-  handle_asynchronously :marketing_tool_sync, queue: :exact_target_sync
 
   def skip_sync!
      @skip_sync = true
