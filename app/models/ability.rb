@@ -48,6 +48,7 @@ class Ability
     cannot :toggle_testing_account, User
     cannot :manual_review, Fulfillment
     cannot :bulk_process, Product
+    cannot :send, Communication
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
 
@@ -89,6 +90,7 @@ class Ability
       can :api_change, TermsOfMembership
       can :api_sale, User
       can :list, Communication
+      can :send, Communication
       can :manage, EmailTemplate
     when 'representative' then
       can :manage, User
@@ -118,6 +120,7 @@ class Ability
       can :list, Transaction
       can :list, ClubCashTransaction
       can :list, Communication
+      cannot :send, Communication
       can :list, Fulfillment
     when 'supervisor' then
       can :manage, User
@@ -141,6 +144,7 @@ class Ability
       can :see_nice, Transaction
       can :list, Membership
       can :list, Communication
+      cannot :send, Communication
       can :list, Fulfillment
       can :manual_review, Fulfillment
     when 'api' then
@@ -178,6 +182,7 @@ class Ability
       can :list, CreditCard
       can :list, UserNote
       can :list, Communication
+      cannot :send, Communication
     # Fulfillment Managment role: Team de Fulfillment
     when 'fulfillment_managment' then
       can :manage, User
@@ -206,6 +211,7 @@ class Ability
       can :list, Transaction
       can :list, ClubCashTransaction
       can :list, Communication
+      cannot :send, Communication
       can :list, Membership
     end
 
