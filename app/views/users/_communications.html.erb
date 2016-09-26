@@ -7,6 +7,7 @@
     	<th> <%= t('activerecord.attributes.communication.scheduled_at') %> </th>
     	<th> <%= t('activerecord.attributes.communication.processed_at') %> </th>
     	<th> <%= t('activerecord.attributes.communication.template_type') %> </th>
+      <th> <%= t('actions') %> </th>
     </tr>
   </thead>
   <tbody>
@@ -16,8 +17,8 @@
     <% end %> 
   	<% @communications.each do |communication| %>
   	<tr>
-  	  <td> 
-  	  	<% if communication.sent_success %> 
+  	  <td class="text-center"> 
+  	  	<% if communication.sent_success %>
   	      <i class ="icon-ok help" rel= "popover" data-toggle="modal" href="#myModal<%=communication.id%>" style="cursor: pointer"></i>
         <% elsif not communication.sent_success and communication.processed_at %>
           <i class ="icon-remove help" rel= "popover" data-toggle="modal" href="#myModal<%=communication.id%>" style="cursor: pointer"></i>
@@ -36,11 +37,14 @@
   	  <td> <%= I18n.l communication.scheduled_at, :format => :only_date if communication.scheduled_at %> </td>
   	  <td> <%= I18n.l communication.processed_at, :format => :only_date if communication.processed_at %> </td>
   	  <td> <%= communication.template_type %> </td>
+      <td class="text-center">
+        <% if communication.processed_at && !communication.sent_success %>
+          <%= link_to(I18n.t(:resend), can?(:send, Communication, current_club.id) ? user_resend_communication_path(communication_id: communication.id) : '#', method: :post, :id => "resend_" + communication.id.to_s, data: { :confirm => I18n.t("are_you_sure") }, :class => "btn btn-mini btn-info #{'disabled' if cannot?(:send, Communication, current_club.id)}") %>
+        <% end %>
+      </td>
     <tr>
 	 <% end %>
   	
   <% end %>
   </tbody>
 </table>
-
-  

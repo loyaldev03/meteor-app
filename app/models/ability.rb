@@ -51,6 +51,7 @@ class Ability
     cannot :toggle_testing_account, User
     cannot :manual_review, Fulfillment
     cannot :bulk_process, Product
+    cannot :send, Communication
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
 
@@ -95,6 +96,7 @@ class Ability
       can :api_change, TermsOfMembership
       can :api_sale, User
       can :list, Communication
+      can :send, Communication
       can :manage, EmailTemplate
     when 'representative' then
       can :manage, User
