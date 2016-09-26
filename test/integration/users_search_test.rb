@@ -381,6 +381,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
 
     click_link_or_button 'Cancel'
     page.execute_script("window.jQuery('#cancel_date').next().click()")
+    find("#ui-datepicker-div")
     date = Time.zone.now + 2.day
     if (date.month > Time.zone.now.month)
       (date.month-Time.zone.now.month).times{ find(".ui-icon-circle-triangle-e").click }
