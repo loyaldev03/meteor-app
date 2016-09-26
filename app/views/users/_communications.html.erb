@@ -39,7 +39,7 @@
   	  <td> <%= communication.template_type %> </td>
       <td class="text-center">
         <% if communication.processed_at && !communication.sent_success %>
-          <%= link_to(I18n.t(:resend), user_resend_communication_path(communication_id: communication.id), method: :post, :id => "resend_" + communication.id.to_s, data: {:confirm => I18n.t("are_you_sure")}, :class => 'btn btn-mini btn-info') if current_agent.can? :send, Communication, current_club.id %>
+          <%= link_to(I18n.t(:resend), can?(:send, Communication, current_club.id) ? user_resend_communication_path(communication_id: communication.id) : '#', method: :post, :id => "resend_" + communication.id.to_s, data: { :confirm => I18n.t("are_you_sure") }, :class => "btn btn-mini btn-info #{'disabled' if cannot?(:send, Communication, current_club.id)}") %>
         <% end %>
       </td>
     <tr>
@@ -48,8 +48,3 @@
   <% end %>
   </tbody>
 </table>
-
-<script type="text/javascript">
-  var agent_can_resend_communication = <%= current_agent.can? :send, Communication, current_club.id %>;
-  $(document).ready(showCommunicationsFunctions());
-</script>
