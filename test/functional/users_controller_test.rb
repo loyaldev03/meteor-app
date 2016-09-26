@@ -4,7 +4,7 @@ class UsersControllerTest < ActionController::TestCase
   setup do
     @agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @saved_user = FactoryGirl.create(:user_with_api, :club_id => @club.id, :next_retry_bill_date => Time.zone.now+5.day)
   	@saved_user = User.last
     sign_in @agent
@@ -125,6 +125,30 @@ class UsersControllerTest < ActionController::TestCase
       @agent.update_attribute :roles, role
       generate_put_toggle_testing_account
       assert_response :unauthorized
+    end
+  end
+
+  test 'should resend communication' do
+    sign_in @agent
+    @tom            = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
+    @email_template = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
+    @communication  = 
+    Communication.create(user: @saved_user, template_name: @email_template.name, client: @email_template.client)
+    post :resend_communication, :partner_prefix => @partner.prefix, :club_prefix => @club.name, user_prefix: @saved_user.id, :communication_id => @communication.id
+    assert_response :redirect
+  end
+
+  test 'should not resend communication' do
+    @tom            = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
+    @email_template = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
+    @communication  = Communication.create(user: @saved_user, template_name: @email_template.name, client: @email_template.client)
+    [:confirmed_supervisor_agent, :confirmed_representative_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+      @agent = FactoryGirl.create agent
+      perform_call_as(@agent) do
+        post :resend_communication, :partner_prefix => @partner.prefix, :club_prefix => @club.name, user_prefix: @saved_user.id, :communication_id => @communication.id
+        assert_response :unauthorized
+      end
     end
   end
 end
