@@ -408,6 +408,7 @@ class UsersController < ApplicationController
   end
 
   def resend_communication
+    my_authorize! :send, Communication, @current_club.id
     comm = Communication.find(params[:communication_id])
     comm.resend!
     Auditory.audit(@current_agent, @current_user, I18n.t('activerecord.attributes.communication.resent_success'), @current_user, Settings.operation_types.resend_communication)
