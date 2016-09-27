@@ -1074,7 +1074,7 @@ function user_change_next_bill_date(){
 
 function user_save_the_sale_functions(){
   disable_form_buttons_upon_submition('save_the_sale_form')  
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 0 });
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd" });
 }
 
 function chargeback_user_functions(){

@@ -17,7 +17,7 @@
     <tr>
       <td>
         <%= label_tag :change_tom_date, t('future_save_the_sale'), :class => 'help-inline' %>
-        <%= text_field_tag :change_tom_date, (params[:change_tom_date] || Time.current.to_date), :class => 'datepicker readonly' %> 
+        <%= text_field_tag :change_tom_date, (params[:change_tom_date] || Time.current.to_date), :class => 'datepicker', readonly: 'readonly' %> 
       </td>
     </tr>
     <tr>
