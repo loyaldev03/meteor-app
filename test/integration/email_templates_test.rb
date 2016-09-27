@@ -498,4 +498,25 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
     end
     assert page.has_no_content? I18n.t('error_messages.testing_communication_send')
   end
+
+  test "Resend failed communication" do
+    sign_in_as(@admin_agent)
+    @saved_user = create_active_user(@tom, :active_user)
+    assert_difference("Communication.count",1) do
+      @saved_user.set_as_canceled!
+    end
+    communication = @saved_user.communications.last
+    visit show_user_path(partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id)
+    within(".nav-tabs"){ click_on("Communications") }
+    within("#communications") do
+      assert page.has_no_selector? "#resend_#{communication.id}"
+    end
+
+    communication.update_attribute :sent_success, false
+    visit show_user_path(partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id)
+    within(".nav-tabs"){ click_on("Communications") }
+    within("#communications") do
+      assert find(:xpath, "//a[@id='resend_#{communication.id}']")[:class].exclude? 'disabled'
+    end
+  end
 end

@@ -42,6 +42,23 @@ class Communication < ActiveRecord::Base
     end
   end
 
+  def resend!
+    case client
+    when 'lyris'
+      self.deliver_lyris
+    when 'exact_target'
+      self.deliver_exact_target
+    when 'mailchimp_mandrill'
+      self.deliver_mandrill
+    when 'action_mailer'
+      self.deliver_action_mailer
+    else
+      message = "Client not supported: Client: #{client.to_s}"
+      Auditory.report_issue("Communication Client", message)
+      logger.error "* * * * * Client not supported"
+    end
+  end
+
   def deliver_exact_target
     if self.user.exact_target_member
       result = self.user.exact_target_member.send_email(external_attributes[:customer_key])
