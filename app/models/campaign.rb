@@ -56,7 +56,7 @@ class Campaign < ActiveRecord::Base
       if campaign_day 
         campaign_day.is_missing? ? [campaign_day] : []
       else
-        CampaignDay.create(campaign: self, date: initial_date).tap(&:readonly!)
+        [CampaignDay.create(campaign: self, date: initial_date).tap(&:readonly!)]
       end
     else
       all_days = past_period(date).to_a
