@@ -1,5 +1,5 @@
 module Mailchimp
-  class UserSynchronizationJob < ActiveJob::Base
+  class ProspectSynchronizationJob < ActiveJob::Base
     queue_as :mailchimp_sync
 
     def perform(prospect_id)
