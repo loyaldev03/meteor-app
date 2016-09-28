@@ -456,7 +456,7 @@ class User < ActiveRecord::Base
 
   def save_the_sale(new_tom_id, agent = nil, date = nil, additional_actions = {})
     new_tom = TermsOfMembership.find(new_tom_id)
-    if not date or (date and date.to_date == Time.current.to_date)
+    if date.nil? or (date and date.to_date == Time.current.to_date)
       message = "Save the sale from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom_id})."
       operation_type = Settings.operation_types.save_the_sale
       date = nil
