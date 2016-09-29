@@ -455,6 +455,7 @@ en:
         club_cash_installment_amount: 'Club cash amount'
         skip_first_club_cash: 'Skip first club cash'
         needs_enrollment_approval: 'Needs Enrollment Approval'
+        no_pgc_configured: 'Before adding or updating Subscriptions Plans, the PGC information must be provided'
         wizard:
           title_new: 'New Subscription Plan'
           title_edit: 'Edit Subscription Plan'
