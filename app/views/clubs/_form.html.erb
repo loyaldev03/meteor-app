@@ -129,6 +129,20 @@
     </div> 
   </div>
 
+  <h3>Social Links</h3>
+  <div class="control-group">
+    <%= f.label :twitter_url, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :twitter_url, :class => 'text_field input-xxlarge' %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :facebook_url, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :facebook_url, :class => 'text_field input-xxlarge' %>
+    </div>
+  </div>
+
   <div class="form-actions">
     <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= link_to t('cancel', :default => t("helpers.links.cancel")), clubs_path, :class => 'btn' %>

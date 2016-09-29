@@ -97,6 +97,16 @@
   <%= @club.payment_gateway_errors_email %>
 </p>
 
+<h3>Social Links</h3>
+<p>
+  <strong><%= model_class.human_attribute_name(:twitter_url) %>:</strong><br>
+  <%= @club.twitter_url %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:facebook_url) %>:</strong><br>
+  <%= @club.facebook_url %>
+</p>
+
 <div class="form-actions">
   <%= link_to t(:back),
               clubs_path, :class => 'btn'  %>
