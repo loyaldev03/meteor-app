@@ -660,6 +660,10 @@ en:
         spent: 'Spent'
         reached: 'Reached'
         converted: 'Converted'
+  mailchimp:
+    error_details:
+      cant_subscribe: 'is in a compliance state due to unsubscribe, bounce, or compliance review and cannot be subscribed.'
+      fake_or_invalid_email: 'looks fake or invalid, please enter a real email address.'
   date: 
     formats:
       default: "%m/%d/%Y"

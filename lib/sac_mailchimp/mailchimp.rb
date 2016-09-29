@@ -35,15 +35,22 @@ module SacMailchimp
     end
   end
 
-  def self.report_error(message, error, subscriber, raise_exception = true)
-    raise_exception = !(error.try(:detail).to_s.include? 'is in a compliance state due to unsubscribe, bounce, or compliance review and cannot be subscribed.')
+  def self.report_error(message, error, subscriber, notify_error = true)
+    raise_exception = notify_error ? should_raise_exception?(error) : notify_error
     logger.info error.inspect
     if not subscriber.club.billing_enable
       subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false)
-    elsif error.instance_of?(Gibbon::MailChimpError) and error.body.nil? #Timeout
+    elsif error.instance_of?(Gibbon::MailChimpError) and error.body.nil? # Timeout
       raise NonReportableException.new if raise_exception
     else
       raise error if raise_exception
     end
+  end
+
+  def self.should_raise_exception?(error)
+    [
+      I18n.t('mailchimp.error_details.cant_subscribe'),
+      I18n.t('mailchimp.error_details.fake_or_invalid_email')
+    ].select { |text| error.try(:detail).to_s.include?(text) }.empty?
   end
 end
