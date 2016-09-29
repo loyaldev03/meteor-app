@@ -847,7 +847,8 @@ function campaigns_functions(){
     "bLengthChange": false,
     "iDisplayLength": 25,
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 6 ] }],
-    "sAjaxSource": $('#campaigns_table').data('source')
+    "sAjaxSource": $('#campaigns_table').data('source'),
+    "aaSorting": [ [0,'desc'] ]
   });  
 }
 
