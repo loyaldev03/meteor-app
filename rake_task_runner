@@ -89,6 +89,10 @@ cd /var/www/$2/current && bundle exec rake mkt_tools:sync_prospects_to_exact_tar
 echo "`date` rake mkt_tools:sync_prospects_to_mailchimp"
 cd /var/www/$2/current && bundle exec rake mkt_tools:sync_prospects_to_mailchimp  >> $LOGFILE 2>&1 &
 
+if [ "$1" == "production" ]; then
+  echo "`date` running rsync to keep copy of production logs within reporting"
+  rsync -av --delete -e 'ssh -p 30003' /var/www/$2/current/log/ deploy@reporting2.affinitystop.com:/home/deploy/production-logs
+fi
+
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS
-
