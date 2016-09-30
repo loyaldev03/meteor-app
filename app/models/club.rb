@@ -33,6 +33,7 @@ class Club < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true
   validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url,
             format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
+  validates :twitter_url, :facebook_url, format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validate :payment_gateway_errors_email_is_well_formated
 
   
