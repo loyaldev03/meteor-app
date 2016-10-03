@@ -295,7 +295,7 @@ module TasksHelpers
       tz = Time.zone.now
       begin
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
-        user.cancel_user_at_remote_domain_without_delay
+        Users::CancelUserRemoteDomainJob.perform_now(user_id: user.id)
         user.marketing_tool_sync_unsubscription(false)
         user.index.remove user rescue nil
         Operation.delete_all(["user_id = ?", user.id])
