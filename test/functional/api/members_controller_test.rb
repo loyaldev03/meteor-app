@@ -283,7 +283,6 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     @user_created = User.find_by(email: @user.email)
-    assert @response.body.include? '"api_role":["91284557"]'
     assert @response.body.include? '"bill_date":"'+@user_created.next_retry_bill_date.strftime("%m/%d/%Y")+'"'
   end
 
