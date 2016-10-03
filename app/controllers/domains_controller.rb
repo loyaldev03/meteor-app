@@ -50,8 +50,8 @@ class DomainsController < ApplicationController
   def update
     @domain = Domain.find(params[:id])
     my_authorize!(:update, Domain, @domain.club_id)
-    params.delete(:club_id) if params[:club_id].nil? and @domain.club.nil?
-    if @domain.update domain_params
+    
+    if @domain.update params.require(:domain).permit(:url, :description, :data_rights, :hosted)
       redirect_to domain_path(:id => @domain), notice: "The domain #{@domain.url} was successfully updated."
     else
       load_clubs_related

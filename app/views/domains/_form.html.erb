@@ -27,14 +27,10 @@
   <div class="control-group">
     <%= f.label :club_id, :class => 'control-label' %>
     <div class="controls">
-      <% if @domain.club.nil? %>
-        <% if @current_agent.has_global_role? %>
-          <%= generate_select_club_id f, @domain, @clubs %>
-        <% else %>
-          <%= generate_select_club_id f, @domain, @clubs, false %>
-        <% end %>
+      <% if @domain.new_record? %>
+        <%= f.collection_select :club_id, @clubs, "id", "name" %>
       <% else %>
-        <%= generate_select_club_id f, @domain, [@domain.club], false %>
+        <%= f.text_field :club_id, value: @domain.club.name, :class => 'text_field', disabled: true %>
       <% end %>
     </div>
   </div>
