@@ -129,10 +129,10 @@ class ClubsController < ApplicationController
   def get_subscription_plans
     club = Club.find(params[:club_id])
     query = params[:query]
-    subscription_plans = club.terms_of_memberships.select(:id, :name).where('name LIKE ?', "%#{query}%")
+    subscription_plans = club.terms_of_memberships.select(:id, :name).where('id = ? OR name LIKE ?', "#{query}", "%#{query}%")
     values = []
     subscription_plans.each do |plan|
-      values << { id: plan.id.to_s, text: plan.name }
+      values << { id: plan.id.to_s, text: "#{plan.id} - #{plan.name}" }
     end
     render json: values
   end
