@@ -2,12 +2,12 @@
   <tr>
     <td> 
       <%= f.label :number, t('activerecord.credit_card')+' '+t('activerecord.attributes.credit_card.number'), :class => 'help-inline' %>  
-      <%= f.text_field :number, :class => 'text_field input-medium'%> 
+      <%= f.text_field :number, :class => 'text_field input-medium', pattern: "[0-9 ]{13,17}" %> 
     <td> 
       <%= f.label :expire_month, t('activerecord.attributes.credit_card.expire_month'), :class => 'help-inline' %> 
-      <%= f.select( :expire_month, @months,{:include_blank => true}, {:class => 'input-small'} ) %>
+      <%= f.select( :expire_month, @months, {:include_blank => true}, {:class => 'input-small'} ) %>
       <%= f.label :expire_year, t('activerecord.attributes.credit_card.expire_year'), :class => 'help-inline' %> 
-      <%= f.select( :expire_year, @years,{:include_blank => true}, {:class => 'input-small'} ) %>
+      <%= f.select( :expire_year, @years, {:include_blank => true}, {:class => 'input-small'} ) %>
     </td>
   </tr>
   <tr class="control-group">
