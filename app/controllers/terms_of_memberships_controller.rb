@@ -1,6 +1,6 @@
 class TermsOfMembershipsController < ApplicationController
   before_filter :validate_club_presence
-  # before_filter :check_permissions
+  before_filter :validate_pgc_presence, only: [ :new, :create, :edit, :update ]
 
   def index
     my_authorize! :list, TermsOfMembership, @current_club.id
@@ -134,5 +134,11 @@ class TermsOfMembershipsController < ApplicationController
     def months_to_days(months)
       months = months.to_i
       months > 0 ? (months * 30.4166667).to_i : 0
+    end
+
+    def validate_pgc_presence
+      unless current_club.payment_gateway_configurations.first.present?
+        redirect_to new_payment_gateway_configuration_path(club_prefix: current_club.name), alert: t('activerecord.attributes.terms_of_membership.no_pgc_configured') 
+      end
     end
 end
