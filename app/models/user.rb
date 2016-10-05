@@ -539,10 +539,8 @@ class User < ActiveRecord::Base
       validation
     end
   rescue Exception => e
-    trans.update_attribute :operation_type, Settings.operation_types.membership_billing_with_error if trans
-    report_options = { exception: e.to_s, user: self.id }
-    report_options.merge! transaction: "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" if trans
-    Auditory.report_issue( "[URGENT] Billing:membership", I18n.t('error_messages.membership_billing_with_error'), report_options)
+    logger.error "Membership Billing Unexpected Error: #{e.inspect}"
+    trans.delete if trans
     { message: I18n.t('error_messages.airbrake_error_message'), code: Settings.error_codes.membership_billing_error } 
   end
 
