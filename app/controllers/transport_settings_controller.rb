@@ -57,10 +57,10 @@ class TransportSettingsController < ApplicationController
     end
 
     def transport_params
-      params.require(:transport_setting).permit(:transport, :client_id, :client_secret, :access_token, :api_key)
+      params.require(:transport_setting).permit(:transport, :client_id, :client_secret, :access_token, :api_key, :tracking_id, :container_id)
     end
 
     def transport_params_on_update
-      params.require(:transport_setting).permit(:client_id, :client_secret, :access_token, :api_key)
+      params.require(:transport_setting).permit(:client_id, :client_secret, :access_token, :api_key, :tracking_id, :container_id)
     end
 end
