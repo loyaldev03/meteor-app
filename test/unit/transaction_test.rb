@@ -897,10 +897,10 @@ class TransactionTest < ActiveSupport::TestCase
     user.update_attribute :next_retry_bill_date, Time.zone.now
     Transaction.any_instance.stubs(:process).raises("random error")
 
-    assert_difference("Transaction.count")do
+    assert_difference("Transaction.count", 0)do
       user.bill_membership
     end
-    assert_not_nil user.transactions.find_by(response_result: I18n.t('error_messages.airbrake_error_message'))
+    assert_nil user.transactions.find_by(response_result: I18n.t('error_messages.airbrake_error_message'))
   end
 
   # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for MeS

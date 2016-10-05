@@ -140,7 +140,6 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
       assert find_field('user[state]').value == @saved_user.state
       assert find_field('user[gender]').value == @saved_user.gender
       assert find_field('user[country]').value == @saved_user.country
-      assert find_field('user[birth_date]').value == "#{@saved_user.birth_date}"
     end
 
     within("#table_contact_information") do
