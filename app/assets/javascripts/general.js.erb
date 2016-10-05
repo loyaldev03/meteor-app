@@ -862,7 +862,7 @@ function campaignFormFunctions(){
     } 
   }
   else {
-    $(".datepicker").datepicker({ constrainInput: true, minDate: 1 });
+    $(".datepicker").datepicker({ constrainInput: true, minDate: 0 });
     $("#campaign_terms_of_membership_id").select2({
       ajax: {
         url: getSubscriptionPlansUrl,
