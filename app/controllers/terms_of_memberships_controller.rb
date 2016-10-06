@@ -1,6 +1,6 @@
 class TermsOfMembershipsController < ApplicationController
   before_filter :validate_club_presence
-  before_filter :validate_pgc_presence, only: [ :new, :create, :edit, :update ]
+  before_filter :validate_pgc_presence, only: [ :new, :create ]
 
   def index
     my_authorize! :list, TermsOfMembership, @current_club.id
