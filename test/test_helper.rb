@@ -330,8 +330,8 @@ module ActionDispatch
 
 
     def select_from_datepicker(name, date)
+      sleep 1 
       page.execute_script("window.jQuery('#"+name+"').next().click()")
-      find("#ui-datepicker-div")
       within("#ui-datepicker-div") do
         while( within(".ui-datepicker-year"){ page.has_no_content?(date.year)} )
           find(".ui-icon-circle-triangle-e").click
