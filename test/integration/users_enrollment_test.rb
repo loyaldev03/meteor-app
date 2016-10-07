@@ -1137,9 +1137,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     select credit_card.expire_month.to_s, :from => 'credit_card[expire_month]'
     select credit_card.expire_year.to_s, :from => 'credit_card[expire_year]'
 
-    click_on 'Save credit card'
-
-    assert page.has_content?('There was an error with your credit card information. Please verify your information and resubmit. {:number=>["is required"]}')
+    assert_difference('CreditCard.count', 0) do
+      click_on 'Save credit card'
+    end
   end
 
   # # Remove/Add Club Cash on an user with lifetime TOM
