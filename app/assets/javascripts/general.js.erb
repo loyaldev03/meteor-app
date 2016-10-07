@@ -932,6 +932,28 @@ function campaignFormFunctions(){
     $('#campaign_utm_medium').val(medium);
   }
   $(".select2-container").css('display', 'inline-block');
+
+  function disableEnrollRelatedField(campaign_type){
+    var noEnrollCampaignId = "<%= Campaign::NO_ENROLLMENT_CAMPAIGN_TYPE.join(',') %>".split(',');
+    var included = false;
+    for(var key in noEnrollCampaignId){
+      if(campaign_type == noEnrollCampaignId[key]){
+        included = true;
+      }
+    }
+    if(included){
+      $('#campaign_terms_of_membership_id').prop('disabled', 'disabled');
+      $('#campaign_enrollment_price').prop('disabled', 'disabled');
+    }else{
+      $('#campaign_terms_of_membership_id').prop('disabled', false);
+      $('#campaign_enrollment_price').prop('disabled', false);
+    };
+  }
+
+  $("#campaign_campaign_type").change(function(){
+    disableEnrollRelatedField($(this).val());
+  });
+  disableEnrollRelatedField($("#campaign_campaign_type").val());
 }
 
 

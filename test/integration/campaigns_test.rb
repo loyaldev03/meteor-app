@@ -99,4 +99,17 @@ class CampaignTest < ActionDispatch::IntegrationTest
     click_link_or_button 'Update Campaign'
     assert page.has_content?("Campaign #{unsaved_campaign.name} was updated succesfully.")
   end
+
+  test "should display subscription_plan and enrollment_price disabled when campaign_type is Newsletter or Store promotion" do   
+    login_general_admin(:confirmed_admin_agent)
+    visit campaigns_path(@partner.prefix, @club.name)
+    click_link_or_button 'New Campaign' 
+    select('Newsletter', from: "campaign[campaign_type]")
+    assert page.has_css?("#campaign_enrollment_price[disabled]")
+    assert page.has_css?("#campaign_terms_of_membership_id[disabled]")
+
+    select('Store promotion', from: "campaign[campaign_type]")
+    assert page.has_css?("#campaign_enrollment_price[disabled]")
+    assert page.has_css?("#campaign_terms_of_membership_id[disabled]")
+  end
 end

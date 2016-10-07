@@ -7,16 +7,19 @@ class Campaign < ActiveRecord::Base
   before_validation :set_utm_medium
   before_validation :set_campaign_code
   before_save :set_utm_content
+  before_create :set_landing_url
   after_update :fetch_campaign_days_data
 
-  validates :name, :landing_name, :enrollment_price, :initial_date, :campaign_type, :transport, 
+  validates :name, :landing_name, :initial_date, :campaign_type, :transport, 
             :utm_medium, :utm_content, :audience, :campaign_code,
-            :terms_of_membership_id, presence: true
+            presence: true
+  validates :terms_of_membership, :enrollment_price, presence: true, if: -> { enrollment_related? }
 
   validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? }
   validates_date :initial_date, after: lambda { Time.zone.now }, if: -> { (initial_date_changed? || finish_date_changed?) && !can_set_dates_in_the_past? }
 
   TRANSPORTS_FOR_MANUAL_UPDATE = ['twitter', 'adwords']
+  NO_ENROLLMENT_CAMPAIGN_TYPE = ['store_promotion', 'newsletter']
 
   enum campaign_type: {
      sloop:           0,
@@ -50,6 +53,10 @@ class Campaign < ActiveRecord::Base
     [ 'id', 'name', 'campaign_type', 'transport', 'initial_date', 'finish_date' ]
   end
 
+  def enrollment_related?
+    NO_ENROLLMENT_CAMPAIGN_TYPE.exclude? campaign_type
+  end
+
   def missing_days(date: Date.current)
     if mailchimp?
       campaign_day = CampaignDay.where(campaign: self, date: initial_date).first
@@ -80,9 +87,8 @@ class Campaign < ActiveRecord::Base
     !campaign_days.first.present?
   end
 
-  def landing_url
-    return @landing_url if @landing_url
-    url = club.member_landing_url.to_s + '/' + landing_name.to_s
+  def set_landing_url
+    url = (enrollment_related? ? club.member_landing_url : club.store_url).to_s + '/' + landing_name.to_s
     parameters = [
       "utm_campaign=#{campaign_type}",
       "utm_source=#{transport}",
@@ -91,7 +97,7 @@ class Campaign < ActiveRecord::Base
       "audience=#{audience}",
       "campaign_id=#{campaign_code}"
       ]
-    @landing_url = url + '?' + parameters.join('&')
+    self.landing_url = url + '?' + parameters.join('&')
   end
 
   private

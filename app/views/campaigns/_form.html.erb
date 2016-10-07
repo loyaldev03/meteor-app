@@ -26,7 +26,7 @@
         <% if @campaign.new_record? %>
           <%= f.select :terms_of_membership_id, [], { class: 'form-control' }, required: true %>
         <% else %>
-          <%= text_field_tag :terms_of_membership, @campaign.terms_of_membership.name, readonly: true %>
+          <%= text_field_tag :terms_of_membership, (@campaign.terms_of_membership.name if @campaign.terms_of_membership), readonly: true %>
         <% end %>
       </div>
     </div>
@@ -75,7 +75,7 @@
         <% if @campaign.new_record? %>
           <%= f.select :campaign_type, options_for_select(Campaign.campaign_types_i18n.invert, @campaign.campaign_type), { class: 'form-control', prompt: 'Choose one...' }, required: true %>
         <% else %>
-          <%= text_field_tag :campaign_type, @campaign.campaign_type, readonly: true %>
+          <%= text_field_tag :campaign_campaign_type, @campaign.campaign_type, readonly: true %>
         <% end %>
       </div>
     </div>

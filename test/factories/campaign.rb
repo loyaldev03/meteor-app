@@ -22,5 +22,13 @@ FactoryGirl.define do
       utm_medium "email"
       utm_content "email_medium"
     end
+
+    factory :campaign_newsletter do
+      campaign_type { Campaign.campaign_types['newsletter'] }
+    end
+
+    factory :campaign_store_promotion do
+      campaign_type { Campaign.campaign_types['store_promotion'] }
+    end
   end  
 end
