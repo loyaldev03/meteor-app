@@ -565,7 +565,7 @@ function new_payment_gateway_configuration_functions(){
   });
 }
 
-function new_user_functions(){
+function new_user_functions() {
   $('#error_explanation').hide();
   $(".datepicker").datepicker({ constrainInput: true, 
                                 maxDate: 0,
@@ -653,6 +653,8 @@ function new_user_functions(){
       }
     });
   });
+
+  $('#states_div').attr('data-remote', 'true');
 };
 
 function edit_user_functions(){

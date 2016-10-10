@@ -617,4 +617,12 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "mailchimp_mandrill", communication.client
     assert_equal "pillar", communication.template_type
   end
+
+  test "should delete user testing account" do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    user = FactoryGirl.create(:user, :club_id => club.id,:testing_account => true)
+    assert_difference("User.count",-1) do
+      TasksHelpers.delete_testing_accounts
+    end
+  end
 end
