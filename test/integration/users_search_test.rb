@@ -380,6 +380,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     assert find_field('input_first_name').value == @saved_user.first_name
 
     click_link_or_button 'Cancel'
+    sleep 1
     page.execute_script("window.jQuery('#cancel_date').next().click()")
     find("#ui-datepicker-div")
     date = Time.zone.now + 2.day

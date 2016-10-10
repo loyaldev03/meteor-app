@@ -853,6 +853,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     assert find_field('input_first_name').value == @saved_user.first_name
 
     click_link_or_button 'Edit'
+    sleep 1
     page.execute_script("window.jQuery('#user_birth_date').next().click()")
     find("#ui-datepicker-div")
     within(".ui-datepicker-header")do
