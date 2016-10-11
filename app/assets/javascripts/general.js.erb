@@ -857,12 +857,29 @@ function campaigns_functions(){
 
 
 function campaignFormFunctions(){
+  function disableEnrollRelatedField(campaign_type){
+    var noEnrollCampaignId = "<%= Campaign::NO_ENROLLMENT_CAMPAIGN_TYPE.join(',') %>".split(',');
+    var included = false;
+    for(var key in noEnrollCampaignId){
+      if(campaign_type == noEnrollCampaignId[key]){
+        included = true;
+      }
+    }
+    if(included){
+      $('#campaign_terms_of_membership_id').prop('disabled', 'disabled');
+      $('#campaign_enrollment_price').prop('disabled', 'disabled');
+    }else{
+      $('#campaign_terms_of_membership_id').prop('disabled', false);
+      $('#campaign_enrollment_price').prop('disabled', false);
+    };
+  }
+
   if ($('#edit_campaign').length) {
     $(".datepicker").datepicker({ constrainInput: true });
     disableFields();
     if(canEditTransportId) {
       $('#campaign_transport_campaign_id').prop('disabled', false);
-    } 
+    }
   }
   else {
     $(".datepicker").datepicker({ constrainInput: true, minDate: 0 });
@@ -895,6 +912,7 @@ function campaignFormFunctions(){
     });
     $("#campaign_campaign_type").select2();
     $("#campaign_transport").select2();
+    disableEnrollRelatedField($("#campaign_campaign_type").val());
   }
   
   function disableFields() {
@@ -935,27 +953,9 @@ function campaignFormFunctions(){
   }
   $(".select2-container").css('display', 'inline-block');
 
-  function disableEnrollRelatedField(campaign_type){
-    var noEnrollCampaignId = "<%= Campaign::NO_ENROLLMENT_CAMPAIGN_TYPE.join(',') %>".split(',');
-    var included = false;
-    for(var key in noEnrollCampaignId){
-      if(campaign_type == noEnrollCampaignId[key]){
-        included = true;
-      }
-    }
-    if(included){
-      $('#campaign_terms_of_membership_id').prop('disabled', 'disabled');
-      $('#campaign_enrollment_price').prop('disabled', 'disabled');
-    }else{
-      $('#campaign_terms_of_membership_id').prop('disabled', false);
-      $('#campaign_enrollment_price').prop('disabled', false);
-    };
-  }
-
   $("#campaign_campaign_type").change(function(){
     disableEnrollRelatedField($(this).val());
   });
-  disableEnrollRelatedField($("#campaign_campaign_type").val());
 }
 
 
