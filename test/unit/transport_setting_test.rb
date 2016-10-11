@@ -5,6 +5,8 @@ class TransportSettingTest < ActiveSupport::TestCase
   setup do
     @transportsetting = FactoryGirl.build(:transport_settings_facebook)
     @tsmailchimp = FactoryGirl.build(:transport_settings_mailchimp)
+    @ts_google_analytics = FactoryGirl.build(:transport_settings_google_analytics)
+    @ts_google_tag_manager = FactoryGirl.build(:transport_settings_google_tag_manager)
   end
 
   test 'Should save facebook transport settings when filling all data' do
@@ -38,6 +40,16 @@ class TransportSettingTest < ActiveSupport::TestCase
   test 'Should not save transport settings without api_key' do    
     @tsmailchimp.api_key = nil
     assert !@tsmailchimp.save, "Transport settings was saved without api_key"
+  end
+
+  test 'Should not save GA transport setting without tracking_id' do    
+    @ts_google_analytics.tracking_id = nil
+    assert !@ts_google_analytics.save, "GA Transport setting was saved without a tracking_id"
+  end
+
+  test 'Should not save Google Tag Manager transport setting without container_id' do    
+    @ts_google_tag_manager.container_id = nil
+    assert !@ts_google_tag_manager.save, "Google Tag Manager Transport setting was saved without a container_id"
   end
 
   test 'Should not create more than 1 transport for the same club' do

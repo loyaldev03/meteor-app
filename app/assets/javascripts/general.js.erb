@@ -987,6 +987,8 @@ function transportSettingsFormFunctions() {
     if(!transport) transport = $("#transport_setting_transport").val();
     transport == "facebook" ? $("#transport_settings_values_facebook").show() : $("#transport_settings_values_facebook").hide();
     transport == "mailchimp" ? $("#transport_settings_values_mailchimp").show() : $("#transport_settings_values_mailchimp").hide();
+    transport == "google_analytics" ? $("#transport_settings_values_google_analytics").show() : $("#transport_settings_values_google_analytics").hide();
+    transport == "google_tag_manager" ? $("#transport_settings_values_google_tag_manager").show() : $("#transport_settings_values_google_tag_manager").hide();
   }
 
   function assignRequiredTagToFields(transport) {
@@ -994,7 +996,9 @@ function transportSettingsFormFunctions() {
       'client_id', 
       'client_secret', 
       'access_token',
-      'api_key'
+      'api_key',
+      'tracking_id',
+      'container_id'
     ];
     $.each(fields, function(index, field) {
       $('#transport_setting_' + field).prop('required', false);
@@ -1008,6 +1012,12 @@ function transportSettingsFormFunctions() {
         break;
       case 'mailchimp':
         $('#transport_setting_api_key').prop('required', true);
+        break;
+      case 'google_analytics':
+        $('#transport_setting_tracking_id').prop('required', true);
+        break;
+      case 'google_tag_manager':
+        $('#transport_setting_container_id').prop('required', true);
         break;
     }
   }
@@ -1100,7 +1110,7 @@ function user_change_next_bill_date(){
 
 function user_save_the_sale_functions(){
   disable_form_buttons_upon_submition('save_the_sale_form')  
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd" });
+  $(".datepicker").datepicker({ constrainInput: true, minDate: 0 });
 }
 
 function chargeback_user_functions(){

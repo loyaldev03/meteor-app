@@ -3,7 +3,9 @@ class TransportSetting < ActiveRecord::Base
 
   store :settings, accessors: [ 
     :client_id, :client_secret, :access_token,
-    :api_key
+    :api_key,
+    :tracking_id,
+    :container_id
   ], coder: JSON
 
   validates_presence_of :club
@@ -11,12 +13,16 @@ class TransportSetting < ActiveRecord::Base
   validates_uniqueness_of :transport, scope: :club
   validates :client_id, :client_secret, :access_token, presence: true, if: -> { facebook? }
   validates :api_key, presence: true, if: -> { mailchimp? }
+  validates :tracking_id, presence: true, if: -> { google_analytics? }
+  validates :container_id, presence: true, if: -> { google_tag_manager? }
 
   enum transport: {
-    facebook:   0,
-    mailchimp:  1,
-    # twitter:    2,
-    # adwords:    3
+    facebook:           0,
+    mailchimp:          1,
+    # twitter:          2,
+    # adwords:          3,
+    google_analytics:   4,
+    google_tag_manager: 5
   }
 
   def self.datatable_columns
