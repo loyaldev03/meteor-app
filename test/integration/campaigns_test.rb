@@ -84,7 +84,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     assert page.has_css?("#campaign_landing_name[disabled]")
     assert page.has_css?("#terms_of_membership[readonly]")
     assert page.has_css?("#campaign_enrollment_price[disabled]")
-    assert page.has_css?("#campaign_type[readonly]")
+    assert page.has_css?("#campaign_campaign_type[readonly]")
     assert page.has_css?("#transport[readonly]")
     assert page.has_css?("#campaign_utm_medium[readonly]")
     assert page.has_css?("#campaign_transport_campaign_id[disabled]")

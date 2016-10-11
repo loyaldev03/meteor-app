@@ -122,7 +122,7 @@ class ClubsController < ApplicationController
     query = params[:query]
     campaign_codes = club.campaigns.select(:campaign_code).distinct.where('campaign_code LIKE ?', "%#{query}%").pluck(:campaign_code)
     values = []
-    campaign_codes.each_with_index { |code, index| values << { id: index.to_s, text: code } }
+    campaign_codes.each_with_index { |code, index| values << { id: code, text: code } }
     render json: values
   end
 
