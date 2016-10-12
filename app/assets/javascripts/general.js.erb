@@ -79,6 +79,51 @@ function flash_message(message, error){
   $(".container .row:first").prepend("<div class='alert "+message_type+"'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
 }
 
+function show_error_explanation(entityType, data, divName = 'error_explanation') {
+  $('#' + divName).show();
+  $('#' + divName + ' ul').empty();
+  $('#' + divName + ' ul').append("<b>" + data.message + "</b>");
+
+  switch (entityType) {
+    case 'user':
+      for (var key in data.errors) {
+        if (data.errors.hasOwnProperty(key)) {
+          if (key != 'credit_card') {
+            $('#user_' + key).parent().parent().addClass("error");
+            $('#' + divName + ' ul').append("<li>" + key + ': ' + data.errors[key] + "</li>");
+          } else {
+            for (var key2 in data.errors[key]) {
+              if (data.errors[key].hasOwnProperty(key2)) {
+                if (key2 != 0) {
+                  $('#user_credit_card_' + key2).parent().parent().addClass("error");
+                  $('#' + divName + ' ul').append("<li>" + key2 + ': ' + data.errors[key][key2] + "</li>");
+                }
+              }
+            }
+          }
+        }
+      }
+      break;
+    case 'club_cash':
+      for (var key in data.errors) {
+        if (data.errors.hasOwnProperty(key)) {
+          if (key != 'user') {
+            $('#' + divName + ' ul').append("<li>" + key + ": " + data.errors[key] + "</li>");
+          } else {
+            for (var key2 in data.errors[key]) {
+              if (data.errors[key].hasOwnProperty(key2)) {
+                if (key2 != 0) {
+                  $('#' + divName + ' ul').append("<li>" + key2 + ': ' + data.errors[key][key2] + "</li>");
+                }
+              }
+            }
+          }
+        }
+      }
+      break;
+  }
+}
+
 function global_ajax_error_messages(jqXHR){
   if (jqXHR.status == 401)
     return 'Agent is not authorized to make this request.';
@@ -567,12 +612,16 @@ function new_payment_gateway_configuration_functions(){
 
 function new_user_functions() {
   $('#error_explanation').hide();
-  $(".datepicker").datepicker({ constrainInput: true, 
-                                maxDate: 0,
-                                changeMonth: true,
-                                changeYear: true,
-                                yearRange: 'c-100:c'});
-  $('#new_user').submit( function(event) {
+
+  $(".datepicker").datepicker({
+    constrainInput: true,
+    maxDate: 0,
+    changeMonth: true,
+    changeYear: true,
+    yearRange: 'c-100:c'
+  });
+
+  $('#new_user').submit(function(event) {
     startAjaxLoader(true);
     $('#error_explanation').hide();
     event.preventDefault();
@@ -587,40 +636,20 @@ function new_user_functions() {
         endAjaxLoader(true);
         $('input').parent().parent().removeClass("error");
         if (data.code == 000) {
-          alert (data.message);
-          window.location.replace('../user/'+data.member_id);
-        }else{
-          $('#error_explanation').show();
-          $('#error_explanation ul').empty();
-          $('#error_explanation ul').append("<b>"+data.message+"</b>");
-          for (var key in data.errors){
-            if (data.errors.hasOwnProperty(key)) {
-              if (key != 'credit_card'){
-                $('#user_'+key).parent().parent().addClass("error");
-                $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
-              }
-              else{
-                for (var key2 in data.errors[key]){
-                  if (data.errors[key].hasOwnProperty(key2)){
-                    if (key2 != 0){
-                      $('#user_credit_card_'+key2).parent().parent().addClass("error");
-                      $('#error_explanation ul').append("<li>"+key2+': '+data.errors[key][key2]+"</li>");                  
-                    }
-                  }
-                } 
-              }
-            }
-          }
+          alert(data.message);
+          window.location.replace('../user/' + data.member_id);
+        } else {
+          show_error_explanation('user', data);
         }
       },
-      error: function(jqXHR, exception){
+      error: function(jqXHR, exception) {
         endAjaxLoader(true);
         alert(global_ajax_error_messages(jqXHR));
       }
     });
   });
   today = new Date()
-  $('#setter_cc_blank').click(function(){
+  $('#setter_cc_blank').click(function() {
     if ($('#setter_cc_blank').prop('checked')) {
       $('#user_credit_card_number').val('0000000000');
       $('#user_credit_card_expire_month').val(today.getMonth() + 1);
@@ -628,7 +657,7 @@ function new_user_functions() {
       $('#user_credit_card_number').attr('readonly', true);
       $('#user_credit_card_expire_month').attr('readonly', true);
       $('#user_credit_card_expire_year').attr('readonly', true);
-    }else{
+    } else {
       $('#user_credit_card_number').val('');
       $('#user_credit_card_expire_month').val('');
       $('#user_credit_card_expire_year').val('');
@@ -636,18 +665,20 @@ function new_user_functions() {
       $('#user_credit_card_expire_month').attr('readonly', false);
       $('#user_credit_card_expire_year').attr('readonly', false);
     }
-  });  
-
-  $('#user_country').on('change',  function(){
-    country = $('#user_country').val();
-    $.get(this.action, { country_code:country }, null, 'script'); 
   });
 
-  $("#user_terms_of_membership_id").change(function(){
+  $('#user_country').on('change', function() {
+    country = $('#user_country').val();
+    $.get(this.action, {
+      country_code: country
+    }, null, 'script');
+  });
+
+  $("#user_terms_of_membership_id").change(function() {
     $.ajax({
       type: 'GET',
-      url: "../subscription_plans/"+$(this).val()+"/resumed_information",
-      success: function(data){
+      url: "../subscription_plans/" + $(this).val() + "/resumed_information",
+      success: function(data) {
         $("#th_terms_of_memberships .help").attr("data-content", data);
         $("#th_terms_of_memberships .help").data('popover').options['content'] = data;
       }
@@ -657,15 +688,18 @@ function new_user_functions() {
   $('#states_div').attr('data-remote', 'true');
 };
 
-function edit_user_functions(){
+function edit_user_functions() {
   $('#error_explanation').hide();
-  $(".datepicker").datepicker({ constrainInput: true, 
-                                maxDate: 0, 
-                                changeMonth: true,
-                                changeYear: true,
-                                yearRange: 'c-100:c'});    
 
-  $('form').submit( function(event) {
+  $(".datepicker").datepicker({
+    constrainInput: true,
+    maxDate: 0,
+    changeMonth: true,
+    changeYear: true,
+    yearRange: 'c-100:c'
+  });
+
+  $('form').submit(function(event) {
     startAjaxLoader(true);
     event.preventDefault();
 
@@ -673,24 +707,16 @@ function edit_user_functions(){
       type: 'PUT',
       dataType: 'json',
       contentType: "application/json",
-      url: "/api/v1/members/"+id,
+      url: "/api/v1/members/" + id,
       data: JSON.stringify(retrieve_information()),
       success: function(data) {
         endAjaxLoader(true);
         alert(data.message);
         $('input').parent().parent().removeClass("error");
         if (data.code == 000)
-          window.location.replace('../'+id);
-        else{
-          $('#error_explanation').show();
-          $('#error_explanation ul').empty();
-          $('#error_explanation ul').append("<b>"+data.message+"</b>");
-          for (var key in data.errors){
-            if (data.errors.hasOwnProperty(key)) {
-              $('#user_'+key).parent().parent().addClass("error");
-              $('#error_explanation ul').append("<li>"+key+': '+data.errors[key]+"</li>");
-            }     
-          }       
+          window.location.replace('../' + id);
+        else {
+          show_error_explanation('user', data);
         }
       }
     });
@@ -702,47 +728,29 @@ function edit_user_functions(){
   })
 };
 
-function club_cash_functions(){
-  $('#_amount').on('change', function(){
-    amount = $('#_amount').val().substring(0,15);
+function club_cash_functions() {
+  $('#_amount').on('change', function() {
+    amount = $('#_amount').val().substring(0, 15);
     var num = parseFloat(amount);
-    if(num!=0)
+    if (num != 0)
       $('#_amount').val(Math.floor(num * 100) / 100);
   });
 
   $('#error_explanation').hide();
-  $('form').submit( function(event) {
+  $('form').submit(function(event) {
     startAjaxLoader(true);
-    event.preventDefault(); 
+    event.preventDefault();
     $.ajax({
       type: 'POST',
-      url: "/api/v1/members/"+id+"/club_cash_transaction",
+      url: "/api/v1/members/" + id + "/club_cash_transaction",
       data: $("form").serialize(),
       success: function(data) {
         endAjaxLoader(true);
-        if (data.code == 000){
+        if (data.code == 000) {
           alert(data.message);
-          window.location.replace('../'+id);
-        }else{
-          $('#error_explanation').show();
-          $("#error_explanation ul").empty();
-          $('#error_explanation ul').append("<b>"+data.message+"</b>");
-          for (var key in data.errors){
-            if (data.errors.hasOwnProperty(key)){
-              if (key != 'member'){
-              $("#error_explanation ul").append("<li>"+key+": "+data.errors[key]+"</li>");
-               }
-              else{
-                for (var key2 in data.errors[key]){
-                  if (data.errors[key].hasOwnProperty(key2)){
-                    if (key2 != 0){
-                      $('#error_explanation ul').append("<li>"+key2+': '+data.errors[key][key2]+"</li>");                       
-                    }
-                  }
-                } 
-              }
-            }
-          }
+          window.location.replace('../' + id);
+        } else {
+          show_error_explanation('club_cash', data);
         }
       },
     });
