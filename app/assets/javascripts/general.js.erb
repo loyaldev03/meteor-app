@@ -79,7 +79,10 @@ function flash_message(message, error){
   $(".container .row:first").prepend("<div class='alert "+message_type+"'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
 }
 
-function show_error_explanation(entityType, data, divName = 'error_explanation') {
+function show_error_explanation(entityType, data, divName) {
+  if(divName === undefined){ 
+    divName = 'error_explanation';
+  }
   $('#' + divName).show();
   $('#' + divName + ' ul').empty();
   $('#' + divName + ' ul').append("<b>" + data.message + "</b>");
