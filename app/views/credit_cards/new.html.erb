@@ -4,6 +4,7 @@
   <%= render :partial => 'form', :locals => { :f => f } %>
 <% end%>
 
-<script>
-  $(document).ready(disable_form_buttons_upon_submition('new_credit_card'));
-</script>
+
+<% content_for :javascript do %>
+  disable_form_buttons_upon_submition('new_credit_card');
+<% end %>

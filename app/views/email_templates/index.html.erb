@@ -25,6 +25,6 @@
   </table>
 </section>
 
-<script>
-  $(document).ready(email_templates_table_index_functions(<%= EmailTemplate.datatable_columns.size %>));
-</script>
+<% content_for :javascript do %>
+  email_templates_table_index_functions(<%= EmailTemplate.datatable_columns.size %>);
+<% end %>

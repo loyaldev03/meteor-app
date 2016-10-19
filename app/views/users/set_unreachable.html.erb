@@ -21,6 +21,7 @@
 <% end %>
 
 
-<script type="text/javascript">
-  $(document).ready(disable_form_buttons_upon_submition('user_set_unreachable_form'));
-</script>
+
+<% content_for :javascript do %>
+  disable_form_buttons_upon_submition('user_set_unreachable_form');
+<% end %>

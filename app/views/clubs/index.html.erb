@@ -24,6 +24,6 @@
   </tbody>
 </table>
 
-<script>
-  $(document).ready(club_index_functions(<%= Club.datatable_columns.size %>));
-</script>
+<% content_for :javascript do %>
+  club_index_functions(<%= Club.datatable_columns.size %>);
+<% end %>

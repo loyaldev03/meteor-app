@@ -27,6 +27,6 @@
   </table>
 </section>
 
-<script>
-  $(document).ready(product_index_functions(<%= Product.datatable_columns.size %>));
-</script>
+<% content_for :javascript do %>
+  product_index_functions(<%= Product.datatable_columns.size %>);
+<% end %>

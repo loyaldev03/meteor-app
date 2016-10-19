@@ -79,8 +79,9 @@
 <% end %>
 
 
-<script>
+<% content_for :javascript do %>
+  var agent_id = "<%= @agent.id %>"
   var roles = "<%= Agent::ROLES.join(',') %>"
   var clubs = "<%= @clubs.collect{|club| club.name+","+club.id.to_s}.join(";") %>"
-  $(document).ready(admin_form_functions());
-</script>
+  agent_form_functions(agent_id, roles, clubs);
+<% end %>

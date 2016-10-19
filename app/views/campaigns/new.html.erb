@@ -7,3 +7,12 @@
 <%= form_for @campaign, :html => { :class => 'form-horizontal', :id => 'new_campaign' } do |f| %>
   <%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>
+
+<% content_for :javascript do %>
+  var clubId = "<%= current_club.id %>";
+  var getSubscriptionPlansUrl = "<%= get_subscription_plans_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var getFulfillmentCodesUrl = "<%= get_campaign_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
+  var placeholderText = "Choose one...";
+  var placeholderTextFulfillmentCodes = "New automatic code";
+  newCampaignFunctions(clubId, getSubscriptionPlansUrl, getFulfillmentCodesUrl, placeholderText, placeholderTextFulfillmentCodes);
+<% end %>

@@ -1,5 +1,7 @@
-$(document).ready( function() {
+function doOnReadyforAllPages(){
   $('.help').popover({offset: 10, trigger: 'hover', html: true });
+
+  $(".datepicker").datepicker({ constrainInput: true, buttonImage: "<%= asset_path('/icon-calendar.png') %>" , showOn: "both", buttonImageOnly: true, dateFormat: "yy-mm-dd" });
 
   dataConfirmModal.setDefaults({
     title: 'Confirm your action',
@@ -28,8 +30,6 @@ $(document).ready( function() {
   });
 
   $(".alert").alert();
-
-  $(".datepicker").datepicker('option', { buttonImage: "<%= asset_path('/icon-calendar.png') %>" , showOn: "both", buttonImageOnly: true, dateFormat: "yy-mm-dd" })
 
   // https://select2.github.io/options.html
   $.fn.select2.defaults.set("theme", "bootstrap");
@@ -65,7 +65,7 @@ $(document).ready( function() {
       timeout: 200000
     });
   });
-});
+}
 
 function disable_form_buttons_upon_submition(form_id){
   $('#'+form_id).submit(function(){
@@ -483,7 +483,7 @@ function user_index_functions(){
 
 };
 
-function fetch_maketing_client_form(){
+function fetch_maketing_client_form(partner_prefix, club_id, mkt_tool_errors){
   if ($("#club_marketing_tool_client").val().length != 0) {
     $.ajax({
       type: 'GET',
@@ -505,10 +505,10 @@ function fetch_maketing_client_form(){
   }
 };
 
-function clubs_form_functions(){
+function clubs_form_functions(partner_prefix, club_id, mkt_tool_errors){
   $("#club_marketing_tool_client").change(function(){
     if($(this).val()!= ''){
-      fetch_maketing_client_form(club_id, $(this).val());
+      fetch_maketing_client_form(partner_prefix, club_id, mkt_tool_errors);
     }else
       $("#div_mkt_tool_attributes").empty();
   })
@@ -567,10 +567,7 @@ function retrieve_information(){
   return data
 }
 
-function payment_gateway_configuration_functions(){
-}
-
-function new_payment_gateway_configuration_functions(){
+function new_payment_gateway_configuration_functions(confirmationText, reConfirmationText){
   if($('#payment_gateway_configuration_gateway').val() != 'litle'){
     $('#div_report_group').hide('fast');
     $('#div_descriptor_name').hide('fast');
@@ -616,8 +613,7 @@ function new_payment_gateway_configuration_functions(){
 function new_user_functions() {
   $('#error_explanation').hide();
 
-  $(".datepicker").datepicker({
-    constrainInput: true,
+  $(".datepicker").datepicker("option", {
     maxDate: 0,
     changeMonth: true,
     changeYear: true,
@@ -694,8 +690,7 @@ function new_user_functions() {
 function edit_user_functions() {
   $('#error_explanation').hide();
 
-  $(".datepicker").datepicker({
-    constrainInput: true,
+  $(".datepicker").datepicker('option', {
     maxDate: 0,
     changeMonth: true,
     changeYear: true,
@@ -731,7 +726,7 @@ function edit_user_functions() {
   })
 };
 
-function club_cash_functions() {
+function club_cash_functions(clubCashTransactionUrl, userProfileUrl) {
   $('#_amount').on('change', function() {
     amount = $('#_amount').val().substring(0, 15);
     var num = parseFloat(amount);
@@ -745,13 +740,13 @@ function club_cash_functions() {
     event.preventDefault();
     $.ajax({
       type: 'POST',
-      url: "/api/v1/members/" + id + "/club_cash_transaction",
+      url: clubCashTransactionUrl,
       data: $("form").serialize(),
       success: function(data) {
         endAjaxLoader(true);
         if (data.code == 000) {
           alert(data.message);
-          window.location.replace('../' + id);
+          window.location.replace(userProfileUrl);
         } else {
           show_error_explanation('club_cash', data);
         }
@@ -866,8 +861,7 @@ function campaigns_functions(){
   });  
 }
 
-
-function campaignFormFunctions(){
+function newCampaignFunctions(clubId, getSubscriptionPlansUrl, getFulfillmentCodesUrl, placeholderText, placeholderTextFulfillmentCodes){
   function disableEnrollRelatedField(campaign_type){
     var noEnrollCampaignId = "<%= Campaign::NO_ENROLLMENT_CAMPAIGN_TYPE.join(',') %>".split(',');
     var included = false;
@@ -885,63 +879,37 @@ function campaignFormFunctions(){
     };
   }
 
-  if ($('#edit_campaign').length) {
-    $(".datepicker").datepicker({ constrainInput: true });
-    disableFields();
-    if(canEditTransportId) {
-      $('#campaign_transport_campaign_id').prop('disabled', false);
-    }
-  }
-  else {
-    $(".datepicker").datepicker({ constrainInput: true, minDate: 0 });
-    $("#campaign_terms_of_membership_id").select2({
-      ajax: {
-        url: getSubscriptionPlansUrl,
-        dataType: 'json',
-        type: "GET",
-        delay: 250,
-        quietMillis: 50,
-        data: function(params) { return { club_id: clubId, query: params.term, }; },
-        processResults: function(data) { return { results: data }; }
-      },
-      minimumInputLength: 2,
-      placeholder: placeholderText
-    });
-    $("#campaign_campaign_code").select2({
-      ajax: {
-        url: getFulfillmentCodesUrl,
-        dataType: 'json',
-        type: "GET",
-        delay: 250,
-        quietMillis: 50,
-        data: function(params) { return { club_id: clubId, query: params.term, }; },
-        processResults: function(data) { return { results: data }; }
-      },
-      minimumInputLength: 2,
-      placeholder: placeholderTextFulfillmentCodes,
-      allowClear: true
-    });
-    $("#campaign_campaign_type").select2();
-    $("#campaign_transport").select2();
-    disableEnrollRelatedField($("#campaign_campaign_type").val());
-  }
-  
-  function disableFields() {
-    var fieldsToDisable = [
-      'landing_name',
-      'terms_of_membership_id', 
-      'enrollment_price', 
-      'campaign_type',
-      'transport',
-      'audience',
-      'utm_content',
-      'transport_campaign_id',
-      'campaign_code'
-    ];
-    $.each(fieldsToDisable, function(index, field) {
-      $('#campaign_' + field).prop('disabled', true);
-    });
-  }
+  $(".datepicker").datepicker('option', { minDate: 0 });
+  $("#campaign_terms_of_membership_id").select2({
+    ajax: {
+      url: getSubscriptionPlansUrl,
+      dataType: 'json',
+      type: "GET",
+      delay: 250,
+      quietMillis: 50,
+      data: function(params) { return { club_id: clubId, query: params.term }; },
+      processResults: function(data) { return { results: data }; }
+    },
+    minimumInputLength: 2,
+    placeholder: placeholderText
+  });
+  $("#campaign_campaign_code").select2({
+    ajax: {
+      url: getFulfillmentCodesUrl,
+      dataType: 'json',
+      type: "GET",
+      delay: 250,
+      quietMillis: 50,
+      data: function(params) { return { club_id: clubId, query: params.term }; },
+      processResults: function(data) { return { results: data }; }
+    },
+    minimumInputLength: 2,
+    placeholder: placeholderTextFulfillmentCodes,
+    allowClear: true
+  });
+  $("#campaign_campaign_type").select2();
+  $("#campaign_transport").select2();
+  disableEnrollRelatedField($("#campaign_campaign_type").val());
 
   $('#campaign_transport').change(function() {
     setCampaignMedium($('#campaign_transport').val());
@@ -969,6 +937,30 @@ function campaignFormFunctions(){
   });
 }
 
+function editCampaignFunctions(canEditTransportId, canSetDatesInThePast){
+  var fieldsToDisable = [
+    'landing_name',
+    'terms_of_membership_id', 
+    'enrollment_price', 
+    'campaign_type',
+    'transport',
+    'audience',
+    'utm_content',
+    'transport_campaign_id',
+    'campaign_code'
+  ];
+  $.each(fieldsToDisable, function(index, field) {
+    $('#campaign_' + field).prop('disabled', true);
+  });
+
+  if(!canSetDatesInThePast){
+    $(".datepicker").datepicker('option', { minDate: 0 });
+  }
+
+  if(canEditTransportId) {
+    $('#campaign_transport_campaign_id').prop('disabled', false);
+  }
+}
 
 function transportSettingsIndexFunctions() {
   $('#transport_settings_table').DataTable({
@@ -987,7 +979,7 @@ function transportSettingsIndexFunctions() {
 }
 
 
-function transportSettingsFormFunctions() {
+function transportSettingsFormFunctions(transport) {
   $("#transport_setting_transport").change(function() {
     var transport = $("#transport_setting_transport").val();
     assignRequiredTagToFields(transport);
@@ -1056,7 +1048,7 @@ function club_cash_transactions_functions(column_count){
   });
 }
 
-function show_user_functions(){
+function show_user_functions(user_prefix){
 
   var objectsFetch = {transactions:true, notes:false, fulfillments:false, communications:false, operations:false, credit_cards:false, club_cash_transactions:false, memberships:false }
 
@@ -1111,17 +1103,17 @@ function show_user_functions(){
 
 function user_cancellation_functions(){
   disable_form_buttons_upon_submition('user_cancelation_form');
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1 });
+  $(".datepicker").datepicker('option', { minDate: 1 });
 };
 
 function user_change_next_bill_date(){
   disable_form_buttons_upon_submition('user_change_next_bill_date_form');
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 1 });
+  $(".datepicker").datepicker('option', { minDate: 1 });
 };
 
 function user_save_the_sale_functions(){
   disable_form_buttons_upon_submition('save_the_sale_form')  
-  $(".datepicker").datepicker({ constrainInput: true, minDate: 0, dateFormat: "yy-mm-dd" });
+  $(".datepicker").datepicker('option', { minDate: 0 });
 }
 
 function chargeback_user_functions(){
@@ -1134,11 +1126,10 @@ function chargeback_user_functions(){
     };
   })
 
-  $("#adjudication_date").datepicker({ constrainInput: true, 
-                                maxDate: 0, 
-                                changeMonth: true,
-                                changeYear: true,
-                                yearRange: 'c-100:c'});
+  $("#adjudication_date").datepicker('option', { maxDate: 0, 
+                                                 changeMonth: true,
+                                                 changeYear: true,
+                                                 yearRange: 'c-100:c'});
 }
 
 function fulfillments_not_processed_function(){
@@ -1204,8 +1195,8 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
     } 
   }); 
 
-  $(".datepicker").datepicker({ constrainInput: true });
-  
+  $('.datepicker').datepicker('option', { maxDate: 0 });
+
   if ($("#initial_date").val() == ""){
     $("#initial_date").datepicker( "setDate", '-1w' );
   }
@@ -1339,7 +1330,7 @@ function show_terms_of_membership_functions(){
 }
 
 
-function admin_form_functions(){
+function agent_form_functions(agent_id, roles, clubs){
   var count = 0;
 
   $('#club_role_table').on('click', '#add_new_club_role', function(event){
@@ -1621,8 +1612,8 @@ function suspected_fulfillments_functions(){
       endAjaxLoader(true);
     });
   });
-    $(".datepicker").datepicker({ constrainInput: true,
-                                maxDate: 0, 
+  
+  $(".datepicker").datepicker('option', { maxDate: 0, 
                                 changeMonth: true,
                                 changeYear: true,
                                 yearRange: 'c-100:c' });

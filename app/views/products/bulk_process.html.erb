@@ -24,6 +24,6 @@
   </div>
 </div>
 
-<script>
-  $(document).ready(bulk_process_products_functions())
-</script>
+<% content_for :javascript do %>
+  bulk_process_products_functions();
+<% end %>

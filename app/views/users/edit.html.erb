@@ -9,12 +9,12 @@
 <%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>
 
-<script type="text/javascript">
-  $(document).ready( edit_user_functions() );
+
+<% content_for :javascript do %>
+  edit_user_functions();
   if(state!=""){
   	$.get('', { country_code:"<%=@current_user.country%>", 
   		        selected_state:state }, null, 'script'); 
   }
-
-  $(document).ready(function(){ $('#states_div').attr('data-remote', 'true'); })
-</script>
+  $('#states_div').attr('data-remote', 'true');
+<% end %>

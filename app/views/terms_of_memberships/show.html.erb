@@ -156,6 +156,6 @@
 
 <%= link_to t('buttons.return'), '#', :class => "btn", :id => 'return_btn' %>
 
-<script>
-  $(document).ready(show_terms_of_membership_functions());
-</script>
+<% content_for :javascript do %>
+  show_terms_of_membership_functions();
+<% end %>

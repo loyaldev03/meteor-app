@@ -154,12 +154,11 @@
     <%= link_to t('cancel', :default => t("helpers.links.cancel")), clubs_path, :class => 'btn' %>
   </div>
 
-<script>
-  $('document').ready( function(){
-    clubs_form_functions();
-    fetch_maketing_client_form();
-  });
+
+<% content_for :javascript do %>
   var partner_prefix = "<%= @current_partner.prefix %>";
   var club_id = "<%= @club.id %>";
   var mkt_tool_errors = "<%= @club.errors.messages.nil? ? @club.errors.messages : @club.errors.messages[:marketing_tool_attributes] %>";
-</script>
+  clubs_form_functions(partner_prefix, club_id, mkt_tool_errors);
+  fetch_maketing_client_form(partner_prefix, club_id, mkt_tool_errors);
+<% end %>

@@ -8,8 +8,8 @@
 	<%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>
 
-<script>
+<% content_for :javascript do %>
 	var confirmationText = "<%= I18n.t('are_you_sure') %>";
 	var reConfirmationText = "<%= @current_club.payment_gateway_configuration.nil? ? I18n.t('pgc_are_you_sure') : I18n.t('pgc_are_you_sure_replace') %>";
-	$(document).ready(new_payment_gateway_configuration_functions());
-</script>
+	new_payment_gateway_configuration_functions(confirmationText, reConfirmationText);
+<% end %>

@@ -31,7 +31,8 @@
   </table>
 <% end %>
 
-<script>
-  var id = "<%= @current_user.id %>"; 
-  $(document).ready(club_cash_functions())
-</script>
+<% content_for :javascript do %>
+  var clubCashTransactionUrl = "<%= api_member_club_cash_transaction_index_path(member_id: @current_user.id) %>";
+  var userProfileUrl = "<%= show_user_path %>"; 
+  club_cash_functions(clubCashTransactionUrl, userProfileUrl);
+<% end %>

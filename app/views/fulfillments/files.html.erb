@@ -21,6 +21,6 @@
   </tbody>
 </table>
 
-<script>
-  $(document).ready(fulfillment_files_functions());
-</script>
+<% content_for :javascript do %>
+  fulfillment_files_functions();
+<% end %>

@@ -30,6 +30,6 @@
   </table>
 <% end%>
 
-<script>
-  $(document).ready(chargeback_user_functions());
-</script>
+<% content_for :javascript do %>
+  chargeback_user_functions();
+<% end %>

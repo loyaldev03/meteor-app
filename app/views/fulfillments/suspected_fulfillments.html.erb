@@ -40,6 +40,6 @@
   </div>
 <% end %>
 
-<script>
-  $(document).ready( suspected_fulfillments_functions() );
-</script>
+<% content_for :javascript do %>
+  suspected_fulfillments_functions();
+<% end %>

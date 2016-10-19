@@ -36,7 +36,8 @@
 <% end%>
 
 
-<script>
-  $(document).ready( user_save_the_sale_functions() );
-</script>
+
+<% content_for :javascript do %>
+  user_save_the_sale_functions();
+<% end %>
 

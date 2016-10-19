@@ -32,7 +32,6 @@
   </table>
 <% end%>
 
-<script type="text/javascript">
-  $(document).ready(user_cancellation_functions());
-</script>
-
+<% content_for :javascript do %>
+  user_cancellation_functions();
+<% end %>

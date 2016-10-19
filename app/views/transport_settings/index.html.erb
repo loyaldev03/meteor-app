@@ -21,6 +21,6 @@
   </tbody>
 </table>
 
-<script>
-  $(document).ready(transportSettingsIndexFunctions());
-</script>
+<% content_for :javascript do %>
+  transportSettingsIndexFunctions();
+<% end %>

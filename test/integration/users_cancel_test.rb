@@ -130,6 +130,7 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     cancel_date = Time.zone.now + 2.day
 
     click_link_or_button 'cancel'
+    sleep 1 
     cancel_date = select_from_datepicker("cancel_date", cancel_date)
     select(@member_cancel_reason.name, :from => 'reason')
     click_link_or_button 'Cancel user'

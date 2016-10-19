@@ -139,7 +139,7 @@
   </div>  
 <% end %>
 
-<script type="text/javascript">
-  $(document).ready( user_index_functions() );
-</script>
+<% content_for :javascript do %>
+  user_index_functions();
+<% end %>
 

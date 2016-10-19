@@ -30,6 +30,6 @@
   <div class='modal-body'></div>
 </div>
 
-<script>
-  $(document).ready(campaign_days_functions(<%= CampaignDay.datatable_columns.size %>));
-</script>
+<% content_for :javascript do %>
+  campaign_days_functions(<%= CampaignDay.datatable_columns.size %>);
+<% end %>

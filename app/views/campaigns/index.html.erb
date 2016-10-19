@@ -25,6 +25,6 @@
   </tbody>
 </table>
 
-<script>
-  $(document).ready(campaigns_functions());
-</script>
+<% content_for :javascript do %>
+  campaigns_functions();
+<% end %>

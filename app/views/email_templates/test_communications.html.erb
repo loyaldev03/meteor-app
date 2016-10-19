@@ -32,6 +32,6 @@
 
 
 
-<script type="text/javascript">
-  $(document).ready( test_communications_functions() );
-</script>
+<% content_for :javascript do %>
+  test_communications_functions();
+<% end %>

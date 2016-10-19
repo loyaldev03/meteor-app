@@ -22,6 +22,6 @@
   </tbody>
 </table>
 
-<script>
-  $(document).ready(domain_index_functions(<%= Domain.datatable_columns.size%>))
-</script>
+<% content_for :javascript do %>
+  domain_index_functions(<%= Domain.datatable_columns.size%>);
+<% end %>

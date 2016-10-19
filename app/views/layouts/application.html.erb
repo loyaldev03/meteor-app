@@ -36,5 +36,13 @@
       </script>
     <% end %>
 
+    <script type="text/javascript">
+     $(function(){
+        doOnReadyforAllPages();
+        <% if content_for?(:javascript) %>
+          <%= yield :javascript %>
+        <% end %>
+      });
+    </script>
   </body>
 </html>

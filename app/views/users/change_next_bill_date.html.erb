@@ -19,6 +19,6 @@
   </table>
 <% end%>
 
-<script>
-  $(document).ready(user_change_next_bill_date());
-</script>
+<% content_for :javascript do %>
+  user_change_next_bill_date();
+<% end %>

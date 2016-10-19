@@ -21,6 +21,6 @@
 	</table>
 <% end %>
 
-<script>
-  $(document).ready(disable_form_buttons_upon_submition('manual_billing_form'));
-</script>
+<% content_for :javascript do %>
+  disable_form_buttons_upon_submition('manual_billing_form');
+<% end %>

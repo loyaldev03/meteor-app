@@ -90,7 +90,7 @@
   <%= link_to t(:cancel), :back, class: 'btn', id: 'cancel_button' %>  
 </div>
 
-<script>
+<% content_for :javascript do %>
   var transport = "<%= @transport.transport %>";
-  $(document).ready( transportSettingsFormFunctions() );
-</script>
+  transportSettingsFormFunctions(transport);
+<% end %>

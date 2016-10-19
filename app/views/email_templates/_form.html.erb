@@ -52,13 +52,12 @@
   <%= link_to t('cancel', :default => t("helpers.links.cancel")), terms_of_membership_email_templates_path, :class => 'btn' %>
 </div>
 
-<script type="text/javascript">
-  $(document).ready(function() {
-    switch_days();
-    email_templates_functions();
-  });
+<% content_for :javascript do %>
   var external_attributes_data = "<%= @et.new_record? ? '' : @et.fetch_external_attributes_data %>";
   var partner_prefix = "<%= @current_partner.prefix %>";
   var club_prefix = "<%= @current_club.name %>";
   var terms_of_membership_id = "<%= @tom.id %>";
-</script>
+  
+  switch_days();
+  email_templates_functions();
+<% end %>

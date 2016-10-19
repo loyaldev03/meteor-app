@@ -19,6 +19,6 @@
   </table>
  <% end %>
  
-<script type="text/javascript">
-  $(document).ready( disable_form_buttons_upon_submition('new_user_note') );
-</script>
+<% content_for :javascript do %>
+  disable_form_buttons_upon_submition('new_user_note');
+<% end %>

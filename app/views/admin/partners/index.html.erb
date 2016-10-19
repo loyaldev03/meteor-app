@@ -20,6 +20,6 @@
   </tbody>
 </table>
 
-<script>
-  $(document).ready(partner_index_functions(<%= Partner.datatable_columns.size %>));
-</script>
+<% content_for :javascript do %>
+  partner_index_functions(<%= Partner.datatable_columns.size %>);
+<% end %>

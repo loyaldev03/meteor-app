@@ -170,16 +170,3 @@
   <%= f.submit nil, :class => 'btn btn-primary', :id => 'submit_button' %>
   <%= link_to t(:cancel), :back, :class => 'btn', :id => 'cancel_button' %>  
 </div>
-
-<script>
-  var clubId = "<%= current_club.id %>";
-  var getSubscriptionPlansUrl = "<%= get_subscription_plans_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
-  var getFulfillmentCodesUrl = "<%= get_campaign_codes_path(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name) %>";
-  var placeholderText = "Choose one...";
-  var placeholderTextFulfillmentCodes = "New automatic code";
-  <% unless @campaign.new_record? %>
-  var canEditTransportId = <%= @campaign.can_edit_transport_id? %>;
-  var canSetDatesInThePast = <%= @campaign.can_set_dates_in_the_past? %>;
-  <% end %>
-  $(document).ready( campaignFormFunctions() );
-</script>

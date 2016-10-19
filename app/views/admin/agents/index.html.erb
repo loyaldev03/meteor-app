@@ -19,6 +19,6 @@
   </tbody>
 </table>
 
-<script>
-  $(document).ready(agent_index_functions(<% Agent.datatable_columns.size %>));
-</script>
+<% content_for :javascript do %>
+  agent_index_functions(<% Agent.datatable_columns.size %>);
+<% end %>

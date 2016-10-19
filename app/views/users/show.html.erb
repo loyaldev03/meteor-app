@@ -58,7 +58,7 @@
         <%= link_to 'Add a note', (can?(:add_user_note, UserNote) ? new_user_note_path : '#'), :class => "btn btn-large-w btn-success #{'disabled' if cannot?(:add_user_note, UserNote)}", :id => 'add_user_note' %>
       </div>
       <div class="span4">
-        <%= link_to('Cancel', (@current_user.can_be_canceled? ? user_cancel_path : '#'), :class => "btn  btn-large-w btn-danger #{'disabled' unless @current_user.can_be_canceled?}", :id => 'cancel', data: (current_user.change_tom_date.nil? ? {} : {confirm: t('cancel_confirm_when_tom_change_scheduled')})) %>
+        <%= link_to('Cancel', (@current_user.can_be_canceled? ? user_cancel_path : '#'), method: :get, :class => "btn  btn-large-w btn-danger #{'disabled' unless @current_user.can_be_canceled?}", :id => 'cancel', data: (current_user.change_tom_date.nil? ? {} : {confirm: t('cancel_confirm_when_tom_change_scheduled')})) %>
       </div>
       <% if @current_user.additional_data_form %>
         <div class="span4">
@@ -457,7 +457,8 @@
   <% end %>
 </div>
 
-<script>
+
+<% content_for :javascript do %>
   var user_prefix = "<%= @current_user.id %>"
-  $(document).ready(show_user_functions());
-</script>
+  show_user_functions(user_prefix);
+<% end %>

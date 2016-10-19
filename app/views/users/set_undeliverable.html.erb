@@ -11,6 +11,6 @@
 <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %>
 
 
-<script type="text/javascript">
-  $(document).ready(disable_form_buttons_upon_submition('set_undeliverable'));
-</script>
+<% content_for :javascript do %>
+  disable_form_buttons_upon_submition('set_undeliverable');
+<% end %>

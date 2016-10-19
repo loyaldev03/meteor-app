@@ -24,6 +24,6 @@
   </table>
 </section>
 
-<script>
-  $(document).ready(terms_of_memberships_table_index_functions(<%= TermsOfMembership.datatable_columns.size %>));
-</script>
+<% content_for :javascript do %>
+  terms_of_memberships_table_index_functions(<%= TermsOfMembership.datatable_columns.size %>);
+<% end %>

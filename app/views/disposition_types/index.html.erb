@@ -21,6 +21,7 @@
   </table>
 </section>
 
-<script>
-  $(document).ready(disposition_types_index_functions(<%= DispositionType.datatable_columns.size %>));
-</script>
+
+<% content_for :javascript do %>
+  disposition_types_index_functions(<%= DispositionType.datatable_columns.size %>);
+<% end %>
