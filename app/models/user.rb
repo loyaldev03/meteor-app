@@ -258,7 +258,7 @@ class User < ActiveRecord::Base
       errors = { next_bill_date: 'Is prior to actual date' }
       answer = { message: "Next bill date should be older that actual date.", code: Settings.error_codes.next_bill_date_prior_actual_date, errors: errors }
     elsif self.valid? and not self.active_credit_card.expired?
-      next_bill_date = next_bill_date.to_datetime.change(offset: self.get_offset_related)
+      next_bill_date = next_bill_date.to_datetime.change(offset: self.get_offset_related(next_bill_date.to_date))
       self.next_retry_bill_date = next_bill_date
       self.bill_date = next_bill_date
       self.recycled_times = 0
@@ -1095,12 +1095,12 @@ class User < ActiveRecord::Base
     cancel_date = cancel_date.to_date
     cancel_date = (self.join_date.in_time_zone(get_club_timezone).to_date == cancel_date ? "#{cancel_date} 23:59:59" : cancel_date).to_datetime
     if not message.blank?
-      if cancel_date.change(offset: self.get_offset_related).to_date >= Time.new.getlocal(self.get_offset_related).to_date
+      if cancel_date.change(offset: self.get_offset_related(cancel_date)).to_date >= Time.new.getlocal(self.get_offset_related).to_date
         if self.cancel_date == cancel_date
           answer = { message: "Cancel date is already set to that date", code: Settings.error_codes.wrong_data }
         else
           if can_be_canceled?
-            self.current_membership.update_attribute :cancel_date, cancel_date.to_datetime.change(offset: self.get_offset_related )
+            self.current_membership.update_attribute :cancel_date, cancel_date.to_datetime.change(offset: self.get_offset_related(cancel_date))
             answer = { message: "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", code: Settings.error_codes.success }
             Auditory.audit(current_agent, self, answer[:message], self, operation_type)
           else
@@ -1297,8 +1297,9 @@ class User < ActiveRecord::Base
     end
   end
 
-  def get_offset_related
-    Time.now.in_time_zone(get_club_timezone).formatted_offset
+  def get_offset_related(date = Time.now)
+    date = date.to_date
+    Time.new(date.year, date.month, date.day).in_time_zone(get_club_timezone).formatted_offset
   end
 
   def get_club_timezone
