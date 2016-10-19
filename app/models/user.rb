@@ -1100,7 +1100,7 @@ class User < ActiveRecord::Base
           answer = { message: "Cancel date is already set to that date", code: Settings.error_codes.wrong_data }
         else
           if can_be_canceled?
-            self.current_membership.update_attribute :cancel_date, cancel_date.to_datetime.change(offset: self.get_offset_related(cancel_date))
+            self.current_membership.update_attribute :cancel_date, cancel_date.change(offset: self.get_offset_related(cancel_date))
             answer = { message: "Member cancellation scheduled to #{cancel_date.to_date} - Reason: #{message}", code: Settings.error_codes.success }
             Auditory.audit(current_agent, self, answer[:message], self, operation_type)
           else
