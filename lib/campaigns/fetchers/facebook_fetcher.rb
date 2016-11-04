@@ -67,7 +67,7 @@ class CampaignDataFetcher
           when 2635
             raise FbGraph2::Exception::InvalidRequest.new(response.body['error'].message)
           else
-            Auditory.report_issue("FacebookFetcher campaign retrieval error.", 'Facebook returned an unexpected code', {unexpected_error_code: response.body.error.code, unexpected_error_message: response.body.error.message, campaign_id: report.campaign_id}, false)
+            Auditory.report_issue("FacebookFetcher campaign retrieval error.", 'Facebook returned an unexpected code', {unexpected_error_code: response.body.error.code, unexpected_error_message: response.body.error.message, campaign_id: @report.campaign_id}, false)
             raise "Unexpected error code. Response: #{response}"
         end
       end
