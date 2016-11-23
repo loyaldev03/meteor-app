@@ -40,6 +40,8 @@ class CampaignDataFetcher
       else
         fetcher.fetch_and_save!(report)
       end
+      
+      
     end
     nil
   end

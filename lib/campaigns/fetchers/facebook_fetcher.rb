@@ -5,6 +5,12 @@ class CampaignDataFetcher
     # converted = website_clicks. Unfortunately the only way to get that data is through the actions field as link_clicks.
     # spent = spend
 
+    def fetch_and_save!(report)
+      super
+      missing_data_days_count = CampaignDay.where("campaign_id = ? AND date >= ? AND meta IS NULL", report.campaign_id, 1.week.ago.to_date).count
+      Campaign.find(report.campaign_id).update_attribute(:finish_date, Time.current.yesterday) if missing_data_days_count == 7
+    end
+
     def fetch!(report)
       @report               = report.dup
       @report.date          = (report.date || Time.current.yesterday).to_date

@@ -7,6 +7,7 @@ class Campaign < ActiveRecord::Base
   before_validation :set_utm_medium
   before_validation :set_campaign_code
   before_save :set_utm_content
+  before_save :sanitize_transport_campaign_id
   before_create :set_landing_url
   after_update :fetch_campaign_days_data
 
@@ -107,6 +108,10 @@ class Campaign < ActiveRecord::Base
       else
         initial_date .. ((finish_date.nil? || finish_date > date) ? date : finish_date)
       end
+    end
+
+    def sanitize_transport_campaign_id
+      self.transport_campaign_id.strip! if self.transport_campaign_id
     end
 
     def set_utm_medium

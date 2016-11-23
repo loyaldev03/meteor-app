@@ -31,22 +31,24 @@ module SacMailchimp
     end
 
     def update_email!(former_email)
-      begin
-        unless has_fake_email?(former_email)
-          former_subscriber = client.lists(mailchimp_list_id).members(email(former_email)).retrieve rescue nil
-          if former_subscriber
+      unless has_fake_email?(former_email)
+        former_subscriber = client.lists(mailchimp_list_id).members(email(former_email)).retrieve rescue nil
+        if former_subscriber
+          begin
             client.lists(mailchimp_list_id).members(email(former_email)).delete
+          rescue Gibbon::MailChimpError => e
+            SacMailchimp::report_error("Member:mailchimp_update_email", e, self.user)
           end
         end
-        subscribe!
-      rescue Gibbon::MailChimpError => e
-        update_member e
-        raise e
       end
+      subscribe!
     end
 
     def subscribe!
       save!
+    rescue Gibbon::MailChimpError => e
+      update_member e
+      SacMailchimp::report_error("Member:mailchimp_subscribe", e, self.user)
     end
 
     def create!
