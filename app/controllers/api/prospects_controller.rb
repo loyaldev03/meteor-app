@@ -91,5 +91,6 @@ class Api::ProspectsController < ApplicationController
       params[:utm_medium] = params[:utm_medium].downcase if params[:utm_medium]
       params[:utm_content] = params[:utm_content].downcase if params[:utm_content]
       params[:referral_path] = params[:referral_path].truncate(255) if params[:referral_path]
+      params[:user_agent] = params[:user_agent].truncate(255) if params[:user_agent]
     end
 end

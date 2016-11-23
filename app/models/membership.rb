@@ -35,7 +35,7 @@ class Membership < ActiveRecord::Base
       self.campaign_code = params[:campaign_id].downcase if params[:campaign_id]
       self.ip_address = params[:ip_address]
       self.product_sku = params[:product_sku]
-      self.user_agent = params[:user_agent]
+      self.user_agent = params[:user_agent].truncate(255) if params[:user_agent]
       self.referral_host = params[:referral_host]
       self.referral_parameters = params[:referral_parameters]
       self.referral_path = params[:referral_path].truncate(255) if params[:referral_path]
