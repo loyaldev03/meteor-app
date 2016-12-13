@@ -165,6 +165,14 @@ class Club < ActiveRecord::Base
     ] - transport_settings.select(:transport).map(&:transport)
   end
 
+  def toggle_maintenance_mode!
+    toggle :maintenance_mode
+    if save!
+      message = maintenance_mode ? 'Please, make sure to put back on live once the maintenance tasks are done.' : 'This is only a notification. Proceed to accept this US if everything is ok.'
+      Auditory.report_issue("Club #{self.name} has been set in #{maintenance_mode ? 'maintenance' : 'live'} mode", message, {partner: self.partner.name, club_name: self.name}, false)
+    end
+  end
+
   private
     def add_default_member_groups
       ['VIP', 'Celebrity', 'Notable', 'Charter Member'].each do |name|

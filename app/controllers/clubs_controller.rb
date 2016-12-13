@@ -116,7 +116,6 @@ class ClubsController < ApplicationController
     false
   end
 
-
   def get_campaign_codes
     club = Club.find(params[:club_id])
     query = params[:query]
@@ -135,6 +134,15 @@ class ClubsController < ApplicationController
       values << { id: plan.id.to_s, text: "#{plan.id} - #{plan.name}" }
     end
     render json: values
+  end
+
+  def toggle_maintenance_mode
+    my_authorize!(:toggle_maintenance_mode, Club, params[:club_id])
+    club = Club.find(params[:club_id])
+    club.toggle_maintenance_mode!
+    redirect_to club_path(partner_prefix: club.partner.prefix, id: club.id), notice: "Club was successfully put on #{club.maintenance_mode ? 'maintenance' : 'live'} mode."
+  rescue Exception => e
+    redirect_to club_path(partner_prefix: club.partner.prefix, id: club.id), alert: "There was an error while processing your request. #{e}"
   end
 
   private 

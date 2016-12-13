@@ -44,6 +44,7 @@ SacPlatform::Application.routes.draw do
   scope '/partner/:partner_prefix' do
     resources :clubs do
       match '/test_api_connection' => 'clubs#test_api_connection', :via => :get
+      put '/toggle_maintenance_mode' => 'clubs#toggle_maintenance_mode', as: 'toggle_maintenance_mode'
     end
     match 'clubs/:client/marketing_tool_attributes' => 'clubs#marketing_tool_attributes', :via => :get
 
