@@ -120,6 +120,8 @@
               new_domain_path(:club_id => @club.id), :class => 'btn btn-success' %>
   <%= link_to t(:test_api_connection),
               club_test_api_connection_path(:club_id => @club.id), :class => 'btn' %>
+  <%= link_to @club.maintenance_mode ? t(:put_on_live_mode) : t(:put_on_maintenance_mode),
+              club_toggle_maintenance_mode_path(:club_id => @club.id), :class => "btn #{@club.maintenance_mode ? 'btn-success' : 'btn-danger'}", method: :put %>
   <% if @payment_gateway_configuration %>
     <%= link_to t("activerecord.model.payment_gateway_configuration"),
         payment_gateway_configuration_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name, :id => @payment_gateway_configuration.id), :class => 'btn' %>

@@ -42,6 +42,8 @@ en:
   text_blacklist_are_you_sure: 'This user will be blacklisted. Are you really sure?'
   loading: 'Loading'
   test_api_connection: 'Test API Connection'
+  put_on_maintenance_mode: 'Put on Maintenance'
+  put_on_live_mode: 'Put on Live'
   index: '#'
   lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
   days: "days"
