@@ -36,9 +36,14 @@ you will have to use the binnary field within the bundler:
 /home/XXXXXXXX/.rvm/gems/ruby-1.9.3-p327/bundler/gems/yard-eb31004f1306/bin/yardoc --plugin rest --title "Api Documentation" --readme readme_api_doc.rdoc
 
 # in order to put phoenix into mantainance mode:
-rake maintenance:start
+[option 1] rake maintenance:start
+[option 2] touch tmp/maintenance_on
 # remove phoenix from mantainance mode:
-rake maintenance:end
+[if option 1 used] rake maintenance:end
+[if option 2 used] rm tmp/maintenance_on
+# deploy making sure to set maintenance mode while running migrations:
+cap -S put_in_maintenance_mode="true" #{environment} deploy
+
 
 while in mantainance mode, API and Web will not be reachable.
 In order to update the db/declinestrategies.yml file, run:
