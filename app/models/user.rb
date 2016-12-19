@@ -32,6 +32,7 @@ class User < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_marketing_client_sync_as_needed
+  before_save :apply_downcase_to_email
   after_create :elasticsearch_asyn_call
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_save :create_operation_on_testing_account_toggle
@@ -1584,5 +1585,9 @@ class User < ActiveRecord::Base
         current_agent = RequestStore.store[:current_agent]
         Auditory.audit(current_agent, self, message, self, operation_type)
       end
+    end
+
+    def apply_downcase_to_email
+      self.email = self.email.to_s.downcase if email_changed?
     end
 end
