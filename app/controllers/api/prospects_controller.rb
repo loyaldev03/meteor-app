@@ -83,6 +83,7 @@ class Api::ProspectsController < ApplicationController
 
   private 
     def standarize_params(params)
+      params[:email] = params[:email].downcase if params[:email] 
       params[:product_sku] = params[:product_sku].upcase if params[:product_sku] 
       params[:utm_campaign] = params[:utm_campaign].downcase if params[:utm_campaign]
       params[:audience] = params[:audience].downcase if params[:audience]
