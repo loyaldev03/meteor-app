@@ -19,7 +19,7 @@ class CampaignDataFetcher
         if report_data
           if report_data[:impressions] and report_data[:actions] and report_data[:spend]
             @report.reached   = report_data.impressions.to_i
-            @report.converted = (report_data.actions.select{|x| x.action_type == 'link_click'}.first.value.to_i rescue 0) # we want to retrieve the website_clicks
+            @report.converted = report_data.actions.select{|x| x.action_type == 'link_click'}.first.try(:value).to_i # we want to retrieve the website_clicks
             @report.spent     = report_data.spend.to_f
           end
           @report.meta        = report_data["meta"] || :no_error
