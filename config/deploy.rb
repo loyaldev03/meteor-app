@@ -133,6 +133,26 @@ namespace :deploy do
       puts `echo 'No new tag created for #{rails_env}.'`
     end
   end
+
+  desc 'Start maintenance mode'
+  task :enable_maintenance_mode, :roles => :web do
+    puts "Starting maintenance mode"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake maintenance:start"
+    run "mkdir -p '#{shared_path}/tmp/' && cp #{current_path}/tmp/maintenance.yml #{shared_path}/tmp/"
+  end
+
+  desc 'End maintenance mode'
+  task :disable_maintenance_mode, :roles => :web do
+    puts "Ending maintenance mode"
+    run "cd #{current_path} && RAILS_ENV=#{rails_env} bundle exec rake maintenance:end"
+    run "rm '#{shared_path}/tmp/maintenance.yml'"
+  end
+
+  desc "Copy mainteannce.yml file to make sure app is in maintenance mode if needed."
+  task :copy_maintenance_file do
+    puts "Copying maintenance.yml file from shared to current path"
+    run "if [ -e #{shared_path}/tmp/maintenance.yml ]; then #{sudo} cp #{shared_path}/tmp/maintenance.yml #{current_path}/tmp/; fi"
+  end
 end
 
 namespace :server_stats do
@@ -196,25 +216,11 @@ task :assets, :roles => :web do
   EOF
 end
 
-# mantainance_mode
-namespace :maintenance_mode do
-  desc "Start"
-  task :start, :roles => :web do
-    run "cd #{release_path} && RAILS_ENV=#{rails_env} bundle exec rake maintenance:start"
-  end
-  
-  desc "Stop"
-  task :stop, :roles => :web do
-    run "cd #{release_path} && RAILS_ENV=#{rails_env} bundle exec rake maintenance:end"
-  end
-end
-
 # after "deploy:setup", "deploy:db:setup" unless fetch(:skip_db_setup, false)
 after "deploy:update_code", "link_config_files"
 after "deploy:update_code", "assets"
-after "deploy:update", "maintenance_mode:start" if fetch(:put_in_maintenance_mode, false)
+after "deploy:update", "deploy:copy_maintenance_file"
 after "deploy:update", "deploy:migrate"
-after "deploy:update", "maintenance_mode:stop" if fetch(:put_in_maintenance_mode, false)
 after 'deploy:update', 'restart_delayed_jobs'
 after "deploy:update", "elasticsearch:reindex" if fetch(:elasticsearch_reindex, false)
 after 'deploy', 'customtasks:customcleanup'

@@ -35,15 +35,14 @@ In order to create the doc you must run:
 you will have to use the binnary field within the bundler:
 /home/XXXXXXXX/.rvm/gems/ruby-1.9.3-p327/bundler/gems/yard-eb31004f1306/bin/yardoc --plugin rest --title "Api Documentation" --readme readme_api_doc.rdoc
 
-# in order to put phoenix into mantainance mode:
-[option 1] rake maintenance:start
-[option 2] touch tmp/maintenance_on
-# remove phoenix from mantainance mode:
-[if option 1 used] rake maintenance:end
-[if option 2 used] rm tmp/maintenance_on
-# deploy making sure to set maintenance mode while running migrations:
-cap -S put_in_maintenance_mode="true" #{environment} deploy
 
+# How to put and remove Phoenix into mantainance mode:
+[Option 1]
+  - start: cap prototype|staging|production deploy:enable_maintenance_mode
+  - end: cap prototype|staging|production deploy:disable_maintenance_mode
+[Option 2] 
+  - start: touch tmp/maintenance_on
+  - end: rm tmp/maintenance_on
 
 while in mantainance mode, API and Web will not be reachable.
 In order to update the db/declinestrategies.yml file, run:
