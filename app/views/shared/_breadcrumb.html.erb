@@ -91,6 +91,28 @@
         <li class="active"><%= delimiter %><%= @transport.transport %></li>
       <% end %>
 
+      <% if params[:controller] == 'preference_groups' %>
+        <% if params[:action] == 'index' %>
+          <li class="active"><%= delimiter %>Preference Groups</li>
+        <% elsif params[:action] == 'new' %>
+          <li class="active"><%= delimiter %>New Preference Group</li>
+        <% elsif ['show', 'edit'].include? params[:action] %>
+          <li><%= delimiter %><a href="<%= preference_groups_path %>"><%= t('activerecord.model.preference_groups') %></a></li>
+          <li class="active"><%= delimiter %></li><%= @preference_group.name %>
+        <% end %>
+      <% end %>
+      <% if params[:controller] == 'preferences' and params[:action] == 'index' %>
+        <li><%= delimiter %><a href="<%= preference_groups_path %>"><%= t('activerecord.model.preference_groups') %></a></li>
+        <li><%= delimiter %><%= @preference_group.name %></li>
+        <li class="active"><%= delimiter %>Preferences</li>
+      <% end %>
+
+      <% if params[:controller] == 'campaign/products' and ['show','edit'].include? params[:action]  %>
+        <li><%= delimiter %><a href="<%= campaigns_path %>"><%= t('activerecord.model.campaigns') %></a></li>
+        <li><%= delimiter %><%= @campaign.name %></li>
+        <li class="active"><%= delimiter %>Products</li>
+      <% end %>
+
     <% end %>
 
     <% if @current_user %>

@@ -1,0 +1,24 @@
+<h5>Change Label of <%= @product.name %></h5>
+
+<%= form_for(@campaign_product, url: campaign_products_label_path(id: @campaign_product.id), :html => { :class => 'form-horizontal', 'data-target' => @campaign_product.id }) do |f| %>
+
+  <div class="control-group">
+    <%= f.label :label, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.text_field :label, :class => 'text_field input-xlarge', required: true, data: { product_name: @product.name } %>
+      <br /><br />
+      <%= link_to t('activerecord.attributes.campaign_product.reset_label'), "javascript:;", class: 'btn', id: 'btn_reset_label' %>
+    </div>
+  </div>
+
+  <div class="form-actions text-right">
+    <%= f.submit t('activerecord.attributes.campaign_product.set_label'), :class => 'btn btn-primary' %>
+    <%= link_to t(:cancel), "javascript:;", class: 'btn', id: 'btn_cancel_button', 'data-dismiss' => 'modal' %>
+  </div>
+<% end %>
+
+<script type="text/javascript">
+  $('#btn_reset_label').click(function() {
+    $('#campaign_product_label').val($('#campaign_product_label').data('product-name'));  
+  });
+</script>

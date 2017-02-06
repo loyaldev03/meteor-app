@@ -27,6 +27,16 @@ FactoryGirl.define do
     authentication_token {Devise.friendly_token.first(8)}
   end
 
+  factory :confirmed_landing_agent, class: Agent do
+    sequence(:username) {|n| "Admin_#{Faker::Lorem.characters(4)}" }
+    password "secret"
+    password_confirmation { password }
+    sequence(:email) {|n| "admin_#{Faker::Lorem.characters(4)}@test.no" }
+    confirmed_at Date.today-1.month
+    roles "landing"
+    authentication_token {Devise.friendly_token.first(8)}
+  end
+
   factory :confirmed_representative_agent, class: Agent do
     sequence(:username) {|n| "Representative_#{Faker::Lorem.characters(4)}" }
     password "secret"

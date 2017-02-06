@@ -22,11 +22,11 @@ class Auditory
     Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
   end
 
-  def self.create_user_story(description, error)
+  def self.create_user_story(description, title, project_id = Settings.pivotal_tracker.project_id, story_type = 'bug')
     PivotalTracker::Client.token = Settings.pivotal_tracker.token
     PivotalTracker::Client.use_ssl = true
-    project = PivotalTracker::Project.find(Settings.pivotal_tracker.project_id)
-    project.stories.create(name: "[#{Rails.env}] #{error}", story_type: 'bug', description: description)
+    project = PivotalTracker::Project.find(project_id)
+    project.stories.create(name: "[#{Rails.env}] #{title}", story_type: story_type, description: description)
   end
   
   def self.report_issue(error = "Special Error", exception = '', params = {}, add_backtrace = true)

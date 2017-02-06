@@ -1,0 +1,25 @@
+<%- model_class = @preference_group.class -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human %></h1>
+</div>
+
+<p>
+  <strong><%= model_class.human_attribute_name(:name) %>:</strong><br>
+  <%= @preference_group.name %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:code) %>:</strong><br>
+  <%= @preference_group.code %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:add_by_default) %>:</strong><br>
+  <%= @preference_group.add_by_default ? 'Yes' : 'No' %>
+</p>
+
+<div class="form-actions">
+  <%= link_to t(:back),
+              preference_groups_path, :class => 'btn'  %>
+  <%= link_to t(:edit),
+              edit_preference_group_path(id: @preference_group.id), :class => 'btn' %>
+  <%= link_to t('activerecord.model.preferences'), preference_group_preferences_path(preference_group_id: @preference_group.id), class: 'btn' %>
+</div>

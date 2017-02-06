@@ -1,0 +1,61 @@
+<div class='row-fluid'>
+  <div class='span12'>
+    <h2><%= @campaign.name %></h2>
+    <h4><%= t('activerecord.model.products') %></h4>
+    <hr />
+  </div>
+</div>
+
+<% if @campaign.campaign_products.first.present? %>
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th><%= t('activerecord.attributes.campaign_product.landing_page_label') %></th>
+      <th><%= t('activerecord.attributes.product.name') %></th>
+      <th><%= t('activerecord.attributes.product.sku') %></th>
+      <th><%= t('activerecord.attributes.product.stock') %></th>
+      <th><%= t('activerecord.attributes.product.allow_backorder') %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @campaign.campaign_products.each do |p| %>
+      <tr>
+      <td><%= p.label %></td>
+      <td><%= p.product.name %></td>
+      <td><%= p.product.sku %></td>
+      <td><%= p.product.stock %></td>
+      <td><%= p.product.allow_backorder? ? 'Yes' : 'No' %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<h5> Product Images Preview </h5>
+
+<% @campaign.campaign_products.includes(:product).each do |campaign_product| %>
+  <div class='span2'>
+    <%= label_tag campaign_product.product.name %>
+    <%= image_tag campaign_product.product.image_url, alt: 'No image found' %>
+  </div>
+<% end %>
+
+<% else %>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <p>This campaign doesn't have products assigned.</p>
+    <hr />
+  </div>
+</div>
+
+<% end %>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <div class="form-actions">
+      <%= link_to t('back', default: t('helpers.links.back')), campaigns_path, class: 'btn' %>
+      <%= link_to t(:edit), campaign_products_edit_url(campaign_id: @campaign.id), :class => 'btn' %>
+    </div>
+  </div>
+</div>

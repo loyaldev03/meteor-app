@@ -18,73 +18,77 @@
  *= require select2-bootstrap
  */
 
-
-form .clearfix:before, form .clearfix:after {
+form .clearfix:before,
+form .clearfix:after {
   display: inline;
 }
 
-.card_expired{
+.card_expired {
   background-color: red;
 }
 
-.ligthgreen{
+.ligthgreen {
   background-color: #90EE90;
 }
 
-.red{
+.red {
   color: #FFFFFF;
   background-color: red;
 }
 
-.yellow{
+.yellow {
   background-color: yellow;
 }
 
-.blacklisted{
+.blacklisted {
   background-color: #EEE8CD;
 }
 
-.ligthgrey{
+.ligthgrey {
   background-color: #F5F5F5;
 }
 
+.help {
+  /* Without this the popover won't work. */
+  position: relative;
+}
 
-.help {position: relative;}​ /*Without this the popover won't work.*/
+.comment {
+  height: auto;
+  display: inline-block;
+  word-wrap: break-word
+}
 
-.comment {height:auto; 
-        display:inline-block; 
-        word-wrap: break-word }
-
-.odd{
+.odd {
   background-color: #E0EEEE;
 }
 
-.even{
+.even {
   background-color: #FFFFFF;
 }
 
-label.error{
-  float:right;
-  width:70%;
-  text-align:left;
+label.error {
+  float: right;
+  width: 70%;
+  text-align: left;
 }
 
-div.dataTables_filter label{
-    text-align:left;
+div.dataTables_filter label {
+  text-align: left;
 }
 
 div.dataTables_filter input {
-    float: right;    
+  float: right;
 }
 
-#dataTableSelect{
-  height:auto;
-  width:auto;
-  float:left; 
+#dataTableSelect {
+  height: auto;
+  width: auto;
+  float: left;
 }
 
-#operations_table_info{
-  width:33%;
+#operations_table_info {
+  width: 33%;
 }
 
 .label.label-secondary {
@@ -100,12 +104,12 @@ div.dataTables_filter input {
 }
 
 .btn_on_header {
-  float: right; 
+  float: right;
   margin-top: -25px;
 }
 
-.btn_on_header_additional{
-  float:right;
+.btn_on_header_additional {
+  float: right;
   margin-top: -25px;
   margin-right: 5px;
 }
@@ -116,10 +120,12 @@ div.dataTables_filter input {
   height: 40px;
 }
 
-.box_title th{ vertical-align: middle !important; }
+.box_title th {
+  vertical-align: middle !important;
+}
 
-.nowrap{
-  white-space:nowrap;
+.nowrap {
+  white-space: nowrap;
 }
 
 .btn-large-w {
@@ -127,22 +133,26 @@ div.dataTables_filter input {
 }
 
 .disabled {
-  pointer-events: none;  Disables the button completely. Better than just cursor: default; 
+  pointer-events: none;
 }
 
-.hidden_table_border, .hidden_table_border th, .hidden_table_border td   {
+.hidden_table_border,
+.hidden_table_border th,
+.hidden_table_border td {
   border-style: hidden;
 }
 
 .tab_body_content {
   padding: 1%;
- }
-
-.tab_body_padding {
-	padding: 9px;	
 }
 
-.required_asterisk:after { content:" *"; }
+.tab_body_padding {
+  padding: 9px;
+}
+
+.required_asterisk:after {
+  content: " *";
+}
 
 #ajax_loader {
   position: fixed;
@@ -152,59 +162,59 @@ div.dataTables_filter input {
   width: 120px;
   height: 35px;
   border: 2px solid #D2D2D2;
-  overflow: hidden; 
+  overflow: hidden;
   left: 45%;
   top: 0px;
   display: none;
   z-index: 200000;
 }
 
-#ajax_loader p{
-  position:absolute;
-  float:left;
+#ajax_loader p {
+  position: absolute;
+  float: left;
   font-size: 20px;
   font-weight: bold;
   top: 25%;
   left: 5px;
 }
 
-.help_div{
+.help_div {
   background-color: #EBE9EA;
   border-radius: 6px 6px 6px 6px;
   border: 2px solid #D2D2D2;
 }
 
-.spinner{
-  float:right;
+.spinner {
+  float: right;
   top: 18px;
   right: 18px;
 }
 
-.dataTables_wrapper .top, .dataTables_wrapper .bottom {
-	padding: 0;
-	background-color: transparent;
-	border: none;
+.dataTables_wrapper .top,
+.dataTables_wrapper .bottom {
+  padding: 0;
+  background-color: transparent;
+  border: none;
 }
 
 .dataTables_wrapper .dataTables_paginate {
-	float: right;
-	text-align: center;
+  float: right;
+  text-align: center;
 }
 
-
 div.dataTables_filter {
-  float:left;
+  float: left;
 }
 
 #members.tab-pane .pagination {
-	margin: 0em 0;
+  margin: 0em 0;
 }
 
-.div-table{
-  margin-top:25px;
+.div-table {
+  margin-top: 25px;
 }
 
-.div-table .title{
+.div-table .title {
   border-bottom: solid;
 }
 
@@ -230,8 +240,8 @@ div.dataTables_filter {
   cursor: pointer;
 }
 
-#suspected_list tbody td, 
-#suspected_list thead th{
+#suspected_list tbody td,
+#suspected_list thead th {
   text-align: center;
   font-size: 10px !important;
 }
@@ -247,13 +257,56 @@ table.suspected_fulfillment tbody td {
 }
 
 table.evidences tbody,
-table.evidences thead { display: block; }
-table.evidences tbody {
-    height: 25vw;
-    overflow-y: auto;
+table.evidences thead {
+  display: block;
 }
 
-form#new_campaign i#generate_fulfillment_code { cursor: pointer; }
-form#new_campaign .select2-selection__placeholder { color: black !important; }
+table.evidences tbody {
+  height: 25vw;
+  overflow-y: auto;
+}
 
-.error .help-inline { color: red; }
+form#new_campaign i#generate_fulfillment_code {
+  cursor: pointer;
+}
+
+form#new_campaign .select2-selection__placeholder {
+  color: black !important;
+}
+
+.error .help-inline {
+  color: red;
+}
+
+table.borderless td {
+  border-top-style: none !important;
+  border-left-style: none !important;
+  border-right-style: none !important;
+  border-bottom-style: none !important;
+}
+
+table#assigned_products_table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+table#assigned_products_table th {
+  vertical-align: top;
+}
+
+.nav.nav-tabs li.active {
+  font-weight: bold;
+}
+
+.tab-content .tab-pane {
+  padding: 20px;
+}
+
+#tokens-help {
+  display: none;
+}
+
+textarea#css_style,
+textarea#club_css_style {
+  font-family: monospace;
+}

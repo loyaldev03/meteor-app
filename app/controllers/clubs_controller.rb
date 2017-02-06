@@ -10,7 +10,7 @@ class ClubsController < ApplicationController
     flash[:error] = "There was an error while connecting to the remote API. " + $!.to_s
   ensure
     redirect_to club_path(id: club.id)
-  end  
+  end
 
   # GET /clubs
   # GET /clubs.json
@@ -28,7 +28,7 @@ class ClubsController < ApplicationController
     @club = Club.find(params[:id])
     @drupal_domain = Domain.find(@club.drupal_domain_id) if @club.drupal_domain_id
     @payment_gateway_configuration = @club.payment_gateway_configurations.first
-    flash[:error] = "Marketing client is not correctly configured" unless @club.marketing_tool_correctly_configured? 
+    flash[:error] = "Marketing client is not correctly configured" unless @club.marketing_tool_correctly_configured?
   end
 
   # GET /clubs/new
@@ -46,13 +46,15 @@ class ClubsController < ApplicationController
   # POST /clubs
   def create
     my_authorize!(:create, Club)
-    @club = Club.new params.require(:club).permit(:name, :description, :cs_phone_number, :theme, :logo, :require_external_attributes, :club_cash_enable, :family_memberships_allowed, :time_zone, :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :api_type, :api_username, :api_password, :marketing_tool_client, :payment_gateway_errors_email, :twitter_url, :facebook_url, :store_url)
+    @club = Club.new club_params
     prepare_marketing_tool_attributes(params[:marketing_tool_attributes], params[:club][:marketing_tool_client]) if params[:marketing_tool_attributes]
     @club.partner = @current_partner
     if @club.save
       redirect_to club_path(:id => @club), notice: "The club #{@club.name} was successfully created."
     else
-      render action: "new" 
+      @errors = @club.errors
+      flash.now[:error] = 'CLub was not created. Please review your input.'
+      render action: 'new'
     end
   end
 
@@ -63,11 +65,13 @@ class ClubsController < ApplicationController
     prepare_marketing_tool_attributes(params[:marketing_tool_attributes], params[:club][:marketing_tool_client])
     unless check_domain_belongs_to_partner(params[:drupal_domain_id])
       flash.now[:error] = "Agent can't assign domain. Domain not available."
-      render action: "edit" 
+      render action: "edit"
     else
-      if @club.update params.require(:club).permit(:name, :description, :cs_phone_number, :theme, :logo, :require_external_attributes, :club_cash_enable, :family_memberships_allowed, :time_zone, :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :drupal_domain_id, :api_type, :api_username, :api_password, :marketing_tool_client, :payment_gateway_errors_email, :twitter_url, :facebook_url, :store_url)
+      if @club.update club_params
         redirect_to club_path(:partner_prefix => @current_partner.prefix, :id => @club.id), notice: "The club #{@club.name} was successfully updated."
       else
+        @errors = @club.errors
+        flash.now[:error] = 'CLub was not updated. Please review your input.'
         render action: "edit"
       end
     end
@@ -82,7 +86,7 @@ class ClubsController < ApplicationController
     else
       flash[:error] = "Club #{@club.name} was not destroyed."
       redirect_to clubs_url
-    end 
+    end
   end
 
   def marketing_tool_attributes
@@ -103,10 +107,10 @@ class ClubsController < ApplicationController
     unless drupal_domain_id.blank?
       domain = Domain.find(drupal_domain_id)
       if domain.partner_id == @current_partner.id
-        unless @current_agent.has_global_role? and domain.club 
+        unless @current_agent.has_global_role? and domain.club
           clubs_id = @current_agent.clubs.where("partner_id = ? and club_roles.role = 'admin'", @current_partner.id).collect(&:id)
           valid = false unless clubs_id.include?(domain.club_id)
-        end   
+        end
       else
         valid = false
       end
@@ -115,6 +119,7 @@ class ClubsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     false
   end
+
 
   def get_campaign_codes
     club = Club.find(params[:club_id])
@@ -136,25 +141,21 @@ class ClubsController < ApplicationController
     render json: values
   end
 
-  def toggle_maintenance_mode
-    my_authorize!(:toggle_maintenance_mode, Club, params[:club_id])
-    club = Club.find(params[:club_id])
-    club.toggle_maintenance_mode!
-    redirect_to club_path(partner_prefix: club.partner.prefix, id: club.id), notice: "Club was successfully put on #{club.maintenance_mode ? 'maintenance' : 'live'} mode."
-  rescue Exception => e
-    redirect_to club_path(partner_prefix: club.partner.prefix, id: club.id), alert: "There was an error while processing your request. #{e}"
+  private
+
+  def club_params
+    params.require(:club).permit(:name, :description, :cs_phone_number, :cs_email, :theme, :logo, :require_external_attributes, :club_cash_enable, :family_memberships_allowed, :time_zone, :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :drupal_domain_id, :api_type, :api_username, :api_password, :marketing_tool_client, :payment_gateway_errors_email, :twitter_url, :facebook_url, :store_url, :header_image_url, :favicon_url, :privacy_policy_url, :checkout_page_bonus_gift_box_content, :result_pages_image_url, :checkout_page_footer, :result_page_footer, :thank_you_page_content, :duplicated_page_content, :error_page_content, :checkout_url, :css_style)
   end
 
-  private 
-    def prepare_marketing_tool_attributes(marketing_tool_attributes, marketing_tool_client)
-      unless marketing_tool_attributes.nil?
-        if not @club.new_record? and marketing_tool_client == 'exact_target'
-          if marketing_tool_attributes[:et_password].blank?
-            marketing_tool_attributes.delete(:et_password)
-            marketing_tool_attributes.merge!({:et_password => @club.marketing_tool_attributes["et_password"]}) if @club.marketing_tool_attributes
-          end
+  def prepare_marketing_tool_attributes(marketing_tool_attributes, marketing_tool_client)
+    unless marketing_tool_attributes.nil?
+      if not @club.new_record? and marketing_tool_client == 'exact_target'
+        if marketing_tool_attributes[:et_password].blank?
+          marketing_tool_attributes.delete(:et_password)
+          marketing_tool_attributes.merge!({:et_password => @club.marketing_tool_attributes["et_password"]}) if @club.marketing_tool_attributes
         end
       end
-      @club.marketing_tool_attributes = marketing_tool_attributes
     end
+    @club.marketing_tool_attributes = marketing_tool_attributes
+  end
 end

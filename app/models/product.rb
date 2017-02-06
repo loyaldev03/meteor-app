@@ -1,6 +1,8 @@
 class Product < ActiveRecord::Base
   belongs_to :club
   has_many :fulfillments
+  has_many :campaigns, through: :campaign_products
+  has_many :campaign_products
 
   validates :sku, presence: true, format: /\A[0-9a-zA-Z\-_]+\z/, length: { minimum: 2 }, uniqueness: { scope: [:club_id, :deleted_at] }
   validates :cost_center, format: /\A[a-zA-Z\-_]+\z/, length: { minimum: 2, maximum: 30 }, allow_nil: true
@@ -11,16 +13,26 @@ class Product < ActiveRecord::Base
 
   scope :with_stock, -> { where('(allow_backorder = true) OR (allow_backorder = false and stock > 0)') }
 
+  before_save :validate_image_url
   before_save :apply_upcase_to_sku
   before_update :validate_sku_update
   before_destroy :no_fulfillment_related?
+  before_update :low_stock_alert
 
   acts_as_paranoid
 
   BULK_PROCESS_FIELDS = [ :sku, :name, :package, :stock_to_add, :allow_backorder, :weight, :cost_center ]
 
+  LOW_STOCK_THRESHOLD = 2
+
+  IMAGE_URL_REGEX = /\A(http|https)?:\/\/(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)\z/
+
   def self.datatable_columns
     ['id', 'name', 'sku', 'stock', 'allow_backorder']
+  end
+
+  def can_be_assigned_to_campaign?
+    image_url.present?
   end
 
   def apply_upcase_to_sku
@@ -41,10 +53,21 @@ class Product < ActiveRecord::Base
   def decrease_stock(quantity=1)
     if self.reload.has_stock?
       Product.where(id: self.id).update_all "stock = stock - #{quantity}"
+      low_stock_alert
       logger.info "Product ID: #{self.id} Stock decreased to: #{stock-quantity}"
       {:message => "Stock reduced with success", :code => Settings.error_codes.success}
     else
       {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
+    end
+  end
+
+  def low_stock_alert
+    if alert_on_low_stock
+      if stock > LOW_STOCK_THRESHOLD
+        self.update_column(:low_stock_alerted, false) if low_stock_alerted
+      elsif !low_stock_alerted
+        Products::AlertOnLowStockJob.perform_later(product_id: self.id)
+      end
     end
   end
 
@@ -64,7 +87,7 @@ class Product < ActiveRecord::Base
 
     package = Axlsx::Package.new
     club_list = Club.where(billing_enable: true)
-    club_list = club_list.where(id: clubs_id) if clubs_id 
+    club_list = club_list.where(id: clubs_id) if clubs_id
     club_list.each do |club|
       package.workbook.add_worksheet(:name => club.name) do |sheet|
         sheet.add_row header
@@ -81,12 +104,12 @@ class Product < ActiveRecord::Base
 
   def self.send_product_list_email(clubs_id = nil)
     product_xls = Product.generate_xls(clubs_id)
-    temp = Tempfile.new("posts.xlsx") 
-    
+    temp = Tempfile.new("posts.xlsx")
+
     product_xls.serialize temp.path
     Notifier.product_list(temp).deliver_now!
-    
-    temp.close 
+
+    temp.close
     temp.unlink
   end
 
@@ -115,17 +138,17 @@ class Product < ActiveRecord::Base
             product.cost_center ||= row[6].to_s
             product.cost_center = row[6].to_s unless row[6].blank?
             product.allow_backorder = allow_backorder.to_s.downcase == 'yes' ? true : false
-            
+
             message = if product.new_record?
               'Successfully created.'
-            else 
+            else
               product.changed? ? "Successfully updated: #{product.changed.join(',')}" : "Nothing was updated."
             end
-            
+
             if product.save
               new_row << message
             else
-              message = product.new_record? ? "Could not create product: " : "Could not update product: " 
+              message = product.new_record? ? "Could not create product: " : "Could not update product: "
               message << product.errors.messages.map{|attribute,errors| "#{attribute}: #{errors.join(',')}"}.join(".")
               new_row << message
             end
@@ -144,4 +167,17 @@ class Product < ActiveRecord::Base
     Product.delay.send_bulk_process_results(agent_email, results_file.path)
     File.delete(file_path)
   end
+
+
+  private
+
+    def validate_image_url
+      if self.image_url_changed?
+        self.image_url.gsub!(/\?[0-9a-zA-Z]*$/, '')
+        unless IMAGE_URL_REGEX.match(self.image_url.downcase)
+          errors.add(:image_url, "is invalid")
+          false
+        end
+      end
+    end
 end

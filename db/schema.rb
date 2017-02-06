@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160909121536) do
+ActiveRecord::Schema.define(version: 20170119144516) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -48,6 +48,64 @@ ActiveRecord::Schema.define(version: 20160909121536) do
   add_index "agents", ["reset_password_token"], name: "index_agents_on_reset_password_token", unique: true, using: :btree
   add_index "agents", ["unlock_token"], name: "index_agents_on_unlock_token", unique: true, using: :btree
 
+  create_table "campaign_days", force: :cascade do |t|
+    t.integer  "campaign_id", limit: 4
+    t.date     "date"
+    t.decimal  "spent",                 precision: 10
+    t.integer  "reached",     limit: 4
+    t.integer  "converted",   limit: 4
+    t.integer  "meta",        limit: 4,                default: 0
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "campaign_days", ["campaign_id", "date"], name: "index_campaign_days_on_campaign_id_and_date", unique: true, using: :btree
+
+  create_table "campaign_products", force: :cascade do |t|
+    t.integer "campaign_id", limit: 4
+    t.integer "product_id",  limit: 4
+    t.string  "label",       limit: 255, null: false
+  end
+
+  add_index "campaign_products", ["campaign_id"], name: "index_campaign_products_on_campaign_id", using: :btree
+  add_index "campaign_products", ["product_id"], name: "index_campaign_products_on_product_id", using: :btree
+
+  create_table "campaigns", force: :cascade do |t|
+    t.string   "name",                   limit: 255
+    t.decimal  "enrollment_price",                     precision: 11, scale: 2, default: 0.0
+    t.date     "initial_date"
+    t.date     "finish_date"
+    t.integer  "campaign_type",          limit: 4
+    t.integer  "transport",              limit: 4
+    t.string   "transport_campaign_id",  limit: 255
+    t.string   "utm_medium",             limit: 255
+    t.string   "utm_content",            limit: 255
+    t.string   "audience",               limit: 255
+    t.string   "campaign_code",          limit: 255
+    t.integer  "club_id",                limit: 4
+    t.integer  "terms_of_membership_id", limit: 4
+    t.datetime "created_at",                                                                                              null: false
+    t.datetime "updated_at",                                                                                              null: false
+    t.string   "landing_name",           limit: 255
+    t.text     "landing_url",            limit: 65535
+    t.integer  "products_count",         limit: 4,                              default: 0
+    t.string   "delivery_date",          limit: 255,                            default: "3 - 5 weeks from date ordered"
+    t.string   "slug",                   limit: 255
+  end
+
+  add_index "campaigns", ["club_id"], name: "index_campaigns_on_club_id", using: :btree
+  add_index "campaigns", ["finish_date"], name: "index_campaigns_on_finish_date", using: :btree
+  add_index "campaigns", ["initial_date"], name: "index_campaigns_on_initial_date", using: :btree
+  add_index "campaigns", ["terms_of_membership_id"], name: "index_campaigns_on_terms_of_membership_id", using: :btree
+
+  create_table "campaigns_preference_groups", id: false, force: :cascade do |t|
+    t.integer "preference_group_id", limit: 4
+    t.integer "campaign_id",         limit: 4
+  end
+
+  add_index "campaigns_preference_groups", ["campaign_id"], name: "index_campaigns_preference_groups_on_campaign_id", using: :btree
+  add_index "campaigns_preference_groups", ["preference_group_id"], name: "index_campaigns_preference_groups_on_preference_group_id", using: :btree
+
   create_table "club_cash_transactions", force: :cascade do |t|
     t.decimal  "amount",                    precision: 11, scale: 2, default: 0.0
     t.text     "description", limit: 65535
@@ -70,35 +128,64 @@ ActiveRecord::Schema.define(version: 20160909121536) do
   add_index "club_roles", ["club_id"], name: "index_club_roles_on_club_id", using: :btree
 
   create_table "clubs", force: :cascade do |t|
-    t.text     "description",                  limit: 65535
-    t.string   "name",                         limit: 255
-    t.integer  "partner_id",                   limit: 8
-    t.string   "logo_file_name",               limit: 255
-    t.string   "logo_content_type",            limit: 255
-    t.integer  "logo_file_size",               limit: 4
+    t.text     "description",                          limit: 65535
+    t.string   "name",                                 limit: 255
+    t.integer  "partner_id",                           limit: 8
+    t.string   "logo_file_name",                       limit: 255
+    t.string   "logo_content_type",                    limit: 255
+    t.integer  "logo_file_size",                       limit: 4
     t.datetime "logo_updated_at"
     t.datetime "deleted_at"
-    t.datetime "created_at",                                                         null: false
-    t.datetime "updated_at",                                                         null: false
-    t.integer  "drupal_domain_id",             limit: 8
-    t.string   "api_username",                 limit: 255
-    t.string   "api_password",                 limit: 255
-    t.string   "api_type",                     limit: 255
-    t.string   "theme",                        limit: 255,   default: "application"
-    t.boolean  "requires_external_id",                       default: false
-    t.string   "time_zone",                    limit: 255,   default: "UTC"
-    t.boolean  "billing_enable",                             default: true
-    t.string   "cs_phone_number",              limit: 255
-    t.boolean  "family_memberships_allowed",                 default: false
-    t.boolean  "club_cash_enable",                           default: true
-    t.text     "marketing_tool_attributes",    limit: 65535
-    t.integer  "members_count",                limit: 4
-    t.string   "member_banner_url",            limit: 255
-    t.string   "member_landing_url",           limit: 255
-    t.string   "non_member_banner_url",        limit: 255
-    t.string   "non_member_landing_url",       limit: 255
-    t.string   "marketing_tool_client",        limit: 255
-    t.string   "payment_gateway_errors_email", limit: 255
+    t.datetime "created_at",                                                                 null: false
+    t.datetime "updated_at",                                                                 null: false
+    t.integer  "drupal_domain_id",                     limit: 8
+    t.string   "api_username",                         limit: 255
+    t.string   "api_password",                         limit: 255
+    t.string   "api_type",                             limit: 255
+    t.string   "theme",                                limit: 255,   default: "application"
+    t.boolean  "requires_external_id",                               default: false
+    t.string   "time_zone",                            limit: 255,   default: "UTC"
+    t.boolean  "billing_enable",                                     default: true
+    t.string   "cs_phone_number",                      limit: 255
+    t.boolean  "family_memberships_allowed",                         default: false
+    t.boolean  "club_cash_enable",                                   default: true
+    t.text     "marketing_tool_attributes",            limit: 65535
+    t.integer  "members_count",                        limit: 4
+    t.string   "member_banner_url",                    limit: 255
+    t.string   "member_landing_url",                   limit: 255
+    t.string   "non_member_banner_url",                limit: 255
+    t.string   "non_member_landing_url",               limit: 255
+    t.string   "marketing_tool_client",                limit: 255
+    t.string   "payment_gateway_errors_email",         limit: 255
+    t.string   "twitter_url",                          limit: 255
+    t.string   "facebook_url",                         limit: 255
+    t.boolean  "maintenance_mode",                                   default: false
+    t.string   "store_url",                            limit: 255
+    t.string   "checkout_url",                         limit: 255
+    t.string   "cs_email",                             limit: 255,                           null: false
+    t.text     "privacy_policy_url",                   limit: 65535
+    t.text     "footer_checkout",                      limit: 65535
+    t.text     "footer_result",                        limit: 65535
+    t.text     "url_image_result",                     limit: 65535
+    t.string   "favicon_url_file_name",                limit: 255
+    t.string   "favicon_url_content_type",             limit: 255
+    t.integer  "favicon_url_file_size",                limit: 4
+    t.datetime "favicon_url_updated_at"
+    t.string   "header_image_url_file_name",           limit: 255
+    t.string   "header_image_url_content_type",        limit: 255
+    t.integer  "header_image_url_file_size",           limit: 4
+    t.datetime "header_image_url_updated_at"
+    t.string   "result_pages_image_url_file_name",     limit: 255
+    t.string   "result_pages_image_url_content_type",  limit: 255
+    t.integer  "result_pages_image_url_file_size",     limit: 4
+    t.datetime "result_pages_image_url_updated_at"
+    t.text     "checkout_page_bonus_gift_box_content", limit: 65535
+    t.text     "thank_you_page_content",               limit: 65535
+    t.text     "duplicated_page_content",              limit: 65535
+    t.text     "error_page_content",                   limit: 65535
+    t.text     "checkout_page_footer",                 limit: 65535
+    t.text     "result_page_footer",                   limit: 65535
+    t.text     "css_style",                            limit: 65535
   end
 
   add_index "clubs", ["drupal_domain_id"], name: "index_drupal_domain_id", using: :btree
@@ -251,6 +338,19 @@ ActiveRecord::Schema.define(version: 20160909121536) do
   add_index "enumerations", ["club_id"], name: "index_enumerations_on_club_id", using: :btree
   add_index "enumerations", ["visible", "type"], name: "index_enumerations_on_visible_and_type", using: :btree
 
+  create_table "friendly_id_slugs", force: :cascade do |t|
+    t.string   "slug",           limit: 255, null: false
+    t.integer  "sluggable_id",   limit: 4,   null: false
+    t.string   "sluggable_type", limit: 50
+    t.string   "scope",          limit: 255
+    t.datetime "created_at"
+  end
+
+  add_index "friendly_id_slugs", ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true, using: :btree
+  add_index "friendly_id_slugs", ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type", using: :btree
+  add_index "friendly_id_slugs", ["sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_id", using: :btree
+  add_index "friendly_id_slugs", ["sluggable_type"], name: "index_friendly_id_slugs_on_sluggable_type", using: :btree
+
   create_table "fulfillment_files", force: :cascade do |t|
     t.integer  "agent_id",          limit: 4
     t.integer  "club_id",           limit: 8
@@ -312,40 +412,42 @@ ActiveRecord::Schema.define(version: 20160909121536) do
   add_index "fulfillments", ["user_id"], name: "index2", using: :btree
 
   create_table "memberships", force: :cascade do |t|
-    t.string   "status",                  limit: 255
-    t.integer  "terms_of_membership_id",  limit: 8
+    t.string   "status",                 limit: 255
+    t.integer  "terms_of_membership_id", limit: 8
     t.datetime "join_date"
     t.datetime "cancel_date"
-    t.integer  "created_by_id",           limit: 4
-    t.datetime "created_at",                                                                   null: false
-    t.datetime "updated_at",                                                                   null: false
-    t.integer  "user_id",                 limit: 8
-    t.integer  "parent_membership_id",    limit: 8
-    t.decimal  "enrollment_amount",                     precision: 11, scale: 2, default: 0.0
-    t.string   "product_sku",             limit: 255
-    t.integer  "product_id",              limit: 4
-    t.string   "product_description",     limit: 255
-    t.string   "mega_channel",            limit: 255
-    t.string   "marketing_code",          limit: 255
-    t.string   "fulfillment_code",        limit: 255
-    t.string   "ip_address",              limit: 255
-    t.string   "user_agent",              limit: 255
-    t.string   "referral_host",           limit: 255
-    t.text     "referral_parameters",     limit: 65535
-    t.string   "referral_path",           limit: 255
-    t.string   "visitor_id",              limit: 255
-    t.string   "landing_url",             limit: 255
-    t.text     "preferences",             limit: 65535
-    t.string   "cookie_value",            limit: 255
+    t.integer  "created_by_id",          limit: 4
+    t.datetime "created_at",                                                                  null: false
+    t.datetime "updated_at",                                                                  null: false
+    t.integer  "user_id",                limit: 8
+    t.integer  "parent_membership_id",   limit: 8
+    t.decimal  "enrollment_amount",                    precision: 11, scale: 2, default: 0.0
+    t.string   "product_sku",            limit: 255
+    t.integer  "product_id",             limit: 4
+    t.string   "product_description",    limit: 255
+    t.string   "utm_campaign",           limit: 255
+    t.string   "audience",               limit: 255
+    t.string   "campaign_code",          limit: 255
+    t.string   "ip_address",             limit: 255
+    t.string   "user_agent",             limit: 255
+    t.string   "referral_host",          limit: 255
+    t.text     "referral_parameters",    limit: 65535
+    t.string   "referral_path",          limit: 255
+    t.string   "visitor_id",             limit: 255
+    t.string   "landing_url",            limit: 255
+    t.text     "preferences",            limit: 65535
+    t.string   "cookie_value",           limit: 255
     t.boolean  "cookie_set"
-    t.string   "campaign_medium",         limit: 255
-    t.string   "campaign_description",    limit: 255
-    t.string   "campaign_medium_version", limit: 255
+    t.string   "utm_medium",             limit: 255
+    t.string   "campaign_description",   limit: 255
+    t.string   "utm_content",            limit: 255
     t.boolean  "joint"
-    t.integer  "prospect_id",             limit: 4
-    t.string   "source",                  limit: 255
+    t.integer  "prospect_id",            limit: 4
+    t.string   "utm_source",             limit: 255
+    t.integer  "campaign_id",            limit: 4
   end
 
+  add_index "memberships", ["campaign_id"], name: "index_memberships_on_campaign_id", using: :btree
   add_index "memberships", ["created_at"], name: "index_created_at", using: :btree
   add_index "memberships", ["created_by_id"], name: "index_memberships_on_created_by_id", using: :btree
   add_index "memberships", ["product_id"], name: "index_memberships_on_product_id", using: :btree
@@ -404,20 +506,41 @@ ActiveRecord::Schema.define(version: 20160909121536) do
 
   add_index "payment_gateway_configurations", ["club_id"], name: "index_club_id", using: :btree
 
+  create_table "preference_groups", force: :cascade do |t|
+    t.string   "name",           limit: 255
+    t.string   "code",           limit: 255
+    t.boolean  "add_by_default"
+    t.integer  "club_id",        limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "preference_groups", ["club_id"], name: "index_preference_groups_on_club_id", using: :btree
+
+  create_table "preferences", force: :cascade do |t|
+    t.string   "name",                limit: 255
+    t.integer  "preference_group_id", limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
   create_table "products", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.string   "sku",             limit: 255
-    t.boolean  "recurrent",                   default: false
-    t.integer  "stock",           limit: 4
-    t.integer  "weight",          limit: 4
-    t.integer  "club_id",         limit: 8
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.string   "package",         limit: 255
-    t.boolean  "allow_backorder",             default: false
-    t.string   "cost_center",     limit: 255
-    t.boolean  "is_visible",                  default: true
+    t.string   "name",               limit: 255
+    t.string   "sku",                limit: 255
+    t.boolean  "recurrent",                      default: false
+    t.integer  "stock",              limit: 4
+    t.integer  "weight",             limit: 4
+    t.integer  "club_id",            limit: 8
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.string   "package",            limit: 255
+    t.boolean  "allow_backorder",                default: false
+    t.string   "cost_center",        limit: 255
+    t.boolean  "is_visible",                     default: true
     t.datetime "deleted_at"
+    t.string   "image_url",          limit: 255
+    t.boolean  "alert_on_low_stock",             default: false
+    t.boolean  "low_stock_alerted",              default: false
   end
 
   add_index "products", ["club_id"], name: "index_products_on_club_id", using: :btree
@@ -439,8 +562,8 @@ ActiveRecord::Schema.define(version: 20160909121536) do
     t.string   "visitor_id",                    limit: 255
     t.text     "preferences",                   limit: 65535
     t.string   "product_sku",                   limit: 255
-    t.string   "mega_channel",                  limit: 255
-    t.string   "marketing_code",                limit: 255
+    t.string   "utm_campaign",                  limit: 255
+    t.string   "audience",                      limit: 255
     t.string   "ip_address",                    limit: 255
     t.string   "country",                       limit: 255
     t.string   "user_agent",                    limit: 255
@@ -456,18 +579,21 @@ ActiveRecord::Schema.define(version: 20160909121536) do
     t.boolean  "cookie_set"
     t.string   "referral_path",                 limit: 255
     t.string   "product_description",           limit: 255
-    t.string   "fulfillment_code",              limit: 255
-    t.string   "campaign_medium",               limit: 255
+    t.string   "campaign_code",                 limit: 255
+    t.string   "utm_medium",                    limit: 255
     t.string   "campaign_description",          limit: 255
-    t.string   "campaign_medium_version",       limit: 255
+    t.string   "utm_content",                   limit: 255
     t.string   "uuid",                          limit: 36
     t.integer  "club_id",                       limit: 4
     t.string   "marketing_client_sync_result",  limit: 255
     t.integer  "email_quality",                 limit: 4,     default: 0
-    t.string   "source",                        limit: 255
+    t.string   "utm_source",                    limit: 255
     t.boolean  "need_sync_to_marketing_client",               default: false
+    t.text     "error_messages",                limit: 65535
+    t.integer  "campaign_id",                   limit: 4
   end
 
+  add_index "prospects", ["campaign_id"], name: "index_prospects_on_campaign_id", using: :btree
   add_index "prospects", ["club_id"], name: "index_prospects_on_club_id", using: :btree
   add_index "prospects", ["created_at"], name: "index_created_at", using: :btree
   add_index "prospects", ["uuid"], name: "index_prospects_on_uuid", unique: true, using: :btree
@@ -496,10 +622,10 @@ ActiveRecord::Schema.define(version: 20160909121536) do
     t.decimal  "installment_amount",                         precision: 11, scale: 2, default: 0.0
     t.string   "installment_type",             limit: 255,                            default: "1.month"
     t.datetime "deleted_at"
-    t.datetime "created_at",                                                                               null: false
-    t.datetime "updated_at",                                                                               null: false
+    t.datetime "created_at",                                                                              null: false
+    t.datetime "updated_at",                                                                              null: false
     t.integer  "downgrade_tom_id",             limit: 8
-    t.string   "api_role",                     limit: 255,                            default: "91284557"
+    t.string   "api_role",                     limit: 255
     t.integer  "agent_id",                     limit: 4
     t.decimal  "initial_fee",                                precision: 5,  scale: 2
     t.decimal  "trial_period_amount",                        precision: 5,  scale: 2
@@ -567,6 +693,16 @@ ActiveRecord::Schema.define(version: 20160909121536) do
   add_index "transactions", ["operation_type"], name: "index_transactions_on_operation_type", using: :btree
   add_index "transactions", ["response_transaction_id"], name: "index_response_transaction_id", using: :btree
   add_index "transactions", ["user_id"], name: "index_transactions_on_user_id", using: :btree
+
+  create_table "transport_settings", force: :cascade do |t|
+    t.integer  "club_id",    limit: 4
+    t.integer  "transport",  limit: 4,     null: false
+    t.text     "settings",   limit: 65535, null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "transport_settings", ["club_id", "transport"], name: "index_transport_settings_on_club_id_and_transport", unique: true, using: :btree
 
   create_table "user_additional_data", force: :cascade do |t|
     t.integer  "club_id",    limit: 8
@@ -653,6 +789,7 @@ ActiveRecord::Schema.define(version: 20160909121536) do
     t.boolean  "testing_account",                                                            default: false
     t.date     "change_tom_date"
     t.text     "change_tom_attributes",               limit: 65535
+    t.string   "slug",                                limit: 255
   end
 
   add_index "users", ["club_id", "api_id"], name: "api_id_UNIQUE", unique: true, using: :btree
@@ -662,4 +799,6 @@ ActiveRecord::Schema.define(version: 20160909121536) do
   add_index "users", ["email"], name: "index_users_on_email", using: :btree
   add_index "users", ["need_sync_to_marketing_client", "club_id"], name: "index_users_on_need_sync_to_marketing_client_and_club_id", using: :btree
 
+  add_foreign_key "campaign_products", "campaigns"
+  add_foreign_key "campaign_products", "products"
 end

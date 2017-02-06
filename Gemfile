@@ -9,10 +9,11 @@ gem 'mysql2', '~> 0.3.18'
 gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"
+gem 'aws-sdk', '< 2.0'
 
 gem 'acts_as_list', "0.7.2"
 gem 'delayed_job_active_record'
-gem "delayed_job_web"
+gem "delayed_job_web" # FIXME it is not working in rails 4
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
 
@@ -66,6 +67,10 @@ gem 'premailer-rails'
 gem "enum_help"
 gem "fb_graph2"
 gem "select2-rails"
+
+gem 'rack-cors'
+gem 'friendly_id', '~> 5.1.0'
+gem 'scatter_swap'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
@@ -97,6 +102,7 @@ end
 gem 'tire'
 gem 'progress_bar'
 gem 'data-confirm-modal', github: 'ifad/data-confirm-modal', branch: 'bootstrap2'
+gem 'fat_fingers', github: 'dmferrari/fat_fingers'
 
 group :test do
   gem 'factory_girl_rails'

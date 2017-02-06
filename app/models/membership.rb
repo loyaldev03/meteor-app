@@ -3,6 +3,7 @@ class Membership < ActiveRecord::Base
   belongs_to :user
   belongs_to :created_by, class_name: 'Agent', foreign_key: 'created_by_id'
   belongs_to :product
+  belongs_to :campaign
   has_many :transactions
 
   serialize :preferences, JSON
@@ -29,27 +30,28 @@ class Membership < ActiveRecord::Base
 
   def update_membership_info_by_hash(params)
     unless params.nil?
-      self.product_description = params[:product_description]
-      self.utm_campaign = params[:utm_campaign].downcase if params[:utm_campaign]
-      self.audience = params[:audience].downcase if params[:audience]
-      self.campaign_code = params[:campaign_id].downcase if params[:campaign_id]
-      self.ip_address = params[:ip_address]
-      self.product_sku = params[:product_sku]
-      self.user_agent = params[:user_agent].truncate(255) if params[:user_agent]
-      self.referral_host = params[:referral_host]
-      self.referral_parameters = params[:referral_parameters]
-      self.referral_path = params[:referral_path].truncate(255) if params[:referral_path]
-      self.visitor_id = params[:visitor_id]
-      self.landing_url = params[:landing_url].downcase if params[:landing_url]
-      self.preferences = params[:preferences]
-      self.cookie_value = params[:cookie_value]
-      self.cookie_set = params[:cookie_set]
-      self.utm_source = params[:utm_source]
-      self.utm_medium = params[:utm_medium].downcase if params[:utm_medium]
+      self.product_description  = params[:product_description]
+      self.utm_campaign         = params[:utm_campaign].downcase if params[:utm_campaign]
+      self.audience             = params[:audience].downcase if params[:audience]
+      self.campaign_code        = params[:campaign_id].downcase if params[:campaign_id]
+      self.ip_address           = params[:ip_address]
+      self.product_sku          = params[:product_sku]
+      self.user_agent           = params[:user_agent].truncate(255) if params[:user_agent]
+      self.referral_host        = params[:referral_host]
+      self.referral_parameters  = params[:referral_parameters]
+      self.referral_path        = params[:referral_path].truncate(255) if params[:referral_path]
+      self.visitor_id           = params[:visitor_id]
+      self.landing_url          = params[:landing_url].downcase if params[:landing_url]
+      self.preferences          = params[:preferences]
+      self.cookie_value         = params[:cookie_value]
+      self.cookie_set           = params[:cookie_set]
+      self.utm_source           = params[:utm_source]
+      self.utm_medium           = params[:utm_medium].downcase if params[:utm_medium]
       self.campaign_description = params[:campaign_description]
-      self.utm_content = params[:utm_content].downcase if params[:utm_content]
-      self.prospect_id = params[:prospect_id]
-      self.joint = params[:joint]
+      self.utm_content          = params[:utm_content].downcase if params[:utm_content]
+      self.prospect_id          = params[:prospect_id]
+      self.joint                = params[:joint]
+      self.campaign_id          = Prospect.find(self.prospect_id).campaign_id rescue nil
     end
   end
 

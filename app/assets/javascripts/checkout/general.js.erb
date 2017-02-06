@@ -1,0 +1,87 @@
+function doOnReadyforAllPages() {}
+
+function checkoutPageFunctions() {
+  $('#modal').modal({
+    show: false,
+    backdrop: 'static',
+    keyboard: false
+  });
+
+  $.validator.addMethod(
+    'expirationDate',
+    function(value, element, params) {
+      var minMonth = new Date().getMonth() + 1;
+      var minYear = new Date().getFullYear();
+      var month = parseInt($(params.month).val(), 10);
+      var year = parseInt($(params.year).val(), 10);
+      var retval = true;
+      if (!isNaN(month)) {
+        retval = (year > minYear || (year === minYear && month >= minMonth));
+      }
+      return retval;
+    },
+    "<%= I18n.t('checkout.checkout_page.credit_card_expired') %>"
+  );
+
+  $('#credit_card').validate({
+    rules: {
+      'credit_card[number]': { required: true, creditcard: true },
+      'credit_card[expire_month]': { required: true, number: true, maxlength: 2 },
+      'credit_card[expire_year]': {
+        required: true,
+        number: true,
+        maxlength: 4,
+        expirationDate: {
+          month: '#credit_card_expire_month',
+          year: '#credit_card_expire_year'
+        }
+      }
+    },
+    invalidHandler: function(event, validator) {
+      var errors = validator.numberOfInvalids();
+      if (errors) {
+        toggleFields(true);
+      } else {
+        toggleFields(false);
+      }
+    }
+  });
+
+  $('#submit').click(function() {
+    toggleFields(false);
+  });
+
+  function toggleFields(fieldsEnabled) {
+    if (fieldsEnabled) {
+      $('#modal').modal('hide');
+      $('#credit_card_number').removeAttr('disabled');
+      $('#credit_card_number').removeClass('disabled');
+      $('#credit_card_expire_month').removeAttr('disabled');
+      $('#credit_card_expire_month').removeClass('disabled');
+      $('#credit_card_expire_year').removeAttr('disabled');
+      $('#credit_card_expire_year').removeClass('disabled');
+      $('#submit').removeAttr('disabled');
+      $('#submit').removeClass('disabled');
+    } else {
+      $('#modal').modal('show');
+      $('#credit_card_number').attr('disabled');
+      $('#credit_card_number').addClass('disabled');
+      $('#credit_card_expire_month').attr('disabled');
+      $('#credit_card_expire_month').addClass('disabled');
+      $('#credit_card_expire_year').attr('disabled');
+      $('#credit_card_expire_year').addClass('disabled');
+      $('#submit').attr('disabled');
+      $('#submit').addClass('disabled');
+    }
+  }
+}
+
+function thankYouPageFunctions(autologinUrl) {
+  if (autologinUrl.length > 0) {
+    window.setTimeout(function() { document.location = autologinUrl; }, 15000);
+  }
+}
+
+function duplicatedPageFunctions() {}
+
+function errorPageFunctions() {}

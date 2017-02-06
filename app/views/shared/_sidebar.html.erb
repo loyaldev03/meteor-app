@@ -17,5 +17,9 @@
         </ul>
       <% end %>
     </div><!--/.well -->
+
+    <% if (params[:controller] == 'clubs') && (['new', 'edit', 'show'].include? params[:action]) %>
+      <%= render partial: 'clubs/tokens_help' %>
+    <% end %>
   </div><!--/span-->
 <% end %>

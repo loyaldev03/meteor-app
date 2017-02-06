@@ -93,11 +93,10 @@ class ProductsController < ApplicationController
 
   private
     def product_params
-      params.require(:product).permit(:sku, :name, :package, :recurrent, :stock, :weight, :allow_backorder, :is_visible, :cost_center)
+      params.require(:product).permit(:sku, :name, :package, :recurrent, :stock, :alert_on_low_stock, :weight, :allow_backorder, :is_visible, :cost_center, :image_url)
     end
 
     def check_permissions
       my_authorize! :manage, Product, @current_club.id
     end
-
 end

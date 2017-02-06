@@ -35,7 +35,6 @@ In order to create the doc you must run:
 you will have to use the binnary field within the bundler:
 /home/XXXXXXXX/.rvm/gems/ruby-1.9.3-p327/bundler/gems/yard-eb31004f1306/bin/yardoc --plugin rest --title "Api Documentation" --readme readme_api_doc.rdoc
 
-
 # How to put and remove Phoenix into mantainance mode:
 [Option 1]
   - start: cap prototype|staging|production deploy:enable_maintenance_mode

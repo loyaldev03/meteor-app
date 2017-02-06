@@ -3,245 +3,158 @@ require 'test_helper'
 class Admin::AgentsControllerTest < ActionController::TestCase
   setup do
     @admin_user = FactoryGirl.create(:confirmed_admin_agent)
-    @representative_user = FactoryGirl.create(:confirmed_representative_agent)
-    @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
+    @representative_user = FactoryGirl.create(:confirmed_representative_agent)    
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @api_user = FactoryGirl.create(:confirmed_api_agent)
-    @agent = FactoryGirl.create(:agent)
-    @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
+    @agent = FactoryGirl.create(:agent)   
   end
 
   test "Admin should get index" do
-    sign_in @admin_user
-    get :index
-    assert_response :success
+    [:confirmed_admin_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      get :index
+      assert_response :success
+    end
   end
 
-  test "Representative should not get index" do
-    sign_in @representative_user
-    get :index
-    assert_response :unauthorized
-  end
-
-  test "Fulfillment Manager should not get index" do
-    sign_in @fulfillment_manager_user
-    get :index
-    assert_response :unauthorized
-  end
-
-  test "Supervisor should not get index" do
-    sign_in @supervisor_user
-    get :index
-    assert_response :unauthorized
-  end
-
-  test "Api user should not get index" do
-    sign_in @api_user
-    get :index
-    assert_response :unauthorized
-  end
-
-  #Profile fulfillment_managment
-  test "fulfillment_manager user should not get index" do
-    sign_in @fulfillment_manager_user
-    get :index
-    assert_response :unauthorized
+  test "Agents that should not get index" do
+    [:confirmed_landing_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
+     :confirmed_agency_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      perform_call_as(@agent) do
+        get :index
+        assert_response :unauthorized
+      end
+    end
   end
 
   test "Admin should get new" do
-    sign_in @admin_user
-    get :new
-    assert_response :success
+    [:confirmed_admin_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      get :new
+      assert_response :success
+    end
   end
 
-  test "Representative should not get new" do
-    sign_in @representative_user
-    get :new
-    assert_response :unauthorized
-  end
-
-  test "Supervisor should not get new" do
-    sign_in @supervisor_user
-    get :new
-    assert_response :unauthorized
-  end
-
-  test "Api user should not get new" do
-    sign_in @api_user
-    get :new
-    assert_response :unauthorized
-  end
-
-  #Profile fulfillment_managment
-  test "fulfillment_managment user should not get new" do
-    sign_in @fulfillment_manager_user
-    get :new
-    assert_response :unauthorized
+  test "Agents that should not get new" do
+    [:confirmed_landing_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
+     :confirmed_agency_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      perform_call_as(@agent) do
+        get :new
+        assert_response :unauthorized
+      end
+    end
   end
 
   test "Admin should create agent" do
-    sign_in @admin_user
-    agent = FactoryGirl.build(:confirmed_admin_agent)
-    assert_difference('Agent.count') do
-      post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
+    [:confirmed_admin_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+        agent = FactoryGirl.build(:confirmed_admin_agent)
+        assert_difference('Agent.count', 1) do
+          post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
+        end
+        assert_redirected_to admin_agent_path(assigns(:agent))
     end
-    assert_redirected_to admin_agent_path(assigns(:agent))
   end
 
-  test "Representative should not create agent" do
-    sign_in @representative_user
-    agent = FactoryGirl.build(:confirmed_admin_agent)
-    post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
-    assert_response :unauthorized
-  end
-
-  test "Supervisor should not create agent" do
-    sign_in @supervisor_user
-    agent = FactoryGirl.build(:confirmed_admin_agent)
-    post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
-    assert_response :unauthorized
-  end
-
-  test "Api user should not create agent" do
-    sign_in @api_user
-    agent = FactoryGirl.build(:confirmed_admin_agent)
-    post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
-    assert_response :unauthorized
-  end
-
-  #Profile fulfillment_managment
-  test "fulfillment_managment user should not create agent" do
-    sign_in @fulfillment_manager_user
-    agent = FactoryGirl.build(:confirmed_admin_agent)
-    post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
-    assert_response :unauthorized
+  test "Agents that should not create agent" do
+    [:confirmed_landing_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
+     :confirmed_agency_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      perform_call_as(@agent) do
+        agent = FactoryGirl.build(:confirmed_admin_agent)
+        assert_difference('Agent.count', 0) do
+          post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email, :roles => agent.roles }
+        end
+        assert_response :unauthorized
+      end
+    end
   end
 
   test "Admin should show agent" do
-    sign_in @admin_user
-    get :show, id: @agent.id
-    assert_response :success
+    [:confirmed_admin_agent].each do |agent|
+      sign_agent_with_global_role(agent)    
+      get :show, id: @agent.id
+      assert_response :success
+    end
   end
 
-  test "Representative should not show agent" do
-    sign_in @representative_user
-    get :show, id: @agent.id
-    assert_response :unauthorized
+  test "Agents that should not show agent" do
+    [:confirmed_landing_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
+     :confirmed_agency_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      perform_call_as(@agent) do
+        get :show, id: @agent.id
+        assert_response :unauthorized
+      end
+    end    
   end
-
-  test "Supervisor should not show agent" do
-    sign_in @supervisor_user
-    get :show, id: @agent.id
-    assert_response :unauthorized
-  end
-
-  test "Api user should not show agent" do
-    sign_in @api_user
-    get :show, id: @agent.id
-    assert_response :unauthorized
-  end
-
-  #Profile fulfillment_managment
-  test "fulfillment_managment user should not show agent" do
-    sign_in @fulfillment_manager_user
-    get :show, id: @agent.id
-    assert_response :unauthorized
-  end  
 
   test "Admin should get edit" do
-    sign_in @admin_user
-    get :edit, id: @agent
-    assert_response :success
+    [:confirmed_admin_agent].each do |agent|
+    sign_agent_with_global_role(agent)    
+      get :edit, id: @agent
+      assert_response :success
+    end
   end
 
-  test "Representative should not get edit" do
-    sign_in @representative_user
-    get :edit, id: @agent.id
-    assert_response :unauthorized
-  end
-
-  test "Supervisor should not get edit" do
-    sign_in @supervisor_user
-    get :edit, id: @agent.id
-    assert_response :unauthorized
-  end
-
-  test "Api user should not get edit" do
-    sign_in @api_user
-    get :edit, id: @agent.id
-    assert_response :unauthorized
-  end
-
-  #Profile fulfillment_managment
-  test "fulfillment_managment user should not get edit" do
-    sign_in @fulfillment_manager_user
-    get :edit, id: @agent.id
-    assert_response :unauthorized
+  test "Agents should not get edit" do
+    [:confirmed_landing_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
+     :confirmed_agency_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      perform_call_as(@agent) do
+        get :edit, id: @agent.id
+        assert_response :unauthorized
+      end
+    end
   end
 
   test "Admin should update agent" do
-    sign_in @admin_user
-    put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
-    assert_redirected_to admin_agent_path(assigns(:agent))
+    [:confirmed_admin_agent].each do |agent|
+    sign_agent_with_global_role(agent) 
+      put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+      assert_redirected_to admin_agent_path(assigns(:agent))
+    end
   end
 
-  test "Representative should not update agent" do
-    sign_in @representative_user
-  	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
-    assert_response :unauthorized
-  end
-
-  test "Supervisor should not update agent" do
-    sign_in @supervisor_user
-	  put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
-    assert_response :unauthorized
-  end
-
-  test "Api user should not update agent" do
-    sign_in @api_user
-  	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
-    assert_response :unauthorized
-  end
-
-  #Profile fulfillment_managment
-  test "fulfillment_managment user should not update agent" do
-    sign_in @fulfillment_manager_user
-    put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
-    assert_response :unauthorized
+  test "Agents that should not update agent" do
+    [:confirmed_landing_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
+     :confirmed_agency_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      perform_call_as(@agent) do
+      	put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
+        assert_response :unauthorized
+      end
+    end
   end
 
   test "Admin should destroy agent" do
-    sign_in @admin_user
-    assert_difference('Agent.count', -1) do
-      delete :destroy, id: @agent
+    [:confirmed_admin_agent].each do |agent|
+    sign_agent_with_global_role(agent) 
+      assert_difference('Agent.count', -1) do
+        delete :destroy, id: @agent
+      end
+      assert_redirected_to admin_agents_path
     end
-
-    assert_redirected_to admin_agents_path
   end
 
   test "Representative should not destroy agent" do
-    sign_in @representative_user
-    delete :destroy, id: @agent
-    assert_response :unauthorized
-  end
-
-  test "Supervisor should not destroy agent" do
-    sign_in @supervisor_user
-    delete :destroy, id: @agent
-    assert_response :unauthorized
-  end
-
-  test "Api user should not destroy agent" do
-    sign_in @api_user
-    delete :destroy, id: @agent
-    assert_response :unauthorized
-  end
-
-  #Profile fulfillment_managment
-  test "fulfillment_managment user should not destroy agent" do
-    sign_in @fulfillment_manager_user
-    delete :destroy, id: @agent
-    assert_response :unauthorized
+    [:confirmed_landing_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
+     :confirmed_agency_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      perform_call_as(@agent) do
+        delete :destroy, id: @agent
+        assert_response :unauthorized
+      end
+    end
   end
 
 ## Testing abilities related to views ## 
@@ -286,7 +199,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :index
@@ -299,7 +212,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :new
@@ -313,7 +226,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     agent = FactoryGirl.build(:confirmed_admin_agent)
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       post :create, agent: { :username => agent.username, :password => agent.password, :password_confirmation => agent.password_confirmation, :email => agent.email }, club_roles_attributes: { "1" => { role:"api", club_id: @agent.clubs.first.id }}
@@ -326,7 +239,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :show, id: @agent.id
@@ -339,7 +252,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :edit, id: @agent.id
@@ -352,7 +265,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       put :update, id: @agent.id, agent: { :username => @agent.username, :password => @agent.password, :password_confirmation => @agent.password_confirmation, :email => @agent.email, :roles => @agent.roles }
@@ -365,7 +278,7 @@ class Admin::AgentsControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       delete :destroy, id: @agent

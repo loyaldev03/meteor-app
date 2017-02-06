@@ -3,6 +3,7 @@ require 'test_helper'
 class TransportSettingsTest < ActionDispatch::IntegrationTest
  
   setup do
+    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
     @partner_prefix = @partner.prefix
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
@@ -10,10 +11,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     @tsmailchimp = FactoryGirl.build(:transport_settings_mailchimp, :club_id => @club.id)
     @tsgoogletagmanager = FactoryGirl.build(:transport_settings_google_tag_manager, :club_id => @club.id)
     @tsgoogleanalytics = FactoryGirl.build(:transport_settings_google_analytics, :club_id => @club.id)
-  end
-
-  def login_general_admin(type)
-    @admin_agent = FactoryGirl.create(type)
     sign_in_as(@admin_agent)
   end
 
@@ -25,8 +22,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should see Facebook Transport Settings" do
-    transport_settings_facebook = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)
-    login_general_admin(:confirmed_admin_agent)
+    transport_settings_facebook = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)    
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -35,8 +31,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     click_link_or_button 'Back'
   end
 
-  test "should create Facebook Transport Settings " do
-    login_general_admin(:confirmed_admin_agent)
+  test "should create Facebook Transport Settings " do    
     visit transport_settings_path(@partner_prefix, @club.name)
     click_link_or_button 'new_transport_setting' 
     fill_in_form('facebook', options ={client_id: @tsfacebook.client_id, client_secret: @tsfacebook.client_secret, access_token: @tsfacebook.access_token})       
@@ -48,8 +43,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should edit Facebook Transport Settings" do
-    transport_settings_facebook = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)
-    login_general_admin(:confirmed_admin_agent)
+    transport_settings_facebook = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)    
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'
@@ -64,7 +58,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
 
   test "should see Mailchimp Transport Settings" do
     transport_settings_mailchimp = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club.id)
-    login_general_admin(:confirmed_admin_agent)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -74,7 +67,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should create Mailchimp Transport Settings " do
-    login_general_admin(:confirmed_admin_agent)
     visit transport_settings_path(@partner_prefix, @club.name)
     click_link_or_button 'new_transport_setting'
     fill_in_form('mailchimp', {api_key: @tsmailchimp.api_key})              
@@ -85,7 +77,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
 
   test "should edit Mailchimp Transport Settings" do
     transport_settings_mailchimp = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club.id)
-    login_general_admin(:confirmed_admin_agent)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'
@@ -98,7 +89,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
 
   test "should see Google tag manager Transport Settings" do
     transport_settings_google_tag_manager = FactoryGirl.create(:transport_settings_google_tag_manager, :club_id => @club.id)
-    login_general_admin(:confirmed_admin_agent)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -107,8 +97,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     click_link_or_button 'Back'
   end
 
-  test "should create Google tag manager Transport Settings " do
-    login_general_admin(:confirmed_admin_agent)
+  test "should create Google tag manager Transport Settings " do    
     visit transport_settings_path(@partner_prefix, @club.name)
     click_link_or_button 'new_transport_setting' 
     fill_in_form('google_tag_manager', options ={container_id: @tsgoogletagmanager.container_id})       
@@ -119,7 +108,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
 
   test "should edit Google tag manager Transport Settings" do
     transport_settings_google_tag_manager = FactoryGirl.create(:transport_settings_google_tag_manager, :club_id => @club.id)
-    login_general_admin(:confirmed_admin_agent)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'
@@ -132,7 +120,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
 
   test "should see Google analytics Transport Settings" do
     transport_settings_google_analytics = FactoryGirl.create(:transport_settings_google_analytics, :club_id => @club.id)
-    login_general_admin(:confirmed_admin_agent)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -142,7 +129,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should create Google analytics Transport Settings " do
-    login_general_admin(:confirmed_admin_agent)
     visit transport_settings_path(@partner_prefix, @club.name)
     click_link_or_button 'new_transport_setting' 
     fill_in_form('google_analytics', options ={tracking_id: @tsgoogleanalytics.tracking_id})       
@@ -153,7 +139,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
 
   test "should edit Google analytics Transport Settings" do
     transport_settings_google_analytics = FactoryGirl.create(:transport_settings_google_analytics, :club_id => @club.id)
-    login_general_admin(:confirmed_admin_agent)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'

@@ -65,16 +65,13 @@ class CampaignDataFetcher
       end
 
       def proceed_with_error_logic(response)
-        case(response.body['error'].code.to_i)
+        case(response.body['error'].code)
           when 100, 803
             Hashie::Mash.new('meta' => :invalid_campaign)
           when 104, 190
             Hashie::Mash.new('meta' => :unauthorized)
           when 2635
             raise FbGraph2::Exception::InvalidRequest.new(response.body['error'].message)
-          when 17
-            Campaigns::DataFetcherJob.set(wait: 30.minutes).perform_later(club_id: Campaign.find(@report.campaign_id).club_id, transport: 'facebook', date: @report.date.to_s, campaign_id: @report.campaign_id)
-            raise "Facebook Limit Reached."
           else
             Auditory.report_issue("FacebookFetcher campaign retrieval error.", 'Facebook returned an unexpected code', {unexpected_error_code: response.body.error.code, unexpected_error_message: response.body.error.message, campaign_id: @report.campaign_id}, false)
             raise "Unexpected error code. Response: #{response}"

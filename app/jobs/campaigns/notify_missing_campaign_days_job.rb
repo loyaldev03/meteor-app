@@ -7,7 +7,7 @@ module Campaigns
 
       Club.is_enabled.each do |club|
         unless club_data[club.id] 
-          campaigns = club.campaigns.each_with_object({}) do |campaign, h|
+          campaigns = club.campaigns.with_source_id.each_with_object({}) do |campaign, h|
             if (missing_days = campaign.missing_days(date: date.to_date)).present?
               h[campaign.id.to_s] = missing_days.map{|d| d.id.to_s}
             end

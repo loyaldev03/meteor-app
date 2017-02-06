@@ -1,0 +1,3 @@
+<%= form_for(@preference, url: preference_group_preference_path(id: @preference.id), :html => { :class => 'form-horizontal', 'data-target' => @preference.id }) do |f| %>
+  <%= render partial: 'form', locals: { f: f } %>
+<% end %> 

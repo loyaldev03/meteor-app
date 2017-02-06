@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= @page_title %></title>
+  <meta http-equiv="x-ua-compatible" content="IE=9">
+  <%= csrf_meta_tags %>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <%= javascript_include_tag 'https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js' %>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+  <%= javascript_include_tag 'checkout/checkout' %>
+  <%= stylesheet_link_tag 'checkout/checkout', :media => "all" %>
+  <%= favicon_link_tag @club.favicon_url.url if @club.favicon_url.present? %>
+  <%= render :partial => 'campaigns/checkouts/shared/ga' %>
+
+  <% if @club.css_style.present? %>
+  <style type="text/css"><%= @club.css_style.html_safe %></style>
+  <% end %>
+</head>
+<body>
+  <div class="container checkout">
+    <%= render :partial => 'campaigns/checkouts/shared/header' %>
+    <%= yield %>
+    <% if params[:action].include? 'new' %>
+      <%= render :partial => 'campaigns/checkouts/shared/footer_checkout' %>
+    <% else %>
+      <%= render :partial => 'campaigns/checkouts/shared/footer_result' %>
+    <% end %>
+  </div>
+  <script type="text/javascript">
+    $(function(){
+      doOnReadyforAllPages();
+      <% if content_for?(:javascript) %>
+        <%= yield :javascript %>
+      <% end %>
+    });
+  </script>
+</body>
+</html>

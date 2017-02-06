@@ -45,7 +45,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
   test "Agents different from admin cannot get show" do
     sign_in @agent
     @agent = FactoryGirl.create(:confirmed_admin_agent)
-    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api'].each do |role|
+    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       get :show, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id
       assert_response :unauthorized
@@ -55,7 +55,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
   test "Agents different from admin cannot get new" do
     sign_in @agent
     @agent = FactoryGirl.create(:confirmed_admin_agent)
-    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api'].each do |role|
+    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       get :new, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name
       assert_response :unauthorized
@@ -65,7 +65,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
   test "Agents different from admin cannot get create" do
     sign_in @agent
     @agent = FactoryGirl.create(:confirmed_admin_agent)
-    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api'].each do |role|
+    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, payment_gateway_configuration: { report_group: "NewReportGroup", merchant_key: "NewMerchantKey", :login => "Login", :password => "asdasdds", :gateway => "mes" }
       assert_response :unauthorized
@@ -75,7 +75,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
   test "Agents different from admin cannot get edit" do
     sign_in @agent
     @agent = FactoryGirl.create(:confirmed_admin_agent)
-    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api'].each do |role|
+    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       get :edit, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id
       assert_response :unauthorized
@@ -85,7 +85,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
   test "Agents different from admin cannot get update" do
     sign_in @agent
     @agent = FactoryGirl.create(:confirmed_admin_agent)
-    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api'].each do |role|
+    ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       put :update, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id,
                    payment_gateway_configuration: { report_group: "NewReportGroup", merchant_key: "NewMerchantKey" }
@@ -156,7 +156,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @simple_club_with_gateway.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :show, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id
@@ -169,7 +169,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
     @club = FactoryGirl.create(:club, :partner_id => @partner.id)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :new, partner_prefix: @partner.prefix, club_prefix: @club.name
@@ -181,7 +181,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, payment_gateway_configuration: { report_group: "NewReportGroup", merchant_key: "NewMerchantKey", :login => "Login", :password => "asdasdds", :gateway => "mes" }
@@ -193,7 +193,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @simple_club_with_gateway.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :edit, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id
@@ -205,7 +205,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @simple_club_with_gateway.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       put :update, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id,

@@ -9,18 +9,6 @@ class TransportSettingsControllerTest < ActionController::TestCase
     @tsmailchimp = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club.id)
   end
 
-  def sign_agent_with_global_role(type)
-     @agent = FactoryGirl.create type
-     sign_in @agent     
-  end
-
-  def sign_agent_with_club_role(type, role)
-    @agent = FactoryGirl.create(type, roles: '') 
-    ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
-    sign_in @agent
-  end
-
-
   test "agents that should get index" do 
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
@@ -32,7 +20,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   test "agents that should not get index" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do   
         get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
@@ -52,7 +40,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   test "agents that should not show campaigns" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         get :show, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
@@ -72,7 +60,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   test "agents that should not get new" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         get :new, partner_prefix: @partner_prefix, :club_prefix => @club.name
@@ -92,7 +80,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   test "agents that should not get edit" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         get :edit, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name      
@@ -119,7 +107,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   test "agents that should not create transport setting" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         transportSetting = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)    
@@ -145,7 +133,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   test "agents that should not update campaign" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
         @club1 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) 
@@ -183,7 +171,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   end
 
   test "agent with club roles that should not get index" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|      
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|      
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do     
         get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
@@ -199,7 +187,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not show campaigns with club roles" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do 
         get :show, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
@@ -215,7 +203,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not get new with club roles" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
         get :new, partner_prefix: @partner_prefix, :club_prefix => @club.name
@@ -238,7 +226,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not create transport setting with club roles" do    
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
         transportSetting = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)    
@@ -258,7 +246,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not get edit with club role" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
         get :edit, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name      
@@ -276,7 +264,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not update campaign with club role" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
         @club1 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) 

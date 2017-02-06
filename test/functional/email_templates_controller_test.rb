@@ -21,11 +21,13 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Non Admin agents should not get index' do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
-      assert_response :unauthorized
+      perform_call_as(@agent) do 
+        get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -37,11 +39,13 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Non Admin agents should not get new' do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-    	get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
-      assert_response :unauthorized
+      perform_call_as(@agent) do 
+      	get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -56,11 +60,13 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Non Admin agents should not get create' do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      post :create, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
-      assert_response :unauthorized
+      perform_call_as(@agent) do 
+        post :create, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -72,11 +78,13 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Non Admin agents should not get edit' do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      get :edit, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
-      assert_response :unauthorized
+      perform_call_as(@agent) do 
+        get :edit, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -101,22 +109,26 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Non Admin agents should not get testing communications' do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      get :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
-      assert_response :unauthorized
+      perform_call_as(@agent) do 
+        get :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
+        assert_response :unauthorized
+      end
     end
   end
 
   test 'Non Admin agents should not send testing communications' do
     @communication = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id
-      assert_response :unauthorized
+      perform_call_as(@agent) do 
+        post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -139,11 +151,13 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Non Admin agents should not get update' do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      put :update, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
-      assert_response :unauthorized
+      perform_call_as(@agent) do 
+        put :update, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -216,7 +230,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
@@ -239,7 +253,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
@@ -263,7 +277,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       post :create, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
@@ -286,7 +300,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :edit, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id

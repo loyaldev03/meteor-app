@@ -6,6 +6,7 @@ FactoryGirl.define do
     cost_center Settings.others_product.capitalize
     stock 10
     weight 5
+    image_url 'https://assets.onmc.com/campaigns/products/2014calendars/dale_jr.jpg'
 
     factory :random_product do
       sequence(:sku) {|n| Settings.others_product+"#{n}" }

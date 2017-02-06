@@ -31,6 +31,10 @@ function doOnReadyforAllPages(){
 
   $(".alert").alert();
 
+  $.wait = function(callback, seconds) {
+    return window.setTimeout(callback, seconds * 1000);
+  };
+
   // https://select2.github.io/options.html
   $.fn.select2.defaults.set("theme", "bootstrap");
 
@@ -70,17 +74,26 @@ function doOnReadyforAllPages(){
 function disable_form_buttons_upon_submition(form_id){
   $('#'+form_id).submit(function(){
     startAjaxLoader(true);
-  })  
+  });
 }
 
-function flash_message(message, error){
-  message_type = error ? "alert-error" : "alert-info"
-  $(".container .row:first .alert").remove();
-  $(".container .row:first").prepend("<div class='alert "+message_type+"'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
+function flash_message(message, error) {
+  message_type = error ? "alert-error" : "alert-info";
+  $(".container .row:first .alert-error, .container .row:first .alert-info").remove();
+  $(".container .row:first .span12").prepend("<div class='alert "+message_type+"'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
+}
+
+function timed_flash_message(message, error, seconds) {
+  message_type = error ? "alert-error" : "alert-info";
+  $(".container .row:first .alert-error, .container .row:first .alert-info").remove();
+  $(".container .row:first .span12").prepend("<div id='flash-message-alert' class='alert "+message_type+"'><a class='close' data-dismiss='alert'>×</a><p>"+message+"</p></div>");
+  if(seconds > 0) {
+    $.wait(function() { $("#flash-message-alert").alert('close'); }, seconds);
+  }
 }
 
 function show_error_explanation(entityType, data, divName) {
-  if(divName === undefined){ 
+  if(divName === undefined){
     divName = 'error_explanation';
   }
   $('#' + divName).show();
@@ -338,7 +351,7 @@ function domain_index_functions(column_count){
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] },
                      { "sWidth": "190px", "aTargets": [ column_count ] }],
     "sAjaxSource": $('#domains_table').data('source'),
-  });   
+  });
 }
 
 function product_index_functions(column_count){
@@ -436,7 +449,7 @@ function user_index_functions(){
     });
     if(atLeastOneFilled == false){
       alert("No filters selected.");
-      event.preventDefault(); 
+      event.preventDefault();
     }else{
       startAjaxLoader(true);
       update_select_only = false;
@@ -462,14 +475,14 @@ function user_index_functions(){
     }
   });
 
-  $('#users .pagination a').on('click', function () {  
+  $('#users .pagination a').on('click', function () {
     update_select_only = false;
-    $.getScript(this.href);  
-    return false;  
-  }); 
+    $.getScript(this.href);
+    return false;
+  });
 
   $("#clear_form").click( function(event) {
-    $("#index_search_form input[type=text]").each(function() { $(this).val(''); }); 
+    $("#index_search_form input[type=text]").each(function() { $(this).val(''); });
     $("select option[value='']").each(function() { $(this).attr('selected', true); ; });
     $("#user_state option[value!='']").remove();
     event.preventDefault();
@@ -478,7 +491,7 @@ function user_index_functions(){
   $('#user_country').on('change',  function(){
     country = $('#user_country').val();
     update_select_only = true;
-    $.get(this.action, { country_code:country, only_select:update_select_only }, null, 'script'); 
+    $.get(this.action, { country_code:country, only_select:update_select_only }, null, 'script');
   })
 
 };
@@ -505,14 +518,49 @@ function fetch_maketing_client_form(partner_prefix, club_id, mkt_tool_errors){
   }
 };
 
-function clubs_form_functions(partner_prefix, club_id, mkt_tool_errors){
-  $("#club_marketing_tool_client").change(function(){
-    if($(this).val()!= ''){
+function clubs_form_functions(partner_prefix, club_id, mkt_tool_errors) {
+  $('#tokens-help').hide();
+  $(".nav-tabs li a").click(function() { $('#tokens-help').hide(); });
+  $(".nav-tabs li a#tab-checkout").click(function() { $('#tokens-help').show(); });
+
+  $("#club_marketing_tool_client").change(function() {
+    if ($(this).val() !== '') {
       fetch_maketing_client_form(partner_prefix, club_id, mkt_tool_errors);
-    }else
+    } else
       $("#div_mkt_tool_attributes").empty();
-  })
-};
+  });
+
+  $('#submit_club_form').click(function() {
+    $('input:invalid').each(function() {
+      var $closest = $(this).closest('.tab-pane');
+      var id = $closest.attr('id');
+      $('.nav a[href="#' + id + '"]').tab('show');
+      return false;
+    });
+  });
+
+  $(function() {
+    $('a[data-toggle="tab"]').on('click', function(e) {
+      localStorage.setItem('lastTab', $(e.target).attr('href'));
+    });
+    var lastTab = localStorage.getItem('lastTab');
+    if (lastTab) { $('a[href="' + lastTab + '"]').click(); }
+  });
+}
+
+function clubs_show_functions() {
+  $('#tokens-help').hide();
+  $(".nav-tabs li a").click(function() { $('#tokens-help').hide(); });
+  $(".nav-tabs li a#tab-checkout").click(function() { $('#tokens-help').show(); });
+
+  $(function() {
+    $('a[data-toggle="tab"]').on('click', function(e) {
+      localStorage.setItem('lastTab', $(e.target).attr('href'));
+    });
+    var lastTab = localStorage.getItem('lastTab');
+    if (lastTab) { $('a[href="' + lastTab + '"]').click(); }
+  });
+}
 
 function retrieve_information(){
   var skus = [];
@@ -522,7 +570,7 @@ function retrieve_information(){
   $('#user_product_sku').val(skus.join(','));
 
   data = {
-    member:{  
+    member:{
       first_name: $("#user_first_name").val(),
       gender: $("#user_gender").val()=="" ? null : $("#user_gender").val(),
       address: $("#user_address").val(),
@@ -560,7 +608,7 @@ function retrieve_information(){
   }
   if( $("#setter_cc_blank").length > 0 )
     data["setter"] = { "cc_blank": $("#setter_cc_blank").is(":checked") ? 1 : 0 }
-    
+
   if( $("#setter_wrong_phone_number").length > 0 )
     data["setter"] = { "wrong_phone_number": $("#setter_wrong_phone_number").is(":checked") ? 1 : 0 }
 
@@ -573,12 +621,12 @@ function new_payment_gateway_configuration_functions(confirmationText, reConfirm
     $('#div_descriptor_name').hide('fast');
     $('#div_descriptor_phone').hide('fast');
     $('#div_merchant_key').hide('fast');
-  };  
+  };
   if($('#payment_gateway_configuration_gateway').val() == 'stripe'){
     $('#div_aus_login').hide('fast');
     $('#div_aus_password').hide('fast');
   }
-  
+
   $('#payment_gateway_configuration_gateway').change(function(){
     if($(this).val()!='litle'){
       $('#div_report_group').hide('fast');
@@ -600,7 +648,7 @@ function new_payment_gateway_configuration_functions(confirmationText, reConfirm
     }
   });
 
-  $('form').submit( function(event) { 
+  $('form').submit( function(event) {
     if(confirm(confirmationText)){
       if(!confirm(reConfirmationText)){
         event.preventDefault();
@@ -722,7 +770,7 @@ function edit_user_functions() {
 
   $('#user_country').on('change',  function(){
     country = $('#user_country').val();
-    $.get('', { country_code:country }, null, 'script'); 
+    $.get('', { country_code:country }, null, 'script');
   })
 };
 
@@ -844,7 +892,7 @@ function fulfillment_files_functions() {
     startAjaxLoader(true);
     window.location.href = $(this).attr('href');
   });
-}  
+}
 
 function campaigns_functions(){
   $('#campaigns_table').DataTable({
@@ -855,10 +903,10 @@ function campaigns_functions(){
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 6 ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 7 ] }],
     "sAjaxSource": $('#campaigns_table').data('source'),
     "aaSorting": [ [0,'desc'] ]
-  });  
+  });
 }
 
 function newCampaignFunctions(clubId, getSubscriptionPlansUrl, getFulfillmentCodesUrl, placeholderText, placeholderTextFulfillmentCodes){
@@ -935,13 +983,14 @@ function newCampaignFunctions(clubId, getSubscriptionPlansUrl, getFulfillmentCod
   $("#campaign_campaign_type").change(function(){
     disableEnrollRelatedField($(this).val());
   });
+  $('#campaign_preference_groups').select2({allowClear: true});
 }
 
-function editCampaignFunctions(canEditTransportId, canSetDatesInThePast){
+function editCampaignFunctions(canEditTransportId, canSetDatesInThePast, initialDate) {
   var fieldsToDisable = [
     'landing_name',
-    'terms_of_membership_id', 
-    'enrollment_price', 
+    'terms_of_membership_id',
+    'enrollment_price',
     'campaign_type',
     'transport',
     'audience',
@@ -949,17 +998,15 @@ function editCampaignFunctions(canEditTransportId, canSetDatesInThePast){
     'transport_campaign_id',
     'campaign_code'
   ];
-  $.each(fieldsToDisable, function(index, field) {
+  $.each(fieldsToDisable, function (index, field) {
     $('#campaign_' + field).prop('disabled', true);
   });
 
-  if(!canSetDatesInThePast){
-    $(".datepicker").datepicker('option', { minDate: 0 });
-  }
+  if (!canSetDatesInThePast) { $(".datepicker").datepicker('option', { minDate: initialDate }); }
 
-  if(canEditTransportId) {
-    $('#campaign_transport_campaign_id').prop('disabled', false);
-  }
+  if (canEditTransportId) { $('#campaign_transport_campaign_id').prop('disabled', false); }
+
+  $('#campaign_preference_groups').select2({ allowClear: true });
 }
 
 function transportSettingsIndexFunctions() {
@@ -975,7 +1022,7 @@ function transportSettingsIndexFunctions() {
     "bInfo": false,
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 2 ] }],
     "sAjaxSource": $('#transport_settings_table').data('source')
-  }); 
+  });
 }
 
 
@@ -996,8 +1043,8 @@ function transportSettingsFormFunctions(transport) {
 
   function assignRequiredTagToFields(transport) {
     var fields = [
-      'client_id', 
-      'client_secret', 
+      'client_id',
+      'client_secret',
       'access_token',
       'api_key',
       'tracking_id',
@@ -1006,7 +1053,7 @@ function transportSettingsFormFunctions(transport) {
     $.each(fields, function(index, field) {
       $('#transport_setting_' + field).prop('required', false);
     });
-    
+
     switch(transport) {
       case 'facebook':
         $('#transport_setting_client_id').prop('required', true);
@@ -1054,7 +1101,7 @@ function show_user_functions(user_prefix){
 
   // $(".btn").on('click',function(event){
   //   if($(this).attr('disabled') == 'disabled')
-  //     event.preventDefault(); 
+  //     event.preventDefault();
   // })
 
   mark_as_sent_fulfillment("../fulfillments/");
@@ -1070,7 +1117,7 @@ function show_user_functions(user_prefix){
 
   $(".nav-tabs li a").click(function(){
     var objects_to_search = $(this).attr("name");
-    for(var key in objectsFetch){ 
+    for(var key in objectsFetch){
       if(key == objects_to_search){
         if(!objectsFetch[objects_to_search]){
           startAjaxLoader(false);
@@ -1112,7 +1159,7 @@ function user_change_next_bill_date(){
 };
 
 function user_save_the_sale_functions(){
-  disable_form_buttons_upon_submition('save_the_sale_form')  
+  disable_form_buttons_upon_submition('save_the_sale_form')
   $(".datepicker").datepicker('option', { minDate: 0 });
 }
 
@@ -1122,11 +1169,11 @@ function chargeback_user_functions(){
       startAjaxLoader(true);
     }else{
       alert("Incorrect chargeback value.");
-      event.preventDefault(); 
+      event.preventDefault();
     };
   })
 
-  $("#adjudication_date").datepicker('option', { maxDate: 0, 
+  $("#adjudication_date").datepicker('option', { maxDate: 0,
                                                  changeMonth: true,
                                                  changeYear: true,
                                                  yearRange: 'c-100:c'});
@@ -1152,7 +1199,7 @@ function fulfillments_not_processed_function(){
       alert("Select a fulfillment to apply status.");
     } else{
       $('.fulfillment_selected:checked').each(function(index){
-      var box = $(this); 
+      var box = $(this);
       $.ajax({
         type: 'PUT',
         url: $(this).data('url'),
@@ -1169,10 +1216,10 @@ function fulfillments_not_processed_function(){
             $("#div_fulfillment_selected_"+data.id).append("<div class='error-info alert'>"+data.message+"</div>")
           };
         },
-      });  
+      });
     });
     }
-  });     
+  });
 }
 
 function set_product_filter_at_fulfillments_index(settings_others_product) {
@@ -1188,12 +1235,12 @@ function set_product_filter_at_fulfillments_index(settings_others_product) {
 
 function fulfillments_index_functions(create_xls_file_url, make_report_url, fulfillment_file_cant_be_empty_message, settings_others_product){
   $("#report_results").tablesorter({
-    headers: { 
-      0: { sorter: false }, 
-      7: { sorter: false }, 
-      8: { sorter: false } 
-    } 
-  }); 
+    headers: {
+      0: { sorter: false },
+      7: { sorter: false },
+      8: { sorter: false }
+    }
+  });
 
   $('.datepicker').datepicker('option', { maxDate: 0 });
 
@@ -1231,7 +1278,7 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
     } else {
       alert(fulfillment_file_cant_be_empty_message);
     }
-  });  
+  });
 
   $('#input_product_filter').click(function() {
     $('#radio_product_filter_sku').prop('checked', true);
@@ -1246,16 +1293,16 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
   $("#make_report").click(function() {
     set_product_filter_at_fulfillments_index(settings_others_product);
     $('#fulfillment_report_form').attr("action", make_report_url);
-  });    
+  });
 
   // resend_fulfillment("fulfillments/");
-  
+
   // mark_as_sent_fulfillment("fulfillments/");
 
   // $('*#set_as_wrong_address').click( function(event){
   //   $(this).hide();
   //   append = $(this).parent();
-  //   $.get(this.action, {member_prefix:$(this).attr("name")}, null, 'script'); 
+  //   $.get(this.action, {member_prefix:$(this).attr("name")}, null, 'script');
   //   return false;
   // });
 
@@ -1275,7 +1322,7 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
   //         alert(data.message);
   //       };
   //     },
-  //   });  
+  //   });
   // });
 
 };
@@ -1337,7 +1384,7 @@ function agent_form_functions(agent_id, roles, clubs){
     var role_list = roles.split(",");
     var club_list = clubs.split(";");
     event.preventDefault();
-    
+
     $("*[id$='_club_id'] option:selected").each( function(){
       index = club_list.indexOf($(this).text()+","+$(this).val());
       if(index >= 0)
@@ -1349,10 +1396,10 @@ function agent_form_functions(agent_id, roles, clubs){
       count++;
       var options_for_role = "<option value=''> </option>"
       for (var i in role_list){
-        options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>" 
+        options_for_role = options_for_role+"<option value='"+role_list[i]+"'>"+role_list[i]+"</option>"
       };
       var options_for_club_id = ""
-      for (var i in club_list){  
+      for (var i in club_list){
         club = club_list[i].split(',');
         options_for_club_id = options_for_club_id+"<option value='"+club[1]+"'>"+club[0]+"</option>"
       };
@@ -1382,7 +1429,7 @@ function agent_form_functions(agent_id, roles, clubs){
     var newRole = $(this).val();
     var success = true;
     $("*[id$='_club_id']").each( function(){
-      if(newRole == $(this).val() && name != $(this).attr("name")){ 
+      if(newRole == $(this).val() && name != $(this).attr("name")){
         success = false;
       };
     });
@@ -1416,7 +1463,7 @@ function agent_form_functions(agent_id, roles, clubs){
     };
     $("#club_role_table tr td[id='td_club_role_role_"+club_role_id+"']").append("<select id='select_club_role_"+club_role_id+"' name='[club_roles_attributes]["+count+"][role]'>"+options_for_role+"</select>");
     $("#club_role_table tr td[id='td_club_role_buttons_"+club_role_id+"']").prepend("<input type='button' id='club_role_update' name='"+club_role_id+"' class='btn-primary btn-mini' value='Update'></td>");
-  });   
+  });
 
   $('#club_role_table').on('click', '#club_role_update', function(event){
     event.preventDefault();
@@ -1441,7 +1488,7 @@ function agent_form_functions(agent_id, roles, clubs){
           }
         },
       });
-    } 
+    }
   });
 
   $('#club_role_table').on('confirm:complete', '#club_role_delete', function(event){
@@ -1456,7 +1503,7 @@ function agent_form_functions(agent_id, roles, clubs){
         if(data.code == "000"){
           $("#club_role_table tr[id='tr_club_role_"+club_role_id+"']").remove();
           if(clubs.length == 0)
-            clubs = array[2]+","+array[1];  
+            clubs = array[2]+","+array[1];
           else
             clubs = clubs+";"+array[2]+","+array[1];
           $("#td_notice").children().remove();
@@ -1485,7 +1532,7 @@ function new_tom_functions() {
 }
 
 function tom_create_wizard() {
-  $("#tom_wizard_form").formwizard({ 
+  $("#tom_wizard_form").formwizard({
     formPluginEnabled: false,
     validationEnabled: true,
     validationOptions:{
@@ -1524,7 +1571,7 @@ function switch_days() {
     $("#control_group_days").show(100);
   }
   else {
-   $("#control_group_days").hide(100); 
+   $("#control_group_days").hide(100);
    $("#email_template_days").val(1);
   }
 }
@@ -1595,7 +1642,7 @@ function test_communications_functions() {
 function suspected_fulfillments_functions(){
   $("#suspected_fulfillments_form_submit_button").click(function(event){
     event.preventDefault();
-    if( (new Date($("#end_date").val()) >= new Date($("#initial_date").val())) == true) { 
+    if( (new Date($("#end_date").val()) >= new Date($("#initial_date").val())) == true) {
       $("#suspected_fulfillments_form").submit();
     }else{
       alert('Invalid range of dates.');
@@ -1612,8 +1659,8 @@ function suspected_fulfillments_functions(){
       endAjaxLoader(true);
     });
   });
-  
-  $(".datepicker").datepicker('option', { maxDate: 0, 
+
+  $(".datepicker").datepicker('option', { maxDate: 0,
                                 changeMonth: true,
                                 changeYear: true,
                                 yearRange: 'c-100:c' });
@@ -1656,5 +1703,227 @@ function suspected_fulfillment_information_functions(){
       $(column).width(colWidth[index2]);
       $(column).css('max-width', colWidth[index2]);
     });
+  });
+}
+
+function campaignProductsEditFunctions() {
+  $("#available_products_table").on("click", "a#btn-assign-product", function() {
+    editCampaignProduct('assign', $(this).attr("data-campaign-id"), $(this).attr("data-product-id"));
+  });
+
+  $("#assigned_products_table").on("click", "a#btn-remove-product", function() {
+    editCampaignProduct('destroy', $(this).attr("data-campaign-id"), $(this).attr("data-product-id"));
+  });
+
+  $('#available_products_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"f>rt<"bottom"ilp>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [3, 4] }],
+    "sAjaxSource": $('#available_products_table').data('source'),
+    "aaSorting": [ [0, 'desc'] ],
+  });
+
+  $('#assigned_products_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"f>rt<"bottom"ilp>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    autoWidth: false,
+    "aoColumnDefs": [
+      { "bSortable": false, "aTargets": [2, 4] },
+      { targets: [3], width: "50px" },
+      { targets: [4], width: "120px" },
+    ],
+    "sAjaxSource": $('#assigned_products_table').data('source'),
+    "aaSorting": [ [0, 'desc'] ],
+  });
+
+  function editCampaignProduct(action, campaign_id, product_id) {
+    $('#available_products_table a').attr('disabled', true);
+    $('#assigned_products_table a').attr('disabled', true);
+    $.ajax({
+      type: action == 'assign' ? 'put' : 'delete',
+      data: { campaign_id: campaign_id, product_id: product_id },
+      url: (action == 'assign' ? 'assign' : 'destroy'),
+      success: function (data) {
+        if(data.success === true) {
+          $("#available_products_table").DataTable().ajax.reload(null, false);
+          $("#assigned_products_table").DataTable().ajax.reload(null, false);
+        } else {
+          timed_flash_message(data.message, true, 5);
+        }
+      },
+      error: function(jqXHR, exception) {},
+      complete: function() {
+        $('#available_products_table a').removeAttr('disabled');
+        $('#assigned_products_table a').removeAttr('disabled');
+      }
+    });
+  }
+
+  $('#assigned_products_table').on("click",'a[data-toggle="custom-remote-modal"]', function(event) {
+    event.preventDefault();
+    var targetModal = '#edit_label_modal';
+    $('#edit_label_modal .modal-header h3').remove();
+    $('#edit_label_modal .modal-header').append("<h3> Update Product Label</h3>");
+    $('#edit_label_modal .modal-body').load($(this).attr('data-target'), function(e) {
+      $('#edit_label_modal').modal('show');
+    });
+  });
+
+  $('#edit_label_modal').on('submit', '.modal-body form', function(event) {
+    event.preventDefault();
+    startAjaxLoader(true);
+    var campaign_product_id = $(this).data('target');
+    $.ajax({
+      type: 'put',
+      url: $(this).attr('action'),
+      data: $(this).serialize(),
+      success: function(data){
+        endAjaxLoader(true);
+        if(data.success == true) {
+          $("#assigned_products_table").DataTable().ajax.reload(null, false);
+          $('#edit_label_modal').modal('hide');
+          flash_message(data.message, false)
+        }
+        else {
+          $('#edit_label_modal').modal('hide');
+          flash_message(data.message, true)
+        }
+      },
+      error: function(jqXHR, exception) {
+        endAjaxLoader(true);
+        alert(global_ajax_error_messages(jqXHR));
+      },
+    })
+  });
+}
+
+function preference_group_functions(){
+  $('#preference_groups_table').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 0, "asc" ]],
+    "bSort": false,
+    "sAjaxSource": $('#preference_groups_table').data('source'),
+  });
+}
+
+
+function preference_functions(){
+  $('#preferencesTable').DataTable({
+    "sPaginationType": "full_numbers",
+    "sDom": '<"top"fp>rt<"bottom"il>',
+    "bJQueryUI": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "bLengthChange": false,
+    "iDisplayLength": 25,
+    "aaSorting": [[ 0, "asc" ]],
+    "bSort": true,
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 1 ] }],
+    "sAjaxSource": $('#preferencesTable').data('source'),
+  });
+
+  $('#newPreferenceModal').on('submit', '.modal-body form', function(event){
+    event.preventDefault();
+    startAjaxLoader(true);
+    $.ajax({
+      type: 'post',
+      url: $(this).attr('action'),
+      data: $(this).serialize(),
+      success: function(data){
+        endAjaxLoader(true);
+        if(data.success == true){
+          $("#preferencesTable").DataTable().ajax.reload(null, false);
+          $('#newPreferenceModal').modal('hide');
+          $('#newPreferenceModal #preference_name').val('');
+          flash_message(data.message, false);
+        }else{
+          $('#newPreferenceModal').modal('hide');
+          flash_message(data.message, true);
+        }
+      },
+      error: function(jqXHR, exception){
+        endAjaxLoader(true);
+        alert(global_ajax_error_messages(jqXHR));
+      }
+    })
+  });
+
+  $('#preferencesTable').on("click",'a[data-toggle="custom-remote-modal"]', function(event){
+    event.preventDefault();
+    var targetModal = '#campaignDayEditModal';
+    $('#preferenceEditModal .modal-header h3').remove();
+    $('#preferenceEditModal .modal-header').append("<h3> Update Preference "+$(this).data('name')+"</h3>");
+    $('#preferenceEditModal .modal-body').load($(this).data('target'), function(e) {
+      $('#preferenceEditModal').modal('show');
+    });
+  });
+
+  $('#preferenceEditModal').on('submit', '.modal-body form', function(event){
+    event.preventDefault();
+    startAjaxLoader(true);
+    $.ajax({
+      type: 'put',
+      url: $(this).attr('action'),
+      data: $(this).serialize(),
+      success: function(data){
+        endAjaxLoader(true);
+        if(data.success == true){
+          $("#preferencesTable").DataTable().ajax.reload(null, false);
+          $('#preferenceEditModal').modal('hide');
+          flash_message(data.message, false);
+        }else{
+          $('#preferenceEditModal').modal('hide');
+          flash_message(data.message, true);
+        }
+      },
+      error: function(jqXHR, exception){
+        endAjaxLoader(true);
+        alert(global_ajax_error_messages(jqXHR));
+      }
+    })
+  });
+
+  $('#preferencesTable').on("confirm:complete",'a[data-method="delete"]', function(event){
+    event.preventDefault();
+    startAjaxLoader(true);
+    $.ajax({
+      type: 'DELETE',
+      url: $(this).data('target'),
+      success: function(data){
+        endAjaxLoader(true);
+        if(data.success == true){
+          $("#preferencesTable").DataTable().ajax.reload(null, false);
+          flash_message(data.message, false);
+        }else{
+          flash_message(data.message, true);
+        }
+      },
+      error: function(jqXHR, exception){
+        endAjaxLoader(true);
+        alert(global_ajax_error_messages(jqXHR));
+      }
+    })
+    return false;
+  });
+
+  $('#preferenceEditModal, #newPreferenceModal').on('click', '#cancel', function(event){
+    event.preventDefault();
+    $('#preferenceEditModal, #newPreferenceModal').modal('hide');
   });
 }

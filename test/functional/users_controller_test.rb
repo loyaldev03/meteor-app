@@ -51,7 +51,7 @@ class UsersControllerTest < ActionController::TestCase
     club = FactoryGirl.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    ['representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       get :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id
       assert_response :unauthorized
@@ -78,7 +78,7 @@ class UsersControllerTest < ActionController::TestCase
 
   test "should not bill an event" do
     club = FactoryGirl.create(:simple_club_with_gateway)
-    ['representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       generate_post_bill_event(200, "testing billing event", "one-time")
       assert_response :unauthorized
@@ -112,7 +112,7 @@ class UsersControllerTest < ActionController::TestCase
 
   test "should toggle testing account value" do
     club = FactoryGirl.create(:simple_club_with_gateway)
-    ['admin', 'supervisor', 'fulfillment_managment', 'representative'].each do |role|
+    ['admin', 'supervisor', 'fulfillment_managment', 'representative', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       generate_put_toggle_testing_account
       assert_response :redirect

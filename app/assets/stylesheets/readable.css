@@ -51,3 +51,11 @@ div.dataTables_length label {
 #users.tab-pane .pagination {
 	margin: 0em 0;
 }
+
+table.borderless td
+{
+  border-top-style: none !important;
+  border-left-style: none !important;
+  border-right-style: none !important;
+  border-bottom-style: none !important;
+}

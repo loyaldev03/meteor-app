@@ -12,7 +12,6 @@
       <%= render :partial => "shared/help", :locals => { :title => t('example'), :content => t('activerecord.attributes.product.package_help')} %> 
     </div>
   </div>
-
   <div class="control-group">
     <%= f.label :sku, :class => 'control-label required_asterisk' %>
     <div class="controls">
@@ -39,6 +38,13 @@
     </div>
   </div>
   <div class="control-group">
+    <%= f.label :alert_on_low_stock, :class => 'control-label' %>
+    <div class="controls">
+      <%= f.check_box :alert_on_low_stock, :class => 'check_box' %>
+      <%= render :partial => "shared/help", :locals => { :title => t('activerecord.attributes.product.alert_on_low_stock_label'), :content => t('activerecord.attributes.product.alert_on_low_stock_help') + Product::LOW_STOCK_THRESHOLD.to_s } %> 
+    </div>
+  </div>
+  <div class="control-group">
     <%= f.label :allow_backorder, :class => 'control-label' %>
     <div class="controls">
       <%= f.check_box :allow_backorder, :class => 'check_box' %>
@@ -54,6 +60,12 @@
     <%= f.label :cost_center, :class => 'control-label required_asterisk' %>
     <div class="controls">
       <%= f.text_field :cost_center, :class => 'text_field', maxlength: 30, required: true %>
+    </div>
+  </div>
+  <div class="control-group">
+    <%= f.label :image_url, :class => 'control-label required_asterisk' %>
+    <div class="controls">
+      <%= f.text_field :image_url, :class => 'text_field', required: true %>
     </div>
   </div>
 

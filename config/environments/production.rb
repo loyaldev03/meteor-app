@@ -90,4 +90,15 @@ Rails.application.configure do
     :password       => 'a4my0fm3'
   }
 
+  config.paperclip_defaults = {
+    storage: :s3,
+    s3_credentials: {
+      bucket: 'campaign-checkout-assets-production',
+      access_key_id: 'AKIAIDA572IAALRTB26Q',
+      secret_access_key: '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',
+      s3_region: 'us-east-1',
+    }
+  }
+
+
 end

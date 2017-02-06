@@ -1,0 +1,47 @@
+<div class='panel panel-info'>
+  <div class='panel-body'>
+    <p>
+      Delivered to: <%= @prospect.last_name %>, <%= @prospect.first_name %><br />
+      Delivered in: <%= @campaign.delivery_date.html_safe %>
+    </p>
+  </div>
+</div>
+<div class='panel panel-info'>
+  <div class='panel-heading'>
+    <h3 class='panel-title'><%= t('checkout.checkout_page.step_1_title') %></h3>
+  </div>
+  <div class='panel-body'>
+    <div class="row">
+      <div class='col-sm-4'><%= t('checkout.checkout_page.name') %></div>
+      <div class='col-sm-8'><strong><%= @prospect.first_name %> <%= @prospect.last_name %></strong></div>
+      <div class='col-xs-12 visible-xs'><br /></div>
+    </div>
+    <div class="row">
+      <div class='col-sm-4'><%= t('checkout.checkout_page.email') %></div>
+      <div class='col-sm-8'><strong><%= @prospect.email %></strong></div>
+      <div class='col-xs-12 visible-xs'><br /></div>
+    </div>
+    <div class="row">
+      <div class='col-sm-4'><%= t('checkout.checkout_page.address') %></div>
+      <div class='col-sm-8'><strong><%= @prospect.address %></strong></div>
+      <div class='col-xs-12 visible-xs'><br /></div>
+    </div>
+    <div class="row">
+      <div class='col-sm-4'><%= t('checkout.checkout_page.city') %> / <%= t('checkout.checkout_page.state') %> / <%= t('checkout.checkout_page.zip') %></div>
+      <div class='col-sm-8'><strong><%= @prospect.city %> / <%= @prospect.state %> / <%= @prospect.zip %></strong></div>
+      <div class='col-xs-12 visible-xs'><br /></div>
+    </div>
+    <% if @prospect.phone.to_i > 0 %>
+    <div class="row">
+      <div class='col-sm-4'><%= t('checkout.checkout_page.phone') %></div>
+      <div class='col-sm-8'><strong><%= format_phone_number(@prospect) %></strong></div>
+      <div class='col-xs-12 visible-xs'><br /></div>
+    </div>
+    <% end %>
+    <div class="row">
+      <div class='col-sm-12 text-right'>
+        <a href="<%= @edit_info_url %>" class="btn btn-link"><%= t('checkout.checkout_page.edit_your_information') %></a>
+      </div>
+    </div>
+  </div>
+</div>

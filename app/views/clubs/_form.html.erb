@@ -1,159 +1,294 @@
-  <div class="control-group">
-    <%= f.label :name, :class => 'control-label required_asterisk' %>
-    <div class="controls">
-      <%= f.text_field :name, :class => 'text_field', required: true%>
+<% if @errors %>
+  <%= render partial: 'shared/flash_error_messages' %>
+<% end %>
+
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#home" data-toggle="tab" id="tab-home">Home</a></li>
+  <li><a href="#remote-domain" data-toggle="tab" id="tab-remote-domain">Remote Domain</a></li>
+  <li><a href="#marketing-tool" data-toggle="tab" id="tab-marketing-tool">Marketing Tool</a></li>
+  <li><a href="#checkout" data-toggle="tab" id="tab-checkout">Checkout Pages</a></li>
+  <li><a href="#ptx" data-toggle="tab" id="tab-ptx">PTX Transactions</a></li>
+  <li><a href="#settings" data-toggle="tab" id="tab-settings">Settings</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="home">
+    <div class="control-group">
+      <%= f.label :name, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <%= f.text_field :name, :class => 'text_field', required: true%>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :description, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_area :description, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
+    <div class="control-group">
+      <%= f.label :description, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_area :description, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :cs_phone_number, :class => 'control-label required_asterisk' %>
-    <div class="controls">
-      <%= f.text_field :cs_phone_number, :class => 'text_field', required: true %>
+    <div class="control-group">
+      <%= f.label :cs_phone_number, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <%= f.text_field :cs_phone_number, :class => 'text_field', required: true %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :theme, :class => 'control-label' %>
-    <div class="controls">
-      <%= theme_switcher f %>
+    <div class="control-group">
+      <%= f.label :cs_email, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <%= f.text_field :cs_email, :class => 'text_field', required: true %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :logo, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.file_field :logo, :class => 'text_field' %>
+    <div class="control-group">
+      <%= f.label :twitter_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :twitter_url, :class => 'text_field input-xxlarge' %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :requires_external_id, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.check_box :requires_external_id, :class => 'check_box' %>
+    <div class="control-group">
+      <%= f.label :facebook_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :facebook_url, :class => 'text_field input-xxlarge' %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :club_cash_enable, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.check_box :club_cash_enable, :class => 'check_box' %>
+    <div class="control-group">
+      <%= f.label :theme, :class => 'control-label' %>
+      <div class="controls">
+        <%= theme_switcher f %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :family_memberships_allowed, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.check_box :family_memberships_allowed, :class => 'check_box' %>
+    <div class="control-group">
+      <%= f.label :logo, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.file_field :logo, :class => 'text_field' %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :time_zone, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.time_zone_select(:time_zone) %>
+    <div class="control-group">
+      <%= f.label :requires_external_id, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.check_box :requires_external_id, :class => 'check_box' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :club_cash_enable, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.check_box :club_cash_enable, :class => 'check_box' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :family_memberships_allowed, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.check_box :family_memberships_allowed, :class => 'check_box' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :time_zone, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.time_zone_select(:time_zone) %>
+      </div>
     </div>
   </div>
 
-  <h3>PTX Transactions</h3>
-  <div class="control-group">
-    <%= f.label :member_banner_url, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :member_banner_url, :class => 'text_field' %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :non_member_banner_url, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :non_member_banner_url, :class => 'text_field' %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :member_landing_url, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :member_landing_url, :class => 'text_field' %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :non_member_landing_url, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :non_member_landing_url, :class => 'text_field' %>
-    </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :store_url, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :store_url, :class => 'text_field' %>
-    </div>
-  </div>
-
-  <h3>Remote domain</h3>
-  <div class="control-group">
-    <label class='control-label'>Drupal Domain</label>
-    <div class="controls">
-      <% if @club.domains.empty? %>
+  <div class="tab-pane" id="remote-domain">
+    <h4>Public Site</h4>
+    <div class="control-group">
+      <label class='control-label'>Drupal Domain</label>
+      <div class="controls">
+        <% if @club.domains.empty? %>
         <%= I18n.t("activerecord.attributes.club.club_without_domains") %>
       <% else %>
         <%= f.collection_select :drupal_domain_id, @club.domains, :id, :url, include_blank: true %>
-      <% end %>
+        <% end %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :api_type, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select :api_type, [['Drupal', 'Drupal::Member']], include_blank: true %>
+    <div class="control-group">
+      <%= f.label :api_type, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :api_type, [['Drupal', 'Drupal::Member']], include_blank: true %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :api_username, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :api_username, :class => 'text_field' %>
+    <div class="control-group">
+      <%= f.label :api_username, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :api_username, :class => 'text_field' %>
+      </div>
     </div>
-  </div>
-  <div class="control-group">
-    <%= f.label :api_password, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :api_password, :class => 'text_field' %>
+    <div class="control-group">
+      <%= f.label :api_password, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :api_password, :class => 'text_field' %>
+      </div>
+    </div>
+    <h4>Store</h4>
+    <div class="control-group">
+      <%= f.label :store_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :store_url, :class => 'text_field input-xxlarge' %>
+      </div>
+    </div>
+    <h4>Checkout</h4>
+    <div class="control-group">
+      <%= f.label :checkout_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :checkout_url, :class => 'text_field input-xxlarge' %>
+      </div>
     </div>
   </div>
 
-  <h3>Marketing Tool</h3>
-  <div class="control-group">
-    <%= f.label :marketing_tool_client, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.select :marketing_tool_client, options_for_select(EmailTemplate.clients_options, @club.marketing_tool_client), include_blank: true %>
+  <div class="tab-pane" id="marketing-tool">
+    <div class="control-group">
+      <%= f.label :marketing_tool_client, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :marketing_tool_client, options_for_select(EmailTemplate.clients_options, @club.marketing_tool_client), include_blank: true %>
+      </div>
+    </div>
+    <div id="div_mkt_tool_attributes"></div>
+  </div>
+
+  <div class="tab-pane" id="checkout">
+    <div class="control-group">
+      <%= f.label :header_image_url, :class => 'control-label' %>
+      <div class="controls">
+        <% if @club.header_image_url.present? %>
+        <%= image_tag @club.header_image_url.url(:thumb) %>
+        <br/>
+        <% end %>
+        <%= f.file_field :header_image_url, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :favicon_url, :class => 'control-label' %>
+      <div class="controls">
+        <% if @club.favicon_url.present? %>
+        <%= image_tag @club.favicon_url.url %>
+        <br/>
+        <% end %>
+        <%= f.file_field :favicon_url, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :privacy_policy_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :privacy_policy_url, :class => 'text_field input-xxlarge' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :css_style, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_area :css_style, :cols => 60, :rows => 8, :class => 'text_area input-xxlarge' %>
+      </div>
+    </div>
+    <h4>Checkout Page</h4>
+    <div class="control-group">
+      <%= f.label :checkout_page_bonus_gift_box_content, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_area :checkout_page_bonus_gift_box_content, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
+        <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.club.field_can_use_tokens'),
+        :content => t('activerecord.attributes.club.field_can_use_tokens_help') } %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :checkout_page_footer, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_area :checkout_page_footer, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
+        <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.club.field_can_use_tokens'),
+        :content => t('activerecord.attributes.club.field_can_use_tokens_help') } %>
+      </div>
+    </div>
+    <h4>Result Pages</h4>
+    <div class="control-group">
+      <%= f.label :thank_you_page_content, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_area :thank_you_page_content, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
+        <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.club.field_can_use_tokens'),
+        :content => t('activerecord.attributes.club.field_can_use_tokens_help') } %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :duplicated_page_content, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_area :duplicated_page_content, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
+        <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.club.field_can_use_tokens'),
+        :content => t('activerecord.attributes.club.field_can_use_tokens_help') } %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :error_page_content, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_area :error_page_content, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
+        <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.club.field_can_use_tokens'),
+        :content => t('activerecord.attributes.club.field_can_use_tokens_help') } %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :result_page_footer, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_area :result_page_footer, :cols => 60, :rows =>5, :class => 'text_area input-xxlarge' %>
+        <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.club.field_can_use_tokens'),
+        :content => t('activerecord.attributes.club.field_can_use_tokens_help') } %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :result_pages_image_url, :class => 'control-label' %>
+      <div class="controls">
+        <% if @club.result_pages_image_url.present? %>
+        <%= image_tag @club.result_pages_image_url.url(:thumb) %>
+        <br/>
+        <% end %>
+        <%= f.file_field :result_pages_image_url, :class => 'text_field' %>
+      </div>
     </div>
   </div>
-  <div id="div_mkt_tool_attributes"> </div>
 
-  <h3>Contact Emails</h3>
-  <div class="control-group">
-    <%= f.label :payment_gateway_errors_email, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :payment_gateway_errors_email, :class => 'text_field' %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.club.payment_gateway_errors_email'), 
+  <div class="tab-pane" id="ptx">
+    <div class="control-group">
+      <%= f.label :member_banner_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :member_banner_url, :class => 'text_field input-xxlarge' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :non_member_banner_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :non_member_banner_url, :class => 'text_field input-xxlarge' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :member_landing_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :member_landing_url, :class => 'text_field input-xxlarge' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :non_member_landing_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :non_member_landing_url, :class => 'text_field input-xxlarge' %>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="settings">
+    <h4>Contact Emails</h4>
+    <div class="control-group">
+      <%= f.label :payment_gateway_errors_email, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :payment_gateway_errors_email, :class => 'text_field' %>
+        <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.club.payment_gateway_errors_email'),
         :content => t('activerecord.attributes.club.payment_gateway_errors_email_help') } %>
-    </div> 
-  </div>
-
-  <h3>Social Links</h3>
-  <div class="control-group">
-    <%= f.label :twitter_url, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :twitter_url, :class => 'text_field input-xxlarge' %>
+      </div>
     </div>
   </div>
-  <div class="control-group">
-    <%= f.label :facebook_url, :class => 'control-label' %>
-    <div class="controls">
-      <%= f.text_field :facebook_url, :class => 'text_field input-xxlarge' %>
-    </div>
-  </div>
+</div>
 
-  <div class="form-actions">
-    <%= f.submit nil, :class => 'btn btn-primary' %>
-    <%= link_to t('cancel', :default => t("helpers.links.cancel")), clubs_path, :class => 'btn' %>
-  </div>
-
+<div class="form-actions">
+  <%= f.submit nil, :class => 'btn btn-primary', id: 'submit_club_form' %>
+  <%= link_to t('cancel', :default => t("helpers.links.cancel")), clubs_path, :class => 'btn' %>
+</div>
 
 <% content_for :javascript do %>
   var partner_prefix = "<%= @current_partner.prefix %>";

@@ -1,0 +1,65 @@
+<section> 
+  <div class="page-header">
+    <h1><%= t('activerecord.attributes.campaign_product.campaign_products') %></h1>
+    <h3><%= @campaign.name %></h3>
+  </div>
+</section>
+
+<section>
+<div class='row-fluid'>
+  <div class='span6'>
+    <h4><%= t('activerecord.attributes.campaign_product.available_products') %></h4>
+    <table id="available_products_table" class="table table-bordered table-condensed dataTable" data-source="<%= campaign_products_available_url(format: "json") %>">
+      <thead>
+        <tr>
+          <th><%= t('activerecord.attributes.product.name') %></th>
+          <th><%= t('activerecord.attributes.product.sku') %></th>
+          <th><%= t('activerecord.attributes.product.stock') %></th>
+          <th><%= t('activerecord.attributes.product.has_image') %></th>
+          <th><%= t('actions') %></th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  <p style='float: left'> * Products without image cannot be assigned to campaigns. You have to go to the <%= link_to('products admin', products_path) %> section and set an image url for this product, after that you will be able to assign it here. </p>
+  </div>
+
+  <div class='span6'>
+    <h4><%= t('activerecord.attributes.campaign_product.assigned_products') %></h4>
+    <table id="assigned_products_table" class="table table-bordered table-condensed dataTable" data-source="<%= campaign_products_assigned_url(format: "json") %>">
+      <thead>
+        <tr>
+          <th><%= t('activerecord.attributes.product.name') %></th>
+          <th><%= t('activerecord.attributes.product.sku') %></th>
+          <th><%= t('activerecord.attributes.campaign_product.landing_page_label') %></th>
+          <th><%= t('activerecord.attributes.product.stock') %></th>
+          <th><%= t('actions') %></th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class='row-fluid'>
+    <div class='span12'>
+      <div class="form-actions">
+        <%= link_to t('back', default: t('helpers.links.back')), campaign_products_path(partner_prefix: @current_partner.prefix, club_prefix: @current_club.name, :campaign_id => @campaign.id), class: 'btn' %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id='edit_label_modal' class='well modal hide' style='border: none; width:750px; margin-left:-375px'>
+  <div class='modal-header'>
+    <a href='#' class='close' data-dismiss='modal'>&times;</a>
+  </div>
+  <div class='modal-body'></div>
+</div>
+
+<% content_for :javascript do %>
+  campaignProductsEditFunctions();
+<% end %>

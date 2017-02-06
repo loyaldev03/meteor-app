@@ -17,7 +17,8 @@ class Club < ActiveRecord::Base
   has_many :disposition_types
   has_many :campaigns
   has_many :transport_settings
-
+  has_many :preference_groups
+  
   belongs_to :api_domain,
     class_name:  'Domain',
     foreign_key: 'drupal_domain_id'
@@ -29,12 +30,15 @@ class Club < ActiveRecord::Base
   after_create :add_default_member_groups, :add_default_disposition_type
   after_update :resync_with_merketing_tool_process
 
-  validates :partner_id, :cs_phone_number, presence: true
+  validates :partner_id, :cs_phone_number, :cs_email, presence: true
   validates :name, presence: true, uniqueness: true
-  validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :store_url,
+  validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :store_url, :checkout_url,
             format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
-  validates :twitter_url, :facebook_url, format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
+  validates :privacy_policy_url, :twitter_url, :facebook_url, format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validate :payment_gateway_errors_email_is_well_formated
+  validates :cs_email, format: /\A[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+\z/
+  validates_attachment_content_type :header_image_url, :favicon_url, :result_pages_image_url, 
+    :content_type => /\Aimage\/.*\Z/
 
   
   scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' AND (marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes not like '%\"et_business_unit\":\"\"%') AND (marketing_tool_attributes like '%et_prospect_list%'AND marketing_tool_attributes not like '%\"et_prospect_list\":\"\"%') AND (marketing_tool_attributes like '%et_members_list%' AND marketing_tool_attributes not like '%\"et_members_list\":\"\"%') AND (marketing_tool_attributes like '%et_username%' AND marketing_tool_attributes not like '%\"et_username\":\"\"%') AND ( marketing_tool_attributes like '%et_password%' AND marketing_tool_attributes not like '%\"et_password\":\"\"%') AND (marketing_tool_attributes like '%et_endpoint%' AND marketing_tool_attributes not like '%\"et_endpoint\":\"\"%')") }
@@ -45,6 +49,10 @@ class Club < ActiveRecord::Base
   has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename", 
                            url: "/system/:attachment/:id/:style/:filename",
                            styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
+
+  has_attached_file :header_image_url, styles: { thumb: '300x' }
+  has_attached_file :favicon_url
+  has_attached_file :result_pages_image_url, styles: { thumb: '50x' }
 
   # marketing_tool_attributes possible keys:
   # Pardot : pardot_email, pardot_user_key, pardot_password
@@ -163,14 +171,6 @@ class Club < ActiveRecord::Base
       'google_analytics',
       'google_tag_manager'
     ] - transport_settings.select(:transport).map(&:transport)
-  end
-
-  def toggle_maintenance_mode!
-    toggle :maintenance_mode
-    if save!
-      message = maintenance_mode ? 'Please, make sure to put back on live once the maintenance tasks are done.' : 'This is only a notification. Proceed to accept this US if everything is ok.'
-      Auditory.report_issue("Club #{self.name} has been set in #{maintenance_mode ? 'maintenance' : 'live'} mode", message, {partner: self.partner.name, club_name: self.name}, false)
-    end
   end
 
   private

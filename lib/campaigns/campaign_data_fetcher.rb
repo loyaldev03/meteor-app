@@ -40,8 +40,6 @@ class CampaignDataFetcher
       else
         fetcher.fetch_and_save!(report)
       end
-      
-      
     end
     nil
   end
@@ -49,7 +47,7 @@ class CampaignDataFetcher
   private
 
   def campaigns
-    campaigns_list = Campaign.where(club_id: @club_id).by_transport(@transport).active(@date)
+    campaigns_list = Campaign.where(club_id: @club_id).with_source_id.by_transport(@transport).active(@date)
     campaigns_list = campaigns_list.where(id: @campaign_id) if @campaign_id
     campaigns_list
   end

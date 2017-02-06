@@ -21,14 +21,16 @@ SacPlatform::Application.routes.draw do
       match 'members/get_banner_by_email' => 'members#get_banner_by_email', as: 'get_banner_by_email', :via => [:post]
       match '/products/get_stock' => 'products#get_stock', as: 'get_stock', :via => [:get, :post]
       match '/products/get_list_of_stock' => 'products#get_list_of_stock', as: 'get_list_of_stock', :via => [:get, :post]
+      match '/campaigns/:id/metadata' => 'campaigns#metadata', as: 'metadata', :via => [:post]
       resources :prospects, :only => [:create]
+      post 'prospects/:token' => 'prospects#show', as: 'show_prospect'
     end
   end
 
   match '/my_clubs' => 'admin/agents#my_clubs', as: 'my_clubs', :via => [:get]
 
   namespace :admin do
-    resources :partners   
+    resources :partners
     resources :agents do
       get :lock
       get :unlock
@@ -44,7 +46,6 @@ SacPlatform::Application.routes.draw do
   scope '/partner/:partner_prefix' do
     resources :clubs do
       match '/test_api_connection' => 'clubs#test_api_connection', :via => :get
-      put '/toggle_maintenance_mode' => 'clubs#toggle_maintenance_mode', as: 'toggle_maintenance_mode'
     end
     match 'clubs/:client/marketing_tool_attributes' => 'clubs#marketing_tool_attributes', :via => :get
 
@@ -55,15 +56,15 @@ SacPlatform::Application.routes.draw do
 
       get 'get_subscription_plans' => 'clubs#get_subscription_plans'
       get 'get_campaign_codes' => 'clubs#get_campaign_codes'
-      
+
       resources :terms_of_memberships, :path => 'subscription_plans' do
         get :resumed_information
         resources :email_templates, :path => 'communications'
         match '/external_attributes' => 'email_templates#external_attributes', via: :get
-        match '/test_communications' => 'email_templates#test_communications', via: [:get, :post] 
+        match '/test_communications' => 'email_templates#test_communications', via: [:get, :post]
       end
       resources :payment_gateway_configurations, :except => [:index, :destroy]
-      
+
       scope '/user/:user_prefix' do
         match '/edit' => 'users#edit', as: 'edit_user', :via => [:get]
         match '/operations' => 'operations#index', as: 'operations', :via => [:post, :get]
@@ -90,8 +91,8 @@ SacPlatform::Application.routes.draw do
         match '/resend_fulfillment' => 'users#resend_fulfillment', as: 'user_resend_fulfillment', :via => [:post]
         match '/add_club_cash' => 'users#add_club_cash', as: 'user_add_club_cash', :via => :get
         match '/approve' => 'users#approve', as: 'user_approve', :via => [:post]
-        match '/reject' => 'users#reject', as: 'user_reject', :via => [:post]  
-        match '/no_recurrent_billing' => 'users#no_recurrent_billing', as: 'user_no_recurrent_billing', :via => [:get, :post]  
+        match '/reject' => 'users#reject', as: 'user_reject', :via => [:post]
+        match '/no_recurrent_billing' => 'users#no_recurrent_billing', as: 'user_no_recurrent_billing', :via => [:get, :post]
         match '/manual_billing' => 'users#manual_billing', as: 'user_manual_billing', :via => [:get, :post]
         put '/toggle_testing_account' => 'users#toggle_testing_account', as: 'user_toggle_testing_account'
         match '/' => 'users#show', as: 'show_user', :via => [:get, :post]
@@ -119,11 +120,14 @@ SacPlatform::Application.routes.draw do
         get  '/memberships_content' => 'users#memberships_content', as: 'memberships_content'
       end
 
-      resources :products do 
+      resources :products do
         collection do
           match 'bulk_process' => 'products#bulk_process', via: [:get, :post]
         end
       end
+      resources :preference_groups do
+        resources :preferences
+       end
       resources :disposition_types, :except => [ :show, :destroy ]
 
       match '/fulfillments' => 'fulfillments#index', as: 'fulfillments_index', :via => [:post, :get]
@@ -143,11 +147,19 @@ SacPlatform::Application.routes.draw do
 
       get '/suspected_fulfillments' => 'fulfillments#suspected_fulfillments', as: 'suspected_fulfillments'
       get '/suspected_fulfillment/:id' => 'fulfillments#suspected_fulfillment_information', as: 'suspected_fulfillment_information'
-    
+
       resources :campaigns, except: [:destroy] do
-        collection do 
-          get 'facebook/request_code', to: "campaign/facebook#request_code", as: :campaign_facebook_request_code 
-          get 'facebook/access_token', to: "campaign/facebook#generate_token", as: :campaign_facebook_access_token
+        get 'products', to: "campaigns/products#show"
+        get 'products/edit', to: "campaigns/products#edit"
+        get 'products/available', to: "campaigns/products#available"
+        get 'products/assigned', to: "campaigns/products#assigned"
+        put 'products/assign', to: "campaigns/products#assign"
+        delete 'products/destroy', to: "campaigns/products#destroy"
+        get 'products/edit_label', to: "campaigns/products#edit_label"
+        put 'products/label', to: "campaigns/products#label"
+        collection do
+          get 'facebook/request_code', to: "campaigns/facebook#request_code", as: :campaign_facebook_request_code
+          get 'facebook/access_token', to: "campaigns/facebook#generate_token", as: :campaign_facebook_access_token
         end
       end
 
@@ -164,6 +176,19 @@ SacPlatform::Application.routes.draw do
     match 'dashboard' => 'admin/partners#dashboard', as: 'admin_partner_dashboard', :via => :get
   end
   match '/users/quick_search' => 'users#quick_search', as: 'users_quick_search', :via => [:get]
+
+  scope module: 'campaigns' do
+    resource :checkout, only: [:new, :create] do
+      collection do
+        post :submit
+        get :new
+        get :thank_you
+        get :error
+        get :duplicated
+        get :critical_error
+      end
+    end
+  end
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

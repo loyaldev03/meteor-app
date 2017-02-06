@@ -15,7 +15,7 @@ private
         product.id,
         product.name,
         product.sku,
-        product.stock,
+        product.stock.to_s + (product.alert_on_low_stock? ? show_alert_on_low_stock_icon.html_safe : ''),
         product.allow_backorder ? 'Yes' : 'No',
         (link_to(I18n.t(:show), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini', :id => 'show') if @current_agent.can? :read, Product, @current_club.id).to_s+
         ((link_to(I18n.t(:edit), @url_helpers.edit_product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini', :id => 'edit', 'data-toggle' => 'custom-remote-modal', 'data-target' => product.id.to_s) + edit_modal(product)) if @current_agent.can? :edit, Product, @current_club.id).to_s+
@@ -55,5 +55,9 @@ private
         <a href='#' class='btn' data-dismiss='modal' >Close</a>
       </div>
     </div>".html_safe
+  end
+
+  def show_alert_on_low_stock_icon
+    " <i class='icon-bell' rel='tooltip' title='Will be alerted if stock is below " + Product::LOW_STOCK_THRESHOLD.to_s + " units'></i>"
   end
 end

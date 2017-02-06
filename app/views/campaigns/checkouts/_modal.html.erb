@@ -1,0 +1,20 @@
+<div id="modal" class="modal" role="dialog">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"><%= t('checkout.checkout_page.please_wait') %></h4>
+      </div>
+      <div class="modal-body container-fluid">
+        <div class="row">
+          <div class="col-sm-12">
+            <p><%= t('checkout.checkout_page.while_creating_account') %></p>
+            <div class="center-block" style="text-align: center;">
+              <%= image_tag 'checkout/spinning_wheel.gif' %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>

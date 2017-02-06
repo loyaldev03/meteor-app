@@ -1,0 +1,41 @@
+<%- model_class = Preference.new.class -%>
+<div class="page-header">
+  <h1> <%= @preference_group.name %> - <%=t '.title', :default => model_class.model_name.human.pluralize %> </h1>
+  <%= link_to('#', :class => "btn btn-primary btn_on_header", id: 'new_preference', data: { toggle: 'modal', target: '#newPreferenceModal'}) do %>
+      <i class="icon-plus" ></i> New Preference
+  <% end %>
+</div>
+
+<table id="preferencesTable" class="table table-bordered table-condensed dataTable" data-source="<%= preference_group_preferences_path(format: "json") %>">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= t(:actions) %></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<div id='newPreferenceModal' class='well modal hide' style='border: none; width:750px; margin-left:-375px'>
+  <div class='modal-header'>
+    <a href='#' class='close' data-dismiss='modal'>&times;</a>
+    <h3> New Preference </h3>
+  </div>
+  <div class='modal-body'>
+    <%= form_for @preference, url: preference_group_preferences_path, :html => { :class => 'form-horizontal', :id => 'new_prefernece' } do |f| %>
+      <%= render :partial => 'form', :locals => { :f => f } %>
+    <% end %>
+  </div>
+</div>
+
+<div id='preferenceEditModal' class='well modal hide' style='border: none; width:750px; margin-left:-375px'>
+  <div class='modal-header'>
+    <a href='#' class='close' data-dismiss='modal'>&times;</a>
+  </div>
+  <div class='modal-body'></div>
+</div>
+
+<% content_for :javascript do %>
+  preference_functions(<%= Preference.datatable_columns.size %>);
+<% end %>

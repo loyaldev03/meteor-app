@@ -9,7 +9,7 @@ class Agent < ActiveRecord::Base
          :encryptable, 
          :async
 
-  ROLES = %W(admin api representative supervisor agency fulfillment_managment)
+  ROLES = %W(admin api representative supervisor agency fulfillment_managment landing)
 
   acts_as_paranoid
 

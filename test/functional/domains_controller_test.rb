@@ -19,14 +19,15 @@ class DomainsControllerTest < ActionController::TestCase
     end
   end
 
-  #Profile fulfillment_managment
-  test "agents that sould not get index" do
+  test "agents that should not get index" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
-      @agent = FactoryGirl.create agent
-      sign_in @agent
-      get :index, partner_prefix: @partner_prefix
-      assert_response :unauthorized
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
+      @agent = FactoryGirl.create agent     
+      perform_call_as(@agent) do
+        get :index, partner_prefix: @partner_prefix
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -39,14 +40,15 @@ class DomainsControllerTest < ActionController::TestCase
     end
   end
 
-  #Profile fulfillment_managment
   test "agents that sould not get new" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      get :new, partner_prefix: @partner_prefix
-      assert_response :unauthorized
+      perform_call_as(@agent) do
+        get :new, partner_prefix: @partner_prefix
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -63,16 +65,17 @@ class DomainsControllerTest < ActionController::TestCase
     end
   end
 
-  #Profile fulfillment_managment
-  test "agents that sould not create domain" do
+  test "agents that should not create domain" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
-      post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
-          description: domain.description, hosted: domain.hosted, url: domain.url } 
-      assert_response :unauthorized
+      perform_call_as(@agent) do
+        domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
+        post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
+            description: domain.description, hosted: domain.hosted, url: domain.url } 
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -85,14 +88,15 @@ class DomainsControllerTest < ActionController::TestCase
     end
   end
 
-  #Profile fulfillment_managment
-  test "agents that sould not show domain" do
+  test "agents that should not show domain" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      get :show, id: @domain.id, partner_prefix: @partner_prefix
-      assert_response :unauthorized
+      perform_call_as(@agent) do
+        get :show, id: @domain.id, partner_prefix: @partner_prefix
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -106,14 +110,15 @@ class DomainsControllerTest < ActionController::TestCase
     end
   end
 
-  #Profile fulfillment_managment
-  test "agents that sould not get edit" do
+  test "agents that should not get edit" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      get :edit, id: @domain, partner_prefix: @partner_prefix
-      assert_response :unauthorized
+      perform_call_as(@agent) do
+        get :edit, id: @domain, partner_prefix: @partner_prefix
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -126,14 +131,15 @@ class DomainsControllerTest < ActionController::TestCase
     end
   end
 
-  #Profile fulfillment_managment
-  test "agents that sould not update domain" do
+  test "agents that should not update domain" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
-     :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
+     :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       @agent = FactoryGirl.create agent
-      sign_in @agent
-      put :update, id: @domain, partner_prefix: @partner_prefix, domain: { data_rights: @domain.data_rights, description: @domain.description, hosted: @domain.hosted, url: @domain.url }
-      assert_response :unauthorized
+      perform_call_as(@agent) do
+        put :update, id: @domain, partner_prefix: @partner_prefix, domain: { data_rights: @domain.data_rights, description: @domain.description, hosted: @domain.hosted, url: @domain.url }
+        assert_response :unauthorized
+      end
     end
   end
 
@@ -154,7 +160,7 @@ class DomainsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :index, partner_prefix: @partner_prefix
@@ -176,7 +182,7 @@ class DomainsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :new, partner_prefix: @partner_prefix
@@ -199,7 +205,7 @@ class DomainsControllerTest < ActionController::TestCase
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
     domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
@@ -230,7 +236,7 @@ class DomainsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :show, id: @domain.id, partner_prefix: @partner_prefix
@@ -252,7 +258,7 @@ class DomainsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       get :edit, id: @domain, partner_prefix: @partner_prefix
@@ -274,7 +280,7 @@ class DomainsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       put :update, id: @domain, partner_prefix: @partner_prefix, domain: { data_rights: @domain.data_rights, description: @domain.description, hosted: @domain.hosted, url: @domain.url }
@@ -296,7 +302,7 @@ class DomainsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
       delete :destroy, id: @domain, partner_prefix: @partner_prefix

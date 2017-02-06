@@ -7,6 +7,7 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
     @representative_user = FactoryGirl.create(:confirmed_representative_agent)
     @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
     @agency_user = FactoryGirl.create(:confirmed_agency_agent)
+    @landing_user = FactoryGirl.create(:confirmed_landing_agent)
     # request.env["devise.mapping"] = Devise.mappings[:agent]
     @club = FactoryGirl.create(:club_with_api)
     @partner = @club.partner
@@ -101,5 +102,19 @@ class Api::ClubCashTransactionControllerTest < ActionController::TestCase
                               }, :format => :json })
     assert @response.body.include?(I18n.t('error_messages.club_cash_not_supported'))
     assert @response.body.include?(Settings.error_codes.club_does_not_support_club_cash)
+  end
+
+  test "landing should not add club cash transaction" do
+    sign_in @landing_user
+    @saved_user = create_active_user(@wordpress_terms_of_membership, :active_user, nil, {}, { :created_by => @admin_agent }) 
+
+    assert_difference('ClubCashTransaction.count',0) do
+      result = post(:create, { :member_id => @saved_user.id, 
+                                club_cash_transaction: {
+                                  :amount => 100, 
+                                  :description => "adding club cash"
+                                }, :format => :json })
+    end
+    assert_response :unauthorized
   end
 end

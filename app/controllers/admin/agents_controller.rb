@@ -19,7 +19,7 @@ class Admin::AgentsController < ApplicationController
     else
       @club_roles = @current_agent.id == @agent.id ? @current_agent.club_roles : @agent.club_roles.where("club_id in (?)", @current_agent.clubs_related_id_list("admin"))
     end
-  end 
+  end
 
   # GET /agents/new
   def new
@@ -78,14 +78,14 @@ class Admin::AgentsController < ApplicationController
       rescue ActiveRecord::RecordInvalid => e
         logger.error e
         flash.now[:error] = 'Agent was not saved.'
-      rescue Exception => e        
+      rescue Exception => e
         Auditory.report_issue("Agent:Create", e, { :agent => @agent.inspect, :club_roles_attributes => params[:club_roles_attributes] })
         flash.now[:error] = I18n.t('error_messages.airbrake_error_message')
         raise ActiveRecord::Rollback
       end
     end
-    if success 
-      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.') 
+    if success
+      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully created.')
     else
       # TODO: review if this order it's ok.
       load_clubs_related
@@ -121,8 +121,8 @@ class Admin::AgentsController < ApplicationController
         raise ActiveRecord::Rollback
       end
     end
-    if success 
-      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.') 
+    if success
+      redirect_to([ :admin, @agent ], :notice => 'Agent was successfully updated.')
     else
       load_clubs_related
       @agent.clubs.each{ |c| @clubs = @clubs - [c] }
@@ -139,6 +139,7 @@ class Admin::AgentsController < ApplicationController
   end
 
   def my_clubs
+    my_authorize_action_within_clubs!(:list_my_clubs, Club)
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: MyClubsDatatable.new(view_context,nil,nil,nil,@current_agent) }

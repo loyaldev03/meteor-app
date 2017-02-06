@@ -1,0 +1,45 @@
+<div class='row'>
+  <div class='col-sm-6'>
+    <div class="form-group">
+      <%= f.label :number, t('checkout.checkout_page.credit_card_number'), :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :number, :class => 'form-control', required: true %>
+      </div>
+    </div>
+  </div>
+  <div class='col-sm-3'>
+    <div class="form-group">
+      <%= f.label :expire_month, t('checkout.checkout_page.credit_exp_month'), :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :expire_month, 1..12, {}, { class: "form-control", required: true } %>
+      </div>
+    </div>
+  </div>
+  <div class='col-sm-3'>
+    <div class="form-group">
+      <%= f.label :expire_year, t('checkout.checkout_page.credit_exp_year'), :class => 'control-label' %>
+      <div class="controls">
+        <%= f.select :expire_year, Time.now.year..Time.now.year + 10, {}, { class: "form-control", required: true } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class='row'>
+  <div class='col-xs-6 text-left'>
+    <%= image_tag "checkout/credit_cards.gif", :alt => "", :class => "img-responsive" %>
+  </div>
+  <div class='col-xs-6'>
+    <div class='form-group text-right'>
+      <%= f.hidden_field :campaign_id, value: @campaign.to_param %>
+      <%= f.hidden_field :prospect_token, value: @prospect.token %>
+      <%= f.submit t('checkout.checkout_page.submit'), id: 'submit', class: 'btn btn-danger btn-lg' %>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class='col-xs-12 text-left'>
+    <%= image_tag('checkout/ab_seal_horizontal.png', :style => 'height: 50px;') if @club.name.downcase.include? 'onmc' %>
+  </div>
+</div>

@@ -13,7 +13,27 @@ class ClubTest < ActionDispatch::IntegrationTest
   # TESTS
   ###########################################################
 
+  def configure_checkout_pages(club)
+    within(".nav-tabs") do
+      click_on("Checkout Pages")
+    end
+    fill_in 'club[privacy_policy_url]', with: 'http://products.onmc.com/privacy-policy/'
+    fill_in 'club[css_style]', with: '.panel-info > .panel-heading { 
+                                      background-color: #004101 !important; 
+                                      border-color: #004101 !important;
+                                      }'
+    fill_in 'club[checkout_page_bonus_gift_box_content]', with: club.checkout_page_bonus_gift_box_content
+    fill_in 'club[checkout_page_footer]', with: club.checkout_page_footer
+    fill_in 'club[thank_you_page_content]', with: club.thank_you_page_content
+    fill_in 'club[duplicated_page_content]', with: club.duplicated_page_content
+    fill_in 'club[error_page_content]', with: club.error_page_content
+    fill_in 'club[result_page_footer]', with: club.result_page_footer 
+  end
+
   def configure_exact_target(et_username, et_password, et_business_unit, et_prospect_list, et_members_list, club_id_for_test, et_endpoint)
+    within(".nav-tabs") do
+      click_on("Marketing Tool")
+    end
     select 'Exact Target', from: 'club[marketing_tool_client]'
     fill_in 'marketing_tool_attributes[et_username]', with: et_username
     fill_in 'marketing_tool_attributes[et_password]', with: et_password
@@ -25,24 +45,34 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   def configure_mailchimp_mandrill(mailchimp_api_key, mandrill_api_key, mailchimp_list_id)
+    within(".nav-tabs") do
+      click_on("Marketing Tool")
+    end
     select 'Mailchimp/Mandrill', from: 'club[marketing_tool_client]'
     fill_in 'marketing_tool_attributes[mandrill_api_key]', with: mandrill_api_key
     fill_in 'marketing_tool_attributes[mailchimp_api_key]', with: mailchimp_api_key
     fill_in 'marketing_tool_attributes[mailchimp_list_id]', with: mailchimp_list_id
   end
 
+  def fill_in_club(club)
+    within(".nav-tabs") do
+      click_on("Home")
+    end
+    fill_in 'club[name]', with: club.name
+    fill_in 'club[description]', with: club.description
+    fill_in 'club[cs_email]', with: club.cs_email
+    fill_in 'club[cs_phone_number]', with: club.cs_phone_number
+    attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
+    check('club[requires_external_id]')
+    select('application', from: 'club[theme]')
+    check('club[family_memberships_allowed]')
+  end
+
   test "create club" do
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
-    fill_in 'club[name]', with: unsaved_club.name
-    fill_in 'club[description]', with: unsaved_club.description
-    fill_in 'club[api_username]', with: unsaved_club.api_username
-    fill_in 'club[api_password]', with: unsaved_club.api_password
-    fill_in 'club[cs_phone_number]', with: unsaved_club.cs_phone_number
-    attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
-    check('club[requires_external_id]')
-    select('application', from: 'club[theme]')
+    fill_in_club(unsaved_club)
     assert_difference('Club.count', 1) do
       click_link_or_button 'Create Club'
       assert page.has_content?("The club #{unsaved_club.name} was successfully created")
@@ -86,25 +116,16 @@ class ClubTest < ActionDispatch::IntegrationTest
 
   test "should update club" do
     saved_club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
+    unsaved_club = FactoryGirl.build(:simple_club_with_gateway, partner_id: @partner.id)
     visit clubs_path(@partner.prefix)
     within("#clubs_table") do
       click_link_or_button 'Edit'
     end
-    fill_in 'club[name]', with: 'another name'
-    fill_in 'club[api_username]', with: 'another api username'
-    fill_in 'club[api_password]', with: 'another api password'
-    fill_in 'club[description]', with: 'new description'
-    attach_file('club[logo]', "#{Rails.root}/test/integration/test_img.png")
-    check('club[requires_external_id]')
-    select('application', from: 'club[theme]')
-    
+    fill_in_club(unsaved_club)    
     click_link_or_button 'Update'
-    saved_club.reload
-    
-    assert page.has_content?(" The club #{saved_club.name} was successfully updated.")
-    assert_equal(saved_club.reload.api_username, 'another api username')
-    assert_equal(saved_club.reload.api_password, 'another api password')
-    assert_equal(saved_club.reload.description, 'new description')
+    saved_club.reload    
+    assert page.has_content?(" The club #{saved_club.name} was successfully updated.")    
+    assert_equal(saved_club.reload.description, 'My description')
   end
 
   test "should delete club" do
@@ -131,6 +152,11 @@ class ClubTest < ActionDispatch::IntegrationTest
       assert page.has_content?("Users")
       assert page.has_content?("Products")
       assert page.has_content?("Fulfillments")
+      assert page.has_content?("Fulfillment Files")
+      assert page.has_content?("Suspected Fulfillments")
+      assert page.has_content?("Disposition Types")
+      assert page.has_content?("Campaigns")
+      assert page.has_content?("Campaign Days")
     end
   end
 
@@ -145,7 +171,6 @@ class ClubTest < ActionDispatch::IntegrationTest
     create_user_by_sloop(@admin_agent, unsaved_blacklisted_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @blacklisted_user = User.find_by(email: unsaved_blacklisted_user.email)
     @blacklisted_user.blacklist(@admin_agent,"Testing")
-
     
     unsaved_user =  FactoryGirl.build(:active_user, club_id: @club.id)
     fill_in_user(unsaved_user, credit_card)
@@ -172,9 +197,7 @@ class ClubTest < ActionDispatch::IntegrationTest
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
-    fill_in 'club[name]', with: unsaved_club.name
-    fill_in 'club[description]', with: unsaved_club.description
-    fill_in 'club[cs_phone_number]', with: unsaved_club.cs_phone_number
+    fill_in_club(unsaved_club)
 
     configure_exact_target("et_username_test","et_password_test","et_business_unit_test", "et_prospect_list_test", "et_members_list_test", "club_id_for_test", "et_endpoint")
 
@@ -210,9 +233,7 @@ class ClubTest < ActionDispatch::IntegrationTest
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
-    fill_in 'club[name]', with: unsaved_club.name
-    fill_in 'club[description]', with: unsaved_club.description
-    fill_in 'club[cs_phone_number]', with: unsaved_club.cs_phone_number
+    fill_in_club(unsaved_club)
 
     configure_mailchimp_mandrill("mailchimp_api_key_test","mandrill_api_key_test","list_id_test")
 
@@ -236,9 +257,7 @@ class ClubTest < ActionDispatch::IntegrationTest
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
-    fill_in 'club[name]', with: unsaved_club.name
-    fill_in 'club[description]', with: unsaved_club.description
-    fill_in 'club[cs_phone_number]', with: unsaved_club.cs_phone_number
+    fill_in_club(unsaved_club)
 
     configure_exact_target("et_username_test","et_password_test","et_business_unit_test", "et_prospect_list_test", "et_members_list_test", "club_id_for_test", "et_endpoint")
 
@@ -274,16 +293,13 @@ class ClubTest < ActionDispatch::IntegrationTest
     assert page.has_content? "et_members_list_test_new"
     assert page.has_content? "club_id_for_test_new"
     assert page.has_content? "et_endpoint_new"
-
   end
 
   test "Configure and Update Mailchimp/Mandrill marketing gateway - Login by Admin by Club" do
     unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
-    fill_in 'club[name]', with: unsaved_club.name
-    fill_in 'club[description]', with: unsaved_club.description
-    fill_in 'club[cs_phone_number]', with: unsaved_club.cs_phone_number
+    fill_in_club(unsaved_club)   
 
     configure_mailchimp_mandrill("mailchimp_api_key_test","mandrill_api_key_test","list_id_test")
 
@@ -306,5 +322,31 @@ class ClubTest < ActionDispatch::IntegrationTest
     click_link_or_button('Edit')
     configure_mailchimp_mandrill("mailchimp_api_key_test_new","mandrill_api_key_test_new","list_id_test_new")
     click_link_or_button 'Update Club'
+  end
+
+  test "Configure and Update Checkout Pages" do
+    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    visit clubs_path(@partner.prefix)
+    click_link_or_button 'New Club'
+    fill_in_club(unsaved_club) 
+
+    configure_checkout_pages(unsaved_club)
+
+    assert_difference('Club.count', 1) do
+      click_link_or_button 'Create Club'
+      assert page.has_content?("The club #{unsaved_club.name} was successfully created")
+    end
+    assert page.has_content? "http://products.onmc.com/privacy-policy/"
+    assert page.has_content? unsaved_club.checkout_page_bonus_gift_box_content
+    assert page.has_content? unsaved_club.checkout_page_footer
+    assert page.has_content? unsaved_club.thank_you_page_content
+    assert page.has_content? unsaved_club.duplicated_page_content
+    assert page.has_content? unsaved_club.error_page_content
+    assert page.has_content? unsaved_club.result_page_footer
+
+    click_link_or_button('Edit')
+    configure_checkout_pages(unsaved_club)
+    click_link_or_button 'Update Club'
+    assert page.has_content?("The club #{unsaved_club.name} was successfully updated.")
   end
 end

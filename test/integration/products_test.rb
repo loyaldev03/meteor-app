@@ -19,6 +19,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
     fill_in 'product[weight]', with: unsaved_product.weight
     fill_in 'product[package]', with: unsaved_product.package
     fill_in 'product[cost_center]', with: unsaved_product.cost_center
+    fill_in 'product[image_url]', with: unsaved_product.image_url
     check 'product[allow_backorder]' if unsaved_product.allow_backorder
 
     click_link_or_button 'Create Product'
@@ -117,6 +118,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
     fill_in 'product[weight]', with: unsaved_product.weight
     fill_in 'product[package]', with: unsaved_product.package
     fill_in 'product[cost_center]', with: unsaved_product.cost_center
+    fill_in 'product[image_url]', with: unsaved_product.image_url
     check 'product[allow_backorder]' if unsaved_product.allow_backorder
 
     click_link_or_button 'Create Product'

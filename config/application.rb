@@ -31,6 +31,13 @@ module SacPlatform
     # Be sure to have the adapter's gem in your Gemfile and follow
     # the adapter's specific installation and deployment instructions.
     config.active_job.queue_adapter = :delayed_job
+
+    config.middleware.insert_before 0, "Rack::Cors" do
+      allow do
+        origins /(http|https):\/\/(.*?)\.onmc\.com/, /(http|https):\/\/(.*?)\.stockcarracefans\.com/
+        resource '/api/v1/*', headers: :any, methods: [:get, :post]
+      end
+    end
   end
 end
 

@@ -11,7 +11,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @agency_agent = FactoryGirl.create(:confirmed_agency_agent)
     @fulfillment_managment_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent) 
     
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :family_memberships_allowed => false)
     @club_with_family = FactoryGirl.create(:simple_club_with_gateway_with_family)
     @club_with_api = FactoryGirl.create(:club_with_api)
     @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id

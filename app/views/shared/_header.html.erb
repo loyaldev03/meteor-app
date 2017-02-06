@@ -8,7 +8,7 @@
         <span class="icon-bar"></span>
       </a>
 
-      <a class="brand" href="<%= root_path %>">SacPlatform <%= Rails.env if Rails.env != 'production' %></a>
+      <a class="brand" href="<%= root_path %>">Meteor Affinity Platform <%= Rails.env if Rails.env != 'production' %></a>
 
       <% if current_agent %>
         <div class="container nav-collapse">
@@ -53,6 +53,9 @@
                   <% if @current_agent.can? :read, DispositionType, @current_club.id %>
                     <li><%= link_to t('activerecord.model.disposition_types'), disposition_types_path(@current_club.partner.prefix, @current_club.name) %></li>
                   <% end %>
+                  <% if @current_agent.can? :read, PreferenceGroup, @current_club.id %>
+                    <li><%= link_to t('activerecord.model.preference_groups'), preference_groups_path(@current_club.partner.prefix, @current_club.name) %></li>
+                  <% end %>
                   <% if @current_agent.can?(:read, Product, @current_club.id) or @current_agent.can?(:read, Fulfillment, @current_club.id) or @current_agent.can?(:read, Fulfillment, @current_club.id) or current_agent.can?(:manual_review, Fulfillment, current_club.id) %>
                     <li class="divider"></li>
                     <li class="nav-header">Fulfillment</li>
@@ -64,7 +67,7 @@
                     <% end %>
                     <% if @current_agent.can? :read, Fulfillment, @current_club.id %>
                       <li><%= link_to t('activerecord.model.fulfillment_files'), list_fulfillment_files_path(@current_club.partner.prefix, @current_club.name) %></li>
-                    <% end %> 
+                    <% end %>
                     <% if current_agent.can? :manual_review, Fulfillment, current_club.id %>
                       <li><%= link_to t('activerecord.model.suspected_fulfillments'), suspected_fulfillments_path(current_club.partner.prefix, current_club.name) %></li>
                     <% end %>
@@ -102,8 +105,8 @@
             <li>
               <% selected = @current_club ? [ users_path(@current_partner.prefix, @current_club.name) ] : nil %>
               <%= select_tag "change_partner",
-                options_for_select((@current_agent.has_global_role? ? Club.includes(:partner) : Club.includes(:partner).where(id: @current_agent.club_roles_without_api)).order("partners.name, clubs.name").collect{ |u| [ "#{u.partner.prefix} - #{u.name} #{'(disabled)' unless u.billing_enable}", users_path(u.partner.prefix, u.name) ]}, 
-                  selected ), 
+                options_for_select((@current_agent.has_global_role? ? Club.includes(:partner) : Club.includes(:partner).where(id: @current_agent.club_roles_without_api)).order("partners.name, clubs.name").collect{ |u| [ "#{u.partner.prefix} - #{u.name} #{'(disabled)' unless u.billing_enable}", users_path(u.partner.prefix, u.name) ]},
+                  selected ),
                 :prompt => 'Select Partner-Club',
                 :onchange => "window.open(this.options[this.selectedIndex].value, '_top')", :style => "margin-top: 5px;" %>
                 <%=  %>
@@ -111,7 +114,7 @@
           </ul>
           <% if current_agent.has_role_or_has_club_role_where_can?(:read, User) %>
             <ul class="nav">
-              <li> 
+              <li>
                 <%= form_tag(users_quick_search_path, method: :get, class: "form-inline text-center") do %>
                   <%= text_field_tag :user_id, nil, class: "input-small", placeholder: 'User ID', style: "margin-top:5px" %>
                   <%= submit_tag "Search", class: 'btn btn-success' %>
@@ -120,7 +123,7 @@
             </ul>
           <% end %>
         </div><!--/.nav-collapse -->
-      <% end %>           
+      <% end %>
     </div>
   </div>
 </div>

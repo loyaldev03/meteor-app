@@ -4,12 +4,13 @@
     <hr />
   </div>
 </div>
-<%= form_for @campaign, :as => :campaign, :url => campaign_path(:id => @campaign), :html => { :class => 'form-horizontal' } do |f| %>
+<%= form_for @campaign, :as => :campaign, :url => campaign_path(:id => @campaign.id), :html => { :class => 'form-horizontal' } do |f| %>
   <%= render :partial => 'form', :locals => { :f => f } %>
 <% end %>
 
 <% content_for :javascript do %>
   var canEditTransportId = <%= @campaign.can_edit_transport_id? %>;
   var canSetDatesInThePast = <%= @campaign.can_set_dates_in_the_past? %>;
-  editCampaignFunctions(canEditTransportId, canSetDatesInThePast)
+  var initialDate = new Date("<%= @campaign.initial_date %>");
+  editCampaignFunctions(canEditTransportId, canSetDatesInThePast, initialDate);
 <% end %>

@@ -52,22 +52,22 @@ p4 = Partner.new :prefix => 'ONMC', :name => 'ONMC Import', :contract_uri => '',
 p4.save!
 
 
-c = Club.new :name => "Fans", :cs_phone_number => '123-456-7890'
+c = Club.new :name => "Fans", :cs_phone_number => '123-456-7890', :cs_email => 'email@example.com'
 c.partner = p
 c.save!
-c2 = Club.new :name => "Players", :cs_phone_number => '123-456-7890'
+c2 = Club.new :name => "Players", :cs_phone_number => '123-456-7890', :cs_email => 'email@example.com'
 c2.partner = p
 c2.save!
-c3 = Club.new :name => "TC Fans", :cs_phone_number => '123-456-7890'
+c3 = Club.new :name => "TC Fans", :cs_phone_number => '123-456-7890', :cs_email => 'email@example.com'
 c3.partner = p3
 c3.save!
-c4 = Club.new :name => "TC Players", :cs_phone_number => '123-456-7890'
+c4 = Club.new :name => "TC Players", :cs_phone_number => '123-456-7890', :cs_email => 'email@example.com'
 c4.partner = p3
 c4.save!
-c5 = Club.new :name => "Nascar", :cs_phone_number => '123-456-7890', :api_type => 'Drupal::Member', :theme => 'application'
+c5 = Club.new :name => "Nascar", :cs_phone_number => '123-456-7890', :api_type => 'Drupal::Member', :theme => 'application', :cs_email => 'email@example.com'
 c5.partner = p4
 c5.save! 
-c6 = Club.new :name => "AO Adventure Club", :cs_phone_number => '123-456-7890', :api_type => 'Drupal::Member', :theme => 'application'
+c6 = Club.new :name => "AO Adventure Club", :cs_phone_number => '123-456-7890', :api_type => 'Drupal::Member', :theme => 'application', :cs_email => 'email@example.com'
 c6.partner = p2
 c6.save!
 

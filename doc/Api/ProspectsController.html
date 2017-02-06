@@ -6,7 +6,7 @@
 <title>
   Class: Api::ProspectsController
   
-    &mdash; Phoenix Api Documentation
+    &mdash; Api Documentation
   
 </title>
 
@@ -293,7 +293,7 @@
     
     <div id="content" style="padding-top: 12px;">
 		<div class="service">
-  <h1 class="noborder title">Phoenix Api Documentation</h1>
+  <h1 class="noborder title">Api Documentation</h1>
     <a class="back" href="../index.html" title="back to the overview">&laquo; back to overview</a>
     <h2>Prospects</h2>
     
@@ -441,6 +441,115 @@
 			
 		</div>	
     
+		<div class="method">
+			<p class="method_desc">Fetches information related to the prospect</p>
+			<h3 class="resource_url"><strong>/api/v1/prospects/:token</strong> [POST]</h3>
+
+			<div class="parameters">	
+				
+					<div class="required">
+						<h4>Required Parameters</h4>
+						
+							<ul>
+								<li>
+									<span class="name">api_key</span>
+									<span class="type">String</span>
+									<span class="text">Agent's authentication token. This token allows us to check if the agent is allowed to request this action.</span>
+								</li>
+							</ul>
+						
+							<ul>
+								<li>
+									<span class="name">token</span>
+									<span class="type">String</span>
+									<span class="text">Prospect's identifier used to fetch prospect's inforamtion.</span>
+								</li>
+							</ul>
+						
+					</div>
+				
+
+				
+			</div><!-- parameters -->
+			
+			
+				<div class="response_fields">
+					<h4>Response Fields</h4>
+					
+						<ul>
+							<li>
+								<span class="name">prospect</span>
+								<span class="type">Hash</span>
+								<span class="text">Hash with prospect information.
+<ul>
+   <li><strong>first_name</strong> The prospect's first name.</li>
+   <li><strong>last_name</strong> The prospect's last name.</li>
+   <li><strong>email</strong> The prospect's email address.</li>
+   <li><strong>address</strong> The prospect's address.</li>
+   <li><strong>city</strong> City from where the prospect is from.</li>
+   <li><strong>state</strong> The state standard code where the prospect is from.</li>
+   <li><strong>zip</strong> Prospect's address's zip code.</li>
+   <li><strong>phone</strong> The country and area area code concatenated with the local phone number.</li>
+   <li><strong>preferences</strong> Hash with the prospect's preferences.</li>
+   <li><strong>error_messages</strong> Hash with the prospect's errors .</li></span>
+							</li>
+						</ul>
+					
+						<ul>
+							<li>
+								<span class="name">code</span>
+								<span class="type">String</span>
+								<span class="text">Code related to the method result.</span>
+							</li>
+						</ul>
+					
+				</div>
+			
+			
+			
+				<div class="examples">
+					<h4>Examples</h4>
+					
+						<div class="example">
+							
+							
+							
+							<span class="description">
+								
+									
+										Example of request.
+									
+								
+							</span>
+							<span class="hash request">
+								<strong class="type">Request</strong>
+								
+									
+										curl -v -k -X POST --data-ascii '{"api_key":"3v5L15ovoJyee8mKh5DQ"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/v1/prospects/MSwyMDE2LTExLTAxIDEyOjI2OjU4IFVUQw==\n
+									
+								
+							</span>
+							<span class="hash response">
+								<strong class="type">Response</strong>
+								
+									
+										{"prospect":{"first_name":"alice","last_name":"brennan","address":"someSt","city":"Dresden","state":"AL","zip":"12345","email":"alice@brennan.com","preferences":{"driver_1"=>"Busch, Kurt"},"product_sku":"PRODUCTSKU","country":"US","error_messages":{:phone=>["Wrong phone number"]},"phone":""}
+									
+								
+							</span>
+							<span class="description">
+								
+									
+										Example response to valid request.
+									
+								
+							</span>
+						</div>
+					
+				</div>
+			
+		</div>	
+    
   </div>
 
 </div>
@@ -460,7 +569,7 @@
 	</div>
     
     <div id="footer">
-  Generated on Fri Sep  2 12:54:19 2016 with ruby-2.2.0
+  Generated on Mon Nov  7 14:20:12 2016 with ruby-2.2.0
 </div>
 
   </body>

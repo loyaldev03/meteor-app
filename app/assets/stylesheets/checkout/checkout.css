@@ -1,0 +1,76 @@
+body {
+  padding-top: 0px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+@media screen and (min-width: 1200px) {
+  .container.checkout {
+    width: 970px !important;
+  }
+}
+
+@media screen and (max-width: 990px) {
+  #result_image {
+    display: none;
+  }
+}
+
+.checkout .header {
+  border-top: 1px solid #000
+}
+
+.checkout .footer {
+  margin-top: 11px;
+  text-align: justify;
+}
+
+.checkout .footer.result {
+  text-align: center;
+}
+
+.checkout .footer p {
+  font-size: 10px
+}
+
+.checkout .header,
+.checkout .content {
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
+
+.checkout .content {
+  border-bottom: 1px solid #000;
+  padding: 10px;
+}
+
+.checkout .panel-info {
+  border-color: #900;
+  border-radius: 0px;
+}
+
+.checkout .panel-info>.panel-heading {
+  -ms-filter: none !important;
+  background-color: #cc0000;
+  background-image: none !important;
+  border-color: #900;
+  border-radius: 0px;
+  color: #fff;
+  filter: none !important;
+}
+
+.checkout #submit {
+  width: 100%;
+}
+
+.checkout .thankyou_ad {
+  margin-bottom: 30px;
+  margin-top: 30px;
+}
+
+.checkout #todays_total_box hr {
+  border-color: #cc0000;
+}
+
+.checkout label.error {
+  color: red;
+}

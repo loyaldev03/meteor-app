@@ -101,6 +101,25 @@ class CampaignTest < ActiveSupport::TestCase
     assert sloop_campaign.landing_url.include? sloop_campaign.club.store_url    
   end
 
+  test 'should not assign preference group if it belongs to another club' do
+    club = FactoryGirl.create(:simple_club_with_gateway)    
+    @campaign.preference_groups <<  FactoryGirl.create(:preference_group, :club_id => club.id)
+    assert !@campaign.save, "Campaign allows to assign preference_groups that belongs to another club."
+  end
+
+  test 'should not assign product to campaign if it belongs to another club' do
+    club = FactoryGirl.create(:simple_club_with_gateway)    
+    @campaign.products <<  FactoryGirl.create(:random_product, :club_id => club.id)
+    assert !@campaign.save, "Campaign allows to assign products that belongs to another club."
+  end
+
+  test 'should not assign product if it has not image_url'do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    product = FactoryGirl.build(:random_product, :club_id => club.id, :image_url => nil)
+    @campaign.products << product
+    assert !@campaign.save, "Campaign allows to assign products that does not have image_url."
+  end
+
   ################################################
   ##############FACEBOOK##########################
   ################################################

@@ -2,6 +2,7 @@ require 'auditory'
 require 'exception_notification'
 require 'axlsx'
 require 'csv'
+require "#{Rails.root}/lib/campaigns/checkout.rb"
 Dir["#{Rails.root}/lib/exceptions/*.rb"].each {|file| require file }
 Dir["#{Rails.root}/lib/extensions/*.rb"].each {|file| require file }
 

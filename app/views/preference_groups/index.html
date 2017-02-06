@@ -1,0 +1,28 @@
+<section> 
+  <div class="page-header">
+    <h1><%= t('activerecord.model.preference_groups') %></h1>
+    <% if can? :create, PreferenceGroup, current_club.id %>
+      <%= link_to(new_preference_group_path, :class => "btn btn-primary btn_on_header", :id => "new_preference_group") do %> 
+        <i class="icon-plus"></i> New Preference Group
+      <% end %>
+    <% end %>
+  </div>
+</section>
+
+<table id="preference_groups_table" class="table table-bordered table-condensed dataTable" data-source="<%= preference_groups_url(format: "json") %>">
+  <thead>
+    <tr>
+      <th> <%= t('activerecord.attributes.preference_group.id') %> </th>
+      <th> <%= t('activerecord.attributes.preference_group.name') %> </th>
+      <th> <%= t('activerecord.attributes.preference_group.code') %> </th>
+      <th> <%= t('activerecord.attributes.preference_group.add_by_default') %> </th>
+      <th> <%= t('actions') %> </th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<% content_for :javascript do %>
+  preference_group_functions();
+<% end %>

@@ -26,6 +26,10 @@
   <%= @product.stock %>
 </p>
 <p>
+  <strong><%= model_class.human_attribute_name(:alert_on_low_stock) %>:</strong><br>
+  <%= @product.alert_on_low_stock %>
+</p>
+<p>
   <strong><%= model_class.human_attribute_name(:allow_backorder) %>:</strong><br>
   <%= @product.allow_backorder %>
 </p>
@@ -40,6 +44,10 @@
 <p>
   <strong><%= model_class.human_attribute_name(:is_visible) %>:</strong><br>
   <%= @product.is_visible %>
+</p>
+<p>
+  <strong><%= model_class.human_attribute_name(:image) %>:</strong><br>
+  <%= image_tag @product.image_url, alt: 'No image found' %>
 </p>
 
 <div class="form-actions">

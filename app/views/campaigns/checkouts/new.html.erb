@@ -1,0 +1,53 @@
+<div class='content'>
+
+  <%= render partial: 'modal' %>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <h3 class=""><%= t('checkout.checkout_page.quick_checkout') %></h3>
+    </div>
+  </div>
+
+  <div class='row'>
+    <div class='col-sm-12 col-md-4 col-md-push-8'>
+      <%= render :partial => 'merchandise_box' %>
+      <% if @club.cs_phone_number || @club.cs_email %>
+        <div class='visible-md visible-lg'>
+          <%= render :partial => 'contact_box' %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class='col-sm-12 col-md-8 col-md-pull-4'>
+      <%= render :partial => 'prospect_data' %>
+    </div>
+
+    <div class='col-sm-12 col-md-8 col-md-pull-4'>
+      <div class='panel panel-info'>
+        <div class='panel-heading'>
+          <h3 class='panel-title'><%= t('checkout.checkout_page.step_2_title') %></h3>
+        </div>
+        <div class='panel-body'>
+          <%= form_for :credit_card, html: { id: :credit_card }, url: checkout_path, method: 'post' do |f| %>
+            <%= render :partial => 'form', :locals => { :f => f } %>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @club.checkout_page_bonus_gift_box_content.present? %>
+      <div class='panel panel-info'>
+        <div class='panel-heading'>
+          <h3 class='panel-title'><%= t('checkout.checkout_page.step_3_title') %></h3>
+        </div>
+        <div class='panel-body'>
+          <%= replace_tokens(@club.checkout_page_bonus_gift_box_content, @club, @campaign).html_safe %>
+        </div>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% content_for :javascript do %>
+  checkoutPageFunctions();
+<% end %>

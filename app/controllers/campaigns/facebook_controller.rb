@@ -1,4 +1,4 @@
-class Campaign::FacebookController < ApplicationController
+class Campaigns::FacebookController < ApplicationController
   before_filter :validate_club_presence
   before_action :set_transport_settings
 
@@ -27,7 +27,7 @@ class Campaign::FacebookController < ApplicationController
     redirect_to transport_setting_path(partner_prefix: current_partner.prefix, club_id: current_club.id, id: @transport_setting.id)
   end
 
-  private 
+  private
 
     def authorize_manager!
       authorize Club.find(params[:club_id])
@@ -39,8 +39,8 @@ class Campaign::FacebookController < ApplicationController
 
     def client
       @client ||= FbGraph2::Auth.new(
-        @transport_setting.settings['client_id'].to_i, 
-        @transport_setting.settings['client_secret'], 
+        @transport_setting.settings['client_id'].to_i,
+        @transport_setting.settings['client_secret'],
         redirect_uri: campaign_facebook_access_token_campaigns_url(partner_prefix: current_club.partner.prefix, club_prefix: current_club.name)
       )
     end

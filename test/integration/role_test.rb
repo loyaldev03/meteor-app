@@ -8,7 +8,6 @@ class RolesTest < ActionDispatch::IntegrationTest
   def setup_admin
     @agent = FactoryGirl.create(:confirmed_admin_agent)
     sign_in_as(@agent)
-
   end
 
   def setup_agent_no_rol
@@ -391,11 +390,11 @@ class RolesTest < ActionDispatch::IntegrationTest
     end
   end
 
-   ###############################################################
-   ## AGENCY
-   ###############################################################
+  ##############################################################
+  ## AGENCY
+  ##############################################################
 
-  # Select only clubs related to agency agent.
+  #Select only clubs related to agency agent.
   test "select every club when user has global role 'agency'" do
     setup_agency
     partner = FactoryGirl.create(:partner)
@@ -539,10 +538,11 @@ class RolesTest < ActionDispatch::IntegrationTest
     partner = FactoryGirl.create(:partner)
     2.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
     first_club = Club.first
-    second_club = Club.last
+    second_club = Club.last    
     @agent.add_role_with_club('representative', first_club)
-    @agent.add_role_with_club('supervisor', second_club)
+    @agent.add_role_with_club('supervisor', second_club) 
 
+    visit my_clubs_path
     find("#my_clubs").click
     within("#my_clubs_table")do
       assert page.has_content?("#{first_club.name}")
@@ -565,6 +565,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     @agent.add_role_with_club('agency', fourth_club)
     @agent.add_role_with_club('admin', fifth_club)
 
+    visit my_clubs_path
     find("#my_clubs").click
     within("#my_clubs_table")do
       assert page.has_content?("#{first_club.name}")
@@ -607,6 +608,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     @agent.add_role_with_club('agency', fourth_club)
     @agent.add_role_with_club('admin', fifth_club)
 
+    visit my_clubs_path
     find("#my_clubs").click
     within("#my_clubs_table")do
       assert page.has_content?("#{first_club.name}")
@@ -664,6 +666,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     @agent.add_role_with_club('agency', fourth_club)
     @agent.add_role_with_club('admin', fifth_club)
 
+    visit my_clubs_path
     find("#my_clubs").click
     within("#my_clubs_table")do
       assert page.has_content?("#{first_club.name}")

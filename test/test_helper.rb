@@ -187,6 +187,17 @@ def perform_call_as(agent)
   yield
   sign_out agent
 end
+
+def sign_agent_with_global_role(type)
+   @agent = FactoryGirl.create type
+   sign_in @agent     
+end
+
+def sign_agent_with_club_role(type, role)
+  @agent = FactoryGirl.create(type, roles: '') 
+  ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
+  sign_in @agent
+end
   
 module ActionDispatch
   class IntegrationTest

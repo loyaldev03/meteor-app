@@ -2,114 +2,234 @@
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human %></h1>
 </div>
-<p>
-  <strong><%= model_class.human_attribute_name(:name) %>:</strong><br>
-  <%= @club.name %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:description) %>:</strong><br>
-  <%= @club.description %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:cs_phone_number) %>:</strong><br>
-  <%= @club.cs_phone_number %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:theme) %>:</strong><br>
-  <%= @club.theme %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:requires_external_id) %>:</strong><br>
-  <%= @club.requires_external_id %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:club_cash_enable) %>:</strong><br>
-  <%= @club.club_cash_enable %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:family_memberships_allowed) %>:</strong><br>
-  <%= @club.family_memberships_allowed %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:time_zone) %>:</strong><br>
-  <%= @club.time_zone %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:logo) %>:</strong><br>
-  <% if @club.logo_file_name %>
-    <%= image_tag(@club.logo(:small)) %>
+
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#home" data-toggle="tab" id="tab-home">Home</a></li>
+  <li><a href="#remote-domain" data-toggle="tab" id="tab-remote-domain">Remote Domain</a></li>
+  <li><a href="#marketing-tool" data-toggle="tab" id="tab-marketing-tool">Marketing Tool</a></li>
+  <li><a href="#checkout" data-toggle="tab" id="tab-checkout">Checkout Pages</a></li>
+  <li><a href="#ptx" data-toggle="tab" id="tab-ptx">PTX Transactions</a></li>
+  <li><a href="#settings" data-toggle="tab" id="tab-settings">Settings</a></li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane active" id="home">
+    <p>
+      <strong><%= model_class.human_attribute_name(:name) %>:</strong><br>
+      <%= @club.name %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:description) %>:</strong><br>
+      <%= @club.description %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:cs_phone_number) %>:</strong><br>
+      <%= @club.cs_phone_number %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:cs_email) %>:</strong><br>
+      <%= @club.cs_email %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:theme) %>:</strong><br>
+      <%= @club.theme %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:requires_external_id) %>:</strong><br>
+      <%= @club.requires_external_id %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:club_cash_enable) %>:</strong><br>
+      <%= @club.club_cash_enable %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:family_memberships_allowed) %>:</strong><br>
+      <%= @club.family_memberships_allowed %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:time_zone) %>:</strong><br>
+      <%= @club.time_zone %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:logo) %>:</strong><br>
+      <% if @club.logo_file_name %>
+      <%= image_tag(@club.logo(:small)) %>
+    <% else %>
+      Logo was not set.
+      <% end %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:twitter_url) %>:</strong><br>
+      <%= @club.twitter_url %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:facebook_url) %>:</strong><br>
+      <%= @club.facebook_url %>
+    </p>
+  </div>
+  <div class="tab-pane" id="remote-domain">
+    <h4>Drupal</h4>
+    <p>
+      <strong><%= model_class.human_attribute_name(:drupal_domain_id) %>:</strong><br>
+      <%= @drupal_domain.nil? ? "It has no drupal domain assosiated" : @drupal_domain.url %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:api_type) %>:</strong><br>
+      <%= @club.api_type %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:api_username) %>:</strong><br>
+      <%= @club.api_username %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:api_password) %>:</strong><br>
+      <%= @club.api_password %>
+    </p>
+    <h4>Store</h4>
+    <p>
+      <strong><%= model_class.human_attribute_name(:store_url) %>:</strong><br>
+      <%= @club.store_url %>
+    </p>
+    <h4>Checkout</h4>
+    <p>
+      <strong><%= model_class.human_attribute_name(:checkout_url) %>:</strong><br>
+      <%= @club.checkout_url %>
+    </p>
+  </div>
+  <div class="tab-pane" id="marketing-tool">
+    <% if @club.marketing_tool_client.blank? %>
+    It has no marketing tool assosiated
   <% else %>
-    Logo was not set.
-  <% end %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:member_banner_url) %>:</strong><br>
-  <%= @club.member_banner_url %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:non_member_banner_url) %>:</strong><br>
-  <%= @club.non_member_banner_url %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:member_landing_url) %>:</strong><br>
-  <%= @club.member_landing_url %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:non_member_landing_url) %>:</strong><br>
-  <%= @club.non_member_landing_url %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:store_url) %>:</strong><br>
-  <%= @club.store_url %>
-</p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:marketing_tool_client) %>:</strong>
+      <br>
+      <%= @club.marketing_tool_client %>
+    </p>
+    <% @club.marketing_tool_attributes.each do |key,value| %>
+    <p>
+      <strong><%= t("activerecord.attributes.club.marketing_tool_attributes.#{@club.marketing_tool_client}.#{key}")  %>:</strong>&nbsp;
+      <br>
+      <%= value %>
+    </p>
+    <% end unless @club.marketing_tool_attributes.nil? %>
+    <% end %>
+  </div>
+  <div class="tab-pane" id="checkout">
+    <p>
+      <strong><%= model_class.human_attribute_name(:header_image_url) %>:</strong><br>
+      <% if @club.header_image_url.present? %>
+      <%= image_tag @club.header_image_url.url(:thumb) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:favicon_url) %>:</strong><br>
+      <% if @club.favicon_url.present? %>
+      <%= image_tag @club.favicon_url.url %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:privacy_policy_url) %>:</strong><br>
+      <%= @club.privacy_policy_url.present? ? @club.privacy_policy_url : 'Not set.' %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:css_style) %>:</strong><br>
+      <% if @club.css_style.present? %>
+      <%= text_area_tag('css_style',  @club.css_style, :cols => 60, :rows =>5, class: 'text_area input-xxlarge', readonly: true) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
 
+    <h4>Checkout Page</h4>
+    <p>
+      <strong><%= model_class.human_attribute_name(:checkout_page_bonus_gift_box_content) %>:</strong><br>
+      <% if @club.checkout_page_bonus_gift_box_content.present? %>
+      <%= text_area_tag('checkout_page_bonus_gift_box_content',  @club.checkout_page_bonus_gift_box_content, :cols => 60, :rows =>5, class: 'text_area input-xxlarge', readonly: true) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:checkout_page_footer) %>:</strong><br>
+      <% if @club.checkout_page_footer.present? %>
+      <%= text_area_tag('checkout_page_footer',  @club.checkout_page_footer, :cols => 60, :rows =>5, class: 'text_area input-xxlarge', readonly: true) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
 
-<h3>Remote domain</h3>
-<p>
-  <strong><%= model_class.human_attribute_name(:drupal_domain_id) %>:</strong><br>
-  <%= @drupal_domain.nil? ? "It has no drupal domain assosiated" : @drupal_domain.url %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:api_type) %>:</strong><br>
-  <%= @club.api_type %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:api_username) %>:</strong><br>
-  <%= @club.api_username %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:api_password) %>:</strong><br>
-  <%= @club.api_password %>
-</p>
-
-
-<h3>Marketing Tool</h3>
-<% if @club.marketing_tool_client.blank? %>
-  It has no marketing tool assosiated
-<% else %>
-  <p>
-    <strong><%= model_class.human_attribute_name(:marketing_tool_client) %>:</strong> <br> <%= @club.marketing_tool_client %>
-  </p>
-  <% @club.marketing_tool_attributes.each do |key,value| %>
-    <p> <strong><%= t("activerecord.attributes.club.marketing_tool_attributes.#{@club.marketing_tool_client}.#{key}")  %>:</strong>&nbsp; <br> <%= value %> </p>
-  <% end unless @club.marketing_tool_attributes.nil? %>
-<% end %>
-
-<h3>Contact Emails</h3>
-<p> 
-  <strong><%= model_class.human_attribute_name(:payment_gateway_errors_email) %>:</strong><br>
-  <%= @club.payment_gateway_errors_email %>
-</p>
-
-<h3>Social Links</h3>
-<p>
-  <strong><%= model_class.human_attribute_name(:twitter_url) %>:</strong><br>
-  <%= @club.twitter_url %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:facebook_url) %>:</strong><br>
-  <%= @club.facebook_url %>
-</p>
+    <h4>Result Pages</h4>
+    <p>
+      <strong><%= model_class.human_attribute_name(:thank_you_page_content) %>:</strong><br>
+      <% if @club.thank_you_page_content.present? %>
+      <%= text_area_tag('thank_you_page_content',  @club.thank_you_page_content, :cols => 60, :rows =>5, class: 'text_area input-xxlarge', readonly: true) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:duplicated_page_content) %>:</strong><br>
+      <% if @club.duplicated_page_content.present? %>
+      <%= text_area_tag('duplicated_page_content',  @club.duplicated_page_content, :cols => 60, :rows =>5, class: 'text_area input-xxlarge', readonly: true) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:error_page_content) %>:</strong><br>
+      <% if @club.error_page_content.present? %>
+      <%= text_area_tag('error_page_content',  @club.error_page_content, :cols => 60, :rows =>5, class: 'text_area input-xxlarge', readonly: true) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:result_page_footer) %>:</strong><br>
+      <% if @club.result_page_footer.present? %>
+      <%= text_area_tag('result_page_footer',  @club.result_page_footer, :cols => 60, :rows =>5, class: 'text_area input-xxlarge', readonly: true) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:result_pages_image_url) %>:</strong><br>
+      <% if @club.result_pages_image_url.present? %>
+      <%= image_tag @club.result_pages_image_url.url(:thumb) %>
+    <% else %>
+      Not set.
+      <% end %>
+    </p>
+  </div>
+  <div class="tab-pane" id="ptx">
+    <p>
+      <strong><%= model_class.human_attribute_name(:member_banner_url) %>:</strong><br>
+      <%= @club.member_banner_url %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:non_member_banner_url) %>:</strong><br>
+      <%= @club.non_member_banner_url %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:member_landing_url) %>:</strong><br>
+      <%= @club.member_landing_url %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:non_member_landing_url) %>:</strong><br>
+      <%= @club.non_member_landing_url %>
+    </p>
+  </div>
+  <div class="tab-pane" id="settings">
+    <h4>Contact Emails</h4>
+    <p>
+      <strong><%= model_class.human_attribute_name(:payment_gateway_errors_email) %>:</strong><br>
+      <%= @club.payment_gateway_errors_email %>
+    </p>
+  </div>
+</div>
 
 <div class="form-actions">
   <%= link_to t(:back),
@@ -120,8 +240,6 @@
               new_domain_path(:club_id => @club.id), :class => 'btn btn-success' %>
   <%= link_to t(:test_api_connection),
               club_test_api_connection_path(:club_id => @club.id), :class => 'btn' %>
-  <%= link_to @club.maintenance_mode ? t(:put_on_live_mode) : t(:put_on_maintenance_mode),
-              club_toggle_maintenance_mode_path(:club_id => @club.id), :class => "btn #{@club.maintenance_mode ? 'btn-success' : 'btn-danger'}", method: :put %>
   <% if @payment_gateway_configuration %>
     <%= link_to t("activerecord.model.payment_gateway_configuration"),
         payment_gateway_configuration_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name, :id => @payment_gateway_configuration.id), :class => 'btn' %>
@@ -129,9 +247,9 @@
     <%= link_to t("button.new_payment_gateway"),
         new_payment_gateway_configuration_path(:partner_prefix => @club.partner.prefix, :club_prefix => @club.name), :class => 'btn' %>
   <% end %>
-  <%= link_to t(:destroy),
-              club_path(:id => @club.id),
-              :method => 'delete',
-              data: {:confirm => t('confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?'))},
-              :class => 'btn btn-danger' if can? :destroy, Club %>
+  <%= link_to t(:destroy), club_path(:id => @club.id), :method => 'delete', data: {:confirm => t('confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?'))}, :class => 'btn btn-danger' if can? :destroy, Club %>
 </div>
+
+<% content_for :javascript do %>
+  clubs_show_functions();
+<% end %>

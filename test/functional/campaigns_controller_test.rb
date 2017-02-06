@@ -10,17 +10,6 @@ class CampaignsControllerTest < ActionController::TestCase
     @partner_prefix = @partner.prefix
   end
 
-  def sign_agent_with_global_role(type)
-     @agent = FactoryGirl.create type
-     sign_in @agent     
-  end
-
-  def sign_agent_with_club_role(type, role)
-    @agent = FactoryGirl.create(type, roles: '') 
-    ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
-    sign_in @agent
-  end
-
   def post_create_campaign(campaign)
     post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
       name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
@@ -43,9 +32,9 @@ class CampaignsControllerTest < ActionController::TestCase
   test "agents that should not get index" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
-      perform_call_as(@agent) do   
+      perform_call_as(@agent) do 
         get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
         assert_response :unauthorized, "Agent #{agent} can access to this page."     
       end
@@ -63,7 +52,7 @@ class CampaignsControllerTest < ActionController::TestCase
   test "agents that should not show campaigns" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         get :show, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
@@ -83,7 +72,7 @@ class CampaignsControllerTest < ActionController::TestCase
   test "agents that should not get new" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         get :new, partner_prefix: @partner_prefix, :club_prefix => @club.name
@@ -100,19 +89,20 @@ class CampaignsControllerTest < ActionController::TestCase
       assert_difference('Campaign.count',1) do
         post_create_campaign(campaign)
       end
-      assert_redirected_to campaign_path(assigns(:campaign), partner_prefix: @partner_prefix, :club_prefix => @club.name)
+      campaign = Campaign.last
+      assert_redirected_to campaign_path(id: campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name)
     end
   end
 
   test "agents that should not create campaign" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         post_create_campaign(campaign)
-        assert_response :unauthorized, "Agent #{agent} can access to this page." 
+        assert_response :unauthorized, "Agent #{agent} can access to this page."       
       end
     end
   end
@@ -128,7 +118,7 @@ class CampaignsControllerTest < ActionController::TestCase
   test "agents that should not get edit" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
         get :edit, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name      
@@ -149,9 +139,9 @@ class CampaignsControllerTest < ActionController::TestCase
   test "agents that should not update campaign" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
-      sign_agent_with_global_role(agent)
-      perform_call_as(@agent) do 
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
+      sign_agent_with_global_role(agent)     
+      perform_call_as(@agent) do  
         campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
         assert_response :unauthorized, "Agent #{agent} can update this page."
@@ -162,9 +152,9 @@ class CampaignsControllerTest < ActionController::TestCase
   test "agents should not delete campaigns" do
     [:confirmed_admin_agent, :confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
-     :confirmed_agency_agent].each do |agent|
-      sign_agent_with_global_role(agent)  
-      perform_call_as(@agent) do        
+     :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
+      sign_agent_with_global_role(agent) 
+      perform_call_as(@agent) do 
         begin
           delete :destroy, club_id: @club.id, id: @campaign.id
         rescue Exception => error
@@ -175,9 +165,9 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
 
-  #####################################################
-  # CLUBS ROLES
-  ##################################################### 
+  ####################################################
+  ##CLUBS ROLES
+  #################################################### 
 
   test "agent with club Admin role that should get index" do     
     sign_agent_with_club_role(:agent,'admin')
@@ -202,9 +192,9 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agent with club roles that should not get index" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|      
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|      
       sign_agent_with_club_role(:agent, role)
-      perform_call_as(@agent) do     
+      perform_call_as(@agent) do 
         get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
         assert_response :unauthorized, "Agent #{role} can access to this page."
       end
@@ -218,7 +208,7 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not show campaigns with club roles" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do 
         get :show, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
@@ -234,11 +224,11 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not get new with club roles" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
-      perform_call_as(@agent) do
+      perform_call_as(@agent) do 
         get :new, partner_prefix: @partner_prefix, :club_prefix => @club.name
-        assert_response :unauthorized, "Agent #{role} can access to this page."
+        assert_response :unauthorized, "Agent #{role} can access to this page."      
       end
     end
   end
@@ -249,16 +239,17 @@ class CampaignsControllerTest < ActionController::TestCase
     assert_difference('Campaign.count',1) do
       post_create_campaign(campaign)
     end
-    assert_redirected_to campaign_path(assigns(:campaign), partner_prefix: @partner_prefix, :club_prefix => @club.name)    
+    campaign = Campaign.last
+    assert_redirected_to campaign_path(id: campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name)
   end
 
   test "agents that should not create campaign with club roles" do    
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
-      perform_call_as(@agent) do
+      perform_call_as(@agent) do 
         campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         post_create_campaign(campaign)
-        assert_response :unauthorized, "Agent #{role} can access to this page."
+        assert_response :unauthorized, "Agent #{role} can access to this page."      
       end
     end
   end
@@ -270,11 +261,11 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not get edit with club role" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
-      perform_call_as(@agent) do
+      perform_call_as(@agent) do 
         get :edit, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name      
-        assert_response :unauthorized, "Agent #{role} can access to this page."
+        assert_response :unauthorized, "Agent #{role} can access to this page."      
       end
     end
   end
@@ -287,9 +278,9 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agents that should not update campaign with club role" do
-    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
+    ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
-      perform_call_as(@agent) do
+      perform_call_as(@agent) do 
         campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
         assert_response :unauthorized, "Agent #{role} can access to this page."
@@ -298,9 +289,9 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agents should not delete campaigns with club roles" do
-    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
-      sign_agent_with_club_role(:agent, role) 
-      perform_call_as(@agent) do         
+    ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
+      sign_agent_with_club_role(:agent, role)  
+      perform_call_as(@agent) do       
         begin
           delete :destroy, club_id: @club.id, id: @campaign.id
         rescue Exception => error

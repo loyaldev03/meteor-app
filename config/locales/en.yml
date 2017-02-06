@@ -7,6 +7,9 @@ en:
   save: 'Save'
   destroy: 'Destroy'
   add: 'Add'
+  assign: 'Assign'
+  remove: 'Remove'
+  rename: 'Rename'
   lock: 'Lock'
   unlock: 'Unlock'
   new: 'New'
@@ -35,15 +38,12 @@ en:
   are_you_sure: 'Are you sure?'
   pgc_are_you_sure: "Are you really sure? You wont be able to change this Payment Gateway once there are enrolled users in the club."
   pgc_are_you_sure_replace: "Are you really sure? This payment gateway will replace previous one and you wont be able to change it once there are enrolled users in the club."
-  initial_date: 'Initial date'
   end_date: 'End date'
   all_times: 'All times'
   text_cancel_are_you_sure: 'This user will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This user will be blacklisted. Are you really sure?'
   loading: 'Loading'
   test_api_connection: 'Test API Connection'
-  put_on_maintenance_mode: 'Put on Maintenance'
-  put_on_live_mode: 'Put on Live'
   index: '#'
   lorem: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
   days: "days"
@@ -52,6 +52,7 @@ en:
   future_save_the_sale: "Schedule save the sale to be done at"
   remove_club_cash: "Remove club cash when proceesing scheduled TOM change"
   cancel_confirm_when_tom_change_scheduled: "The member you are about to cancel has a future subscription plan scheduled. If the cancelation date you will choose is before the one for the future subscription plan update then that scheduled subscription plan will have no effect."
+  preference_management_notification: 'Any change made on the preference list has to be replicated in the list of preferences in Drupal.'
   enums:
     campaign:
       transport:
@@ -67,7 +68,7 @@ en:
         newsletter: Newsletter
         daily_candy: Daily candy
         freemium: Freemium
-  menu: 
+  menu:
     admin_menu: 'Admin Menu'
     logout: 'Logout'
     agents: 'Agents'
@@ -150,7 +151,7 @@ en:
     fulfillment_error: "Could not update fulfillment status."
     fulfillment_new_status_blank: "New status is blank. Please, select a new status to be applied."
     credit_amount_invalid: "Credit amount must be a positive number."
-    club_cash_transaction_invalid_amount: "Can not process club cash transaction with amount 0 or letters." 
+    club_cash_transaction_invalid_amount: "Can not process club cash transaction with amount 0 or letters."
     refund_invalid: "Cant credit more $ than the original transaction amount"
     credit_card_blank_with_grace: "Payment gateway not found."
     duplicate_transaction: "Duplicated Transaction: %{response}"
@@ -169,7 +170,7 @@ en:
     fulfillments_decrease_stock_error: "Could not decrease stock on product related to fulfillment."
     fulfillment_cannot_be_recovered: "Could not recover fulfillment. Can only be set as not_process of manual_review_required."
     fulfillment_invalid_transition: "Fulfilllment cannot be updated to that status."
-    drupal_error_sync: "Unable to add club cash. There was a synchronization error, while requesting this." 
+    drupal_error_sync: "Unable to add club cash. There was a synchronization error, while requesting this."
     club_cash_not_supported: "Club cash is not supported for this club."
     unable_to_perform_due_member_status: "Unable to perfom this action. The member is not in the right status to perform this."
     not_expecting_billing: "Unable to perfom this action. The member is not expected to get billed."
@@ -189,9 +190,56 @@ en:
     chargeback_adjudication_date_not_blank: "Adjudication date cannot be blank."
     cannot_chargeback_transaction: "Transaction cannot be chargebacked."
     membership_billing_with_error: "This error should be checked during the same day it was reported in order to make sure that we are avoiding multiple unnecessary billings on the user. We should validate with the gateway if this transaction was correctly process, and in case it was we should proceed to update the transaction data according to it and also make sure to leave the user's next_retry_bill_date and bill_date set properly. In case the gateway confirms that the transaction was not process, we should delete this transaction to avoid having unnecessary records."
+    campaign_is_not_active: 'This offer is not active at this moment.'
     club_cash:
       negative_amount: "Check amount value, please. Amount cannot be less than 0 (zero)."
       null_amount: "Check amount value, please. Amount cannot be blank or null."
+  checkout:
+    validation:
+      first_name_problem: 'First name is invalid'
+      last_name_problem: 'Last name is invalid'
+      address_problem: 'Address is invalid'
+      city_problem: 'City name is invalid'
+      state_problem: 'State name is invalid'
+      zip_problem: 'Unfortunately we are unable to ship outside of the United States at this time.'
+      email_problem: 'Wrong email address'
+      phone_problem: 'Wrong phone number'
+    pages_titles:
+      new: 'Quick and Easy Checkout'
+      thank_you: 'Thank You!'
+      duplicated: 'Duplicated'
+      error: 'Error'
+      critical_error: 'Something Went Wrong!'
+    checkout_page:
+      quick_checkout: 'Quick and Easy Checkout'
+      step_1_title: '1 - Confirm Your Information'
+      step_2_title: '2 - Payment Information'
+      step_3_title: '3 - **BONUS GIFT'
+      edit_your_information: 'Edit Your Information'
+      merchandise: 'Merchandise'
+      todays_total: "Today's Total"
+      bonus_gift: '**BONUS GIFT'
+      shipping_and_processing: 'Shipping & Processing'
+      name: 'Name'
+      email: 'Email'
+      address: 'Address'
+      city: 'City'
+      state: 'State'
+      zip: 'Zip'
+      phone: 'Phone'
+      submit: 'Submit'
+      credit_card_number: 'Card Number *'
+      credit_exp_month: 'Month *'
+      credit_exp_year: 'Year *'
+      credit_card_expired: 'Your credit card has expired'
+      please_wait: 'Please Wait'
+      while_creating_account: 'While we are creating your account.'
+      login_now: 'Login Now!'
+      email_us: 'Email Us'
+      call: 'Call'
+    thankyou_page:
+    duplicated_page:
+    error_page:
   activerecord:
     errors:
       models:
@@ -215,6 +263,9 @@ en:
       campaign_days: 'Campaign Days'
       transport_setting: 'Transport Setting'
       transport_settings: 'Transport Settings'
+      preference_group: 'Preference Group'
+      preference_groups: 'Preference Groups'
+      preferences: 'Preferences'
     gateway:
       mes: 'Merchant e Solutions'
       litle: Litle
@@ -233,7 +284,7 @@ en:
         refund_amount_help: 'Amount to refund'
         payment_type: 'Payment type'
         transaction_type: 'Transaction type'
-        transaction_types: 
+        transaction_types:
           sale: Sale
           sale_manual_check: 'Sale Manual Check'
           sale_manual_cash: 'Sale Manual Cash'
@@ -273,7 +324,7 @@ en:
         cc_related: 'CC Last 4 Digits'
         not_found: 'No transactions were found.'
         adjudication_date: 'Adjudication date'
-      agent:  
+      agent:
         login: "Username or email"
         password: "Password"
         remember_me: "Remember me"
@@ -379,7 +430,7 @@ en:
         tom: 'TOM'
         quota: 'Quota'
         product_sku: Product
-        change_tom_date: 'Subscription change' 
+        change_tom_date: 'Subscription change'
       disposition_type:
         id: 'ID'
         name: 'Name'
@@ -392,6 +443,21 @@ en:
         club_without_domains: 'There are no domains related to this club. In order to assign a drupal domain, you should first relate domains to this club. (Once the club is created, you can relate the domain from its edit/creation page).'
         payment_gateway_errors_email: 'Payment Gateway Errors related to AUS'
         payment_gateway_errors_email_help: 'Errors related to AUS service (CALL error), will be notified to the emails specified. You can add several emails separated by commas. (Eg: "email+one@example.com, email+two@example.com, email+three@example.com") '
+        field_can_use_tokens: 'This field can use tokens'
+        field_can_use_tokens_help: 'You can use tokens in the content of this field. These tokens will be replaced dinamically with values loaded from the club or the campaigns. You can use any of the tokens shown in the help located in the sidebar'
+        tokens_help:
+          club_name: 'Name of the Club'
+          landing_url: 'URL of the Landing page'
+          checkout_url: 'URL of the Checkout page'
+          delivery_date: 'Date range in which the user will receive the product'
+          enrollment_amount: 'Amount that will be charged to the user after the enroll'
+          membership_amount: 'Amount billed at the end of each period'
+          trial_period: 'Trial period of the Subscription Plan'
+          cs_email: 'Email address of the customer service'
+          cs_phone_number: 'Phone number of the customer service'
+          privacy_policy_url: 'URL of the Privacy Policy page'
+          twitter_url: 'URL of the Twitter fan page'
+          facebook_url: 'URL of the Facebook fan page'
         marketing_tool_attributes:
           exact_target:
             et_username: 'Username'
@@ -563,7 +629,7 @@ en:
         user_id: User
         status: 'Status'
         status_options:
-          not_processed: 'Not processed' 
+          not_processed: 'Not processed'
           manual_review_required: 'Manual review'
           in_process: 'In process'
           on_hold: 'On hold'
@@ -592,7 +658,7 @@ en:
         sent_success: 'Sent success'
         not_found: 'No communications were found.'
         resent_success: 'Communication resent requested'
-      club_cash_transaction: 
+      club_cash_transaction:
         id: 'ID'
         created_at: 'Created at'
         amount: 'Amount'
@@ -607,6 +673,7 @@ en:
         allow_backorder: 'Allow Backorder'
         created_at: 'Created at'
         sku: SKU
+        allow_backorder: 'Allow Backorder'
         package: Package
         package_help: 'This value is part of the Packageid on the fulfillment file. e.g: set as package NCARFLAG and platform will add the user id. The packageid obtained will be NCARFLAG20243911111'
         sku_help: 'Users get fulfills according to the list of SKUs stored while enrollment.'
@@ -615,6 +682,9 @@ en:
         is_visible_help: 'This option makes a product invisible in the fulfillment file manager.'
         bulk_process_help_title: 'Products bulk create'
         bulk_process_help_content: "Allows to create/update several products at once using a csv file providing the required data. If the sku provided does belongs to an already created product we will proceed to update it, and in case it doesn't we will create it. Each column shall be separated by comma and each row by a new line. The format of each row is SKU, NAME, PACKAGE, STOCK TO ADD, ALLOW BACKORDER, WEIGHT, COST CENTER). Example: FLAGDALE,Flag Dale,Flag,100,yes,2.5,FDALE."
+        alert_on_low_stock_label: 'Alert on low Stock'
+        alert_on_low_stock_help: 'An User Story will be created if the quantity of the product is below '
+        has_image: 'Has image'
         validations:
           sku: 'Required and unique string with at least 2 characters.'
           name: 'String of charactes. Accepts letters and numbers.'
@@ -644,9 +714,10 @@ en:
         aus_password_update_help: "Account Updater Service service password. Leaving this field empty will not change current password."
       campaign:
         id: 'ID'
+        name: 'Name'
         campaign_type: 'Campaign Type'
         transport: 'Source'
-        start_date: 'Start Date'
+        initial_date: 'Initial Date'
         finish_date: 'Finish Date'
         enrollment_price: 'Enrollment Price'
         utm_medium: 'Medium'
@@ -654,20 +725,47 @@ en:
         audience: 'Audience'
         landing_name: 'Landing Name'
         landing_url: 'Landing Url'
+        delivery_date: 'Delivery Date'
         campaign_code: 'Campaign Code'
         campaign_code_help: 'This value is used to fill in the campaign_id value within the Landing Url.'
         transport_campaign_id: 'Source Campaign ID'
-        transport_campaign_id_help: "The campaign's ID within the selected Source, used to identify the campaign within the selected Source." 
+        transport_campaign_id_help: "The campaign's ID within the selected Source, used to identify the campaign within the selected Source."
+        preference_groups: Preference Group
+        slug: 'Landing ID'
+        slug_help: 'This value must be configured in landing_id field within the landing page.'
       campaign_day:
         date: 'Date'
         spent: 'Spent'
         reached: 'Reached'
         converted: 'Converted'
+      preference_group:
+        name: 'Name'
+        code: 'Code'
+        add_by_default: 'Add by default'
+        add_by_default_help: 'Preference Groups marked to be add by default will be automatically added within preferences field in new campaigns form.'
+      campaign_product:
+        campaign_products: 'Campaign Products'
+        available_products: 'Available Products'
+        assigned_products: 'Assigned Products'
+        landing_page_label: 'Landing Page Labels'
+        set_label: 'Set Product Label'
+        reset_label: 'Reset Product Label'
+        product_assigned: 'Product assigned successfuly'
+        product_removed: 'Product assigned successfuly'
+        product_not_found: 'Product not found'
+        product_already_assigned: 'Product already assigned'
+        product_already_removed: 'Product already removed'
+        product_was_not_assigned: 'Product was not assigned'
+        product_without_image: 'Cannot be assigned because it does not have image'
+      campaign_preference_group:
+        campaign_preference_groups: 'Campaign Preference Groups'
+        available_preference_groups: 'Available Preference Groups'
+        assigned_preference_groups: Assigned Preference Groups'
   mailchimp:
     error_details:
       cant_subscribe: 'is in a compliance state due to unsubscribe, bounce, or compliance review and cannot be subscribed.'
       fake_or_invalid_email: 'looks fake or invalid, please enter a real email address.'
-  date: 
+  date:
     formats:
       default: "%m/%d/%Y"
       short: "%b %d"

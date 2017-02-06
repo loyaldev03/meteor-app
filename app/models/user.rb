@@ -2,6 +2,9 @@
 class User < ActiveRecord::Base
   extend Extensions::User::CountrySpecificValidations
 #  extend Extensions::Member::DateSpecificValidations
+  extend FriendlyId
+  friendly_id :custom_slug, use: :slugged
+
   belongs_to :club
   belongs_to :member_group_type
   has_many :user_notes
@@ -32,7 +35,6 @@ class User < ActiveRecord::Base
   before_create :record_date
   before_save :wrong_address_logic
   before_save :set_marketing_client_sync_as_needed
-  before_save :apply_downcase_to_email
   after_create :elasticsearch_asyn_call
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_save :create_operation_on_testing_account_toggle
@@ -727,8 +729,10 @@ class User < ActiveRecord::Base
         credit_card = active_credit_card
       end
 
-      self.save! validate: !skip_user_validation unless self.id
-      
+      unless self.id
+        self.save! validate: !skip_user_validation
+      end
+
       membership = Membership.new(terms_of_membership_id: tom.id, created_by: agent, enrollment_amount: amount)
       membership.update_membership_info_by_hash user_params
       membership.product = product
@@ -1587,7 +1591,7 @@ class User < ActiveRecord::Base
       end
     end
 
-    def apply_downcase_to_email
-      self.email = self.email.to_s.downcase if email_changed?
-    end
+  def custom_slug
+    ScatterSwap.hash("#{email},#{Time.current.to_i}").to_i
+  end
 end
