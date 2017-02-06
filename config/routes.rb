@@ -1,5 +1,6 @@
 SacPlatform::Application.routes.draw do
-  devise_for :agents
+  devise_for :agents,
+             controllers: { sessions: 'customdevise/sessions' }
 
   namespace :api do
     scope 'v1' do
