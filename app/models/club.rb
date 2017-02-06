@@ -18,7 +18,7 @@ class Club < ActiveRecord::Base
   has_many :campaigns
   has_many :transport_settings
   has_many :preference_groups
-  
+
   belongs_to :api_domain,
     class_name:  'Domain',
     foreign_key: 'drupal_domain_id'
@@ -32,21 +32,21 @@ class Club < ActiveRecord::Base
 
   validates :partner_id, :cs_phone_number, :cs_email, presence: true
   validates :name, presence: true, uniqueness: true
-  validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :store_url, :checkout_url,
+  validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :store_url, :checkout_url, :unavailable_campaign_url,
             format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validates :privacy_policy_url, :twitter_url, :facebook_url, format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validate :payment_gateway_errors_email_is_well_formated
   validates :cs_email, format: /\A[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+\z/
-  validates_attachment_content_type :header_image_url, :favicon_url, :result_pages_image_url, 
+  validates_attachment_content_type :header_image_url, :favicon_url, :result_pages_image_url,
     :content_type => /\Aimage\/.*\Z/
 
-  
+
   scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' AND (marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes not like '%\"et_business_unit\":\"\"%') AND (marketing_tool_attributes like '%et_prospect_list%'AND marketing_tool_attributes not like '%\"et_prospect_list\":\"\"%') AND (marketing_tool_attributes like '%et_members_list%' AND marketing_tool_attributes not like '%\"et_members_list\":\"\"%') AND (marketing_tool_attributes like '%et_username%' AND marketing_tool_attributes not like '%\"et_username\":\"\"%') AND ( marketing_tool_attributes like '%et_password%' AND marketing_tool_attributes not like '%\"et_password\":\"\"%') AND (marketing_tool_attributes like '%et_endpoint%' AND marketing_tool_attributes not like '%\"et_endpoint\":\"\"%')") }
   scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' AND (marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes not like '%\"mailchimp_api_key\":\"\"%') AND (marketing_tool_attributes like '%mailchimp_list_id%'AND marketing_tool_attributes not like '%\"mailchimp_list_id\":\"\"%')") }
   scope :is_enabled, -> { where(billing_enable: true) }
 
 
-  has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename", 
+  has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename",
                            url: "/system/:attachment/:id/:style/:filename",
                            styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
 
@@ -89,19 +89,19 @@ class Club < ActiveRecord::Base
   end
 
   def pardot_sync?
-    self.marketing_tool_attributes and 
-    [ 
-      self.marketing_tool_attributes['pardot_email'], 
-      self.marketing_tool_attributes['pardot_password'], 
+    self.marketing_tool_attributes and
+    [
+      self.marketing_tool_attributes['pardot_email'],
+      self.marketing_tool_attributes['pardot_password'],
       self.marketing_tool_attributes['pardot_user_key']
     ].none?(&:blank?)
   end
 
   def exact_target_sync?
     if self.marketing_tool_attributes
-      attributes = [ 
-        self.marketing_tool_attributes['et_business_unit'], 
-        self.marketing_tool_attributes['et_prospect_list'], 
+      attributes = [
+        self.marketing_tool_attributes['et_business_unit'],
+        self.marketing_tool_attributes['et_prospect_list'],
         self.marketing_tool_attributes['et_members_list'],
         self.marketing_tool_attributes['et_username'],
         self.marketing_tool_attributes['et_password'],
@@ -109,27 +109,27 @@ class Club < ActiveRecord::Base
       ]
       attributes << self.marketing_tool_attributes['club_id_for_test'] unless Rails.env.production?
       attributes.none?(&:blank?)
-    else 
+    else
       false
     end
   end
 
   def mailchimp_sync?
-    self.marketing_tool_attributes and 
-    [ 
-      self.marketing_tool_attributes['mailchimp_api_key'], 
-      self.marketing_tool_attributes['mailchimp_list_id'] 
+    self.marketing_tool_attributes and
+    [
+      self.marketing_tool_attributes['mailchimp_api_key'],
+      self.marketing_tool_attributes['mailchimp_list_id']
     ].none?(&:blank?)
   end
 
   def mandrill_configured?
-    self.marketing_tool_attributes and 
-    [ 
+    self.marketing_tool_attributes and
+    [
       self.marketing_tool_attributes['mandrill_api_key']
     ].none?(&:blank?)
   end
 
-  def marketing_tool_correctly_configured? 
+  def marketing_tool_correctly_configured?
     case marketing_tool_client
     when "exact_target"
       exact_target_sync?
@@ -141,12 +141,12 @@ class Club < ActiveRecord::Base
       true
     end
   end
-    
+
   def payment_gateway_configuration
     payment_gateway_configurations.first
   end
 
-  # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin. 
+  # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin.
   def is_not_drupal?
     api_type != 'Drupal::Member'
   end
@@ -208,7 +208,7 @@ class Club < ActiveRecord::Base
     def resync_with_merketing_tool_process
       if self.changes.include? :marketing_tool_client
         unless ['action_mailer', ''].include?(self.changes[:marketing_tool_client].last)
-          resync_users_and_prospects 
+          resync_users_and_prospects
         end
       end
     end
@@ -234,5 +234,5 @@ class Club < ActiveRecord::Base
           errors[:payment_gateway_errors_email] << "Invalid information. '#{email}' is an invalid email."
         end
       end
-    end 
+    end
 end

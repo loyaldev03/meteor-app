@@ -28,16 +28,18 @@ class Api::CampaignsController < ApplicationController
   def metadata
     @campaign = Campaign.find_by!(slug: params[:id])
     my_authorize! :api_campaign_get_data, @campaign, @campaign.club_id
-    if @campaign.active?
+    products = get_products
+    if @campaign.active? && products.first.present?
       render json: {
         code: Settings.error_codes.success,
         campaign: get_campaign,
-        get_products: get_products,
+        get_products: products,
         get_preferences: get_preferences
       }
     else
       render json: {
         code: Settings.error_codes.campaign_not_active,
+        jump_url: @campaign.club.unavailable_campaign_url,
         message: I18n.t('error_messages.campaign_is_not_active')
       }
     end
@@ -55,7 +57,7 @@ class Api::CampaignsController < ApplicationController
   end
 
   def get_products
-    @campaign.products.where('stock > ? OR allow_backorder = ?', 0, true).order(:name).pluck(:id, "campaign_products.label as label", :image_url, :sku).map { |id, label, image_url, sku| { id: id, name: label, sku: sku, image_url: image_url } }
+    @campaign.products.where('stock > ? OR allow_backorder = ?', 0, true).order(:weight).pluck(:id, "campaign_products.label as label", :image_url, :sku).map { |id, label, image_url, sku| { id: id, name: label, sku: sku, image_url: image_url } }
   end
 
   def get_preferences
