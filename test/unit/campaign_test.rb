@@ -45,8 +45,18 @@ class CampaignTest < ActiveSupport::TestCase
   end
 
   test 'Should not save campaign without transport_campaign_id' do
-    @campaign.transport_campaign_id = nil
+    @campaign.transport_campaign_id = nil    
     assert !@campaign.save, "Campaign was saved without transport_campaign_id"
+  end
+
+  test 'Should not allow transport_campaign_id null if it has campaign_days associated' do
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    terms_of_membership = FactoryGirl.create(:terms_of_membership, :club_id => club.id)
+    campaign = FactoryGirl.create(:campaign, :club_id => club.id, :terms_of_membership_id => terms_of_membership.id, :initial_date => Time.zone.yesterday)
+    campaign_days = FactoryGirl.create(:campaign_day, :campaign_id => campaign.id)
+    campaign.reload    
+    campaign.transport_campaign_id = nil
+    assert !campaign.save, "Campaign was saved without transport_campaign_id with campaign_days associated"
   end
   
   test 'Should not save campaign without utm_medium' do

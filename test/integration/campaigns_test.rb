@@ -64,13 +64,14 @@ class CampaignTest < ActionDispatch::IntegrationTest
     within("#campaigns_table") do
       click_link_or_button 'Edit'
     end   
+    assert page.has_css?("#campaign_transport_campaign_id[disabled]")
     select_from_datepicker("campaign_initial_date", @campaign.initial_date - 3.days) rescue NoMethodError 
     select_from_datepicker("campaign_finish_date", @campaign.finish_date - 1.days) rescue NoMethodError
     click_link_or_button 'Update Campaign'
     assert page.has_content?("Campaign #{@campaign.name} was not updated.")    
   end
 
-  test "should only update name, initial_date and finish_date fields on campaign" do        
+  test "should only update name, initial_date, finish_date and source id fields on campaign" do        
     visit campaigns_path(@partner.prefix, @club.name)
     within("#campaigns_table") do
       click_link_or_button 'Edit'
@@ -80,8 +81,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     assert page.has_css?("#campaign_enrollment_price[disabled]")
     assert page.has_css?("#campaign_campaign_type[readonly]")
     assert page.has_css?("#transport[readonly]")
-    assert page.has_css?("#campaign_utm_medium[readonly]")
-    assert page.has_css?("#campaign_transport_campaign_id[disabled]")
+    assert page.has_css?("#campaign_utm_medium[readonly]")    
     assert page.has_css?("#campaign_utm_content[disabled]")
     assert page.has_css?("#campaign_audience[disabled]")
     assert page.has_css?("#campaign_campaign_code[disabled]")   
@@ -90,6 +90,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     fill_in 'campaign[name]', with: unsaved_campaign.name
     select_from_datepicker("campaign_initial_date", unsaved_campaign.initial_date + 3.days)
     select_from_datepicker("campaign_finish_date", unsaved_campaign.finish_date + 10.days)
+    fill_in 'campaign[transport_campaign_id]', with: unsaved_campaign.transport_campaign_id
     click_link_or_button 'Update Campaign'
     assert page.has_content?("Campaign #{unsaved_campaign.name} was updated succesfully.")
   end
