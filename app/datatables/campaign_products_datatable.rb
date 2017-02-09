@@ -14,6 +14,7 @@ class CampaignProductsDatatable < Datatable
   def data
     products.map do |product|
       [
+        landing_position(product),
         product.name,
         product.sku,
         landing_label(product),
@@ -31,7 +32,7 @@ class CampaignProductsDatatable < Datatable
   end
 
   def fetch_products
-    products = campaign.products.where(club_id: @current_club.id).order("#{sort_column} #{sort_direction}")
+    products = campaign.products.where(club_id: @current_club.id)
     products = products.page(page).per_page(per_page)
     if params[:sSearch].present?
       products = products.where('sku LIKE :search OR name LIKE :search', search: "%#{params[:sSearch]}%")
@@ -39,12 +40,16 @@ class CampaignProductsDatatable < Datatable
     products
   end
 
-  def sort_column
-    cols = ['name', 'sku', nil, 'stock']
-    cols[params[:iSortCol_0].to_i]
+  def campaign_product(product)
+    @campaign_products ||= []
+    @campaign_products[product.id] ||= CampaignProduct.find_by(campaign_id: campaign.id, product_id: product.id)
   end
 
   def landing_label(product)
-    CampaignProduct.find_by(campaign_id: campaign.id, product_id: product.id).label
+    campaign_product(product).label
+  end
+
+  def landing_position(product)
+    campaign_product(product).position
   end
 end

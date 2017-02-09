@@ -8,14 +8,14 @@
  * You're free to add application-wide styles to this file and they'll appear at the top of the
  * compiled file, but it's generally better to create a new file per style scope.
  *
- *= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
  *= require_self
+ *= require jquery-ui
  *= require bootstrap_and_overrides
  *= require scaffolds
- *= require jquery-ui
  *= require table_sorter_style
  *= require select2
  *= require select2-bootstrap
+ *= require datatables
  */
 
 form .clearfix:before,
@@ -197,6 +197,11 @@ div.dataTables_filter input {
   border: none;
 }
 
+
+.dataTables_paginate .pagination {
+  margin: 0px !important;
+}
+
 .dataTables_wrapper .dataTables_paginate {
   float: right;
   text-align: center;
@@ -310,3 +315,15 @@ textarea#css_style,
 textarea#club_css_style {
   font-family: monospace;
 }
+
+.dragable{
+  cursor: move;
+  box-shadow: inset 0px 0px 400px 110px rgba(0, 0, 0, .1);
+}
+
+table.table thead .sorting { background: url(<%= asset_path 'datatables/sort_both.png' %>) no-repeat center right !important; }
+table.table thead .sorting_asc { background: url(<%= asset_path 'datatables/sort_asc.png' %>) no-repeat center right !important; }
+table.table thead .sorting_desc { background: url(<%= asset_path 'datatables/sort_desc.png' %>) no-repeat center right !important; }
+table.table thead .sorting_asc_disabled { background: url(<%= asset_path 'datatables/sort_asc_disabled.png' %>) no-repeat center right !important; }
+table.table thead .sorting_desc_disabled { background: url(<%= asset_path 'datatables/sort_desc_disabled.png' %>) no-repeat center right !important; }
+

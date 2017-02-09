@@ -37,7 +37,7 @@ class CreditCardsControllerTest < ActionController::TestCase
       end
     end
     assert_response :redirect
-    assert_equal(@saved_user.active_credit_card.number, nil)
+    assert_nil @saved_user.active_credit_card.number
     assert_equal(@saved_user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
     assert_equal(@saved_user.active_credit_card.expire_month, @credit_card.expire_month)
 	end
@@ -57,7 +57,7 @@ class CreditCardsControllerTest < ActionController::TestCase
       end
     end
     assert_response :redirect
-    assert_equal(@saved_user.active_credit_card.number, nil)
+    assert_nil @saved_user.active_credit_card.number
     assert_equal(@saved_user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card_master_card_number])
     assert_equal(@saved_user.active_credit_card.expire_month, @credit_card.expire_month)
   end
@@ -78,7 +78,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     end
     assert_response :redirect
 
-    assert_equal(@saved_user.active_credit_card.number, nil)
+    assert_nil @saved_user.active_credit_card.number
     assert_equal(@saved_user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card_master_card_number])
     assert_equal(@saved_user.active_credit_card.expire_month, @credit_card.expire_month)
   end
@@ -139,7 +139,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     end
 
     assert_response :redirect
-    assert_equal(@saved_user.active_credit_card.number, nil)
+    assert_nil @saved_user.active_credit_card.number
     assert_equal(@saved_user.active_credit_card.token, cc_token)
   end
 
@@ -159,7 +159,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     end
 
     assert_response :redirect
-    assert_equal(@saved_user.active_credit_card.number, nil)
+    assert_nil @saved_user.active_credit_card.number
     assert_equal(@saved_user.active_credit_card.token, cc_token)
   end
 
@@ -200,7 +200,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    assert_equal(@saved_user.active_credit_card.number, nil)
+    assert_nil @saved_user.active_credit_card.number
     assert_not_equal(@saved_user.active_credit_card.expire_month, @credit_card.expire_month)
     assert_not_equal(@saved_user.active_credit_card.expire_year, @credit_card.expire_year)
   end
@@ -223,7 +223,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    assert_equal(@saved_user.active_credit_card.number, nil)
+    assert_nil @saved_user.active_credit_card.number
     assert_equal(@saved_user.active_credit_card.token, cc_token)
     assert_not_equal(@saved_user.active_credit_card.expire_year, @credit_card.expire_year)
   end

@@ -190,7 +190,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     assert_equal(fulfillment.product_sku, @product.sku)
     assert_equal(fulfillment.assigned_at.year, Time.zone.now.year)
     assert_equal(fulfillment.assigned_at.day, Time.zone.now.day)
-    assert_equal(fulfillment.renewable_at, nil)
+    assert_nil fulfillment.renewable_at
     assert_equal(fulfillment.status, 'not_processed')
     
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -1358,7 +1358,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     @saved_user = User.find_by_email(@user.email)
     fulfillment = Fulfillment.find_by_product_sku(product.sku)
       assert_equal((I18n.l(fulfillment.assigned_at, :format => :only_date)),(I18n.l(fulfillment.user.join_date, :format => :only_date)))
-      assert_equal(fulfillment.renewable_at,nil)
+      assert_nil fulfillment.renewable_at
       assert_equal(fulfillment.status,'not_processed')
       assert_equal(fulfillment.recurrent,false)
     click_link_or_button("My Clubs")

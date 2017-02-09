@@ -44,7 +44,9 @@ class Campaigns::ProductsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: { success: false, message: t('activerecord.attributes.campaign_product.product_not_found') }
   rescue ActiveRecord::RecordInvalid
-    render json: { success: false, message: @campaign.errors.full_messages.first }
+    render json: { success: false, message:  @campaign.errors.full_messages.first || $!.to_s }
+  rescue CampaignMaxProductsException
+    render json: { success: false, message: $!.to_s }
   end
 
   def destroy
@@ -69,6 +71,17 @@ class Campaigns::ProductsController < ApplicationController
     render partial: 'edit_label'
   rescue ActiveRecord::RecordNotFound
     render json: { success: false, message: t('activerecord.attributes.campaign_product.product_not_found') }
+  end
+
+  def set_position
+    my_authorize! :edit, @campaign, @campaign.club_id
+    campaign_product = CampaignProduct.find_by(campaign_id: params[:campaign_id], position: params[:old_position])
+    if campaign_product
+      campaign_product.insert_at(params[:new_position].to_i)
+      render json: { success: true }
+    else
+      render json: { success: false, message: t('activerecord.attributes.campaign_product.product_not_found') }
+    end
   end
 
   def label

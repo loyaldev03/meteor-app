@@ -1,0 +1,1 @@
+class CampaignMaxProductsException < Exception ; end

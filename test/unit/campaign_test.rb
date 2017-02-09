@@ -169,9 +169,9 @@ class CampaignTest < ActiveSupport::TestCase
     assert_difference('CampaignDay.count', 0) do
       @campaign_day = CampaignDay.first    
       assert_equal(@campaign_day.meta, "invalid_campaign")
-      assert_equal(@campaign_day.spent, nil)
-      assert_equal(@campaign_day.reached, nil)
-      assert_equal(@campaign_day.converted, nil)
+      assert_nil @campaign_day.spent
+      assert_nil @campaign_day.reached
+      assert_nil @campaign_day.converted
     end
   end
 
@@ -182,9 +182,9 @@ class CampaignTest < ActiveSupport::TestCase
     assert_difference('CampaignDay.count', 0) do
       @campaign_day = CampaignDay.first    
       assert_equal(@campaign_day.meta, "unauthorized")
-      assert_equal(@campaign_day.spent, nil)
-      assert_equal(@campaign_day.reached, nil)
-      assert_equal(@campaign_day.converted, nil)
+      assert_nil @campaign_day.spent
+      assert_nil @campaign_day.reached
+      assert_nil @campaign_day.converted
     end
   end
 
@@ -227,9 +227,9 @@ class CampaignTest < ActiveSupport::TestCase
     assert_difference('CampaignDay.count', 0) do
       @campaign_day = CampaignDay.first 
       assert_equal(@campaign_day.meta, "invalid_campaign")
-      assert_equal(@campaign_day.spent, nil)
-      assert_equal(@campaign_day.reached, nil)
-      assert_equal(@campaign_day.converted, nil)
+      assert_nil @campaign_day.spent
+      assert_nil @campaign_day.reached
+      assert_nil @campaign_day.converted
     end
   end
 
@@ -240,9 +240,9 @@ class CampaignTest < ActiveSupport::TestCase
     assert_difference('CampaignDay.count', 0) do
       @campaign_day = CampaignDay.first  
       assert_equal(@campaign_day.meta, "unauthorized")
-      assert_equal(@campaign_day.spent, nil)
-      assert_equal(@campaign_day.reached, nil)
-      assert_equal(@campaign_day.converted, nil)
+      assert_nil @campaign_day.spent
+      assert_nil @campaign_day.reached
+      assert_nil @campaign_day.converted
     end
   end
 end

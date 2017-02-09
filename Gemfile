@@ -11,7 +11,7 @@ gem 'uuidtools'
 gem "paperclip", "~> 3.0"
 gem 'aws-sdk', '< 2.0'
 
-gem 'acts_as_list', "0.7.2"
+gem 'acts_as_list'
 gem 'delayed_job_active_record'
 gem "delayed_job_web" # FIXME it is not working in rails 4
 # uncomment if pardot is enabled again
@@ -33,8 +33,8 @@ group :assets do
 end
 
 
-gem 'jquery-datatables-rails', github: 'rweng/jquery-datatables-rails'
 gem 'jquery-ui-rails'
+gem 'jquery-datatables', github: 'sebastianGitDL/jquery-datatables'
 
 gem 'carmen-rails'
 gem 'country_code_select', '~> 1.0.0'
@@ -69,6 +69,7 @@ gem "fb_graph2"
 gem "select2-rails"
 
 gem 'rack-cors'
+gem 'minitest', '~>5.1'
 gem 'friendly_id', '~> 5.1.0'
 gem 'scatter_swap'
 # To use ActiveModel has_secure_password

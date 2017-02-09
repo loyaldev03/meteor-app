@@ -117,7 +117,7 @@ class UserTest < ActiveSupport::TestCase
       answer = user.recover(@terms_of_membership_with_gateway, nil, {product_sku: Settings.others_product})
       assert answer[:code] == Settings.error_codes.success, answer[:message]
       assert_equal 'provisional', user.status, "Status was not updated."
-      assert_equal user.current_membership.parent_membership_id, nil
+      assert_nil user.current_membership.parent_membership_id
     end
   end
 
@@ -364,7 +364,7 @@ class UserTest < ActiveSupport::TestCase
     @saved_user.reload
       
     assert_equal @saved_user.current_membership.status, @saved_user.status
-    assert_equal @saved_user.current_membership.cancel_date, nil
+    assert_nil @saved_user.current_membership.cancel_date
     assert_equal @saved_user.current_membership.parent_membership_id, old_membership_id
   end
 
@@ -401,8 +401,8 @@ class UserTest < ActiveSupport::TestCase
       end
       @saved_user.reload
       assert_equal @saved_user.club_cash_amount, 100
-      assert_equal @saved_user.change_tom_date, nil
-      assert_equal @saved_user.change_tom_attributes, nil
+      assert_nil @saved_user.change_tom_date
+      assert_nil @saved_user.change_tom_attributes
       assert_equal @saved_user.current_membership.created_by_id, agent.id
       assert_equal @saved_user.terms_of_membership_id, @terms_of_membership2.id
     end
@@ -429,8 +429,8 @@ class UserTest < ActiveSupport::TestCase
       end
       @saved_user.reload
       assert_equal @saved_user.club_cash_amount, 0
-      assert_equal @saved_user.change_tom_date, nil
-      assert_equal @saved_user.change_tom_attributes, nil
+      assert_nil @saved_user.change_tom_date
+      assert_nil @saved_user.change_tom_attributes
       assert_equal @saved_user.terms_of_membership_id, @terms_of_membership2.id
       assert_equal @saved_user.current_membership.created_by_id, agent.id
     end

@@ -158,6 +158,7 @@ SacPlatform::Application.routes.draw do
         delete 'products/destroy', to: "campaigns/products#destroy"
         get 'products/edit_label', to: "campaigns/products#edit_label"
         put 'products/label', to: "campaigns/products#label"
+        put 'products/set_position', to: 'campaigns/products#set_position'
         collection do
           get 'facebook/request_code', to: "campaigns/facebook#request_code", as: :campaign_facebook_request_code
           get 'facebook/access_token', to: "campaigns/facebook#generate_token", as: :campaign_facebook_access_token

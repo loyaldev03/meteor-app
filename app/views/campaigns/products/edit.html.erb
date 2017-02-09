@@ -30,6 +30,7 @@
     <table id="assigned_products_table" class="table table-bordered table-condensed dataTable" data-source="<%= campaign_products_assigned_url(format: "json") %>">
       <thead>
         <tr>
+          <th><%= t('activerecord.attributes.campaign_product.position') %></th>
           <th><%= t('activerecord.attributes.product.name') %></th>
           <th><%= t('activerecord.attributes.product.sku') %></th>
           <th><%= t('activerecord.attributes.campaign_product.landing_page_label') %></th>
@@ -61,5 +62,6 @@
 </div>
 
 <% content_for :javascript do %>
-  campaignProductsEditFunctions();
+  var campaign_id = "<%= @campaign.id %>"
+  campaignProductsEditFunctions(campaign_id);
 <% end %>

@@ -119,7 +119,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
         assert_equal json_prospect["preferences"], prospect.preferences
         assert_equal json_prospect["product_sku"], prospect.product_sku
         assert_equal json_prospect["country"], prospect.country
-        assert_equal json_prospect["error_messages"], nil  
+        assert_nil json_prospect["error_messages"] 
       end  
     end
   end
@@ -225,7 +225,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
         assert_equal json_prospect["preferences"], prospect.preferences
         assert_equal json_prospect["product_sku"], prospect.product_sku
         assert_equal json_prospect["country"], prospect.country
-        assert_equal json_prospect["error_messages"], nil  
+        assert_nil json_prospect["error_messages"]  
       end  
     end
   end

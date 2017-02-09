@@ -64,7 +64,6 @@ class CampaignTest < ActionDispatch::IntegrationTest
     within("#campaigns_table") do
       click_link_or_button 'Edit'
     end   
-    assert page.has_css?("#campaign_transport_campaign_id[disabled]")
     select_from_datepicker("campaign_initial_date", @campaign.initial_date - 3.days) rescue NoMethodError 
     select_from_datepicker("campaign_finish_date", @campaign.finish_date - 1.days) rescue NoMethodError
     click_link_or_button 'Update Campaign'

@@ -224,8 +224,8 @@ function club_index_functions(column_count){
     "bLengthChange": false,
     "iDisplayLength": 25,
     "aaSorting": [[ 0, "asc" ]],
-    "aoColumnDefs": [{ "sWidth": "380px", "aTargets": [ column_count+1 ] },
-                     { "bSortable": false, "aTargets": [ column_count+1, column_count ] }],
+    "aoColumnDefs": [{ "sWidth": "380px", "aTargets": [ column_count ] },
+                     { "bSortable": false, "aTargets": [ column_count ] }],
     "sAjaxSource": $('#clubs_table').data('source'),
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
       if(aData[4] == 'Disabled'){ $('td', nRow).closest('tr').removeClass('even odd').addClass('alert'); }
@@ -330,8 +330,8 @@ function my_club_index_functions(column_count){
     "bProcessing": true,
     "bServerSide": true,
     "aaSorting": [[ 0, "asc" ]],
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count, column_count+1 ] },
-                     { "sWidth": "360px", "aTargets": [ column_count+1 ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] },
+                     { "sWidth": "360px", "aTargets": [ column_count ] }],
     "sAjaxSource": $('#my_clubs_table').data('source'),
     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
       if(aData[4] == 'Disabled'){ $('td', nRow).closest('tr').removeClass('even odd').addClass('alert'); }
@@ -1706,7 +1706,7 @@ function suspected_fulfillment_information_functions(){
   });
 }
 
-function campaignProductsEditFunctions() {
+function campaignProductsEditFunctions(campaign_id) {
   $("#available_products_table").on("click", "a#btn-assign-product", function() {
     editCampaignProduct('assign', $(this).attr("data-campaign-id"), $(this).attr("data-product-id"));
   });
@@ -1728,7 +1728,8 @@ function campaignProductsEditFunctions() {
     "aaSorting": [ [0, 'desc'] ],
   });
 
-  $('#assigned_products_table').DataTable({
+  var assigned_products_table = $('#assigned_products_table').DataTable({
+    "rowReorder": true,
     "sPaginationType": "full_numbers",
     "sDom": '<"top"f>rt<"bottom"ilp>',
     "bJQueryUI": false,
@@ -1737,13 +1738,34 @@ function campaignProductsEditFunctions() {
     "bLengthChange": false,
     "iDisplayLength": 25,
     autoWidth: false,
+    "bSort": false,
     "aoColumnDefs": [
-      { "bSortable": false, "aTargets": [2, 4] },
-      { targets: [3], width: "50px" },
-      { targets: [4], width: "120px" },
+      { targets: [0], width: "50px" },
+      { targets: [4], width: "50px" },
+      { targets: [5], width: "120px" },
     ],
-    "sAjaxSource": $('#assigned_products_table').data('source'),
-    "aaSorting": [ [0, 'desc'] ],
+    createdRow: function(row, data, index) {
+    $('td', row).eq(0).addClass('dragable');
+    },
+    "sAjaxSource": $('#assigned_products_table').data('source')
+  });
+
+  assigned_products_table.on( 'row-reorder', function ( e, diff, edit ) {
+    for ( var i=0, ien=diff.length ; i<ien ; i++ ) {
+      var rowData = assigned_products_table.row( diff[i].node ).data();
+      if(rowData[2] == edit.triggerRow.data()[2]){
+        // alert('el product'+ edit.triggerRow.data()[2]+ 'se actualiza a posicion' + diff[i].newData + 'Antes era '+ diff[i].oldData + 'cmapign id : '+ campaign_id)
+        $.ajax({
+          type: 'put',
+          data: {old_position: diff[i].oldData, new_position: diff[i].newData, campaign_id: campaign_id},
+          url: 'set_position',
+          success: function (data) {
+            $("#assigned_products_table").DataTable().ajax.reload(null, false);
+          }
+        })
+
+      }
+    }
   });
 
   function editCampaignProduct(action, campaign_id, product_id) {

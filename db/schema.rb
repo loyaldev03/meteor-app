@@ -65,6 +65,7 @@ ActiveRecord::Schema.define(version: 20170206215016) do
     t.integer "campaign_id", limit: 4
     t.integer "product_id",  limit: 4
     t.string  "label",       limit: 255, null: false
+    t.integer "position",    limit: 4
   end
 
   add_index "campaign_products", ["campaign_id"], name: "index_campaign_products_on_campaign_id", using: :btree

@@ -10,7 +10,7 @@ class Campaign < ActiveRecord::Base
   has_many :memberships
   has_many :products, through: :campaign_products
   has_and_belongs_to_many :preference_groups
-  has_many :campaign_products
+  has_many :campaign_products, -> { order(position: :asc) }
 
   before_validation :set_utm_medium
   before_validation :set_campaign_code
@@ -31,9 +31,7 @@ class Campaign < ActiveRecord::Base
 
   validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? }
   validates_date :initial_date, after: lambda { Time.zone.now }, if: -> { (initial_date_changed? || finish_date_changed?) && !can_set_dates_in_the_past? }
-  validates_length_of :campaign_products, maximum: Campaign::MAX_PRODUCTS_ALLOWED, message: "has too many products. Maximum allowed is #{Campaign::MAX_PRODUCTS_ALLOWED}"
   validates :transport_campaign_id, presence: true, if: -> { has_campaign_day_associated? }
-
   enum campaign_type: {
     sloop:           0,
     ptx:             1,

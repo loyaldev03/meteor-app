@@ -18,7 +18,6 @@ class Club < ActiveRecord::Base
   has_many :campaigns
   has_many :transport_settings
   has_many :preference_groups
-
   belongs_to :api_domain,
     class_name:  'Domain',
     foreign_key: 'drupal_domain_id'
@@ -39,7 +38,6 @@ class Club < ActiveRecord::Base
   validates :cs_email, format: /\A[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+\z/
   validates_attachment_content_type :header_image_url, :favicon_url, :result_pages_image_url,
     :content_type => /\Aimage\/.*\Z/
-
 
   scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' AND (marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes not like '%\"et_business_unit\":\"\"%') AND (marketing_tool_attributes like '%et_prospect_list%'AND marketing_tool_attributes not like '%\"et_prospect_list\":\"\"%') AND (marketing_tool_attributes like '%et_members_list%' AND marketing_tool_attributes not like '%\"et_members_list\":\"\"%') AND (marketing_tool_attributes like '%et_username%' AND marketing_tool_attributes not like '%\"et_username\":\"\"%') AND ( marketing_tool_attributes like '%et_password%' AND marketing_tool_attributes not like '%\"et_password\":\"\"%') AND (marketing_tool_attributes like '%et_endpoint%' AND marketing_tool_attributes not like '%\"et_endpoint\":\"\"%')") }
   scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' AND (marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes not like '%\"mailchimp_api_key\":\"\"%') AND (marketing_tool_attributes like '%mailchimp_list_id%'AND marketing_tool_attributes not like '%\"mailchimp_list_id\":\"\"%')") }
@@ -73,7 +71,7 @@ class Club < ActiveRecord::Base
   end
 
   def self.datatable_columns
-    ['id', 'name', 'description', 'status' ]
+    ['id', 'name', 'description', 'members_count', 'billing_enable' ]
   end
 
   def sync?

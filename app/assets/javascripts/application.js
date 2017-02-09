@@ -12,8 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require dataTables/jquery.dataTables
-//= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
+//= require datatables
 //= require twitter/bootstrap
 //= require jquery-ui
 //= require jquery.validate

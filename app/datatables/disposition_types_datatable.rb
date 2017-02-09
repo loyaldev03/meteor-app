@@ -24,7 +24,7 @@ private
   end
 
   def fetch_disposition_types
-    disposition_types = @current_club.disposition_types.order("#{sort_column} #{sort_direction}")
+    disposition_types = @current_club.disposition_types.unscope(:order).order("#{sort_column} #{sort_direction}")
     disposition_types = disposition_types.page(page).per_page(per_page)
     if params[:sSearch].present?
       disposition_types = disposition_types.where("id like :search or name like :search", search: "%#{params[:sSearch]}%")

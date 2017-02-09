@@ -758,6 +758,7 @@ en:
         product_already_removed: 'Product already removed'
         product_was_not_assigned: 'Product was not assigned'
         product_without_image: 'Cannot be assigned because it does not have image'
+        position: 'Pos'
       campaign_preference_group:
         campaign_preference_groups: 'Campaign Preference Groups'
         available_preference_groups: 'Available Preference Groups'

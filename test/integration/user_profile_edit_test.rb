@@ -289,7 +289,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
 
     within("#table_contact_information"){ assert !page.has_css?('tr.yellow') }
     @saved_user.reload
-    assert_equal @saved_user.wrong_phone_number, nil
+    assert_nil @saved_user.wrong_phone_number
   end
 
   # change unreachable address to undeliverable when changeing address
@@ -307,7 +307,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
       sleep 5
       within("#table_demographic_information"){ assert !page.has_css?('tr.yellow') }
       @saved_user.reload
-      assert_equal @saved_user.wrong_phone_number, nil
+      assert_nil @saved_user.wrong_phone_number
     end 
   end
 
@@ -326,7 +326,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
       assert !page.has_css?('tr.yellow')
     end 
     @saved_user.reload
-    assert_equal @saved_user.wrong_phone_number, nil
+    assert_nil @saved_user.wrong_phone_number
     
     set_as_undeliverable_user(@saved_user,'reason')
     click_link_or_button "Edit"
@@ -340,7 +340,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
       assert !page.has_css?('tr.yellow')
     end 
     @saved_user.reload
-    assert_equal @saved_user.wrong_phone_number, nil
+    assert_nil @saved_user.wrong_phone_number
   end
 
   test "change unreachable phone number to reachable by changeing phone" do
@@ -359,7 +359,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     within("#table_contact_information"){ assert !page.has_css?('tr.yellow') }
     @saved_user.reload
 
-    assert_equal @saved_user.wrong_phone_number, nil
+    assert_nil @saved_user.wrong_phone_number
 
     #By changing phone_area_code
   
@@ -374,7 +374,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
 
     within("#table_contact_information"){ assert !page.has_css?('tr.yellow') }
     @saved_user.reload
-    assert_equal @saved_user.wrong_phone_number, nil
+    assert_nil @saved_user.wrong_phone_number
     #By changing phone_local_number
 
     set_as_unreachable_user(@saved_user,'Unreachable')    
@@ -390,7 +390,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
 
     within("#table_contact_information"){ assert !page.has_css?('tr.yellow') }
     @saved_user.reload
-    assert_equal @saved_user.wrong_phone_number, nil
+    assert_nil @saved_user.wrong_phone_number
   end
 
   test "change type of phone number" do

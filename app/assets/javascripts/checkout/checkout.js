@@ -12,8 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require dataTables/jquery.dataTables
-//= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
+//= require datatables/jquery.dataTables
+//= require datatables/dataTables.bootstrap2
 //= require twitter/bootstrap
 //= require jquery-ui
 //= require jquery.validate

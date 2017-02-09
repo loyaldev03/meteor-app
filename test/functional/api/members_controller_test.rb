@@ -602,7 +602,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     assert_response :success
-    assert_equal(@user.active_credit_card.number, nil)
+    assert_nil @user.active_credit_card.number
     assert_equal(@user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])    
   end
 
@@ -738,7 +738,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     assert_response :success
     @user.reload
-    assert_equal(@user.active_credit_card.number, nil)
+    assert_nil @user.active_credit_card.number
     assert_not_equal(@user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])    
     assert_equal(@user.active_credit_card.token, cc_token)    
   end
@@ -984,7 +984,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @user.reload
     assert_response :success
-    assert_equal(@user.active_credit_card.number, nil)
+    assert_nil @user.active_credit_card.number
     assert_equal(@user.active_credit_card.token, token)
     assert_not_equal(old_token, token)
   end
@@ -1086,7 +1086,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @user.reload
     assert_response :success
-    assert_equal(@user.active_credit_card.number, nil)
+    assert_nil @user.active_credit_card.number
     assert_equal(@user.active_credit_card.token, token)
   end
 
@@ -1112,7 +1112,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @user.reload
     assert_response :success
-    assert_equal(@user.active_credit_card.number, nil)
+    assert_nil @user.active_credit_card.number
     assert_equal(@user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
   end
 
@@ -1137,7 +1137,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @user.reload
     assert_response :success
-    assert_equal(@user.active_credit_card.number, nil)
+    assert_nil @user.active_credit_card.number
     assert_equal(@user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
   end
 
@@ -1163,7 +1163,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     @user.reload
     assert_response :success
-    assert_equal(@user.active_credit_card.number, nil)
+    assert_nil @user.active_credit_card.number
     assert_equal(@user.active_credit_card.token, CREDIT_CARD_TOKEN[@credit_card.number])
   end
   
@@ -1219,8 +1219,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     put( :club_cash, { id: @user.id, amount: new_amount, expire_date: new_expire_date , :format => :json })
     @user.reload
     assert_response :success
+
     assert_equal(@user.club_cash_amount, old_amount)
-    assert_equal(@user.club_cash_expire_date, old_expire_date)
+    assert @user.club_cash_expire_date == old_expire_date
   end
 
   test "Update club cash if club is Drupal" do
@@ -1232,7 +1233,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @user.reload
     assert_response :success
     assert_equal(@user.club_cash_amount, old_amount)
-    assert_equal(@user.club_cash_expire_date, old_expire_date)
+    assert @user.club_cash_expire_date == old_expire_date
   end
 
   test "Should not update club cash amount when provided a negative amount." do
