@@ -144,7 +144,7 @@ class ClubsController < ApplicationController
   private
 
   def club_params
-    params.require(:club).permit(:name, :description, :cs_phone_number, :cs_email, :theme, :logo, :require_external_attributes, :club_cash_enable, :family_memberships_allowed, :time_zone, :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :drupal_domain_id, :api_type, :api_username, :api_password, :marketing_tool_client, :payment_gateway_errors_email, :twitter_url, :facebook_url, :store_url, :header_image_url, :favicon_url, :privacy_policy_url, :checkout_page_bonus_gift_box_content, :result_pages_image_url, :checkout_page_footer, :result_page_footer, :thank_you_page_content, :duplicated_page_content, :error_page_content, :checkout_url, :css_style)
+    params.require(:club).permit(:name, :description, :cs_phone_number, :cs_email, :theme, :logo, :require_external_attributes, :club_cash_enable, :family_memberships_allowed, :time_zone, :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :drupal_domain_id, :api_type, :api_username, :api_password, :marketing_tool_client, :payment_gateway_errors_email, :twitter_url, :facebook_url, :store_url, :header_image_url, :favicon_url, :privacy_policy_url, :checkout_page_bonus_gift_box_content, :result_pages_image_url, :checkout_page_footer, :result_page_footer, :thank_you_page_content, :duplicated_page_content, :error_page_content, :checkout_url, :css_style, :unavailable_campaign_url)
   end
 
   def prepare_marketing_tool_attributes(marketing_tool_attributes, marketing_tool_client)

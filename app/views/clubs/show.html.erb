@@ -90,10 +90,14 @@
       <strong><%= model_class.human_attribute_name(:store_url) %>:</strong><br>
       <%= @club.store_url %>
     </p>
-    <h4>Checkout</h4>
+    <h4>Campaigns</h4>
     <p>
       <strong><%= model_class.human_attribute_name(:checkout_url) %>:</strong><br>
       <%= @club.checkout_url %>
+    </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:unavailable_campaign_url) %>:</strong><br>
+      <%= @club.unavailable_campaign_url %>
     </p>
   </div>
   <div class="tab-pane" id="marketing-tool">

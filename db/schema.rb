@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170119144516) do
+ActiveRecord::Schema.define(version: 20170206215016) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -159,14 +159,10 @@ ActiveRecord::Schema.define(version: 20170119144516) do
     t.string   "payment_gateway_errors_email",         limit: 255
     t.string   "twitter_url",                          limit: 255
     t.string   "facebook_url",                         limit: 255
-    t.boolean  "maintenance_mode",                                   default: false
     t.string   "store_url",                            limit: 255
     t.string   "checkout_url",                         limit: 255
-    t.string   "cs_email",                             limit: 255,                           null: false
+    t.string   "cs_email",                             limit: 255
     t.text     "privacy_policy_url",                   limit: 65535
-    t.text     "footer_checkout",                      limit: 65535
-    t.text     "footer_result",                        limit: 65535
-    t.text     "url_image_result",                     limit: 65535
     t.string   "favicon_url_file_name",                limit: 255
     t.string   "favicon_url_content_type",             limit: 255
     t.integer  "favicon_url_file_size",                limit: 4
@@ -186,6 +182,7 @@ ActiveRecord::Schema.define(version: 20170119144516) do
     t.text     "checkout_page_footer",                 limit: 65535
     t.text     "result_page_footer",                   limit: 65535
     t.text     "css_style",                            limit: 65535
+    t.text     "unavailable_campaign_url",             limit: 65535
   end
 
   add_index "clubs", ["drupal_domain_id"], name: "index_drupal_domain_id", using: :btree
