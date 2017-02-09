@@ -126,6 +126,12 @@
     </div>
     <h4>Campaigns</h4>
     <div class="control-group">
+      <%= f.label :member_landing_url, :class => 'control-label' %>
+      <div class="controls">
+        <%= f.text_field :member_landing_url, :class => 'text_field input-xxlarge' %>
+      </div>
+    </div>
+    <div class="control-group">
       <%= f.label :checkout_url, :class => 'control-label' %>
       <div class="controls">
         <%= f.text_field :checkout_url, :class => 'text_field input-xxlarge' %>
@@ -261,12 +267,6 @@
       <%= f.label :non_member_banner_url, :class => 'control-label' %>
       <div class="controls">
         <%= f.text_field :non_member_banner_url, :class => 'text_field input-xxlarge' %>
-      </div>
-    </div>
-    <div class="control-group">
-      <%= f.label :member_landing_url, :class => 'control-label' %>
-      <div class="controls">
-        <%= f.text_field :member_landing_url, :class => 'text_field input-xxlarge' %>
       </div>
     </div>
     <div class="control-group">
