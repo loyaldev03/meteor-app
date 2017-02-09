@@ -58,6 +58,9 @@
 <p>
   <strong><%= I18n.t('activerecord.attributes.campaign.landing_url') %>:</strong>
   <%= text_field_tag('landing_url', @campaign.landing_url, class: 'text_field input-xxlarge', readonly: true) %>
+  <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.campaign.landing_url'),
+        :content => t('activerecord.attributes.campaign.landing_url_help') } %>
 </p>
 <p>
   <strong><%= I18n.t('activerecord.attributes.campaign.delivery_date') %>:</strong>
@@ -73,7 +76,7 @@
   <strong><%= I18n.t('activerecord.attributes.campaign.preference_groups') %>:</strong>
   <% @campaign.preference_groups.each do |preference_group| %>
     <span class='label label-info'> <%= preference_group.name %> </span>
-  <% end %>  
+  <% end %>
 </p>
 
 <div class='row-fluid'>
