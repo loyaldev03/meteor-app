@@ -172,7 +172,7 @@ class Product < ActiveRecord::Base
   private
 
     def validate_image_url
-      if self.image_url_changed?
+      if self.image_url_changed? and self.image_url.present?
         self.image_url.gsub!(/\?[0-9a-zA-Z]*$/, '')
         unless IMAGE_URL_REGEX.match(self.image_url.downcase)
           errors.add(:image_url, "is invalid")
