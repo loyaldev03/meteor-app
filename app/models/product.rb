@@ -23,7 +23,7 @@ class Product < ActiveRecord::Base
 
   BULK_PROCESS_FIELDS = [ :sku, :name, :package, :stock_to_add, :allow_backorder, :weight, :cost_center ]
 
-  LOW_STOCK_THRESHOLD = 2
+  LOW_STOCK_THRESHOLD = 30
 
   IMAGE_URL_REGEX = /\A(http|https)?:\/\/(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)\z/
 
