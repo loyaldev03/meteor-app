@@ -1,6 +1,6 @@
 class Campaign < ActiveRecord::Base
   extend FriendlyId
-  friendly_id :custom_slug, use: :slugged
+  friendly_id :slug_candidate, use: :slugged
 
   belongs_to :club
   belongs_to :transport_setting
@@ -169,7 +169,8 @@ class Campaign < ActiveRecord::Base
     errors.add(:preference_groups, "Cannot add preference group because it belongs to another club.") if preference_groups.where.not(club_id: self.club_id).first
   end
 
-  def custom_slug
-    ScatterSwap.hash(Time.current.to_i).to_i
+  def slug_candidate
+    [ (Digest::MD5.hexdigest(Time.current.to_s) + self.club_id.to_s) ]
   end
+
 end

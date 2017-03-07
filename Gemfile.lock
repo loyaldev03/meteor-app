@@ -417,7 +417,6 @@ GEM
       nokogiri (>= 1.4.0)
       nori (~> 2.4)
       wasabi (~> 3.4)
-    scatter_swap (0.0.3)
     select2-rails (4.0.3)
       thor (~> 0.14)
     selenium-webdriver (2.53.4)
@@ -585,7 +584,6 @@ DEPENDENCIES
   ruby-prof
   rvm-capistrano
   sass-rails
-  scatter_swap
   select2-rails
   selenium-webdriver (>= 2.53.0)
   settingslogic (= 2.0.8)

@@ -71,7 +71,6 @@ gem "select2-rails"
 gem 'rack-cors'
 gem 'minitest', '~>5.1'
 gem 'friendly_id', '~> 5.1.0'
-gem 'scatter_swap'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
