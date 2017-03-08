@@ -19,7 +19,7 @@ class Campaigns::CheckoutsController < ApplicationController
     if @club && @campaign && (@club.id == @campaign.club_id) # @campaign.landing_url.include? params[:landing_url]
       prospect = Checkout.new(campaign: @campaign).find_or_create_prospect_by params
       if prospect.nil?
-        Rails.logger.error "Checkout::SubmitError: Prospect not found."
+        Rails.logger.error 'Checkout::SubmitError: Prospect not found.'
         redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
       elsif prospect.error_messages && prospect.error_messages.any?
         redirect_to generate_edit_user_info_url(prospect)
@@ -27,13 +27,13 @@ class Campaigns::CheckoutsController < ApplicationController
         redirect_to new_checkout_url(token: prospect.token, campaign_id: @campaign)
       end
     else
-      Rails.logger.error "Checkout::SubmitError: Campaign and Club inconsistencies "
-      redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number )
+      Rails.logger.error 'Checkout::SubmitError: Campaign and Club inconsistencies '
+      redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
     end
   rescue
-    Rails.logger.error "Checkout::SubmitError: Error: #{$!.to_s}"
-    Auditory.report_issue("Checkout::SubmitError", $!.to_s, { campaign_slug: params[:landing_id] })
-    redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number )
+    Rails.logger.error "Checkout::SubmitError: Error: #{$ERROR_INFO}"
+    Auditory.report_issue('Checkout::SubmitError', $ERROR_INFO.to_s, campaign_slug: params[:landing_id])
+    redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
   def new
@@ -41,8 +41,8 @@ class Campaigns::CheckoutsController < ApplicationController
     @product = Product.find_by(club_id: @prospect.club_id, sku: @prospect.product_sku)
     @edit_info_url = generate_edit_user_info_url(@prospect)
   rescue
-    Rails.logger.error "Checkout::NewError: Error: #{$!.to_s}"
-    Auditory.report_issue("Checkout::NewError", $!.to_s, { campaign_slug: params[:campaign_id], prospect_token: params[:token] })
+    Rails.logger.error "Checkout::NewError: Error: #{$ERROR_INFO}"
+    Auditory.report_issue('Checkout::NewError', $ERROR_INFO.to_s, campaign_slug: params[:campaign_id], prospect_token: params[:token])
     @club = @prospect ? @prospect.club : load_club_based_on_host
     redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
@@ -68,12 +68,12 @@ class Campaigns::CheckoutsController < ApplicationController
         redirect_to thank_you_checkout_path(campaign_id: @campaign, user_id: User.find(response[:member_id]).to_param)
       else
         Rails.logger.error "Checkout::CreateError: #{response.inspect}"
-        redirect_to (['407', '409', '9507'].include?(response[:code]) ? duplicated_checkout_path(campaign_id: @campaign, token: @prospect.token) : error_checkout_path(campaign_id: @campaign, token: @prospect.token)), alert: response[:message]
+        redirect_to (%w(407 409 9507).include?(response[:code]) ? duplicated_checkout_path(campaign_id: @campaign, token: @prospect.token) : error_checkout_path(campaign_id: @campaign, token: @prospect.token)), alert: response[:message]
       end
     end
   rescue
-    Rails.logger.error "Checkout::CreateError: #{$!.to_s}"
-    Auditory.report_issue("Checkout::CreateError", $!.to_s, { campaign_slug: params[:credit_card][:campaign_id], prospect_token: params[:credit_card][:prospect_token] })
+    Rails.logger.error "Checkout::CreateError: #{$ERROR_INFO}"
+    Auditory.report_issue('Checkout::CreateError', $ERROR_INFO.to_s, campaign_slug: params[:credit_card][:campaign_id], prospect_token: params[:credit_card][:prospect_token])
     redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
@@ -103,16 +103,16 @@ class Campaigns::CheckoutsController < ApplicationController
   end
 
   def load_campaign
-    if params[:campaign_id].present?
-      @campaign = Campaign.find_by! slug: params[:campaign_id]
-    else
-      # TODO: We expect the ID of the Campaign coming as :landing_id.
-      # It will change in the future to :campaign_id.
-      @campaign = Campaign.find_by slug: params[:landing_id]
-    end
+    @campaign = if params[:campaign_id].present?
+                  Campaign.find_by! slug: params[:campaign_id]
+                else
+                  # TODO: We expect the ID of the Campaign coming as :landing_id.
+                  # It will change in the future to :campaign_id.
+                  Campaign.find_by slug: params[:landing_id]
+                end
     raise ActiveRecord::RecordNotFound unless @campaign
   rescue ActiveRecord::RecordNotFound
-    Rails.logger.error "Checkout::LoadCampaign: #{$!.to_s} campaign_id: #{params[:campaign_id]}"
+    Rails.logger.error "Checkout::LoadCampaign: #{$ERROR_INFO} campaign_id: #{params[:campaign_id]}"
     redirect_to critical_error_checkout_path
   end
 
@@ -120,13 +120,16 @@ class Campaigns::CheckoutsController < ApplicationController
     @prospect = Prospect.where_token(params[:token])
     raise ActiveRecord::RecordNotFound unless @prospect
   rescue ActiveRecord::RecordNotFound
-    Rails.logger.error "Checkout::LoadProspect: #{$!.to_s} token: #{params[:token]}"
+    Rails.logger.error "Checkout::LoadProspect: #{$ERROR_INFO} token: #{params[:token]}"
     redirect_to critical_error_checkout_path
   end
 
   def set_page_title
-    return t('checkout.pages_titles.error') if @campaign.nil?
-    @page_title = "#{@campaign.name} - " + t('checkout.pages_titles.' + params[:action])
+    @page_title = if @campaign.nil?
+                    t('checkout.pages_titles.error')
+                  else
+                    "#{@campaign.name} - " + t('checkout.pages_titles.' + params[:action])
+                  end
   end
 
   def load_ga_tracking_id
@@ -144,8 +147,8 @@ class Campaigns::CheckoutsController < ApplicationController
 
   def campaign_active
     return if @campaign.nil? || @campaign.active?
-    Rails.logger.error "Checkout::CheckIfActiveError: Campaign is not active"
-    Auditory.report_issue("Checkout::CheckIfActiveError", '', { campaign_id: @campaign.id, initial_date: @campaign.initial_date, finish_date: @campaign.finish_date, today: Date.today.to_s })
+    Rails.logger.error 'Checkout::CheckIfActiveError: Campaign is not active'
+    Auditory.report_issue('Checkout::CheckIfActiveError', '', campaign_id: @campaign.id, initial_date: @campaign.initial_date, finish_date: @campaign.finish_date, today: Date.today.to_s)
     redirect_to error_checkout_path, alert: I18n.t('error_messages.campaign_is_not_active')
   end
 
@@ -156,8 +159,7 @@ class Campaigns::CheckoutsController < ApplicationController
         sign_in agent
       end
     end
-    unless agent_signed_in?
+    return if agent_signed_in?
       render file: "#{Rails.root}/public/401", status: 401, layout: false, formats: [:html]
-    end
   end
 end

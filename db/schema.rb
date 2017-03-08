@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170206215016) do
+ActiveRecord::Schema.define(version: 20170303185717) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -91,12 +91,13 @@ ActiveRecord::Schema.define(version: 20170206215016) do
     t.text     "landing_url",            limit: 65535
     t.integer  "products_count",         limit: 4,                              default: 0
     t.string   "delivery_date",          limit: 255,                            default: "3 - 5 weeks from date ordered"
-    t.string   "slug",                   limit: 255
+    t.string   "slug",                   limit: 100
   end
 
   add_index "campaigns", ["club_id"], name: "index_campaigns_on_club_id", using: :btree
   add_index "campaigns", ["finish_date"], name: "index_campaigns_on_finish_date", using: :btree
   add_index "campaigns", ["initial_date"], name: "index_campaigns_on_initial_date", using: :btree
+  add_index "campaigns", ["slug"], name: "index_campaigns_on_slug", using: :btree
   add_index "campaigns", ["terms_of_membership_id"], name: "index_campaigns_on_terms_of_membership_id", using: :btree
 
   create_table "campaigns_preference_groups", id: false, force: :cascade do |t|
@@ -787,7 +788,7 @@ ActiveRecord::Schema.define(version: 20170206215016) do
     t.boolean  "testing_account",                                                            default: false
     t.date     "change_tom_date"
     t.text     "change_tom_attributes",               limit: 65535
-    t.string   "slug",                                limit: 255
+    t.string   "slug",                                limit: 100
   end
 
   add_index "users", ["club_id", "api_id"], name: "api_id_UNIQUE", unique: true, using: :btree
@@ -796,6 +797,7 @@ ActiveRecord::Schema.define(version: 20170206215016) do
   add_index "users", ["current_membership_id"], name: "index_current_membership_id", using: :btree
   add_index "users", ["email"], name: "index_users_on_email", using: :btree
   add_index "users", ["need_sync_to_marketing_client", "club_id"], name: "index_users_on_need_sync_to_marketing_client_and_club_id", using: :btree
+  add_index "users", ["slug"], name: "index_users_on_slug", using: :btree
 
   add_foreign_key "campaign_products", "campaigns"
   add_foreign_key "campaign_products", "products"
