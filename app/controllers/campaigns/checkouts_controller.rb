@@ -5,8 +5,8 @@ class Campaigns::CheckoutsController < ApplicationController
   skip_before_filter :authenticate_agent!
   skip_before_filter :validate_partner_presence
   before_filter :load_club_based_on_host, only: [:submit, :new, :create, :thank_you, :duplicated, :error, :critical_error]
-  before_filter :set_page_title, only: [:new, :thank_you, :duplicated, :error, :critical_error]
   before_filter :load_campaign, only: [:submit, :new, :thank_you, :duplicated, :error]
+  before_filter :set_page_title, only: [:new, :thank_you, :duplicated, :error, :critical_error]
   before_filter :campaign_active, only: [:submit, :new, :thank_you, :duplicated]
   before_filter :load_prospect, only: [:new, :duplicated, :error]
   before_filter :load_ga_tracking_id, only: [:new, :thank_you, :duplicated, :error, :critical_error]
@@ -160,6 +160,6 @@ class Campaigns::CheckoutsController < ApplicationController
       end
     end
     return if agent_signed_in?
-      render file: "#{Rails.root}/public/401", status: 401, layout: false, formats: [:html]
+    render file: "#{Rails.root}/public/401", status: 401, layout: false, formats: [:html]
   end
 end
