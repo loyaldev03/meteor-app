@@ -57,13 +57,13 @@ class Api::CampaignsController < ApplicationController
   end
 
   def get_products
-    @campaign.products.where('stock > ? OR allow_backorder = ?', 0, true).order(:weight).pluck(:id, "campaign_products.label as label", :image_url, :sku).map { |id, label, image_url, sku| { id: id, name: label, sku: sku, image_url: image_url } }
+    @campaign.products.where('stock > ? OR allow_backorder = ?', 0, true).order(:weight).pluck(:id, 'campaign_products.label as label', :image_url, :sku).map { |id, label, image_url, sku| { id: id, name: label, sku: sku, image_url: image_url } }
   end
 
   def get_preferences
-    preferences = Array.new
+    preferences = []
     @campaign.preference_groups.includes(:preferences).each do |pg|
-      pg.preferences.select(:id, :name).each do |p|
+      pg.preferences.select(:id, :name).order(:name).each do |p|
         preferences << { group_code: pg.code, id: p.id, name: p.name }
       end
     end
