@@ -53,7 +53,7 @@ class Checkout
       @prospect.cookie_value          = ''
       @prospect.cookie_set            = ''
       @prospect.joint                 = ''
-      @prospect.user_agent            = params[:user_agent]
+      @prospect.user_agent            = params[:user_agent].truncate(255)
       @prospect.ip_address            = params[:ip_address]
       @prospect.campaign              = @campaign
       @prospect.campaign_description  = @campaign.name
