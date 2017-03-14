@@ -21,7 +21,7 @@ class Campaign < ActiveRecord::Base
 
   TRANSPORTS_FOR_MANUAL_UPDATE = ['twitter', 'adwords']
   NO_ENROLLMENT_CAMPAIGN_TYPE = ['store_promotion', 'newsletter']
-  MAX_PRODUCTS_ALLOWED = 15
+  MAX_PRODUCTS_ALLOWED = 25
 
   validates :name, :landing_name, :initial_date, :campaign_type, :transport,
     :utm_medium, :utm_content, :audience, :campaign_code,
