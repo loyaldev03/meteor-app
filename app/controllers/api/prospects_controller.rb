@@ -128,15 +128,16 @@ class Api::ProspectsController < ApplicationController
 
   private
     def standarize_params(params)
-      params[:product_sku] = params[:product_sku].upcase if params[:product_sku]
-      params[:utm_campaign] = params[:utm_campaign].downcase if params[:utm_campaign]
-      params[:audience] = params[:audience].downcase if params[:audience]
-      params[:campaign_code] = params[:campaign_id].downcase if params[:campaign_id]
-      params[:landing_url] = params[:landing_url].downcase if params[:landing_url]
-      params[:utm_medium] = params[:utm_medium].downcase if params[:utm_medium]
-      params[:utm_content] = params[:utm_content].downcase if params[:utm_content]
-      params[:referral_path] = params[:referral_path].truncate(255) if params[:referral_path]
-      params[:user_agent] = params[:user_agent].truncate(255) if params[:user_agent]
+      params[:email]          = params[:email].downcase if params[:email]
+      params[:product_sku]    = params[:product_sku].upcase if params[:product_sku]
+      params[:utm_campaign]   = params[:utm_campaign].downcase if params[:utm_campaign]
+      params[:audience]       = params[:audience].downcase if params[:audience]
+      params[:campaign_code]  = params[:campaign_id].downcase if params[:campaign_id]
+      params[:landing_url]    = params[:landing_url].downcase if params[:landing_url]
+      params[:utm_medium]     = params[:utm_medium].downcase if params[:utm_medium]
+      params[:utm_content]    = params[:utm_content].downcase if params[:utm_content]
+      params[:referral_path]  = params[:referral_path].truncate(255) if params[:referral_path]
+      params[:user_agent]     = params[:user_agent].truncate(255) if params[:user_agent]
     end
 
     def phone_for_landing(prospect)
