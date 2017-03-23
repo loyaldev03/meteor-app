@@ -1,5 +1,5 @@
 <p> <h1> <%= t('search_results') %> </h1> </p> 
-<%= will_paginate @users if @users %>
+<%= will_paginate @users if @users and @users.any? %>
 <table class="table table-bordered table-condensed" id="table_user_search_result">
   <thead>
   	<tr>
@@ -8,6 +8,7 @@
       <% if @current_club.requires_external_id %>
         <th> <%= t('activerecord.attributes.user.external_id') %> </th>
       <% end %>
+      <th style="width: 170px;"> <%= sortable "email", t('activerecord.attributes.user.email') %></th>
       <th style="width: 170px;"> <%= sortable "full_name", t('activerecord.attributes.user.full_name') %></th>
       <th style="width: 170px;"> <%= sortable "full_address", t('activerecord.attributes.user.full_address') %></th>
       <th> <%= t('activerecord.attributes.user.user_classification_type') %> </th>
@@ -35,6 +36,7 @@
           <% if @current_club.requires_external_id %>
             <td> <%= user.external_id if !user.external_id.nil? %> </td>
           <% end %>
+          <td> <%= user.email %> </td>
           <td> <%= user.full_name %> </td>
           <td> <%= user.full_address %> </td>
           <td> <%= user.member_group_type.nil? ? t('activerecord.attributes.user.not_group_associated') : user.member_group_type.name %> </td>

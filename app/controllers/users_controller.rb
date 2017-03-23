@@ -33,18 +33,25 @@ class UsersController < ApplicationController
   end
 
   def search_result
-    current_club = @current_club
-    query_param = "club_id:#{current_club.id}"
-    [ :id, :first_name, :last_name, :city, :email, :country, :state, :zip, :cc_last_digits, :status ].each do |field|
-      query_param << " #{field}:#{sanitize_string_for_elasticsearch_string_query(field,params[:user][field].strip)}" unless params[:user][field].blank?
+    query_param = ""
+    [ :id, :first_name, :last_name, :city, :email, :country, :state, :zip, :cc_last_digits, :status, :phone_number ].each do |field|
+      unless params[:user][field].blank?
+        sanitized_value = sanitize_string_for_elasticsearch_string_query(field,params[:user][field].strip)
+        query_param << " #{field}:#{sanitized_value}" if sanitized_value.present? 
+      end
     end
     sort_column = @sort_column = params[:sort].nil? ? :id : params[:sort]
     sort_direction = @sort_direction = params[:direction].nil? ? 'desc' : params[:direction]
 
-    @users = User.search(:load => true, :page => (params[:page] || 1), per_page: 20) do
-      query { string query_param, :default_operator => "AND" }
-      sort { by sort_column, sort_direction }
-    end
+    @users = if query_param.present?
+      query_param = "club_id:#{current_club.id}" << query_param 
+      User.search(:load => true, :page => (params[:page] || 1), per_page: 20) do
+        query { string query_param, :default_operator => "AND" }
+        sort { by sort_column, sort_direction }
+      end
+    else
+      []
+    end 
   rescue Errno::ECONNREFUSED
     @elasticsearch_is_down = true
     Auditory.report_issue("User:search_result", "Elasticsearch is down. Confirm that server is running, if problem persist restart it")
@@ -504,6 +511,7 @@ class UsersController < ApplicationController
     end
 
     def sanitize_string_for_elasticsearch_string_query(field, value)
+      value = value.gsub(/[\(\)\-\D]/,'') if field == :phone_number
       escaped_characters = Regexp.escape('\\-+&|!(){}[]^~?:@')
       value = value.gsub(/([#{escaped_characters}])/, '\\\\\1')
       ['AND', 'OR', 'NOT'].each do |word|
@@ -511,8 +519,8 @@ class UsersController < ApplicationController
         value = value.gsub(/\s*\b(#{word.upcase})\b\s*/, " #{escaped_word} ")
       end
       quote_count = value.count '"'
-      value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1 
-      field == :id ? "#{value}".gsub(/[^\d]/,"") : "*#{value}*".gsub(" ","* *")
+      value = value.gsub(/(.*)"(.*)/, '\1\"\3') if quote_count % 2 == 1
+      field == :id ? "#{value}".gsub(/[^\d]/,"") : (value.present? ? "*#{value}*".gsub(" ","* *") : "")
     end
 end
 

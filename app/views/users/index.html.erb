@@ -9,7 +9,7 @@
       <% end %>
     </div>
     <p class="muted">
-      - Use special character '*' to match zero or more characteres inside a word. E.g: 'to*acr' will match 'stoneacre' and 'stotoacre'
+      - Use spaces (' ') to match zero or more characteres inside a word. E.g: 'to acr' will match 'stoneacre' and 'stotoacre'
       <br>
       - If you are looking for more than one word just write. "jo rla" matching "carla jojo" --besides the words are in different order--
     </p>
@@ -46,6 +46,12 @@
                     <td><%= t('activerecord.attributes.user.email') %></td>
                     <td><%= text_field :user, :email, :class => 'text_field',
                                      :value => (params[:user][:email] if params[:user]) %>         
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><%= t('activerecord.attributes.user.phone_number') %></td>
+                    <td><%= text_field :user, :phone_number, :class => 'text_field',
+                                     :value => (params[:user][:phone_number] if params[:user]) %>         
                     </td>
                   </tr>
                 </table>

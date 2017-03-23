@@ -12,7 +12,7 @@ class CreditCard < ActiveRecord::Base
   BLANK_CREDIT_CARD_TOKEN = 'a'
 
   def elasticsearch_index_asyn_call
-    self.user.elasticsearch_asyn_call if self.user and not (self.changed & ['last_digits', 'token', 'active']).empty? and self.active
+    self.user.async_elasticsearch_index if self.user and not (self.changed & ['last_digits', 'token', 'active']).empty? and self.active
   end
 
   def number=(x)

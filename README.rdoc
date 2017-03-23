@@ -5,6 +5,10 @@ RAILS_ENV=production rake db:drop; RAILS_ENV=production rake db:create ; RAILS_E
 
 # Installing elasticsearch to run locally: 
 	https://www.digitalocean.com/community/tutorials/how-to-install-elasticsearch-on-an-ubuntu-vps
+# Creating the elasticsearch index:
+  1. Delete current index: User.index.delete
+  2. Create index: User.create_elasticsearch_index
+  3. Import user's data: User.index.import User.all
 
 # Do you want to use members search page locally?
 Use the following command to start solr

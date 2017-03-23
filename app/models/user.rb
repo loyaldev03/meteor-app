@@ -93,7 +93,7 @@ class User < ActiveRecord::Base
       email_analyzer: {
         type: 'custom',
         tokenizer: 'uax_url_email',
-        filter: ['email_filter', 'lowercase','asciifolding']
+        filter: ['email_filter', 'lowercase', 'asciifolding']
       }
     }
   } do
@@ -110,6 +110,7 @@ class User < ActiveRecord::Base
         indexes :full_address,    type: "string",  analyzer: 'standard'
         indexes :cc_last_digits,  type: "string",  analyzer: 'standard'
         indexes :status,          type: "string",  analyzer: 'standard'
+        indexes :phone_number,    type: "string",  analyzer: 'standard'
         indexes :club_id,         type: "long", analyzer: 'standard'
       end
   end
@@ -129,6 +130,7 @@ class User < ActiveRecord::Base
     state: state,
     status: status,
     cc_last_digits: active_credit_card.last_digits, 
+    phone_number: full_phone_number.gsub(/\D/, ''),
     club_id: club_id,
     }.to_json
   end
@@ -138,7 +140,7 @@ class User < ActiveRecord::Base
   end
 
   def elasticsearch_asyn_call
-    async_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'zip', 'city', 'country', 'state', 'address', 'email', 'status']).empty?
+    async_elasticsearch_index if not (self.changed & ['id', 'first_name', 'last_name', 'zip', 'city', 'country', 'state', 'address', 'email', 'status', 'phone_country_code', 'phone_area_code', 'phone_local_number']).empty?
   end
   ########### SEARCH ###############
 
