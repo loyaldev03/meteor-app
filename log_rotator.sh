@@ -19,3 +19,10 @@ do
   kill -USR1 `cat /opt/nginx/logs/nginx.pid`
   gzip -f $LOGFILE.${TODAY}
 done
+
+for LOGFILE in `find -P /opt/nginx_with_passenger_5/logs/ -iname "*.log" -print`
+do
+  mv $LOGFILE $LOGFILE.${TODAY}
+  kill -USR1 `cat /opt/nginx_with_passenger_5/logs/nginx.pid`
+  gzip -f $LOGFILE.${TODAY}
+done
