@@ -1,11 +1,11 @@
 source 'http://rubygems.org'
 
-gem 'rails', '4.2.3'
+gem 'rails', '4.2.6'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'mysql2', '~> 0.3.18'
+gem 'mysql2', '0.4.5'
 gem 'uuidtools'
 
 gem "paperclip", "~> 3.0"

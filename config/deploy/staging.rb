@@ -5,6 +5,7 @@ set :deploy_to, "/var/www/#{application}"
 set :repository, 'git@github.com:stoneacre/sac-platform.git'
 set :database_name, 'sac_platform_staging'
 set :rails_env, "staging"
+set :user, 'deploy'
 set :keep_releases,       3
 
 server "staging.platform.xagax.com", :app, :web
