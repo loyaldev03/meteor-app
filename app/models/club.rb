@@ -46,12 +46,11 @@ class Club < ActiveRecord::Base
 
   has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename",
                            url: "/system/:attachment/:id/:style/:filename",
-                           styles: { header: "120x40", thumb: "100x100#", small: "150x150>" },
-                           s3_protocol: :https
+                           styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
 
-  has_attached_file :header_image_url, styles: { thumb: '300x' }, s3_protocol: :https
-  has_attached_file :favicon_url, s3_protocol: :https
-  has_attached_file :result_pages_image_url, styles: { thumb: '50x' }, s3_protocol: :https
+  has_attached_file :header_image_url, styles: { thumb: '300x' }
+  has_attached_file :favicon_url
+  has_attached_file :result_pages_image_url, styles: { thumb: '50x' }
 
   # marketing_tool_attributes possible keys:
   # Pardot : pardot_email, pardot_user_key, pardot_password
