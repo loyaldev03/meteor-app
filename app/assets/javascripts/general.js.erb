@@ -1158,9 +1158,25 @@ function user_change_next_bill_date(){
   $(".datepicker").datepicker('option', { minDate: 1 });
 };
 
-function user_save_the_sale_functions(){
+function user_save_the_sale_functions(allToms, stsToms) {
   disable_form_buttons_upon_submition('save_the_sale_form')
   $(".datepicker").datepicker('option', { minDate: 0 });
+
+  var tomsDropdown = $("#terms_of_membership_id");
+  $("#show_all_toms").click(function() {
+    var data;
+    if($(this).is(":checked")) {
+      data = allToms;
+    } else {
+      data = stsToms;
+    }
+    tomsDropdown.empty();
+    $.each(data, function(index, item) {
+      tomsDropdown.append(
+        $('<option>', { value: item.id, text: item.name }, '</option>')
+      );
+    });
+  });
 }
 
 function chargeback_user_functions(){

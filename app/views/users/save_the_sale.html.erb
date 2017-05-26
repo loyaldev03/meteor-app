@@ -9,15 +9,21 @@
     </tr>
     <tr>
       <td>
-        <%= label_tag :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %>: 
-        <%= select_tag :terms_of_membership_id, options_from_collection_for_select(TermsOfMembership.where(:club_id => @current_club ), "id", "name") %> 
+        <% if @sts_toms.first.present? %>
+          <%= label_tag :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %>:
+          <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@sts_toms, "id", "name") %>
+          <label><%= check_box_tag :show_all_toms, false %> Show all Subscription Plans</label>
+        <% else %>
+          <%= label_tag :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %>:
+          <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@all_toms, "id", "name") %>
+        <% end %>
       </td>
     </tr>
     <tr><th colspan="2">Schedule Save the sale</th></tr>
     <tr>
       <td>
         <%= label_tag :change_tom_date, t('future_save_the_sale'), :class => 'help-inline' %>
-        <%= text_field_tag :change_tom_date, (params[:change_tom_date] || Time.current.to_date), :class => 'datepicker', readonly: 'readonly' %> 
+        <%= text_field_tag :change_tom_date, (params[:change_tom_date] || Time.current.to_date), :class => 'datepicker', readonly: 'readonly' %>
       </td>
     </tr>
     <tr>
@@ -28,16 +34,15 @@
     </tr>
     <tr>
       <td> <%= submit_tag t('buttons.save_te_sale'), :class => 'btn btn-primary', data: {:confirm => t('are_you_sure')}, :id => "save_the_sale_button" %>
-        <%= link_to t('buttons.full_save'), user_full_save_path , :class=> 'btn btn-success', :id => 'full_save_button' %> 
-        <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn', :id => 'cancel_button' %> 
+        <%= link_to t('buttons.full_save'), user_full_save_path , :class=> 'btn btn-success', :id => 'full_save_button' %>
+        <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn', :id => 'cancel_button' %>
         </td>
     </tr>
   </table>
 <% end%>
 
-
-
 <% content_for :javascript do %>
-  user_save_the_sale_functions();
+  var allToms = JSON.parse("<%= raw escape_javascript(@all_toms.to_json) %>");
+  var stsToms = JSON.parse("<%= raw escape_javascript(@sts_toms.to_json) %>");
+  user_save_the_sale_functions(allToms, stsToms);
 <% end %>
-
