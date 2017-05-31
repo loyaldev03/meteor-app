@@ -45,8 +45,8 @@ wait $WAIT_PIDS
 
 echo "`date` rake products:send_product_list_email"
 cd /var/www/$2/current && bundle exec rake products:send_product_list_email  >> $LOGFILE 2>&1 &
-echo "`date` rake mkt_tools:sync_members_to_exact_target"
-cd /var/www/$2/current && bundle exec rake mkt_tools:sync_members_to_exact_target  >> $LOGFILE 2>&1 &
+# echo "`date` rake mkt_tools:sync_members_to_exact_target"
+# cd /var/www/$2/current && bundle exec rake mkt_tools:sync_members_to_exact_target  >> $LOGFILE 2>&1 &
 echo "`date` rake mkt_tools:sync_members_to_mailchimp"
 cd /var/www/$2/current && bundle exec rake mkt_tools:sync_members_to_mailchimp  >> $LOGFILE 2>&1 &
 
@@ -84,8 +84,8 @@ if [ `date +"%d"` == "01" ]; then
   echo "`date` rake users:delete_testing_accounts"
   cd /var/www/$2/current && bundle exec rake users:delete_testing_accounts  >> $LOGFILE 2>&1 &
 fi
-echo "`date` rake mkt_tools:sync_prospects_to_exact_target"
-cd /var/www/$2/current && bundle exec rake mkt_tools:sync_prospects_to_exact_target  >> $LOGFILE 2>&1 &
+# echo "`date` rake mkt_tools:sync_prospects_to_exact_target"
+# cd /var/www/$2/current && bundle exec rake mkt_tools:sync_prospects_to_exact_target  >> $LOGFILE 2>&1 &
 echo "`date` rake mkt_tools:sync_prospects_to_mailchimp"
 cd /var/www/$2/current && bundle exec rake mkt_tools:sync_prospects_to_mailchimp  >> $LOGFILE 2>&1 &
 
