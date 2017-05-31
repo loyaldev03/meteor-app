@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170303185717) do
+ActiveRecord::Schema.define(version: 20170524202657) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -51,12 +51,12 @@ ActiveRecord::Schema.define(version: 20170303185717) do
   create_table "campaign_days", force: :cascade do |t|
     t.integer  "campaign_id", limit: 4
     t.date     "date"
-    t.decimal  "spent",                 precision: 10
+    t.decimal  "spent",                 precision: 10, scale: 2
     t.integer  "reached",     limit: 4
     t.integer  "converted",   limit: 4
-    t.integer  "meta",        limit: 4,                default: 0
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
+    t.integer  "meta",        limit: 4,                          default: 0
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
   end
 
   add_index "campaign_days", ["campaign_id", "date"], name: "index_campaign_days_on_campaign_id_and_date", unique: true, using: :btree
@@ -638,6 +638,7 @@ ActiveRecord::Schema.define(version: 20170303185717) do
     t.decimal  "initial_club_cash_amount",                   precision: 11, scale: 2, default: 0.0
     t.decimal  "club_cash_installment_amount",               precision: 11, scale: 2, default: 0.0
     t.boolean  "skip_first_club_cash",                                                default: false
+    t.boolean  "show_in_save_the_sale",                                               default: false
   end
 
   add_index "terms_of_memberships", ["club_id"], name: "index_club_id", using: :btree
