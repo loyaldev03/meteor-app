@@ -102,23 +102,21 @@ class UsersController < ApplicationController
   end
 
   def save_the_sale
-    if request.post?
-      if TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id).nil?
-        flash[:error] = 'Subscription plan not found'
+    @sts_toms = TermsOfMembership.select(:id, :name).where(club_id: @current_club, show_in_save_the_sale: true)
+    @all_toms = TermsOfMembership.select(:id, :name).where(club_id: @current_club)
+    return unless request.post?
+    if TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id).nil?
+      flash[:error] = 'Subscription plan not found'
+      redirect_to show_user_path
+    else
+      save_the_sale_params = { remove_club_cash: params[:remove_club_cash].present? }
+      answer = current_user.save_the_sale(params[:terms_of_membership_id], current_agent, params[:change_tom_date], save_the_sale_params)
+      if answer[:code] == Settings.error_codes.success
+        flash[:notice] = "Save the sale succesfully applied: #{answer[:message]}"
         redirect_to show_user_path
       else
-        save_the_sale_params = { remove_club_cash: params[:remove_club_cash].present? }
-        answer = current_user.save_the_sale(params[:terms_of_membership_id], current_agent, params[:change_tom_date], save_the_sale_params)
-        if answer[:code] == Settings.error_codes.success
-          flash[:notice] = "Save the sale succesfully applied: #{answer[:message]}"
-          redirect_to show_user_path
-        else
-          flash.now[:error] = answer[:message]
-        end
+        flash.now[:error] = answer[:message]
       end
-    else
-      @sts_toms = TermsOfMembership.where(club_id: @current_club, show_in_save_the_sale: true)
-      @all_toms = TermsOfMembership.where(club_id: @current_club)
     end
   end
 
