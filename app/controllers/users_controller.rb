@@ -40,6 +40,17 @@ class UsersController < ApplicationController
         query_param << " #{field}:#{sanitized_value}" if sanitized_value.present?
       end
     end
+
+    if params[:user][:transaction_start_date].present? and params[:user][:transaction_end_date].present?
+      transaction_query = []
+      (params[:user][:transaction_start_date].to_date..params[:user][:transaction_end_date].to_date).each do |date|
+        transaction_query << (params[:user][:transaction_amount].present? ? "transaction_info:#{date.to_s}\\:#{sprintf('%.2f', params[:user][:transaction_amount])}" : " transaction_info:#{date}\\:*")
+      end
+      query_param << " (#{transaction_query.join(' OR ')})"
+    elsif params[:user][:transaction_amount].present?
+      query_param << " transaction_info:*\\:#{sprintf('%.2f', params[:user][:transaction_amount])}"
+    end
+
     sort_column = @sort_column = params[:sort].nil? ? :id : params[:sort]
     sort_direction = @sort_direction = params[:direction].nil? ? 'desc' : params[:direction]
 

@@ -269,7 +269,7 @@ module ActionDispatch
       fields_selector.each do |field,value|
         fill_in field, :with => value unless value.nil?
       end
-      select_country_and_state(user.country) if country
+      select_country_and_state(user.country) if country      
 
       within('#index_search_form') do 
         click_on 'Search'
@@ -280,6 +280,7 @@ module ActionDispatch
           assert page.has_content?("#{user.id}")
           assert page.has_content?(user.full_name)
           assert page.has_content?(user.full_address)
+          assert page.has_content?(user.email)
 
           if !user.external_id.nil?
             assert page.has_content?(user.external_id)
