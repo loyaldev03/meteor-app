@@ -13,6 +13,7 @@ class Transaction < ActiveRecord::Base
   attr_accessor :refund_response_transaction_id, :stripe_customer_id
 
   before_save :validate_adjudication_date, :if => lambda {|record| [Settings.operation_types.chargeback, Settings.operation_types.chargeback_rebutted].include? record.operation_type}
+  after_save :elasticsearch_index_asyn_call
 
   scope :refunds, lambda { where('transaction_type IN (?, ?)', 'credit', 'refund') }
 
@@ -366,5 +367,9 @@ class Transaction < ActiveRecord::Base
         errors[:adjudication_date] << "cannot be blank"
         return false
       end
+    end
+
+    def elasticsearch_index_asyn_call
+      self.user.async_elasticsearch_index if self.user_id and not (self.changed & ['user_id', 'amount', 'created_at']).empty?
     end
 end

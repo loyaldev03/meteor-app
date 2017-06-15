@@ -169,7 +169,7 @@ class TransactionTest < ActiveSupport::TestCase
     # bill users the day trial days expires. User should be billed
     Timecop.travel(Time.zone.now + user.terms_of_membership.provisional_days.days) do
       Delayed::Worker.delay_jobs = true
-      assert_difference('DelayedJob.count',3)do  # asign_club_cash  membership_bill_communication  elasticsearch_sync
+      assert_difference('DelayedJob.count',4)do  # asign_club_cash  membership_bill_communication  elasticsearch_sync
         TasksHelpers.bill_all_members_up_today
       end
       Delayed::Worker.delay_jobs = false  
@@ -185,7 +185,7 @@ class TransactionTest < ActiveSupport::TestCase
       Timecop.travel(next_year) do
         next_year = next_year + user.terms_of_membership.installment_period.days
         Delayed::Worker.delay_jobs = true
-        assert_difference('DelayedJob.count',3) do  # asign_club_cash , renewal_membership_communication, membership_bill_communication
+        assert_difference('DelayedJob.count',4) do  # asign_club_cash , renewal_membership_communication, membership_bill_communication
           TasksHelpers.bill_all_members_up_today
         end
         Delayed::Worker.delay_jobs = false

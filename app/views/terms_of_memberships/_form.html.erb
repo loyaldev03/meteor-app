@@ -16,35 +16,44 @@
     <%= f.label :name, t('activerecord.attributes.terms_of_membership.wizard.plan_name'), :class => 'control-label required_asterisk', :style => "width:auto" %>
     <div class="controls">
       <%= f.text_field :name, :class => 'text_field required', required: true %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.plan_name'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.plan_name_help') } %> 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.plan_name'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.plan_name_help') } %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :api_role, t('activerecord.attributes.terms_of_membership.wizard.external_code'), :class => 'control-label' %>
     <div class="controls">
       <%= f.text_field :api_role, :value => @tom.api_role, :type => 'number', :class => 'text_field input-small' %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.external_code'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.external_code_help') } %> 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.external_code'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.external_code_help') } %>
     </div>
   </div>
   <div class="control-group">
     <%= f.label :description, t('activerecord.attributes.terms_of_membership.wizard.description'), :class => 'control-label' %>
     <div class="controls">
       <%= f.text_area :description, :class => 'text_area', :rows => 5 %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.description'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.description_help') } %> 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.description'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.description_help') } %>
+    </div>
+  </div>
+  <div class="control-group" id="show_in_save_the_sale_group">
+    <%= label_tag 'show_in_save_the_sale', t('activerecord.attributes.terms_of_membership.wizard.show_in_save_the_sale'), :class => 'control-label' %>
+    <div class="controls">
+      <%= f.check_box 'show_in_save_the_sale' %>
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.show_in_save_the_sale'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.show_in_save_the_sale_help') } %>
     </div>
   </div>
 </div>
 
 <% # Second step %>
-<div class="step" id="second">  
+<div class="step" id="second">
   <div class="control-group"><%= wizard_steps_indicator(2) %></div>
-  
+
 <!--   <div class="control-group">
     <%= label_tag 'initial_fee_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_fee_amount'), :class => 'control-label' %>
     <div class="controls">
@@ -56,9 +65,9 @@
     <%= label_tag 'needs_enrollment_approval', t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval'), :class => 'control-label' %>
     <div class="controls">
       <%= f.check_box 'needs_enrollment_approval' %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval_help') } %> 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.needs_enrollment_approval_help') } %>
     </div>
   </div>
 
@@ -69,9 +78,9 @@
       <%= t('activerecord.attributes.terms_of_membership.wizard.lasting') %>
       <%= text_field_tag 'trial_period_lasting', @tom.provisional_days, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 0 %>
       <%= select_for_date_span("trial_period_lasting_time_span") %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.trial_period'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.trial_period_help') } %> 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.trial_period'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.trial_period_help') } %>
     </div>
   </div>
 
@@ -82,8 +91,8 @@
       <%= t('activerecord.attributes.terms_of_membership.wizard.payment_is_expected') %>&nbsp;
        <%= radio_button_tag 'is_payment_expected', 'no', @tom.is_payment_expected == false %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.no_pay_is_expected') %>&nbsp;
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'), 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial'),
         :content => t('activerecord.attributes.terms_of_membership.wizard.at_the_end_of_trial_help') } %>
     </div>
   </div>
@@ -92,7 +101,7 @@
     <div class="control-group span" id="recurring_amount_amount" >
       <%= label_tag 'recurring_amount', t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), :class => 'control-label required_asterisk' %>
       <div class="controls">
-        $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %> 
+        $&nbsp;<%= text_field_tag 'installment_amount', @tom.installment_amount, :class => 'text_field input-small required', :placeholder => '0', :type => 'number' %>
       </div>
     </div>
 
@@ -101,8 +110,8 @@
         <%= t('activerecord.attributes.terms_of_membership.wizard.every') %>
         <%= text_field_tag 'installment_amount_days', @tom.installment_period, :class => 'text_field input-small required', :placeholder => '0', :type => 'number', :min => 1 %>
         <%= select_for_date_span("installment_amount_days_time_span") %>
-        <%= render :partial => "shared/help", :locals => { 
-          :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'), 
+        <%= render :partial => "shared/help", :locals => {
+          :title => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount'),
         :content => t('activerecord.attributes.terms_of_membership.wizard.recurring_amount_help') } %>
       </div>
     </div>
@@ -118,8 +127,8 @@
       <span id="label_for_stop_billing_after"><%= t('activerecord.attributes.terms_of_membership.wizard.stop_billing_after') %></span>
       <%= text_field_tag 'subscription_terms_stop_billing_after', @tom.subscription_limits, :class => 'text_field input-small', :placeholder => '0', :type => 'number' %>
       <%= select_for_date_span("subscription_terms_stop_billing_after_time_span") %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.subscription_terms'), 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.subscription_terms'),
         :content => t('lorem') } %>  -->
     </div>
   </div>
@@ -128,9 +137,9 @@
     <%= label_tag 'initial_club_cash_amount', t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), :class => 'control-label required_asterisk' %>
     <div class="controls">
       <%= f.text_field 'initial_club_cash_amount', :class => 'text_field input-small', :type => 'number', :min => 0 %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount_help') } %> 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.initial_club_cash_amount_help') } %>
     </div>
   </div>
 
@@ -138,9 +147,9 @@
     <%= label_tag 'club_cash_installment_amount', t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), :class => 'control-label required_asterisk' %>
     <div class="controls">
       <%= f.text_field 'club_cash_installment_amount', :class => 'text_field input-small', :type => 'number', :placeholder => '0.0', :min => 0 %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount_help') } %> 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.club_cash_installment_amount_help') } %>
       <%= t('activerecord.attributes.terms_of_membership.wizard.skip_first_club_cash') %>
       <%= f.check_box 'skip_first_club_cash' %>
     </div>
@@ -164,25 +173,25 @@
  -->      <%= radio_button_tag 'if_cannot_bill_user', 'downgrade_to', @tom.if_cannot_bill == 'downgrade_tom' %>&nbsp;
       <%= t('activerecord.attributes.terms_of_membership.wizard.downgrade_to') %>
       <%= select_for_toms('downgrade_to_tom', @tom.downgrade_tom_id, @tom) %>
-      <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.downgrade_to'), 
-        :content => t('activerecord.attributes.terms_of_membership.wizard.downgrade_to_help') } %> 
+      <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.downgrade_to'),
+        :content => t('activerecord.attributes.terms_of_membership.wizard.downgrade_to_help') } %>
     </div>
   </div>
   <div class='row span12' style='margin-left:-30px !important;'>
     <div class="control-group span" id="upgrade_options">
       <%= label_tag 'upgrade_to_tom', t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), :class => 'control-label' %>
       <div class="controls">
-        <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp; 
+        <%= select_for_toms('upgrade_to_tom', @tom.upgrade_tom_id, @tom) %>&nbsp;
       </div>
-    </div> 
+    </div>
     <div class="control-group">
       <div class="controls">
-        <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>      
+        <%= t('activerecord.attributes.terms_of_membership.wizard.after') %>
         <%= text_field_tag 'upgrade_to_tom_days', @tom.upgrade_tom_period, :class => 'text_field input-small', :placeholder => '0', :type => 'number', :min => 1 %>
         <%= select_for_date_span("upgrade_to_tom_days_time_span") %>
-        <%= render :partial => "shared/help", :locals => { 
-        :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'), 
+        <%= render :partial => "shared/help", :locals => {
+        :title => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to'),
         :content => t('activerecord.attributes.terms_of_membership.wizard.upgrade_to_help') } %>
       </div>
     </div>
@@ -202,12 +211,12 @@
 </div>
 
 <script type="text/javascript">
-  // Second Step  
+  // Second Step
   function until_cancel_logic(){
     $('#subscription_terms_stop_billing_after').removeAttr('required');
     $('#subscription_terms_stop_billing_after').prop('disabled',true);
     $('#subscription_terms_stop_billing_after_time_span').removeAttr('required');
-    $('#subscription_terms_stop_billing_after_time_span').prop('disabled',true);    
+    $('#subscription_terms_stop_billing_after_time_span').prop('disabled',true);
   }
 
   $('#is_payment_expected_yes').click(function() {
@@ -248,28 +257,28 @@
     $('#downgrade_to_tom').removeAttr('required');
     $('#if_cannot_bill_user_suspend_for').prop('disabled', false);
     $('#if_cannot_bill_user_suspend_for_time_span').prop('disabled', false);
-    $('#downgrade_to_tom').prop('disabled', true);   
+    $('#downgrade_to_tom').prop('disabled', true);
   }
 
-  function downgrade_radio_logic(){    
+  function downgrade_radio_logic(){
     $('#if_cannot_bill_user_suspend_for').removeAttr('required');
     $('#downgrade_to_tom').prop('required', true);
     $('#if_cannot_bill_user_suspend_for').prop('disabled', true);
     $('#if_cannot_bill_user_suspend_for_time_span').prop('disabled', true);
-    $('#downgrade_to_tom').prop('disabled', false);  
+    $('#downgrade_to_tom').prop('disabled', false);
   }
 
   function select_upgrade_logic_disable(){
-    $('#upgrade_to_tom_days').prop('disabled', true);          
+    $('#upgrade_to_tom_days').prop('disabled', true);
     $('#upgrade_to_tom_days').removeAttr('required');
-    $('#upgrade_to_tom_days_time_span').prop('disabled', true);          
+    $('#upgrade_to_tom_days_time_span').prop('disabled', true);
     $('#upgrade_to_tom_days_time_span').removeAttr('required');
   }
 
   function select_upgrade_logic_enable(){
-    $('#upgrade_to_tom_days').prop('disabled', false);          
+    $('#upgrade_to_tom_days').prop('disabled', false);
     $('#upgrade_to_tom_days').prop('required', true);
-    $('#upgrade_to_tom_days_time_span').prop('disabled', false);          
+    $('#upgrade_to_tom_days_time_span').prop('disabled', false);
     $('#upgrade_to_tom_days_time_span').prop('required', true);
   }
 
@@ -307,7 +316,7 @@
     if($('#upgrade_to_tom').val() != '') {
       select_upgrade_logic_enable();
     } else {
-      select_upgrade_logic_disable();  
+      select_upgrade_logic_disable();
     }
   });
 
@@ -353,7 +362,7 @@
         <% end %>
         break;
     }
-    if(isSubmitButton) {  
+    if(isSubmitButton) {
       $("#tom_wizard_form").formwizard("option", {textSubmit: buttonText});
     }
     else {
@@ -370,8 +379,8 @@
       currentStep = $("#tom_wizard_form").formwizard("state").currentStep;
       switch(currentStep) {
         case "second":
-          if ($("#subscription_terms_until_cancelled").is(":checked") ){ 
-            until_cancel_logic(); 
+          if ($("#subscription_terms_until_cancelled").is(":checked") ){
+            until_cancel_logic();
           }
           if ($('#is_payment_expected_yes').is(':checked')) {
             window.atTheEndOfTheTrial = "payment";
@@ -393,19 +402,19 @@
             $('#upgrade_options').hide('fast');
             $('#no_configuration_message').show();
           }
-          
-          if( $("#if_cannot_bill_user_cancel").is(":checked") ){ 
-            cancel_radio_logic(); 
+
+          if( $("#if_cannot_bill_user_cancel").is(":checked") ){
+            cancel_radio_logic();
           }
-          else if( $("#if_cannot_bill_user_suspend").is(":checked") ){ 
-            suspend_radio_logic(); 
+          else if( $("#if_cannot_bill_user_suspend").is(":checked") ){
+            suspend_radio_logic();
           }
-          else if( $("#if_cannot_bill_user_downgrade_to").is(":checked") ){ 
+          else if( $("#if_cannot_bill_user_downgrade_to").is(":checked") ){
             downgrade_radio_logic();
           }
 
-          if( $("#upgrade_to_tom").val() == "" ){ 
-            select_upgrade_logic_disable(); 
+          if( $("#upgrade_to_tom").val() == "" ){
+            select_upgrade_logic_disable();
           }
           break;
       }

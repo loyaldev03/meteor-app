@@ -53,6 +53,7 @@ en:
   remove_club_cash: "Remove club cash when proceesing scheduled TOM change"
   cancel_confirm_when_tom_change_scheduled: "The member you are about to cancel has a future subscription plan scheduled. If the cancelation date you will choose is before the one for the future subscription plan update then that scheduled subscription plan will have no effect."
   preference_management_notification: 'Any change made on the preference list has to be replicated in the list of preferences in Drupal.'
+  no_toms_for_save_the_sale: 'No Subscription Plans set to be shown here. Go, enable some '
   enums:
     campaign:
       transport:
@@ -536,6 +537,8 @@ en:
           external_code_help: 'A value to be used by an external system, usually a CMS. If you are using Drupal, this should be set as the role to be granted to the member in Drupal when enrolled with this subscription plan.'
           description: 'Description (optional)'
           description_help: "Short text describing for what the subscription plan will be used to."
+          show_in_save_the_sale: 'Show in Save the Sale'
+          show_in_save_the_sale_help: 'Set this field if you want this plan avaliable to be selected in the Subscription plans dropdown in the Save the Sale form'
           step_1_button_next: 'Define Membership Terms'
           step_1_edit_button_next: 'Edit Membership Terms'
           # Step 2

@@ -87,6 +87,20 @@ class User < ActiveRecord::Base
             "@(.+)",
             "@(\\w+)"
          ]
+      },
+      transaction_filter: {
+        type: 'pattern_capture',
+        patterns: [
+          "[0-9\-]{10}:[0-9\.]{5}",
+          "[0-9\-]{10}:",
+          ":[0-9\.]{5}"
+        ]
+      }
+    },
+    tokenizer: {
+      transaction_tokenizer: {
+        type: "pattern",
+        pattern: ","
       }
     },
     analyzer: {
@@ -94,24 +108,30 @@ class User < ActiveRecord::Base
         type: 'custom',
         tokenizer: 'uax_url_email',
         filter: ['email_filter', 'lowercase', 'asciifolding']
+      },
+      transaction_analyzer: {
+        type: 'custom',
+        tokenizer: 'transaction_tokenizer',
+        filter: ['transaction_filter']
       }
     }
   } do
       mapping do
-        indexes :id,              type: "long", index: :not_analyzed
-        indexes :first_name,      type: "string",  analyzer: 'standard'
-        indexes :last_name,       type: "string",  analyzer: 'standard'
-        indexes :full_name,       type: "string",  analyzer: 'standard'
-        indexes :city,            type: "string",  analyzer: 'standard'
-        indexes :zip,             type: "string",  analyzer: 'keyword'
-        indexes :email,           type: "string",  analyzer: 'email_analyzer'
-        indexes :country,         type: "string",  analyzer: 'standard'
-        indexes :state,           type: "string",  analyzer: 'standard'
-        indexes :full_address,    type: "string",  analyzer: 'standard'
-        indexes :cc_last_digits,  type: "string",  analyzer: 'standard'
-        indexes :status,          type: "string",  analyzer: 'standard'
-        indexes :phone_number,    type: "string",  analyzer: 'standard'
-        indexes :club_id,         type: "long", analyzer: 'standard'
+        indexes :id,                type: "long", index: :not_analyzed
+        indexes :first_name,        type: "string",  analyzer: 'standard'
+        indexes :last_name,         type: "string",  analyzer: 'standard'
+        indexes :full_name,         type: "string",  analyzer: 'standard'
+        indexes :city,              type: "string",  analyzer: 'standard'
+        indexes :zip,               type: "string",  analyzer: 'keyword'
+        indexes :email,             type: "string",  analyzer: 'email_analyzer'
+        indexes :country,           type: "string",  analyzer: 'standard'
+        indexes :state,             type: "string",  analyzer: 'standard'
+        indexes :full_address,      type: "string",  analyzer: 'standard'
+        indexes :cc_last_digits,    type: "string",  analyzer: 'standard'
+        indexes :status,            type: "string",  analyzer: 'standard'
+        indexes :phone_number,      type: "string",  analyzer: 'standard'
+        indexes :transaction_info,  type: "string", analyzer: 'transaction_analyzer'
+        indexes :club_id,           type: "long", analyzer: 'standard'
       end
   end
 
@@ -131,6 +151,7 @@ class User < ActiveRecord::Base
     status: status,
     cc_last_digits: active_credit_card.last_digits, 
     phone_number: full_phone_number.gsub(/\D/, ''),
+    transaction_info: transactions.collect{|t| "#{t.created_at.to_date.to_s}:#{sprintf('%.2f', t.amount)}"}.join(','),
     club_id: club_id,
     }.to_json
   end

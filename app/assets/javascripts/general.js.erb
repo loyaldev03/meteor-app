@@ -454,7 +454,7 @@ function user_index_functions(){
       startAjaxLoader(true);
       update_select_only = false;
 
-    $.ajax({
+      $.ajax({
         type: "GET",
         url: window.location.pathname.match("search_result") ? window.location.pathname : "users/search_result",
         dataType: 'script',
@@ -475,6 +475,8 @@ function user_index_functions(){
     }
   });
 
+  $(".datepicker").datepicker('option', { maxDate: 0 });
+
   $('#users .pagination a').on('click', function () {
     update_select_only = false;
     $.getScript(this.href);
@@ -482,7 +484,7 @@ function user_index_functions(){
   });
 
   $("#clear_form").click( function(event) {
-    $("#index_search_form input[type=text]").each(function() { $(this).val(''); });
+    $("#index_search_form input[type=text], #index_search_form input[type=number]").each(function() { $(this).val(''); });
     $("select option[value='']").each(function() { $(this).attr('selected', true); ; });
     $("#user_state option[value!='']").remove();
     event.preventDefault();
@@ -492,8 +494,18 @@ function user_index_functions(){
     country = $('#user_country').val();
     update_select_only = true;
     $.get(this.action, { country_code:country, only_select:update_select_only }, null, 'script');
-  })
+  });
 
+  $('#user_transaction_start_date, #user_transaction_end_date').on('change', function(){
+    if( $('#user_transaction_start_date').val() == '' )
+      $('#user_transaction_start_date').val( $(this).val() );
+    else if( $('#user_transaction_end_date').val() == '' )
+      $('#user_transaction_end_date').val( $(this).val() );
+    else if ( new Date($("#user_transaction_start_date").val()) > new Date($("#user_transaction_end_date").val()) ){
+      $('#user_transaction_start_date').val( $(this).val() );
+      $('#user_transaction_end_date').val( $(this).val() );
+    }
+  });
 };
 
 function fetch_maketing_client_form(partner_prefix, club_id, mkt_tool_errors){
@@ -1158,9 +1170,25 @@ function user_change_next_bill_date(){
   $(".datepicker").datepicker('option', { minDate: 1 });
 };
 
-function user_save_the_sale_functions(){
+function user_save_the_sale_functions(allToms, stsToms) {
   disable_form_buttons_upon_submition('save_the_sale_form')
   $(".datepicker").datepicker('option', { minDate: 0 });
+
+  var tomsDropdown = $("#terms_of_membership_id");
+  $("#show_all_toms").click(function() {
+    var data;
+    if($(this).is(":checked")) {
+      data = allToms;
+    } else {
+      data = stsToms;
+    }
+    tomsDropdown.empty();
+    $.each(data, function(index, item) {
+      tomsDropdown.append(
+        $('<option>', { value: item.id, text: item.name }, '</option>')
+      );
+    });
+  });
 }
 
 function chargeback_user_functions(){

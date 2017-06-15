@@ -5,12 +5,12 @@ class UsersController < ApplicationController
   skip_before_filter :validate_partner_presence, :only => [ :quick_search ]
   before_filter :validate_user_presence, :except => [ :index, :new, :search_result, :quick_search ]
   before_filter lambda { RequestStore.store[:current_agent] = current_agent }
-  before_filter :check_permissions, :except => [ :additional_data, :transactions_content, :notes_content, 
-                                                 :fulfillments_content, :communications_content, 
-                                                 :operations_content, :credit_cards_content, 
+  before_filter :check_permissions, :except => [ :additional_data, :transactions_content, :notes_content,
+                                                 :fulfillments_content, :communications_content,
+                                                 :operations_content, :credit_cards_content,
                                                  :club_cash_transactions_content, :memberships_content,
                                                  :quick_search ]
-  
+
   def index
     @countries = Carmen::Country.coded('US').subregions + Carmen::Country.coded('CA').subregions
     respond_to do |format|
@@ -37,28 +37,39 @@ class UsersController < ApplicationController
     [ :id, :first_name, :last_name, :city, :email, :country, :state, :zip, :cc_last_digits, :status, :phone_number ].each do |field|
       unless params[:user][field].blank?
         sanitized_value = sanitize_string_for_elasticsearch_string_query(field,params[:user][field].strip)
-        query_param << " #{field}:#{sanitized_value}" if sanitized_value.present? 
+        query_param << " #{field}:#{sanitized_value}" if sanitized_value.present?
       end
     end
+
+    if params[:user][:transaction_start_date].present? and params[:user][:transaction_end_date].present?
+      transaction_query = []
+      (params[:user][:transaction_start_date].to_date..params[:user][:transaction_end_date].to_date).each do |date|
+        transaction_query << (params[:user][:transaction_amount].present? ? "transaction_info:#{date.to_s}\\:#{sprintf('%.2f', params[:user][:transaction_amount])}" : " transaction_info:#{date}\\:*")
+      end
+      query_param << " (#{transaction_query.join(' OR ')})"
+    elsif params[:user][:transaction_amount].present?
+      query_param << " transaction_info:*\\:#{sprintf('%.2f', params[:user][:transaction_amount])}"
+    end
+
     sort_column = @sort_column = params[:sort].nil? ? :id : params[:sort]
     sort_direction = @sort_direction = params[:direction].nil? ? 'desc' : params[:direction]
 
     @users = if query_param.present?
-      query_param = "club_id:#{current_club.id}" << query_param 
+      query_param = "club_id:#{current_club.id}" << query_param
       User.search(:load => true, :page => (params[:page] || 1), per_page: 20) do
         query { string query_param, :default_operator => "AND" }
         sort { by sort_column, sort_direction }
       end
     else
       []
-    end 
+    end
   rescue Errno::ECONNREFUSED
     @elasticsearch_is_down = true
     Auditory.report_issue("User:search_result", "Elasticsearch is down. Confirm that server is running, if problem persist restart it")
   rescue Errno::ETIMEDOUT
     @elasticsearch_is_down = true
-    Auditory.report_issue("User:search_result", "Elasticsearch Timeout Error received. Confirm that service is available.")  
-  rescue Exception => e 
+    Auditory.report_issue("User:search_result", "Elasticsearch Timeout Error received. Confirm that service is available.")
+  rescue Exception => e
     @elasticsearch_is_down = true
     Auditory.report_issue("User:search_result", e)
   ensure
@@ -93,7 +104,7 @@ class UsersController < ApplicationController
     @years = Time.zone.now.year.upto(Time.zone.now.year+20).to_a
   end
 
-  def edit  
+  def edit
     @user = @current_user
     @member_group_types = MemberGroupType.where(club_id: @current_club)
     @country = Carmen::Country.coded(@user.country)
@@ -102,25 +113,26 @@ class UsersController < ApplicationController
   end
 
   def save_the_sale
-    if request.post?
-      if TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id).nil?
-        flash[:error] = "Subscription plan not found"
+    @sts_toms = TermsOfMembership.select(:id, :name).where(club_id: @current_club, show_in_save_the_sale: true)
+    @all_toms = TermsOfMembership.select(:id, :name).where(club_id: @current_club)
+    return unless request.post?
+    if TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id).nil?
+      flash[:error] = 'Subscription plan not found'
+      redirect_to show_user_path
+    else
+      save_the_sale_params = { remove_club_cash: params[:remove_club_cash].present? }
+      answer = current_user.save_the_sale(params[:terms_of_membership_id], current_agent, params[:change_tom_date], save_the_sale_params)
+      if answer[:code] == Settings.error_codes.success
+        flash[:notice] = "Save the sale succesfully applied: #{answer[:message]}"
         redirect_to show_user_path
       else
-        save_the_sale_params = { remove_club_cash: params[:remove_club_cash].present? }
-        answer = current_user.save_the_sale(params[:terms_of_membership_id], current_agent, params[:change_tom_date], save_the_sale_params)
-        if answer[:code] == Settings.error_codes.success
-          flash[:notice] = "Save the sale succesfully applied: #{answer[:message]}"
-          redirect_to show_user_path
-        else
-          flash.now[:error] = answer[:message]
-        end
+        flash.now[:error] = answer[:message]
       end
     end
   end
 
   def unschedule_future_tom_update
-    if current_user.can_change_tom? and @current_user.update_attributes change_tom_date: nil, change_tom_attributes: nil 
+    if current_user.can_change_tom? and @current_user.update_attributes change_tom_date: nil, change_tom_attributes: nil
       message = "Unschedule TOM change."
       Auditory.audit(current_agent, current_user.current_membership, message, current_user, Settings.operation_types.unschedule_save_the_sale)
       flash[:notice] = message
@@ -136,10 +148,10 @@ class UsersController < ApplicationController
       if tom.nil?
         flash[:error] = "Subscription plan not found"
       else
-        answer = @current_user.recover(tom, current_agent, 
+        answer = @current_user.recover(tom, current_agent,
           { product_sku: params[:product_sku],
-            landing_url: request.env['HTTP_HOST'], 
-            referral_path: request.env['REQUEST_URI'], 
+            landing_url: request.env['HTTP_HOST'],
+            referral_path: request.env['REQUEST_URI'],
             ip_address: request.env['REMOTE_ADDR'] })
         if answer[:code] == Settings.error_codes.success
           flash[:notice] = answer[:message]
@@ -179,7 +191,7 @@ class UsersController < ApplicationController
       flash[:error] = I18n.t("error_messages.cannot_chargeback_transaction")
       redirect_to show_user_path
     end
-    
+
     if request.post?
       if params[:amount].to_f > @transaction.amount_available_to_refund
         flash.now[:error] = I18n.t("error_messages.chargeback_amount_greater_than_available")
@@ -199,7 +211,7 @@ class UsersController < ApplicationController
     @current_user.toggle :testing_account
     if @current_user.save
       if current_user.testing_account
-        current_user.fulfillments.where_cancellable.each do |fulfillment| 
+        current_user.fulfillments.where_cancellable.each do |fulfillment|
           fulfillment.update_status(current_agent, 'canceled', "Member set as testing account")
         end
       end
@@ -237,14 +249,14 @@ class UsersController < ApplicationController
 
   def blacklist
     @blacklist_reasons = MemberBlacklistReason.all
-    if request.post? 
+    if request.post?
       response = @current_user.blacklist(@current_agent, params[:reason])
       if response[:code] == Settings.error_codes.success
-        flash[:notice] = response[:message] 
+        flash[:notice] = response[:message]
       else
         flash[:error] = response[:message]
       end
-      redirect_to show_user_path  
+      redirect_to show_user_path
     end
   end
 
@@ -257,11 +269,11 @@ class UsersController < ApplicationController
       else
         flash.now[:error] = answer[:message]
         @errors = answer[:errors]
-      end  
+      end
     end
   end
 
-  def set_undeliverable 
+  def set_undeliverable
     if request.post?
       answer = @current_user.set_wrong_address(@current_agent, params[:reason])
       if answer[:code] == Settings.error_codes.success
@@ -271,7 +283,7 @@ class UsersController < ApplicationController
       end
       respond_to do |format|
         format.html { redirect_to show_user_path }
-        format.json { render json: { :message => answer[:message], :code => answer[:code] }} 
+        format.json { render json: { :message => answer[:message], :code => answer[:code] }}
       end
     end
   end
@@ -310,7 +322,7 @@ class UsersController < ApplicationController
     else
       flash[:error] = "User cannot be rejected. It must be applied."
     end
-    redirect_to show_user_path  
+    redirect_to show_user_path
   end
 
   def login_as_user
@@ -368,7 +380,7 @@ class UsersController < ApplicationController
         message = "Member synchronized"
       end
       Auditory.audit(@current_agent, @current_user, message, @current_user, Settings.operation_types.user_manually_synced_to_drupal)
-      redirect_to show_user_path, notice: message    
+      redirect_to show_user_path, notice: message
     end
   rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
@@ -380,7 +392,7 @@ class UsersController < ApplicationController
     @api_user = @current_user.api_user
     @data = @api_user.get
     respond_to do |format|
-      format.html 
+      format.html
     end
   end
 
@@ -416,7 +428,7 @@ class UsersController < ApplicationController
 
   def resend_communication
     my_authorize! :send, Communication, current_club.id
-    begin    
+    begin
       comm = Communication.find(params[:communication_id])
       comm.resend!
       Auditory.audit(@current_agent, @current_user, I18n.t('activerecord.attributes.communication.resent_success'), @current_user, Settings.operation_types.resend_communication)
@@ -481,7 +493,7 @@ class UsersController < ApplicationController
     render :partial => 'users/operations'
   end
 
-  def credit_cards_content 
+  def credit_cards_content
     my_authorize! :list, CreditCard, @current_club.id
     @credit_cards = @current_user.credit_cards.all
     render :partial => 'users/credit_cards', :locals => { :credit_cards => @credit_cards }
@@ -497,11 +509,11 @@ class UsersController < ApplicationController
     render :partial => 'users/memberships'
   end
 
-  private 
+  private
     def sort_column
       @sort_column ||= ['status', 'id', 'full_name', 'full_address' ].include?(params[:sort]) ? params[:sort] : 'join_date'
     end
-    
+
     def sort_direction
       @sort_direction ||= %w[asc desc].include?(params[:direction]) ? params[:direction] : 'desc'
     end
