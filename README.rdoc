@@ -25,8 +25,10 @@ RAILS_ENV=test rake sunspot:solr:start
 Use the following command to stop solr
 RAILS_ENV=test rake sunspot:solr:stop
 
-
-
+# Generating SSL certificates with letsencrypt for CS and checkout subdomains in Production
+sudo ufw allow 80
+certbot-auto certonly -a webroot --webroot-path=/var/www/sac-platform/current/public -d cs.affinitystop.com -d api.affinitystop.com -d checkout.onmc.com -d checkout.stockcarracefans.com 
+sudo ufw deny 80
 
 http://rails-erd.rubyforge.org/install.html
 sudo aptitude install graphviz
