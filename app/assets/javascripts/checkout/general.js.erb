@@ -47,6 +47,13 @@ function checkoutPageFunctions() {
     }
   });
 
+  $('body').keydown(function() {
+    if (event.keyCode == 13) {
+      document.activeElement.blur();
+      return false;
+    }
+  });
+
   $('#submit').click(function() {
     toggleFields(false);
   });

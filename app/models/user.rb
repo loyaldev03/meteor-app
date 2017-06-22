@@ -1177,10 +1177,10 @@ class User < ActiveRecord::Base
   end
 
   def validate_if_credit_card_already_exist(tom, credit_card, only_validate = true, allow_cc_blank = false, current_agent = nil, set_active = true)
-    new_month, new_year, new_number = credit_card["expire_month"], credit_card["expire_year"], credit_card["number"].to_s
+    new_month, new_year, new_number = credit_card["expire_month"], credit_card["expire_year"], (credit_card["number"] || credit_card.number).to_s
     answer = { message: "Credit card valid", code: Settings.error_codes.success}
     family_memberships_allowed = tom.club.family_memberships_allowed
-    new_credit_card = CreditCard.new(number: new_number, expire_month: new_month, expire_year: new_year, token: credit_card["token"])
+    new_credit_card = CreditCard.new(number: new_number, expire_month: new_month, expire_year: new_year, token: credit_card["token"], cc_type: credit_card.try(:cc_type))
     new_credit_card.get_token(tom.payment_gateway_configuration, self)
 
     credit_cards = if new_credit_card.token.nil?
