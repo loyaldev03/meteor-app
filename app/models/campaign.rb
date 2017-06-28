@@ -14,7 +14,6 @@ class Campaign < ActiveRecord::Base
 
   before_validation :set_utm_medium
   before_validation :set_campaign_code
-  before_save :set_utm_content
   before_save :sanitize_transport_campaign_id
   before_create :set_landing_url
   after_update :fetch_campaign_days_data
@@ -150,12 +149,6 @@ class Campaign < ActiveRecord::Base
       :email
     when 'adwords'
       :search
-    end
-  end
-
-  def set_utm_content
-    unless (self.utm_content.start_with?('email_') || self.utm_content.start_with?('banner_'))
-      self.utm_content = (mailchimp? ? 'email' : 'banner') + '_' + utm_content
     end
   end
 
