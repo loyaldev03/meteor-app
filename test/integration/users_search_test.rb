@@ -71,30 +71,30 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     search_user({"user[id]" => "#{@search_user.id}"}, @search_user)    
   end
 
-  test "search user by date billing information" do
-    setup_user(false)
-    Delayed::Worker.delay_jobs = true    
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
-    saved_credit_card = @saved_user.active_credit_card
-    Delayed::Job.all.each{ |x| x.invoke_job }
-    Delayed::Worker.delay_jobs = false
-    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)      
-    transaction = Transaction.first
-    date_time = (transaction.created_at).utc
-    select_from_datepicker("user_transaction_start_date", date_time) 
-    within('#index_search_form') do 
-      click_link_or_button 'Search'        
-    end 
-    within("#users") do
-      assert page.has_content?(@saved_user.status)
-      assert page.has_content?("#{@saved_user.id}")
-      assert page.has_content?(@saved_user.email)
-      assert page.has_content?(@saved_user.full_name)
-      assert page.has_content?(@saved_user.full_address)
-    end
-  end
+  # test "search user by date billing information" do
+  #   setup_user(false)
+  #   Delayed::Worker.delay_jobs = true    
+  #   unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
+  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+  #   @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
+  #   saved_credit_card = @saved_user.active_credit_card
+  #   Delayed::Job.all.each{ |x| x.invoke_job }
+  #   Delayed::Worker.delay_jobs = false
+  #   visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)      
+  #   transaction = Transaction.first
+  #   date_time = (transaction.created_at).utc
+  #   select_from_datepicker("user_transaction_start_date", date_time) 
+  #   within('#index_search_form') do 
+  #     click_link_or_button 'Search'        
+  #   end 
+  #   within("#users") do
+  #     assert page.has_content?(@saved_user.status)
+  #     assert page.has_content?("#{@saved_user.id}")
+  #     assert page.has_content?(@saved_user.email)
+  #     assert page.has_content?(@saved_user.full_name)
+  #     assert page.has_content?(@saved_user.full_address)
+  #   end
+  # end
 
   test "search user by amount billing information" do
     setup_user(false)
