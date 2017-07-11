@@ -188,7 +188,7 @@ class ClubTest < ActionDispatch::IntegrationTest
     @club.payment_gateway_configurations.first.update_attribute(:club_id,nil)
     visit my_clubs_path
     within("#my_clubs_table") do
-      within("tr", text: @club.name, exact: true){ click_link_or_button 'Users' }
+      within("tr", text: @club.name, match: :prefer_exact){ click_link_or_button 'Users' }
     end
     assert page.has_no_content?("We're sorry, but something went wrong.")
   end

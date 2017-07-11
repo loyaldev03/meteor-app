@@ -71,7 +71,7 @@ gem "select2-rails"
 gem 'rack-cors'
 gem 'minitest', '~>5.1'
 gem 'friendly_id', '~> 5.1.0'
-gem 'daemons'
+gem 'daemons', '1.1.9'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
@@ -110,7 +110,7 @@ group :test do
   gem 'faker', github: 'stympy/faker'
   gem 'mocha', require: false
   gem 'capybara'
-  gem 'selenium-webdriver', '>=2.53.0'
+  gem 'selenium-webdriver', '2.53.4'
   gem 'brakeman'
   gem 'simplecov'
   gem "timecop"

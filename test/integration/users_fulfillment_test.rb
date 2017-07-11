@@ -417,7 +417,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do 
-      within("tr", text: @club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
 
@@ -450,7 +450,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
 
@@ -493,7 +493,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     end
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @saved_user.club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
     fulfillment = Fulfillment.find_by_product_sku(Settings.others_product)
@@ -577,7 +577,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     fulfillment.set_as_in_process
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @saved_user.club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
@@ -623,7 +623,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @saved_user.club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
@@ -657,7 +657,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @saved_user.club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
@@ -676,7 +676,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     end
     visit products_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#products_table") do 
-      within("tr", :text => product.name, exact: true){click_link_or_button 'Edit'}
+      within("tr", :text => product.name, match: :prefer_exact){click_link_or_button 'Edit'}
     end
 
     page.has_content?('Edit Product')
@@ -685,7 +685,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @saved_user.club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
@@ -788,7 +788,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @saved_user.club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
@@ -816,7 +816,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     @fulfillment.reload
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
-      within("tr", text: @saved_user.club.name, exact: true){click_on 'Fulfillments'}
+      within("tr", text: @saved_user.club.name, match: :prefer_exact){click_on 'Fulfillments'}
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
@@ -1059,7 +1059,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     setup_user
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do 
-      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+      within('tr', text: @saved_user.club.name, match: :prefer_exact){ click_link_or_button("Fulfillments") }
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
@@ -1078,7 +1078,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do
-      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button 'Fulfillments' }
+      within('tr', text: @saved_user.club.name, match: :prefer_exact){ click_link_or_button 'Fulfillments' }
     end
     page.has_content?("Fulfillments")
 
@@ -1113,7 +1113,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do 
-      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+      within('tr', text: @saved_user.club.name, match: :prefer_exact){ click_link_or_button("Fulfillments") }
     end
     page.has_content?("Fulfillments")
 
@@ -1158,7 +1158,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     
     click_link_or_button("My Clubs")
     within("#my_clubs_table")do
-      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+      within('tr', text: @saved_user.club.name, match: :prefer_exact){ click_link_or_button("Fulfillments") }
     end
     page.has_content?("Fulfillments")
 
@@ -1215,7 +1215,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     end
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do 
-      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+      within('tr', text: @saved_user.club.name, match: :prefer_exact){ click_link_or_button("Fulfillments") }
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do
@@ -1363,7 +1363,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert_equal(fulfillment.recurrent,false)
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do 
-      within('tr', text: @saved_user.club.name, exact: true){ click_link_or_button("Fulfillments") }
+      within('tr', text: @saved_user.club.name, match: :prefer_exact){ click_link_or_button("Fulfillments") }
     end
     page.has_content?("Fulfillments")
     within("#fulfillments_table")do

@@ -1072,7 +1072,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     created_user = User.find_by_email(unsaved_user.email)  
 
     visit edit_club_path(@club_with_family.partner.prefix, @club_with_family.id)
-    assert_nil find(:xpath, "//input[@id='club_family_memberships_allowed']").set(true)
+    assert page.has_checked_field?('club_club_cash_enable')
 
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club_with_family.id)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)

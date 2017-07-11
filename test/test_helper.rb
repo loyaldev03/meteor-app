@@ -29,7 +29,7 @@ Capybara.current_driver = :selenium
 # Capybara.javascript_driver = :chrome
 # Capybara.current_driver = :chrome
 ## end chrome configuration
-# Capybara.default_wait_time = 10
+# Capybara.default_max_wait_time = 10
 
 class ActiveRecord::Base
   mattr_accessor :shared_connection
@@ -226,7 +226,7 @@ module ActionDispatch
     end
 
     def wait_until
-      Timeout.timeout(Capybara.default_wait_time) do
+      Timeout.timeout(Capybara.default_max_wait_time) do
         sleep(0.1) until value = yield
         value
       end

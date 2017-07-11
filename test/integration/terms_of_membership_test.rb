@@ -469,7 +469,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     visit show_user_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :user_prefix => @saved_user.id)
   end
 
-  # # # EDIT
+  # # EDIT
 
   test "Edit subcription plan with Initial Fee distinct of 0 - No membership  associated" do
     sign_in_as(@admin_agent)
@@ -669,7 +669,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     tom_name = 'TOM Name'
     tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
-    within('#terms_of_memberships_table') do
+    within('#terms_of_memberships_table') do      
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
       within("tr", :text => tom_name) do
         click_link_or_button "Edit"
@@ -680,8 +680,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     click_link_or_button 'Edit Membership Terms'
     fill_in_step_2({initial_fee_amount:10, trial_period_amount:20, trial_period_lasting:30},{trial_period_lasting_time_span:"Month(s)"},["is_payment_expected_no","subscription_terms_until_cancelled"])
     click_link_or_button 'Edit Upgrades / Downgrades'
-    
-    first("div", I18n.t('activerecord.attributes.terms_of_membership.wizard.no_downgrade_upgrade_configuration'))
+    assert page.has_content? ('According to the configuration you selected on step 2, there is nothing to configure on this step.')      
     click_link_or_button 'Update Plan'
     assert page.has_content?('was updated succesfully') # TOM was created
     assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table

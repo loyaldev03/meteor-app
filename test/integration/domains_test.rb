@@ -12,7 +12,7 @@ class DomainTest < ActionDispatch::IntegrationTest
     visit admin_partners_path
     assert page.has_content?('Partners')
     within("#partners_table")do 
-      within('tr', text: @partner.name, exact: true){click_link_or_button 'Dashboard'}
+      within('tr', text: @partner.name, match: :prefer_exact){click_link_or_button 'Dashboard'}
     end
     assert page.has_content?('Partner')
     within(".sidebar-nav"){ click_link_or_button 'Domains' }
@@ -51,7 +51,7 @@ class DomainTest < ActionDispatch::IntegrationTest
     saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
     visit admin_partners_path
     within("#partners_table") do
-      within('tr', text: @partner.name, exact: true){click_link_or_button 'Dashboard'}
+      within('tr', text: @partner.name, match: :prefer_exact){click_link_or_button 'Dashboard'}
     end
     click_link_or_button 'Domains'
     assert page.has_content?(saved_domain.url)
