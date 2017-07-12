@@ -65,37 +65,38 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       click_link_or_button 'Search'        
     end 
   end
-
+  
   test "search user by user id" do
     setup_search
     search_user({"user[id]" => "#{@search_user.id}"}, @search_user)    
   end
 
-  # test "search user by date billing information" do
-  #   setup_user(false)
-  #   Delayed::Worker.delay_jobs = true    
-  #   unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
-  #   @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
-  #   saved_credit_card = @saved_user.active_credit_card
-  #   Delayed::Job.all.each{ |x| x.invoke_job }
-  #   Delayed::Worker.delay_jobs = false
-  #   visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)      
-  #   transaction = Transaction.first
-  #   date_time = (transaction.created_at).utc
-  #   select_from_datepicker("user_transaction_start_date", date_time) 
-  #   within('#index_search_form') do 
-  #     click_link_or_button 'Search'        
-  #   end 
-  #   within("#users") do
-  #     assert page.has_content?(@saved_user.status)
-  #     assert page.has_content?("#{@saved_user.id}")
-  #     assert page.has_content?(@saved_user.email)
-  #     assert page.has_content?(@saved_user.full_name)
-  #     assert page.has_content?(@saved_user.full_address)
-  #   end
-  # end
-
+  test "search user by date billing information" do
+    setup_user(false)
+    Delayed::Worker.delay_jobs = true    
+    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
+    saved_credit_card = @saved_user.active_credit_card
+    Delayed::Job.all.each{ |x| x.invoke_job }
+    Delayed::Worker.delay_jobs = false
+    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)      
+    transaction = Transaction.first
+    date_time = (transaction.created_at).utc
+    select_from_datepicker("user_transaction_start_date", date_time)
+    sleep 5
+    within('#index_search_form') do
+      click_link_or_button 'Search'        
+    end 
+    within("#users") do
+      assert page.has_content?(@saved_user.status)
+      assert page.has_content?(@saved_user.id.to_s)
+      assert page.has_content?(@saved_user.email)
+      assert page.has_content?(@saved_user.full_name)
+      assert page.has_content?(@saved_user.full_address)
+    end
+  end
+  
   test "search user by amount billing information" do
     setup_user(false)
     Delayed::Worker.delay_jobs = true    
@@ -108,7 +109,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)      
     search_user({"user[transaction_amount]" => 0.50}, @saved_user)
   end  
-
+  
   test "search user by phone" do
     setup_search
     @search_user.update_attribute :phone_country_code, "987"
@@ -117,7 +118,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     @search_user.index.store @search_user
     search_user({"user[phone_number]" => "987-987-9685"}, @search_user)
   end
-
+  
   test "search user by first_name" do
     setup_search
     search_user({"user[first_name]" => "#{@search_user.first_name}"}, @search_user)
@@ -125,7 +126,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     @search_user.index.store @search_user
     search_user({"user[first_name]" => "Bar Dar"}, @search_user)
   end
-
+  
   # Search user with duplicated letters at Last Name
   test "search by last name" do
     setup_search false
@@ -154,47 +155,47 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       assert page.has_css?('tr td.btn-danger')
     end
   end
-
+  
   test "search user by email" do
     setup_search
     search_user({"user[email]" => "#{@search_user.email}"}, @search_user)
     search_user({"user[email]" => "#{@search_user.email.split('@').first}*"}, @search_user)
   end
-
+  
   test "search user by city" do
     setup_search
     search_user({"user[city]" => "#{@search_user.city}"}, @search_user)
   end
-
+  
   test "search user by state" do
     setup_search
     user_to_search = User.order("id").last
     search_user({}, user_to_search, user_to_search.country)
   end
-
+  
   test "search user by user zip" do
     setup_search
     search_user({"user[zip]" => "#{@search_user.zip}"}, @search_user)
   end
-
+  
   test "search by last digits" do
     setup_search
     cc_last_digits = 8965
     @search_user.active_credit_card.update_attribute :last_digits, cc_last_digits
     @search_user.index.store @search_user
-
+  
     within("#payment_details")do
       fill_in "user[cc_last_digits]", :with => cc_last_digits.to_s
     end
     within('#index_search_form') do 
       click_on 'Search'
     end
-
+  
     within("#users")do
       find("tr", :text => @search_user.full_name)
     end
   end
-
+  
   test "search by last status" do
     setup_search
     ["provisional", "active", "lapsed"].each do |status|
@@ -210,7 +211,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       end
     end
   end
-
+  
   # TODO: refactor this test. Create one test "go from user index to edit user's" something general. And create
   # one test that validates that "edit user's phone number to a wrong phone number" without using search 
   test "go from user index to edit user's classification to VIP and to Celebrity" do
@@ -227,7 +228,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       assert find_field('input_member_group_type').value == value
     end
   end
-
+  
   test "View token in user record - Admin and Supervisor role" do
     setup_user(false)
     stubs_elasticsearch_index
@@ -238,7 +239,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     ['admin', 'supervisor'].each do |role|
       @admin_agent.update_attribute(:roles, "supervisor")
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-
+  
       within("#table_active_credit_card") do
         assert page.has_content?("#{saved_credit_card.token}")
       end
@@ -248,7 +249,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       end
     end
   end
-
+  
   test "View token in user record - Representative rol" do
     setup_user(false)
     stubs_elasticsearch_index
@@ -268,7 +269,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       assert page.has_no_content?("#{saved_credit_card.token}")
     end
   end 
-
+  
   # Organize User results by Pagination
   test "search user by pagination" do
     setup_user
@@ -312,24 +313,24 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       end
     end
   end
-
+  
   test "display user" do
     setup_search
     search_user({"user[id]" => "#{@search_user.id}"}, @search_user)
     page.execute_script("window.jQuery('.odd:first a:first').find('.icon-zoom-in').click()")
-
+  
     validate_view_user_base(@search_user, @search_user.status)
-
+  
     within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table") { assert page.has_content?(operations_table_empty_text) }
-
+  
     active_credit_card = @search_user.active_credit_card
     within(".nav-tabs"){ click_on("Credit Cards") }
     within("#credit_cards") { 
       assert page.has_content?("#{active_credit_card.number}") 
       assert page.has_content?("#{active_credit_card.expire_month} / #{active_credit_card.expire_year}")
     }
-
+  
     within(".nav-tabs"){ click_on("Transactions") }
     within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }    
     within(".nav-tabs"){ click_on("Fulfillments") }
@@ -337,7 +338,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     within(".nav-tabs"){ click_on("Communications") }
     within("#communications") { assert page.has_content?(communication_table_empty_text) }
   end
-
+  
   test "search by multiple values, trimming and also with invalid characters" do
     setup_user
     user_to_search = User.first
@@ -354,7 +355,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     #   assert page.has_content?('No records were found.')
     # end
   end
-
+  
   test "search user that does not exist" do
     setup_user
     visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -368,7 +369,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       assert page.has_content?('No records were found.')
     end
   end
-
+  
   test "should accept applied user" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
@@ -383,16 +384,16 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-
+  
     click_link_or_button 'Approve'
     confirm_ok_js
     assert find_field('input_first_name').value == @saved_user.first_name
- 
+  
     within("#table_membership_information") do  
       within("#td_mi_status") { assert page.has_content?('provisional') }
     end
   end
-
+  
   test "should reject applied user" do
     @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
     @partner = FactoryGirl.create(:partner)
@@ -404,27 +405,27 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     credit_card = FactoryGirl.build(:credit_card)
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
-
+  
     sign_in_as(@admin_agent)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
   
     click_link_or_button 'Reject'
     confirm_ok_js
-
+  
     assert find_field('input_first_name').value == @saved_user.first_name
-
+  
     @saved_user.reload
     within("#table_membership_information") do  
       within("#td_mi_status") { assert page.has_content?('lapsed') }
     end
   end
-
+  
   test "canceled date will be abble to be cancelled once set." do
     setup_user
     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
-
+  
     click_link_or_button 'Cancel'
     sleep 1
     page.execute_script("window.jQuery('#cancel_date').next().click()")
@@ -443,7 +444,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     @saved_user.reload
     assert find_field('input_first_name').value == @saved_user.first_name
     assert page.has_content?("Member cancellation scheduled to #{I18n.l(@saved_user.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}") 
-
+  
     click_link_or_button 'Cancel'
     date = Time.zone.now + 3.day
     page.execute_script("window.jQuery('#cancel_date').next().click()")
@@ -460,14 +461,14 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     find(".alert", :text => "Member cancellation scheduled to #{I18n.l(@saved_user.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}" )
     assert page.has_content? "Member cancellation scheduled to #{I18n.l(@saved_user.cancel_date, :format => :only_date)} - Reason: #{cancel_reason.name}"
   end
-
+  
   # See an user is blacklisted in the search results
   test "should show status with 'Blisted' on search results, when user is blacklisted." do
     setup_user
     cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
     @saved_user.set_as_canceled!
     @saved_user.update_attribute(:blacklisted,true)
-
+  
     search_user({"user[id]" => "#{@saved_user.id}"}, @saved_user)
     within("#users")do
       assert page.has_content?("- Blisted")
