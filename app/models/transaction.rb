@@ -285,7 +285,11 @@ class Transaction < ActiveRecord::Base
         save_custom_response({ code: Settings.error_codes.credit_card_blank_without_grace, message: "Credit card is blank we wont bill" })
       else
         load_gateway
-        credit_response=@gateway.credit(amount_to_send, credit_card_token, @options)
+        credit_response = nil
+        time_elapsed    = Benchmark.ms do
+          credit_response = @gateway.credit(amount_to_send, credit_card_token, @options)
+        end
+        logger.info "AM::Credit::Answer #{gateway} took #{time_elapsed}ms"
         save_response(credit_response)
       end
     rescue Timeout::Error
@@ -303,7 +307,11 @@ class Transaction < ActiveRecord::Base
         save_custom_response({ code: Settings.error_codes.credit_card_blank_without_grace, message: "Credit card is blank we wont bill" })
       else
         load_gateway
-        refund_response=@gateway.refund(amount_to_send, refund_response_transaction_id, @options)
+        refund_response = nil
+        time_elapsed    = Benchmark.ms do
+          refund_response = @gateway.refund(amount_to_send, refund_response_transaction_id, @options)
+        end
+        logger.info "AM::Refund::Answer #{gateway} took #{time_elapsed}ms"
         save_response(refund_response)
       end
     rescue Timeout::Error
@@ -324,7 +332,11 @@ class Transaction < ActiveRecord::Base
         save_custom_response({ code: Settings.error_codes.credit_card_blank_without_grace, message: "Credit card is blank we wont bill" })
       else
         load_gateway
-        purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
+        purchase_response = nil
+        time_elapsed = Benchmark.ms do
+          purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
+        end
+        logger.info "AM::Sale::Answer #{gateway} took #{time_elapsed}ms"
         save_response(purchase_response)
       end
     end

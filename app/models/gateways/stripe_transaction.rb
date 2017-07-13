@@ -8,9 +8,12 @@ class StripeTransaction < Transaction
   def self.store!(am_credit_card, pgc, user)
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
     gateway = ActiveMerchant::Billing::StripeGateway.new login: pgc.login
-    params = user.stripe_id ? {customer: user.stripe_id, :set_default => true} : {email: user.email, :set_default => true}
-    answer = gateway.store(am_credit_card, params)
-    logger.info "AM::Store::Answer => " + answer.inspect
+    params  = user.stripe_id ? {customer: user.stripe_id, :set_default => true} : {email: user.email, :set_default => true}
+    answer  = nil
+    time_elapsed = Benchmark.ms do
+      answer = gateway.store(am_credit_card, params)
+    end
+    logger.info "AM::Store::Answer => (#{pgc.gateway} took #{time_elapsed}ms)" + answer.inspect
     raise answer.params["error"]["code"] if answer.params["error"]
     if user.stripe_id
       answer.params["fingerprint"]

@@ -7,10 +7,13 @@ class TrustCommerceTransaction < Transaction
 
   def self.store!(am_credit_card, pgc)
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
-    login_data = { login: pgc.login, password: pgc.password }
-    gateway = ActiveMerchant::Billing::TrustCommerceGateway.new(login_data)
-    answer = gateway.store(am_credit_card)
-    logger.info "AM::Store::Answer => " + answer.inspect
+    login_data  = { login: pgc.login, password: pgc.password }
+    gateway     = ActiveMerchant::Billing::TrustCommerceGateway.new(login_data)
+    answer      = nil
+    time_elapsed = Benchmark.ms do
+      answer = gateway.store(am_credit_card)
+    end
+    logger.info "AM::Store::Answer => (#{pgc.gateway} took #{time_elapsed}ms)" + answer.inspect
     raise answer.params['status'] unless answer.success?    
     answer.params["billingid"] if answer.params
   end

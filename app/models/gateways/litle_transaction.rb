@@ -14,8 +14,10 @@ class LitleTransaction < Transaction
     login_data = { login: pgc.login, password: pgc.password, merchant_id: pgc.merchant_key }
     token, answer = nil, nil
     gateway = ActiveMerchant::Billing::LitleGateway.new(login_data)
-    answer = gateway.store(am_credit_card)
-    logger.info "AM::Store::Answer => " + answer.inspect
+    time_elapsed = Benchmark.ms do
+      answer = gateway.store(am_credit_card)
+    end
+    logger.info "AM::Store::Answer => (#{pgc.gateway} took #{time_elapsed}ms)" + answer.inspect
     raise answer.params['litleOnlineResponse']['response'] unless answer.success?
     answer.params['litleOnlineResponse']['registerTokenResponse']['litleToken']
   end

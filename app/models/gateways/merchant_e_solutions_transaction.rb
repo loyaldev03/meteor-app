@@ -11,10 +11,13 @@ class MerchantESolutionsTransaction < Transaction
   # AM::Store::Answer => #<ActiveMerchant::Billing::Response:0x0000000718c228 @params={"transaction_id"=>"1e9be6d0b4303619897d20524de49372", "error_code"=>"000", "auth_response_text"=>"Card Data Stored"}, @message="This transaction has been approved", @success=true, @test=true, @authorization="1e9be6d0b4303619897d20524de49372", @fraud_review=nil, @avs_result={"code"=>nil, "message"=>nil, "street_match"=>nil, "postal_match"=>nil}, @cvv_result={"code"=>nil, "message"=>nil}>
   def self.store!(am_credit_card, pgc)
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
-    login_data = { login: pgc.login, password: pgc.password, merchant_key: pgc.merchant_key }
-    gateway = ActiveMerchant::Billing::MerchantESolutionsGateway.new(login_data)
-    answer = gateway.store(am_credit_card)
-    logger.info "AM::Store::Answer => " + answer.inspect
+    login_data  = { login: pgc.login, password: pgc.password, merchant_key: pgc.merchant_key }
+    gateway     = ActiveMerchant::Billing::MerchantESolutionsGateway.new(login_data)
+    answer      = nil
+    time_elapsed = Benchmark.ms do
+      answer = gateway.store(am_credit_card)
+    end
+    logger.info "AM::Store::Answer => (#{pgc.gateway} took #{time_elapsed}ms)" + answer.inspect
     raise answer.params['error_code'] unless answer.success?
     answer.params['transaction_id']
   end
