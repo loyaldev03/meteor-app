@@ -23,8 +23,9 @@ class CampaignTest < ActionDispatch::IntegrationTest
     select_from_datepicker("campaign_finish_date", unsaved_campaign.finish_date)
     select(campaign_type.capitalize, from: "campaign[campaign_type]")
     select(transport.capitalize, from: 'campaign[transport]')
+    select(unsaved_campaign.utm_medium, from: 'campaign[utm_medium]')
     fill_in 'campaign[transport_campaign_id]', with: unsaved_campaign.transport_campaign_id
-    fill_in 'campaign[utm_content]', with: unsaved_campaign.utm_content
+    fill_in 'campaign[utm_content]', with: unsaved_campaign.utm_content    
     fill_in 'campaign[audience]', with: unsaved_campaign.audience  
     fill_in 'campaign[delivery_date]', with: unsaved_campaign.delivery_date 
     find(:xpath, "//body").find(".select2-search__field").set(@preference_group.name) 
@@ -80,7 +81,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     assert page.has_css?("#campaign_enrollment_price[disabled]")
     assert page.has_css?("#campaign_campaign_type[readonly]")
     assert page.has_css?("#transport[readonly]")
-    assert page.has_css?("#campaign_utm_medium[readonly]")    
+    assert page.has_css?("#campaign_utm_medium[disabled]")    
     assert page.has_css?("#campaign_utm_content[disabled]")
     assert page.has_css?("#campaign_audience[disabled]")
     assert page.has_css?("#campaign_campaign_code[disabled]")   

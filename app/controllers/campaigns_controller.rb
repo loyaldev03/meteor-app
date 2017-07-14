@@ -59,7 +59,7 @@ class CampaignsController < ApplicationController
   private
 
   def campaign_params
-    params.require(:campaign).permit(:name, :landing_name, :enrollment_price, :transport, :audience, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :utm_content, :transport_campaign_id, :campaign_code, :delivery_date)
+    params.require(:campaign).permit(:name, :landing_name, :enrollment_price, :transport, :audience, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :utm_content, :utm_medium, :transport_campaign_id, :campaign_code, :delivery_date)
   end
 
   def sanitize_preference_groups

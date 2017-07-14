@@ -971,25 +971,6 @@ function newCampaignFunctions(clubId, getSubscriptionPlansUrl, getFulfillmentCod
   $("#campaign_transport").select2();
   disableEnrollRelatedField($("#campaign_campaign_type").val());
 
-  $('#campaign_transport').change(function() {
-    setCampaignMedium($('#campaign_transport').val());
-  });
-  function setCampaignMedium(transport_type) {
-    var medium = '';
-    switch(transport_type) {
-      case 'facebook':
-      case 'twitter':
-        medium = 'display';
-        break;
-      case 'mailchimp':
-        medium = 'email';
-        break;
-      case 'adwords':
-        medium = 'search';
-        break;
-    }
-    $('#campaign_utm_medium').val(medium);
-  }
   $(".select2-container").css('display', 'inline-block');
 
   $("#campaign_campaign_type").change(function(){
@@ -1007,6 +988,7 @@ function editCampaignFunctions(canEditTransportId, canSetDatesInThePast, initial
     'transport',
     'audience',
     'utm_content',
+    'utm_medium',
     'transport_campaign_id',
     'campaign_code'
   ];

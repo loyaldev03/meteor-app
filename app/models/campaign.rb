@@ -12,15 +12,15 @@ class Campaign < ActiveRecord::Base
   has_and_belongs_to_many :preference_groups
   has_many :campaign_products, -> { order(position: :asc) }
 
-  before_validation :set_utm_medium
   before_validation :set_campaign_code
   before_save :sanitize_transport_campaign_id
   before_create :set_landing_url
   after_update :fetch_campaign_days_data
 
-  TRANSPORTS_FOR_MANUAL_UPDATE = ['twitter', 'adwords']
-  NO_ENROLLMENT_CAMPAIGN_TYPE = ['store_promotion', 'newsletter']
-  MAX_PRODUCTS_ALLOWED = 25
+  TRANSPORTS_FOR_MANUAL_UPDATE  = ['twitter', 'adwords']
+  NO_ENROLLMENT_CAMPAIGN_TYPE   = ['store_promotion', 'newsletter']
+  AVAILABLE_MEDIUMS             = ['display', 'email', 'search', 'referral']
+  MAX_PRODUCTS_ALLOWED          = 25
 
   validates :name, :landing_name, :initial_date, :campaign_type, :transport,
     :utm_medium, :utm_content, :audience, :campaign_code,
@@ -45,7 +45,8 @@ class Campaign < ActiveRecord::Base
     facebook:   0,
     mailchimp:  1,
     twitter:    2,
-    adwords:    3
+    adwords:    3,
+    nascar:     4
   }
 
   scope :active, -> (date = nil) {
@@ -139,17 +140,6 @@ class Campaign < ActiveRecord::Base
 
   def sanitize_transport_campaign_id
     self.transport_campaign_id.strip! if self.transport_campaign_id
-  end
-
-  def set_utm_medium
-    self.utm_medium = case transport
-    when 'facebook', 'twitter'
-      :display
-    when 'mailchimp'
-      :email
-    when 'adwords'
-      :search
-    end
   end
 
   def fetch_campaign_days_data
