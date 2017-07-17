@@ -13,7 +13,7 @@ class FirstDataTransaction < Transaction
     time_elapsed = Benchmark.ms do
       answer = gateway.store(am_credit_card)
     end
-    logger.info "AM::Store::Answer => (#{pgc.gateway} took #{time_elapsed}ms)" + answer.inspect
+    logger.info "AM::Store::Answer (#{pgc.gateway} took #{time_elapsed}ms) => " + answer.inspect
     raise answer.message unless answer.success?    
     answer.params["transarmor_token"] if answer.params
   end

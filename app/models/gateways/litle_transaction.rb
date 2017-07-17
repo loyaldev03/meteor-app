@@ -17,7 +17,7 @@ class LitleTransaction < Transaction
     time_elapsed = Benchmark.ms do
       answer = gateway.store(am_credit_card)
     end
-    logger.info "AM::Store::Answer => (#{pgc.gateway} took #{time_elapsed}ms)" + answer.inspect
+    logger.info "AM::Store::Answer (#{pgc.gateway} took #{time_elapsed}ms) => " + answer.inspect
     raise answer.params['litleOnlineResponse']['response'] unless answer.success?
     answer.params['litleOnlineResponse']['registerTokenResponse']['litleToken']
   end
