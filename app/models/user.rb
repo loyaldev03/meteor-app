@@ -1456,7 +1456,7 @@ class User < ActiveRecord::Base
 
     def cancellation
       self.cancel_user_at_remote_domain
-      if (Time.zone.now.to_date - join_date.to_date).to_i <= Settings.days_to_wait_to_cancel_fulfillments
+      if (Time.zone.now.to_date - join_date.in_time_zone(get_club_timezone).to_date).to_i <= Settings.days_to_wait_to_cancel_fulfillments
         fulfillments.where_cancellable.each do |fulfillment| 
           fulfillment.update_status(nil, 'canceled', "Member canceled")
         end
