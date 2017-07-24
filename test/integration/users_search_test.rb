@@ -84,17 +84,12 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     transaction = Transaction.first
     date_time = (transaction.created_at).utc
     select_from_datepicker("user_transaction_start_date", date_time)
-    sleep 5
-    within('#index_search_form') do
-      click_link_or_button 'Search'        
-    end 
-    within("#users") do
-      assert page.has_content?(@saved_user.status)
-      assert page.has_content?(@saved_user.id.to_s)
-      assert page.has_content?(@saved_user.email)
-      assert page.has_content?(@saved_user.full_name)
-      assert page.has_content?(@saved_user.full_address)
-    end
+    find("#submit_button").click    
+    assert page.find('#table_user_search_result').has_content?(@saved_user.status)
+    assert page.find('#table_user_search_result').has_content?(@saved_user.id.to_s)
+    assert page.find('#table_user_search_result').has_content?(@saved_user.email)
+    assert page.find('#table_user_search_result').has_content?(@saved_user.full_name)
+    assert page.find('#table_user_search_result').has_content?(@saved_user.full_address)
   end
   
   test "search user by amount billing information" do
