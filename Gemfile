@@ -91,8 +91,9 @@ group :development do
   gem 'redcarpet'
   gem 'ruby-prof'
   # -> deploy
-  gem 'capistrano', '2.15.4'
-  gem 'rvm-capistrano',  require: false
+  gem "capistrano", "3.8"
+  gem 'capistrano-rails', '1.3'
+  gem 'capistrano-rvm'
   gem 'tinder'
   #####
   gem 'foreman'

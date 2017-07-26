@@ -1,19 +1,13 @@
-set :scm, :git
-set :application, 'sac-platform'
-set :cplatform, 'all'
-set :deploy_to, "/var/www/#{application}"
-set :repository, 'git@github.com:stoneacre/sac-platform.git'
-set :database_name, 'sac_production'
-set :rails_env, "production"
-set :user, 'deploy'
-set :keep_releases,       5
+server "50.116.20.46", user: 'deploy', roles: [:app, :web]
 
-server "50.116.20.46", :app, :web
-
-# taken from https://rvm.io/integration/capistrano/ && http://stackoverflow.com/questions/8003762/rvmsudo-does-not-work-in-deploy-rb-on-ubuntu
-# $:.unshift(File.expand_path('./lib', ENV['rvm_path'])) # commented this line because it loads another file
-set :rvm_type, :system 
-set :rvm_ruby_string, '2.2.0@global' 
-require 'rvm/capistrano'
-set :rvm_bin_path, "/usr/local/rvm/bin"
-set :sudo, 'rvmsudo'
+set :application,      'sac-platform'
+set :cplatform,        'all'
+set :deploy_to,        "/var/www/#{fetch(:application)}"
+set :repo_url,         'git@github.com:stoneacre/sac-platform.git'
+set :database_name,    'sac_production'
+set :rails_env,        "production"
+set :keep_releases,    5
+set :rvm_type,         :system 
+set :rvm_ruby_version, '2.2.0@global'
+set :rvm_custom_path,  '/usr/local/rvm'
+set :sudo,             'rvmsudo'
