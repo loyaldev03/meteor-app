@@ -16,7 +16,8 @@ Delayed::Worker.queue_attributes = {
   lyris_email: { priority: 15 },
   email_queue: { priority: 20 },
   drupal_queue: { priority: 15 },
-  generic_queue: { priority: 40 }
+  generic_queue: { priority: 40 },
+  campaigns: { priority: 40 }
 }
 
 Delayed::Worker.class_eval do

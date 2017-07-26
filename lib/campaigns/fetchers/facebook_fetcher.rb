@@ -23,6 +23,10 @@ class CampaignDataFetcher
             @report.spent     = report_data.spend.to_f
           end
           @report.meta        = report_data["meta"] || :no_error
+        else
+          @report.reached   = 0
+          @report.converted = 0
+          @report.spent     = 0
         end
       rescue => e
         @logger.error "FacebookFetcher Error: #{e.to_s}"
