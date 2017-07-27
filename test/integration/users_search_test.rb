@@ -182,13 +182,12 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     within("#payment_details")do
       fill_in "user[cc_last_digits]", :with => cc_last_digits.to_s
     end
-    within('#index_search_form') do 
-      click_on 'Search'
-    end
-  
-    within("#users")do
-      find("tr", :text => @search_user.full_name)
-    end
+    find("#submit_button").click
+    assert page.find('#table_user_search_result').has_content?(@search_user.status)
+    assert page.find('#table_user_search_result').has_content?(@search_user.id.to_s)
+    assert page.find('#table_user_search_result').has_content?(@search_user.email)
+    assert page.find('#table_user_search_result').has_content?(@search_user.full_name)
+    assert page.find('#table_user_search_result').has_content?(@search_user.full_address)
   end
   
   test "search by last status" do
@@ -343,12 +342,6 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     search_user({"user[id]" => "#{user_to_search.id}", "user[first_name]" => "  #{user_to_search.first_name}  ", 
                  "user[last_name]" => "  #{user_to_search.last_name}  ", "user[email]" => "  #{user_to_search.email}  ",
                  "user[city]" => "  #{user_to_search.city}  ", "user[zip]" => "  #{user_to_search.zip}  "}, user_to_search, user_to_search.country)
-    # search_user({"user[id]" => "#{user_to_search.id}", "user[first_name]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(", 
-    #              "user[last_name]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(", "user[email]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(",
-    #              "user[city]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*(", "user[zip]" => "~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*("}, user_to_search, user_to_search.country, false)
-    # within("#users")do
-    #   assert page.has_content?('No records were found.')
-    # end
   end
   
   test "search user that does not exist" do
