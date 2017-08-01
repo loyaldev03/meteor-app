@@ -17,8 +17,8 @@ namespace :deploy do
   desc "Restart application and Delayed Jobs"
   task :restart do
     on roles(:app) do
-      sudo :service, 'backend-sac-platform', :stop 
-      sudo :service, 'backend-sac-platform', :start 
+      sudo :service, fetch(:application), :stop 
+      sudo :service, fetch(:application), :start 
       execute :touch, current_path.join("tmp/restart.txt")
     end
   end
