@@ -50,7 +50,7 @@ namespace :deploy do
   task :enable_maintenance_mode do
     on roles(:app) do
       puts "Starting maintenance mode"
-      execute "cd #{current_path} && #{fetch(:rvm_custom_path)}/bin/rvm #{fetch(:rvm_ruby_version)} do bundle exec rake maintenance:start"
+      execute "cd #{current_path} && #{fetch(:rvm_custom_path)}/bin/rvm #{fetch(:rvm_ruby_version)} do bundle exec rake maintenance:start RAILS_ENV=#{fetch(:rails_env)}"
       execute "mkdir -p '#{shared_path}/tmp/' && cp #{current_path}/tmp/maintenance.yml #{shared_path}/tmp/"
     end
   end
@@ -59,7 +59,7 @@ namespace :deploy do
   task :disable_maintenance_mode do
     on roles(:app) do
       puts "Ending maintenance mode"
-      execute "cd #{current_path} && #{fetch(:rvm_custom_path)}/bin/rvm #{fetch(:rvm_ruby_version)} do bundle exec rake maintenance:end"
+      execute "cd #{current_path} && #{fetch(:rvm_custom_path)}/bin/rvm #{fetch(:rvm_ruby_version)} do bundle exec rake maintenance:end RAILS_ENV=#{fetch(:rails_env)}"
       execute "rm '#{shared_path}/tmp/maintenance.yml'"
     end
   end
