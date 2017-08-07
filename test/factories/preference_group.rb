@@ -5,10 +5,10 @@ FactoryGirl.define do
     add_by_default false
   
     factory :preference_group_with_preferences do
-      after_create do |preference_group| 
+      after(:create) do |preference_group| 
         FactoryGirl.create(:preference, preference_group_id: preference_group.id)
       end
-      after_create do |preference_group| 
+      after(:create) do |preference_group| 
         FactoryGirl.create(:preference, preference_group_id: preference_group.id)
       end
     end
