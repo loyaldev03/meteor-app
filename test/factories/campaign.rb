@@ -13,7 +13,7 @@ FactoryGirl.define do
     audience { Faker::Lorem.characters(10) }
     campaign_code { Faker::Lorem.characters(20) }
     delivery_date "3 - 5 weeks from date ordered"
-    after_create { |campaign| campaign.update_attribute(:slug, nil) ; campaign.save }
+    after(:create) { |campaign| campaign.update_attribute(:slug, nil) ; campaign.save }
 
     factory :campaign_twitter do
       transport { Campaign.transports['twitter'] }
