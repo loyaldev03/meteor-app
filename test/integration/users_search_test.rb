@@ -55,7 +55,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   ##########################################################
   # TESTS
   ##########################################################
-
+  
   test "search user with empty form" do
     setup_search 
     visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
@@ -70,7 +70,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     setup_search
     search_user({"user[id]" => "#{@search_user.id}"}, @search_user)    
   end
-
+  
   test "search user by date billing information" do
     setup_user(false)
     Delayed::Worker.delay_jobs = true    
@@ -183,6 +183,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
       fill_in "user[cc_last_digits]", :with => cc_last_digits.to_s
     end
     find("#submit_button").click
+    sleep 2 #had to add this sleep since it was not working
+    
     assert page.find('#table_user_search_result').has_content?(@search_user.status)
     assert page.find('#table_user_search_result').has_content?(@search_user.id.to_s)
     assert page.find('#table_user_search_result').has_content?(@search_user.email)
