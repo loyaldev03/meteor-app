@@ -85,7 +85,6 @@ gem 'daemons', '1.1.9'
 # To use debugger
 group :development do
   gem "rails-erd"
-  gem 'rack-bug', :git => 'https://github.com/brynary/rack-bug.git', :branch => 'rails3'
   gem "yard"  , :git => 'git://github.com/stoneacre/yard.git'
   gem 'yard-rest'
   gem 'redcarpet'
@@ -108,7 +107,7 @@ gem 'fat_fingers', github: 'dmferrari/fat_fingers'
 
 group :test do
   gem 'factory_girl_rails'
-  gem 'faker', github: 'stympy/faker'
+  gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'
   gem 'selenium-webdriver', '2.53.4'
