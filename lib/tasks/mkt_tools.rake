@@ -8,7 +8,7 @@ namespace :mkt_tools do
   # This task should be run each day at 3 am ?
   task :sync_members_to_pardot => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/mkt_tools_sync_members_to_pardot.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -28,7 +28,7 @@ namespace :mkt_tools do
   # This task should be run each day at 3 am ?
   task :sync_members_to_exact_target => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/mkt_tools_sync_members_to_exact_target.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -44,7 +44,7 @@ namespace :mkt_tools do
   # This task should be run each day at 3 am ?
   task :sync_prospects_to_exact_target => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/mkt_tools_sync_prospects_to_exact_target.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -64,7 +64,7 @@ namespace :mkt_tools do
   # This task should be run each day at 3 am ?
   task :sync_members_to_mailchimp => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/mkt_tools_sync_members_to_mailchimp.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -80,7 +80,7 @@ namespace :mkt_tools do
   # This task should be run each day at 3 am ?
   task :sync_prospects_to_mailchimp => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/mkt_tools_sync_prospects_to_mailchimp.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin

@@ -5,8 +5,9 @@ class CampaignDataFetcher
     attr :logger
 
     def initialize(settings: nil)
-      @settings = settings || {}
-      @logger   = Logger.new("#{Rails.root}/log/fetch_data.log")
+      @settings           = settings || {}
+      Rails.logger        = Logger.new("#{Rails.root}/log/fetch_data.log")
+      Rails.logger.level  = Logger.const_get(Settings.logger_level_for_tasks)
     end
 
     # @param [CampaignReport] blank report
