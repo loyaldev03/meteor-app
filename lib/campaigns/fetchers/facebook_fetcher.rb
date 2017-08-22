@@ -29,7 +29,7 @@ class CampaignDataFetcher
           @report.spent     = 0
         end
       rescue => e
-        @logger.error "FacebookFetcher Error: #{e.to_s}"
+        logger.error "FacebookFetcher Error: #{e.to_s}"
         @report.meta = :unexpected_error
       end
       @report

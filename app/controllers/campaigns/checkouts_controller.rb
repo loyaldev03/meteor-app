@@ -8,7 +8,7 @@ class Campaigns::CheckoutsController < ApplicationController
   before_filter :load_campaign, only: [:submit, :new, :thank_you, :duplicated, :error]
   before_filter :set_page_title, only: [:new, :thank_you, :duplicated, :error, :critical_error]
   before_filter :campaign_active, only: [:submit, :new, :thank_you, :duplicated]
-  before_filter :load_prospect, only: [:new, :duplicated, :error]
+  before_filter :load_prospect, only: [:new, :duplicated, :error, :create]
   before_filter :load_ga_tracking_id, only: [:new, :thank_you, :duplicated, :error, :critical_error]
   before_filter :setup_request_params, only: [:submit]
 
@@ -32,7 +32,7 @@ class Campaigns::CheckoutsController < ApplicationController
     end
   rescue
     Rails.logger.error "Checkout::SubmitError: Error: #{$ERROR_INFO}"
-    Auditory.report_issue('Checkout::SubmitError', $ERROR_INFO.to_s, campaign_slug: params[:landing_id])
+    Auditory.report_issue('Checkout::SubmitError', $ERROR_INFO.to_s, {campaign_slug: params[:landing_id]})
     redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
@@ -42,13 +42,12 @@ class Campaigns::CheckoutsController < ApplicationController
     @edit_info_url = generate_edit_user_info_url(@prospect)
   rescue
     Rails.logger.error "Checkout::NewError: Error: #{$ERROR_INFO}"
-    Auditory.report_issue('Checkout::NewError', $ERROR_INFO.to_s, campaign_slug: params[:campaign_id], prospect_token: params[:token])
+    Auditory.report_issue('Checkout::NewError', $ERROR_INFO.to_s, {campaign_slug: params[:campaign_id], prospect_token: params[:token]})
     @club = @prospect ? @prospect.club : load_club_based_on_host
     redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
   def create
-    @prospect = Prospect.where_token(params[:credit_card][:prospect_token])
     @campaign = Campaign.find_by!(slug: params[:credit_card][:campaign_id])
     prospect_attributes = @prospect.attributes.with_indifferent_access
     prospect_attributes[:campaign_id] = @prospect.campaign_code
@@ -73,7 +72,7 @@ class Campaigns::CheckoutsController < ApplicationController
     end
   rescue
     Rails.logger.error "Checkout::CreateError: #{$ERROR_INFO}"
-    Auditory.report_issue('Checkout::CreateError', $ERROR_INFO.to_s, campaign_slug: params[:credit_card][:campaign_id], prospect_token: params[:credit_card][:prospect_token])
+    Auditory.report_issue('Checkout::CreateError', $ERROR_INFO.to_s, {campaign_slug: params[:credit_card][:campaign_id], prospect_token: params[:credit_card][:prospect_token]})
     redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
@@ -117,7 +116,8 @@ class Campaigns::CheckoutsController < ApplicationController
   end
 
   def load_prospect
-    @prospect = Prospect.where_token(params[:token])
+    token = params[:credit_card] ? params[:credit_card][:prospect_token] : params[:token]
+    @prospect = Prospect.where_token(token) if token.present?
     raise ActiveRecord::RecordNotFound unless @prospect
   rescue ActiveRecord::RecordNotFound
     Rails.logger.error "Checkout::LoadProspect: #{$ERROR_INFO} token: #{params[:token]}"
@@ -148,7 +148,7 @@ class Campaigns::CheckoutsController < ApplicationController
   def campaign_active
     return if @campaign.nil? || @campaign.active?
     Rails.logger.error 'Checkout::CheckIfActiveError: Campaign is not active'
-    Auditory.report_issue('Checkout::CheckIfActiveError', '', campaign_id: @campaign.id, initial_date: @campaign.initial_date, finish_date: @campaign.finish_date, today: Date.today.to_s)
+    Auditory.report_issue('Checkout::CheckIfActiveError', '', {campaign_id: @campaign.id, initial_date: @campaign.initial_date, finish_date: @campaign.finish_date, today: Date.today.to_s})
     redirect_to error_checkout_path, alert: I18n.t('error_messages.campaign_is_not_active')
   end
 

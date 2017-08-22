@@ -3,7 +3,7 @@ namespace :clubs do
   # This task should be run every X hours. 
   task :count_members_in_clubs => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/count_members_in_clubs.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin

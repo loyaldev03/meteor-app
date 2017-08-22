@@ -19,7 +19,7 @@ namespace :billing do
   # This task should be run each day at 3 am ?
   task :send_prebill => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/billing_send_prebill.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -36,7 +36,7 @@ namespace :users do
   task :Members => :environment do
     begin
       Rails.logger = Logger.new("#{Rails.root}/log/members_members.log")
-      Rails.logger.level = Logger::DEBUG
+      Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
       ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
       Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{User.count} members"
@@ -79,7 +79,7 @@ namespace :users do
   # This task should be run each day at 3 am ?
   task :send_happy_birthday => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/members_send_happy_birthday.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -92,7 +92,7 @@ namespace :users do
   desc "Send pillar emails"
   task :send_pillar_emails => :environment do 
     Rails.logger = Logger.new("#{Rails.root}/log/members_send_pillar_emails.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -106,7 +106,7 @@ namespace :users do
   # This task should be run each day at 3 am 
   task :process_club_cash => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/members_process_club_cash.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -120,7 +120,7 @@ namespace :users do
   # This task should be run each day at 3 am 
   task :process_fulfillments => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/members_process_fulfillments.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -134,7 +134,7 @@ namespace :users do
   # This task should be run every X hours.
   task :process_sync => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/members_process_sync.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -148,7 +148,7 @@ namespace :users do
   # This task should be run every X hours. 
   task :process_email_sync_error => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/members_process_email_sync_error.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     begin
@@ -161,7 +161,7 @@ namespace :users do
   desc "Sync all members available"
   task :sync_all_to_drupal => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/sync_all.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
 
@@ -193,7 +193,7 @@ namespace :users do
   desc "Delete every user with testing_account flag as true"
   task :delete_testing_accounts => :environment do
     Rails.logger = Logger.new("#{Rails.root}/log/destroy_testing_accounts.log")
-    Rails.logger.level = Logger::DEBUG
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
     ActiveRecord::Base.logger = Rails.logger
     tall = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting rake task"

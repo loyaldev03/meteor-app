@@ -12,6 +12,7 @@ defaults: &defaults
   batch_agent_email: 'batch@xagax.com'
   others_product: "SLOOPS"
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe']
+  logger_level_for_tasks: 'DEBUG'
   pivotal_tracker:
     project_id: 840477
     token: "93edf6fdb44a44b280a675b85c464c5b"
@@ -405,6 +406,7 @@ production:
   <<: *defaults
   campaign_manager_recipients: 'mbrossard@meteoraffinity.com,ndavid@meteoraffinity.com,lerrick@meteoraffinity.com'
   email_to_send_product_list: 'tbrady@meteoraffinity.com,ckincheloe@meteoraffinity.com'
+  logger_level_for_tasks: 'INFO'
   mes_report_service:
     user: Stoneacrereports
     password: do3!lAjo5

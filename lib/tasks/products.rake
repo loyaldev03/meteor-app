@@ -4,7 +4,7 @@ namespace :products do
   task :send_product_list_email => :environment do
     begin
       Rails.logger = Logger.new("#{Rails.root}/log/products_send_product_list_email.log")
-      Rails.logger.level = Logger::DEBUG
+      Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
       ActiveRecord::Base.logger = Rails.logger
       tall = Time.zone.now
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting products:send_product_list_email rake task"
