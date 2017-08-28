@@ -90,7 +90,7 @@ group :development do
   gem 'redcarpet'
   gem 'ruby-prof'
   # -> deploy
-  gem "capistrano", "3.8"
+  gem "capistrano", "3.8.0"
   gem 'capistrano-rails', '1.3'
   gem 'capistrano-rvm'
   gem 'tinder'
