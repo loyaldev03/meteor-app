@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: git://github.com/dmferrari/fat_fingers.git
-  revision: 312cc746dbd782b4cd625c6bce02d6dfda8422b0
+  revision: 3d274b7b8ff66cfca79c596cb2cace5c484fa665
   specs:
-    fat_fingers (0.1.26)
+    fat_fingers (0.1.31)
 
 GIT
   remote: git://github.com/ifad/data-confirm-modal.git
