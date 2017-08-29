@@ -177,13 +177,13 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     setup_search
     cc_last_digits = 8965
     @search_user.active_credit_card.update_attribute :last_digits, cc_last_digits
+    sleep 1
     @search_user.index.store @search_user
   
     within("#payment_details")do
       fill_in "user[cc_last_digits]", :with => cc_last_digits.to_s
     end
     find("#submit_button").click
-    sleep 2 #had to add this sleep since it was not working
     
     assert page.find('#table_user_search_result').has_content?(@search_user.status)
     assert page.find('#table_user_search_result').has_content?(@search_user.id.to_s)
