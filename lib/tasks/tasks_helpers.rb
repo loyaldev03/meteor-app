@@ -296,7 +296,7 @@ module TasksHelpers
       begin
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
         Users::CancelUserRemoteDomainJob.perform_now(user_id: user.id)
-        user.marketing_tool_sync_unsubscription(false)
+        user.marketing_tool_sync_unsubscription(false) if user.marketing_client_synced_status == 'synced'
         user.index.remove user rescue nil
         Operation.delete_all(["user_id = ?", user.id])
         UserNote.delete_all(["user_id = ?", user.id])
@@ -307,6 +307,7 @@ module TasksHelpers
         Communication.delete_all(["user_id = ?", user.id])
         ClubCashTransaction.delete_all(["user_id = ?", user.id])
         Membership.delete_all(["user_id = ?", user.id])
+        Prospect.delete_all(["email = ?", user.email])
         user.delete
       rescue Exception => e
         Auditory.report_issue("Users::deleteTestingAccounts", e, { :user => user.id })
