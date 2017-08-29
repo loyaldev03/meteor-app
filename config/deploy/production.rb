@@ -1,4 +1,4 @@
-server "50.116.20.46", user: 'deploy', roles: [:app, :web]
+server "50.116.20.46", user: 'deploy', roles: [:app, :web, :db]
 
 set :application,      'sac-platform'
 set :cplatform,        'all'

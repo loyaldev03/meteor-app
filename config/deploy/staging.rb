@@ -1,4 +1,4 @@
-server "staging.platform.xagax.com", user: 'deploy', roles: [:app, :web]
+server "staging.platform.xagax.com", user: 'deploy', roles: [:app, :web, :db]
 
 set :application,      'staging.platform'
 set :cplatform,        'all'

@@ -1,4 +1,4 @@
-server "prototype.platform.xagax.com", user: 'deploy', roles: [:app, :web]
+server "prototype.platform.xagax.com", user: 'deploy', roles: [:app, :web, :db]
 
 set :application,      'backend-sac-platform'
 set :cplatform,        'all'
