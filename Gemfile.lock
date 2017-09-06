@@ -17,10 +17,10 @@ GIT
       savon (~> 2.4)
 
 GIT
-  remote: git://github.com/dmferrari/fat_fingers.git
-  revision: 3d274b7b8ff66cfca79c596cb2cace5c484fa665
+  remote: git://github.com/dmferrari/mailcheck-ruby.git
+  revision: ab95b0a287e7d09f8757118c5de01d23a017e932
   specs:
-    fat_fingers (0.1.31)
+    mailcheck (1.0.6)
 
 GIT
   remote: git://github.com/ifad/data-confirm-modal.git
@@ -529,7 +529,6 @@ DEPENDENCIES
   faker
   faraday (>= 0.9.1)
   faraday_middleware (>= 0.9.0)
-  fat_fingers!
   fb_graph2
   foreman
   friendly_id (~> 5.1.0)
@@ -541,6 +540,7 @@ DEPENDENCIES
   jquery-ui-rails
   json (= 1.8.3)
   mailcatcher
+  mailcheck!
   mandrill-api
   minitest (~> 5.1)
   mocha

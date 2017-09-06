@@ -103,7 +103,7 @@ end
 gem 'tire'
 gem 'progress_bar'
 gem 'data-confirm-modal', github: 'ifad/data-confirm-modal', branch: 'bootstrap2'
-gem 'fat_fingers', github: 'dmferrari/fat_fingers'
+gem 'mailcheck', github: 'dmferrari/mailcheck-ruby'
 
 group :test do
   gem 'factory_girl_rails'

@@ -13,7 +13,7 @@ class Checkout
     @prospect.city                  = params[:city]
     @prospect.address               = params[:address]
     @prospect.state                 = (Carmen::Country.coded('US').subregions.named(params[:state]).code if params[:state]) rescue nil
-    @prospect.email                 = params[:email].downcase.clean_up_typoed_email if params[:email]
+    @prospect.email                 = fix_email(params[:email].downcase) if params[:email]
     @prospect.zip                   = params[:zip]
     @prospect.country               = 'US'
     @prospect.birth_date            = ''
@@ -65,6 +65,12 @@ class Checkout
         @prospect.referral_parameters = referral_url.query
       end
     end
+  end
+
+  def fix_email(email_address)
+    mailcheck = Mailcheck.new
+    result = mailcheck.suggest(email_address)
+    result ? result[:full] : email_address
   end
 
   def validate_data(params)
