@@ -60,7 +60,9 @@ class Campaigns::CheckoutsController < ApplicationController
         nil, # current_agent .. which current agent should we use here?
         @campaign.enrollment_price,
         prospect_attributes,
-        params[:credit_card]
+        params[:credit_card],
+        nil,
+        @campaign.create_remote_user_in_background
       )
       if response[:code] == Settings.error_codes.success
         Rails.logger.info "Checkout::CreateSuccess: Response: #{response.inspect}"

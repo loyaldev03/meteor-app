@@ -101,6 +101,7 @@ module Users
 
       testing_account_analysis
       send_fulfillment if not skip_send_fulfillment and @user.current_membership.product_id
+      @user.after_save_sync_to_remote_domain unless @user.api_id
     end
   end
 end
