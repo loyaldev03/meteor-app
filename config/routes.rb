@@ -121,11 +121,7 @@ SacPlatform::Application.routes.draw do
         get  '/memberships_content' => 'users#memberships_content', as: 'memberships_content'
       end
 
-      resources :products do
-        collection do
-          match 'bulk_process' => 'products#bulk_process', via: [:get, :post]
-        end
-      end
+      resources :products, only: [ :index, :show ]
       resources :preference_groups do
         resources :preferences
        end
@@ -171,7 +167,15 @@ SacPlatform::Application.routes.draw do
         end
       end
 
-      resources :transport_settings, except: [:destroy]
+      resources :transport_settings, except: [:destroy] do
+        member do
+          get :test_connection
+        end
+      end
+
+      scope 'store' do 
+        put 'products/import' => 'products#import_product_data', as: 'store_products_import'
+      end
     end
 
     resources :domains

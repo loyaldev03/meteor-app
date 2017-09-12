@@ -17,5 +17,20 @@ namespace :products do
     end
   end
 
-
+  desc "Import product's data from Store."
+  task :import_products_data_from_store => [:environment, :setup_logger ] do
+    begin
+      tall = Time.zone.now
+      base = Club.joins(:transport_settings).where(billing_enable: true).merge(TransportSetting.store_spree)
+      base.each do |club|
+        club.import_products_data
+      end
+    rescue Exception => e
+      Auditory.report_issue("Products::ImportProductDataFromStore", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+      Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+    ensure
+      Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run products:import_products_data_from_store task"
+    end
+  end
 end
+

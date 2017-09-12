@@ -1549,13 +1549,8 @@ class User < ActiveRecord::Base
         self.wrong_address = nil
       end
       if self.changed.include?('wrong_address') and self.wrong_address.nil?
-        self.fulfillments.where_bad_address.each do |s| 
-          answer = s.decrease_stock! 
-          if answer[:code] == Settings.error_codes.success
-            s.update_status( nil, 'not_processed', "Recovered from member unseted wrong address" )
-          else
-            s.update_status( nil, 'out_of_stock', "Recovered from member unseted wrong address" )
-          end
+        self.fulfillments.where_bad_address.each do |fulfillment| 
+          fulfillment.update_status( nil, 'not_processed', "Recovered from member unseted wrong address" )
         end
       end
     end

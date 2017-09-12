@@ -85,11 +85,6 @@
       <strong><%= model_class.human_attribute_name(:api_password) %>:</strong><br>
       <%= @club.api_password %>
     </p>
-    <h4>Store</h4>
-    <p>
-      <strong><%= model_class.human_attribute_name(:store_url) %>:</strong><br>
-      <%= @club.store_url %>
-    </p>
     <h4>Campaigns</h4>
     <p>
       <strong><%= model_class.human_attribute_name(:member_landing_url) %>:</strong><br>
@@ -231,6 +226,11 @@
     <p>
       <strong><%= model_class.human_attribute_name(:payment_gateway_errors_email) %>:</strong><br>
       <%= @club.payment_gateway_errors_email %>
+    </p>
+    <h4>Fulfillment</h4>
+    <p>
+      <strong><%= model_class.human_attribute_name(:fulfillment_tracking_prefix) %>:</strong><br>
+      <%= @club.fulfillment_tracking_prefix %>
     </p>
   </div>
 </div>

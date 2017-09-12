@@ -4,31 +4,24 @@ class Product < ActiveRecord::Base
   has_many :campaigns, through: :campaign_products
   has_many :campaign_products
 
-  validates :sku, presence: true, format: /\A[0-9a-zA-Z\-_]+\z/, length: { minimum: 2 }, uniqueness: { scope: [:club_id, :deleted_at] }
-  validates :cost_center, format: /\A[a-zA-Z\-_]+\z/, length: { minimum: 2, maximum: 30 }, allow_nil: true
+  validates :sku, presence: true, format: /\A[0-9a-zA-Z\-_]+\z/, length: { maximum: 30 }, uniqueness: { scope: [:club_id, :deleted_at] }
   validates :name, presence: true
-
-  validates :package, format: /\A[a-zA-Z\-_]+\z/, length: { maximum: 19 }
-  validates :stock, numericality: { only_integer: true, less_than: 1999999, greater_than: -1999999 }, allow_backorder: true
+  validates :stock, numericality: { only_integer: true, less_than: 1999999, greater_than: -1999999 }
 
   scope :with_stock, -> { where('(allow_backorder = true) OR (allow_backorder = false and stock > 0)') }
 
-  before_save :validate_image_url
   before_save :apply_upcase_to_sku
   before_update :validate_sku_update
   before_destroy :no_fulfillment_related?
-  before_update :low_stock_alert
 
   acts_as_paranoid
 
-  BULK_PROCESS_FIELDS = [ :sku, :name, :package, :stock_to_add, :allow_backorder, :weight, :cost_center ]
-
-  LOW_STOCK_THRESHOLD = 30
-
-  IMAGE_URL_REGEX = /\A(http|https)?:\/\/(?:[a-z0-9\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpg|gif|png)\z/
-
   def self.datatable_columns
     ['id', 'name', 'sku', 'stock', 'allow_backorder']
+  end
+  
+  def store_variant_url 
+    club.store_url + "/admin/products/#{store_slug}/variants/#{store_id}/edit"
   end
 
   def can_be_assigned_to_campaign?
@@ -44,30 +37,16 @@ class Product < ActiveRecord::Base
   end
 
   def validate_sku_update
-    if sku_changed? and not no_fulfillment_related?
-      errors.add :sku, "Cannot change this sku. There are fulfillments related to it."
-      false
-    end
+    fulfillments.update_all(product_sku: sku) if sku_changed?
   end
 
   def decrease_stock(quantity=1)
     if self.reload.has_stock?
       Product.where(id: self.id).update_all "stock = stock - #{quantity}"
-      low_stock_alert
       logger.info "Product ID: #{self.id} Stock decreased to: #{stock-quantity}"
       {:message => "Stock reduced with success", :code => Settings.error_codes.success}
     else
       {:message => I18n.t('error_messages.product_out_of_stock'), :code => Settings.error_codes.product_out_of_stock}
-    end
-  end
-
-  def low_stock_alert
-    if alert_on_low_stock
-      if stock > LOW_STOCK_THRESHOLD
-        self.update_column(:low_stock_alerted, false) if low_stock_alerted
-      elsif !low_stock_alerted
-        Products::AlertOnLowStockJob.perform_later(product_id: self.id)
-      end
     end
   end
 
@@ -112,72 +91,4 @@ class Product < ActiveRecord::Base
     temp.close
     temp.unlink
   end
-
-  def self.send_bulk_process_results(agent_email, results_file_path)
-    Notifier.product_bulk_process_result(results_file_path, agent_email).deliver!
-    File.delete(results_file_path)
-  end
-
-  def self.bulk_process(club_id, agent_email, file_path)
-    package = Axlsx::Package.new
-    package.workbook.add_worksheet(:name => 'Results') do |sheet|
-      sheet.add_row ['Sku', 'Name', 'Package', 'StockToAdd', 'Allow Backorder', 'Weight', 'Cost Center', 'result']
-      CSV.foreach(file_path, headers: true) do |row|
-        allow_backorder = row[4]
-        sku = row[0].upcase
-        new_row = [row[0], row[1], row[2], row[3], row[4], row[5], row[6]]
-        if row.count != 7
-          new_row << "Wrong number of rows. Review example file."
-        elsif allow_backorder.blank? or ['yes','no'].include? allow_backorder.to_s.downcase
-          if( row[3].is_numeric? )
-            product = Product.where(sku: sku, club_id: club_id).first_or_initialize
-            product.name = row[1] unless row[1].blank?
-            product.package = row[2] unless row[2].blank?
-            product.stock = product.stock.to_i + row[3].to_i
-            product.weight = row[5].to_f unless row[5].blank?
-            product.cost_center ||= row[6].to_s
-            product.cost_center = row[6].to_s unless row[6].blank?
-            product.allow_backorder = allow_backorder.to_s.downcase == 'yes' ? true : false
-
-            message = if product.new_record?
-              'Successfully created.'
-            else
-              product.changed? ? "Successfully updated: #{product.changed.join(',')}" : "Nothing was updated."
-            end
-
-            if product.save
-              new_row << message
-            else
-              message = product.new_record? ? "Could not create product: " : "Could not update product: "
-              message << product.errors.messages.map{|attribute,errors| "#{attribute}: #{errors.join(',')}"}.join(".")
-              new_row << message
-            end
-          else
-            new_row << "Stock value is invalid."
-          end
-        else
-          new_row << "Allow backorder value is invalid."
-        end
-        sheet.add_row new_row
-      end
-    end
-    results_file = File.open("tmp/files/bulk_process_results#{Time.current}.xlsx", 'w')
-    package.serialize results_file.path
-    results_file.close
-    Product.delay.send_bulk_process_results(agent_email, results_file.path)
-    File.delete(file_path)
-  end
-
-
-  private
-
-    def validate_image_url
-      if self.image_url_changed? and self.image_url.present?
-        self.image_url.gsub!(/\?[0-9a-zA-Z]*$/, '')
-        unless IMAGE_URL_REGEX.match(self.image_url.downcase)
-          errors.add(:image_url, "is invalid")
-          false
-        end
-      end
-    end
 end

@@ -629,26 +629,18 @@ class RolesTest < ActionDispatch::IntegrationTest
 
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
     assert page.has_no_content?("401 You are Not Authorized.")
-    assert page.has_selector?("#new_product")
-    assert page.has_content?("Edit")
-    assert page.has_content?("Show")
-    click_link_or_button "New Product"
-    assert page.has_no_content?("401 You are Not Authorized.")
+    assert page.has_content?("Show")   
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => fourth_club.name)
-    click_link_or_button "Edit"
+    click_link_or_button "Show"
     assert page.has_no_content?("401 You are Not Authorized.")
 
 
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
     assert page.has_no_content?("401 You are Not Authorized. ")
-    assert page.has_selector?("#new_product")
-    assert page.has_content?("Edit")
     assert page.has_content?("Show")
-    click_link_or_button "New Product"
-      assert page.has_no_content?("401 You are Not Authorized.")
     visit products_path( :partner_prefix => partner.prefix, :club_prefix => fifth_club.name)
-    click_link_or_button "Edit"
-      assert page.has_no_content?("401 You are Not Authorized.")
+    click_link_or_button "Show"
+    assert page.has_no_content?("401 You are Not Authorized.")
   end
 
   test "Agents that can admin fulfillments. (without global role)" do
@@ -796,11 +788,8 @@ class RolesTest < ActionDispatch::IntegrationTest
     within('#credit_cards'){ assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled' }
 
     visit products_path(@partner.prefix, @club.name)
-    assert find(:xpath, "//a[@id='new_product']")[:class].exclude? 'disabled'
     within('#products_table')do
-      assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled'
+      assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'   
     end
 
     visit fulfillments_index_path(@partner.prefix, @club.name)
@@ -936,12 +925,9 @@ class RolesTest < ActionDispatch::IntegrationTest
       within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
 
 
-      visit products_path(@partner.prefix, @club.name)
-      assert find(:xpath, "//a[@id='new_product']")[:class].exclude? 'disabled'
+      visit products_path(@partner.prefix, @club.name)    
       within('#products_table')do
-        assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'
-        assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
-        assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled'
+        assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'        
       end
 
       visit fulfillments_index_path(@partner.prefix, @club.name)
@@ -991,12 +977,9 @@ class RolesTest < ActionDispatch::IntegrationTest
       within('.nav-tabs'){click_on 'Credit Cards'}
       within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
 
-      visit products_path(@partner.prefix, @club.name)
-      assert find(:xpath, "//a[@id='new_product']")[:class].exclude? 'disabled'
+      visit products_path(@partner.prefix, @club.name)    
       within('#products_table')do
-        assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'
-        assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
-        assert find(:xpath, "//a[@id='destroy']")[:class].exclude? 'disabled'
+        assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'    
       end
 
       visit fulfillments_index_path(@partner.prefix, @club.name)

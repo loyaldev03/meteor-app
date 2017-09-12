@@ -15,13 +15,11 @@ private
         product.id,
         product.name,
         product.sku,
-        product.stock.to_s + (product.alert_on_low_stock? ? show_alert_on_low_stock_icon.html_safe : ''),
+        product.stock.to_s,
         product.allow_backorder ? 'Yes' : 'No',
-        (link_to(I18n.t(:show), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini', :id => 'show') if @current_agent.can? :read, Product, @current_club.id).to_s+
-        ((link_to(I18n.t(:edit), @url_helpers.edit_product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini', :id => 'edit', 'data-toggle' => 'custom-remote-modal', 'data-target' => product.id.to_s) + edit_modal(product)) if @current_agent.can? :edit, Product, @current_club.id).to_s+
-        (link_to(I18n.t(:destroy), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :method => :delete,
-                data: {:confirm => I18n.t("are_you_sure")}, :id => 'destroy',
-                :class => 'btn btn-mini btn-danger')if @current_agent.can? :delete, Product, @current_club.id).to_s
+        (link_to(I18n.t(:show), @url_helpers.product_path(@current_partner.prefix, @current_club.name, product.id), :class => 'btn btn-mini', :id => 'show') if @current_agent.can? :read, Product, @current_club.id).to_s +
+        (link_to(I18n.t(:import_data), @url_helpers.store_products_import_path(@current_partner.prefix, @current_club.name), class: 'btn btn-mini', data: {product: product.id, action: 'import_product_data'}) if(@current_club.has_store_configured? and @current_agent.can?(:read, Product, @current_club.id))).to_s +
+        (link_to(I18n.t(:link_to_store_variant), product.store_variant_url, class: 'btn btn-mini', target:'_blank') if(@current_club.has_store_configured? and @current_agent.can?(:read, Product, @current_club.id))).to_s 
       ]
     end
   end
@@ -34,30 +32,12 @@ private
     products = Product.where(:club_id => @current_club.id).order("#{sort_column} #{sort_direction}")
     products = products.page(page).per_page(per_page)
     if params[:sSearch].present?
-      products = products.where("id like :search or name like :search", search: "%#{params[:sSearch]}%")
+      products = products.where("id like :search or name like :search or sku like :search", search: "%#{params[:sSearch]}%")
     end
     products
   end
 
   def sort_column
     Product.datatable_columns[params[:iSortCol_0].to_i]
-  end
-
-  def edit_modal(product)
-    "<div id='myModal#{product.id}' class='well modal hide' style='border: none; width:750px; margin-left:-375px'>
-      <div class='modal-header'>
-        <a href='#' class='close' data-dismiss='modal'>&times;</a>
-        <h3>Edit Product ID #{product.id} - #{product.name}</h3>
-      </div>
-      <div class='modal-body'></div>
-      <div class='modal-footer'>
-        <input class='btn btn-primary' type='submit' value='Update Product' name='commit' data-target='#{product.id.to_s}'>
-        <a href='#' class='btn' data-dismiss='modal' >Close</a>
-      </div>
-    </div>".html_safe
-  end
-
-  def show_alert_on_low_stock_icon
-    " <i class='icon-bell' rel='tooltip' title='Will be alerted if stock is below " + Product::LOW_STOCK_THRESHOLD.to_s + " units'></i>"
   end
 end

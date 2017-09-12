@@ -67,6 +67,10 @@ cd /var/www/$2/current && bundle exec rake users:process_club_cash  >> $LOGFILE 
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS
 
+# fetch data from store
+echo "`date` rake products:import_products_data_from_store"
+cd /var/www/$2/current && bundle exec rake products:import_products_data_from_store >> $LOGFILE 2>&1
+
 # fetch data from campaigns
 echo "`date` rake campaigns:fetch_data"
 cd /var/www/$2/current && bundle exec rake campaigns:fetch_data >> $LOGFILE 2>&1

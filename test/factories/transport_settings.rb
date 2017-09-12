@@ -21,4 +21,10 @@ FactoryGirl.define do
     transport { TransportSetting.transports['google_tag_manager'] } 
     container_id {Faker::Lorem.characters(40)}      
   end
+
+  factory :transport_settings_store, class: TransportSetting do 
+    transport { TransportSetting.transports['store_spree']}
+    url "https://dailydeals.onmc.com"
+    api_token "b3988e7a0a2513d2cbf5f015c71e34584f59f9f86e70ffd1"
+  end
 end

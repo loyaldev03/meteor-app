@@ -1,0 +1,36 @@
+<% content_for :header do %>
+  <tr>
+    <% if @errors.empty? %>
+      <td class="alert alert-good">
+        Successfully synced Fulfillments related to Fulfillment File #<%= @fulfillment_file.id %> with the Store.
+      </td>    
+    <% else %>
+      <td class="alert alert-bad">
+        Alert: There have been some errors when syncing Fulfillments related to Fulfillment File #<%= @fulfillment_file.id %> with the Store.  
+      </td>
+    <% end %>
+  </tr>
+<% end %>
+
+ <% content_for :body do %>
+  <% if @errors.any? %>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td colspan='3'>There have been <b><%= @errors.count %></b> errors while notifying the Store about this fulfillment file being send: (<b>*</b>)</td>
+      </tr>
+      <tr>
+        <th>User</th>
+        <th>Fulfillment</th>
+        <th>Error</th>
+      </tr>
+      <% @errors.each do |error| %>
+        <tr>
+          <td><%= error[:user_id] %></td>
+          <td><%= error[:fulfillment_id] %></td>
+          <td><%= error[:sync_result] %></td>
+        </tr>
+      <% end %>
+    </table>
+    <span style='font-size: 10px;'>(<b>*</b>) There is a Story created in Pivotal Tracker for these cases</span>
+  <% end %>
+<% end %>

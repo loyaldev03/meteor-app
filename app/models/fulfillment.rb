@@ -9,7 +9,7 @@
 class Fulfillment < ActiveRecord::Base
   belongs_to :user
   belongs_to :club
-  belongs_to :product
+  belongs_to :product, -> { with_deleted }
 
   has_and_belongs_to_many :fulfillment_files
   has_many :suspected_fulfillment_evidences
@@ -91,6 +91,10 @@ class Fulfillment < ActiveRecord::Base
     state :bad_address
   end
 
+  def self.modificable_statuses
+    Fulfillment.state_machines[:status].states.map(&:name) - [:canceled, :do_not_honor]
+  end
+
   def renew!
     if recurrent and user.can_renew_fulfillment? and not renewed?
       if self.bad_address?
@@ -107,21 +111,11 @@ class Fulfillment < ActiveRecord::Base
     f = Fulfillment.new 
     f.status = status unless status.nil?
     f.product_sku = self.product_sku
-    f.product_package = self.product_package
     f.user_id = self.user_id
     f.recurrent = true
     f.club_id = self.club_id
     f.product_id = self.product_id
     f.save
-    f.decrease_stock! if status.nil?
-  end
-
-  def decrease_stock!
-    if product.nil? 
-      {:message => I18n.t('error_messages.product_empty'), :code => Settings.error_codes.product_empty}
-    else
-      product.decrease_stock
-    end
   end
 
   def replenish_stock
@@ -140,7 +134,7 @@ class Fulfillment < ActiveRecord::Base
       return {message: I18n.t("error_messages.fulfillment_new_status_equal_to_old", fulfillment_sku: self.product_sku) , code: Settings.error_codes.fulfillment_error }
     end
 
-    if not ['not_processed', 'manual_review_required'].include? new_status and ['canceled', 'do_not_honor'].include? old_status
+    if ['canceled', 'do_not_honor'].include? old_status
       return {message: I18n.t("error_messages.fulfillment_cannot_be_recovered") , code: Settings.error_codes.fulfillment_error }
     elsif (old_status == 'manual_review_required' and not ['canceled', 'do_not_honor', 'not_processed'].include? new_status) or (new_status == 'manual_review_required' and not ['canceled', 'do_not_honor', 'not_processed'].include? old_status)
       return {message: I18n.t("error_messages.fulfillment_invalid_transition") , code: Settings.error_codes.fulfillment_error }
@@ -152,11 +146,11 @@ class Fulfillment < ActiveRecord::Base
       else
         answer = ( user.wrong_address.nil? ? user.set_wrong_address(agent, reason, false) : {code: Settings.error_codes.success, message: "Member already set as wrong address."} )
       end
-    elsif ['not_processed', 'manual_review_required'].include? new_status and not ['not_processed', 'manual_review_required'].include? old_status
-      answer = decrease_stock!
     else
       answer = { code: Settings.error_codes.success }
     end
+
+    notify_cancellation if ['canceled', 'do_not_honor'].include? new_status
     
     if answer[:code] == Settings.error_codes.success        
       self.status = new_status
@@ -207,24 +201,29 @@ class Fulfillment < ActiveRecord::Base
       Fulfillment.find(self.id).update_status(fulfillment_file.agent_id, "in_process", "Fulfillment file generated", fulfillment_file.id) unless self.in_process? or self.renewed?
     end
     user = self.user
-    [ self.tracking_code, self.product.cost_center, user.full_name, user.address, user.city,
+    [ self.tracking_code, self.product_sku, user.full_name, user.address, user.city,
       user.state, user.zip, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper',
       self.product.weight, 'MID']
   end
 
   private
+
+    def notify_cancellation
+      self.store_fulfillment.notify_fulfillment_cancellation if defined?(SacStore::FulfillmentModel) and self.store_fulfillment
+    end
+
     def set_default_values
       self.assigned_at = Time.zone.now
       # 1.year is fixed today, we can change it later if we want to apply rules on our decissions
       if self.recurrent and self.renewable_at.nil?
         self.renewable_at = self.assigned_at + 1.year 
       end
-      self.tracking_code = self.product_package.to_s + self.user.id.to_s
-      self.email = self.user.email
-      self.full_name = "#{self.user.last_name}, #{self.user.first_name}, (#{self.user.state})"
-      self.full_address = [self.user.address, self.user.city, self.user.zip].join(", ")
+      self.tracking_code      = self.club.fulfillment_tracking_prefix.to_s + self.user_id.to_s
+      self.email              = self.user.email
+      self.full_name          = "#{self.user.last_name}, #{self.user.first_name}, (#{self.user.state})"
+      self.full_address       = [self.user.address, self.user.city, self.user.zip].join(", ")
       full_phone_number_value = [self.user.phone_country_code, self.user.phone_area_code, self.user.phone_local_number].join(", ")
-      self.full_phone_number = full_phone_number_value if full_phone_number_value.length > 7
+      self.full_phone_number  = full_phone_number_value if full_phone_number_value.length > 7
     end
 
 end

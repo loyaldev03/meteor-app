@@ -4,7 +4,7 @@
 		<tr>
 			<td colspan="9">
 				<%= label_tag :status, nil, :class => 'help-inline' %>
-				<%= fulfillment_selectable_statuses(:new_status, params[:new_status], true) %>
+				<%= fulfillment_selectable_statuses(:new_status, params[:new_status], true, true) %>
 				<%= text_field_tag "reason", nil, :class => 'text_field input-medium', :placeholder => t('reason') %>
 				<%= link_to t('buttons.update_fulfillment_status'), "#", :class => 'btn btn-primary', :id => 'update_fulfillment_status' %>
 				<%= (link_to t('buttons.export_all_to_xls'), download_xls_fulfillments_path, :class => 'btn btn-primary', :id => "export_all_to_xls_btn" ) if @file %>
@@ -17,7 +17,6 @@
 			<th> <%= t('activerecord.attributes.fulfillment.assigned_at') %> </th>
 			<th> <%= t('activerecord.attributes.fulfillment.renewable_at') %> </th>   
 			<th> <%= t('activerecord.attributes.fulfillment.product_sku') %> </th>
-			<th> <%= t('activerecord.attributes.fulfillment.tracking_code') %> </th> 
 			<th> <%= t('activerecord.attributes.fulfillment.status') %> </th>
 			<th> 
 				<%= check_box_tag "fulfillment_select_all", 1, false, :id => 'fulfillment_select_all' %> Select All
@@ -30,7 +29,7 @@
 		<tbody>
 			<% if @fulfillments.empty? %>
 				<tr>
-					<td colspan="9"><div class="alert">No results were found for this filter.</div></td>
+					<td colspan="8"><div class="alert">No results were found for this filter.</div></td>
 				</tr>
 			<% end %>
 			<% @fulfillments.each_with_index do |fulfillment, index| %>
@@ -42,7 +41,6 @@
 						<td> <%= I18n.l fulfillment.assigned_at, :format => :only_date %> </td>
 						<td> <%= I18n.l fulfillment.renewable_at, :format => :only_date unless fulfillment.renewable_at.nil? %> </td>
 						<td> <%= fulfillment.product_sku %> </td>
-						<td> <%= fulfillment.tracking_code %> </td>
 						<td> <%= fulfillment.status %> </td>
 						<td> 
 							<div id=<%= "div_fulfillment_selected_#{fulfillment.id}" %>>

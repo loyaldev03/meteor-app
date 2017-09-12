@@ -83,6 +83,24 @@
       </div>
     </div>
   </div>
+
+  <div id="transport_settings_values_store_spree" style="display: none;">
+    <div class='row-fluid'>
+      <div class='span12'>
+        <div class="control-group">
+          <%= f.label 'Url', class: 'control-label' %>
+          <div class="controls">
+            <%= f.text_field :url, value: @transport.url, class: 'text_field input-xxlarge' %>
+          </div>
+        </div>
+        <div class="control-group">
+          <%= f.label 'API Token', class: 'control-label' %>
+          <div class="controls">
+            <%= f.text_field :api_token, value: @transport.api_token, class: 'text_field input-xxlarge' %>
+          </div>
+        </div>
+      </div>
+    </div>
 </div>
 
 <div class="form-actions">

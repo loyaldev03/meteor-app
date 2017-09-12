@@ -6,42 +6,26 @@ class ProductTest < ActiveSupport::TestCase
     assert @product.save
   end
 
-  test "should not save a product with package more than 19 digits" do
-    assert_difference("Product.count",0) do
-      @product = FactoryGirl.build(:product, :package => "aaaaaaaaaaaaaaaaaaaa")
-      assert !@product.save, "Product was saved with package with more than 19 characters."
-    end
-  end
-
-  test "should not save a product with cost center less than 2 digits" do
-    assert_difference("Product.count",0) do
-      @product = FactoryGirl.build(:product, :cost_center => "a")
-      assert !@product.save, "Product was saved with package with less than 2 characters."
-    end
-  end
-
-  test "should not save a product with cost center more than 30 digits" do
-    assert_difference("Product.count",0) do
-      @product = FactoryGirl.build(:product, :cost_center => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-      assert !@product.save, "Product was saved with package with more than 30 characters."
-    end
-  end
-
-  test "Create a product with SKU more than 19 characters" do
+  test "Do not allow to create a product with SKU more than 30 characters" do
     assert_difference("Product.count") do
-      @product = FactoryGirl.build(:product, :sku => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+      @product = FactoryGirl.build(:product, :sku => Faker::Lorem.characters(30))
       assert @product.save
+      @product = FactoryGirl.build(:product, :sku => Faker::Lorem.characters(31))
+      assert !@product.save
     end
   end
 
-  test "Should not allow to update SKU if there are fulfillments related to it" do
+  test "Should allow to update SKU if there are fulfillments related to it" do
     club = FactoryGirl.create(:club)
     user = FactoryGirl.create(:user, club_id: club.id )
     product = club.products.last
-    FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id, product_id: product.id)
-    product.sku = "new_sku"
-    assert !product.save
-    assert product.errors.messages[:sku].include? "Cannot change this sku. There are fulfillments related to it."
+    fulfillment = FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id, product_id: product.id)
+    product.sku = "NEW_SKU"
+    assert product.save     
+    product.reload
+    fulfillment.reload     
+    assert_equal(product.sku, "NEW_SKU")
+    assert_equal(fulfillment.product_sku, "NEW_SKU")   
   end
 
   test "Should not allow to delete product if there are fulfillments related to it" do
@@ -50,5 +34,23 @@ class ProductTest < ActiveSupport::TestCase
     product = club.products.last
     FactoryGirl.create(:fulfillment, product_sku: product.sku, club_id: product.club_id, user_id: user.id, product_id: product.id)
     assert !product.destroy
+  end
+
+  test "Should not save 2 products with the same SKU in the same club" do
+    product = FactoryGirl.create(:product, :sku => 'NCALENDARJIMMIEJOHNSON')
+    product_same_sku = FactoryGirl.build(:product, :sku => product.sku)
+    assert !product_same_sku.save
+    assert product_same_sku.errors.messages[:sku].include? "has already been taken"
+  end
+
+  test "Should save 2 products with the same SKU in different clubs" do
+    assert_difference("Product.count", 2) do
+      club = FactoryGirl.create(:club_without_product)
+      product = FactoryGirl.build(:product, :sku => 'NCALENDARJIMMIEJOHNSON', :club_id => club.id)
+      assert product.save
+      club1 = FactoryGirl.create(:club_without_product)
+      product1 = FactoryGirl.build(:product, :sku => 'NCALENDARJIMMIEJOHNSON', :club_id => club1.id)
+      assert product1.save
+    end
   end
 end

@@ -367,62 +367,21 @@ function product_index_functions(column_count){
     "aoColumnDefs": [{ "bSortable": false, "aTargets": [ column_count ] }],
     "sAjaxSource": $('#products_table').data('source'),
   });
-  $('#products_table').on("click",'a[data-toggle="custom-remote-modal"]', function(event){
-    event.preventDefault();
-    var targetModal = '#myModal'+ $(this).data('target');
-    $(targetModal + ' .modal-body').load($(this).attr('href'), function(e) {
-      $(targetModal).modal('show');
-      $('.help').popover({offset: 10, trigger: 'hover', html: true });
-    });
-  });
-  $('#products_table').on('click', '.modal-footer input[type="submit"]', function(){
-    $('#edit_product_'+$(this).data('target')).submit();
-  });
-  $('#products_table').on('submit', '.modal-body form', function(event){
-    event.preventDefault();
+
+  $('#products_table').on('click', 'a[data-action="import_product_data"]', function(event){
     startAjaxLoader(true);
-    var productId = $(this).data('target');
+    event.preventDefault();
     $.ajax({
       type: 'put',
-      url: $(this).attr('action'),
-      data: $(this).serialize(),
+      data: { product_id: $(this).data('product') },
+      url: 'store/products/import',
       success: function(data){
+        $("#products_table").DataTable().ajax.reload(null, false);
+        flash_message(data.message, !data.success);
         endAjaxLoader(true);
-        if(data.success == true){
-          $("#products_table").DataTable().ajax.reload();
-          $('#myModal'+productId).modal('hide');
-          flash_message("Product ID "+productId+" was updated successfully.", false)
-        }else{
-          $("#edit_product_"+productId+" span[data-type='errors']").remove()
-          $("#edit_product_"+productId+" .control-group").removeClass("error")
-          for (var key in data.errors){
-            $('#edit_product_'+productId+' #product_'+key).parents(".control-group").addClass("error")
-            $('#edit_product_'+productId+' #product_'+key).parent().append("<span class='help-inline' data-type='errors'>"+data.errors[key]+"</span>")
-          }
-        }
-      },
-      error: function(jqXHR, exception){
-        endAjaxLoader(true);
-        alert(global_ajax_error_messages(jqXHR));
       }
-    })
-  });
-}
-
-function bulk_process_products_functions(){
-  $("#bulk_process_submit").click(function(event){
-    event.preventDefault();
-    if($("#bulk_process_file").prop('files').length == 0){
-      alert("No file provided for to bulk update products.");
-    }else{
-      if($("#bulk_process_file").prop('files')[0].size > 1002867){
-        alert("File exceeds maximum size limit.");
-      }else{
-        startAjaxLoader(true);
-        $("#bulk_process_form").submit();
-      }
-    }
-  });
+    });
+});
 }
 
 function terms_of_memberships_table_index_functions(column_count) {
@@ -1033,6 +992,7 @@ function transportSettingsFormFunctions(transport) {
     transport == "mailchimp" ? $("#transport_settings_values_mailchimp").show() : $("#transport_settings_values_mailchimp").hide();
     transport == "google_analytics" ? $("#transport_settings_values_google_analytics").show() : $("#transport_settings_values_google_analytics").hide();
     transport == "google_tag_manager" ? $("#transport_settings_values_google_tag_manager").show() : $("#transport_settings_values_google_tag_manager").hide();
+    transport == "store_spree" ? $("#transport_settings_values_store_spree").show() : $("#transport_settings_values_store_spree").hide();
   }
 
   function assignRequiredTagToFields(transport) {
@@ -1238,8 +1198,6 @@ function set_product_filter_at_fulfillments_index(settings_others_product) {
     $('#product_filter').val(radio_product_filter.val());
   }else if (radio_product_filter.val() == "sku") {
     $('#product_filter').val($('#input_product_filter').val());
-  }else{
-    $('#product_filter').val($('#input_product_package').val());
   }
 }
 
@@ -1292,12 +1250,6 @@ function fulfillments_index_functions(create_xls_file_url, make_report_url, fulf
 
   $('#input_product_filter').click(function() {
     $('#radio_product_filter_sku').prop('checked', true);
-    $("#input_product_package").val("");
-  });
-
-  $('#input_product_package').click(function() {
-    $('#radio_product_filter_package').prop('checked', true);
-    $("#input_product_filter").val("");
   });
 
   $("#make_report").click(function() {

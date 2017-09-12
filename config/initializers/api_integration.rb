@@ -15,12 +15,15 @@ Drupal.enable_integration! unless Rails.env.test? or Rails.env.development?
 require 'sac_exact_target/exact_target'
 require 'sac_mailchimp/mailchimp'
 require 'sac_mandrill/mandrill'
+require 'sac_store/store'
 require 'campaigns/campaign_data_fetcher'
 
 SacExactTarget.logger = Logger.new("#{Rails.root}/log/exact_target_client.log")
 SacMailchimp.logger = Logger.new("#{Rails.root}/log/mailshimp_client.log")
 SacMandrill.logger = Logger.new("#{Rails.root}/log/mandrill_client.log")
+SacStore.logger = Logger.new("#{Rails.root}/log/store_client.log")
 # in test env, integration should be manually enabled in specific tests
 SacExactTarget.enable_integration! unless Rails.env.test? or Rails.env.development?
 SacMailchimp.enable_integration! unless Rails.env.test? or Rails.env.development?
 SacMandrill.enable_integration! unless Rails.env.test? or Rails.env.development?
+SacStore.enable_integration! unless Rails.env.test? or Rails.env.development?

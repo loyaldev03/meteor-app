@@ -74,4 +74,18 @@ class Auditory
       Auditory.create_user_story(description, "[IMMEDIATE] Club:marketing_client_changed")
     end
   end
+
+  def self.management_stock_notification(title, message, errors)
+    unless ["test", "development"].include? Rails.env  
+      description = <<-EOF
+        **Message**
+        ```#{message}```
+        -------------------------------
+        **Errors**
+        \n#{errors.collect{|x| "* #{x}" }.join("\n")}
+      EOF
+      Auditory.create_user_story(description, title)
+    end
+  end
+
 end

@@ -58,12 +58,11 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   
   test "search user with empty form" do
     setup_search 
-    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)    
-    
+    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within('#index_search_form') do 
       alert_ok_js
       click_link_or_button 'Search'        
-    end 
+    end   
   end
   
   test "search user by user id" do

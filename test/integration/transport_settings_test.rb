@@ -11,6 +11,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     @tsmailchimp = FactoryGirl.build(:transport_settings_mailchimp, :club_id => @club.id)
     @tsgoogletagmanager = FactoryGirl.build(:transport_settings_google_tag_manager, :club_id => @club.id)
     @tsgoogleanalytics = FactoryGirl.build(:transport_settings_google_analytics, :club_id => @club.id)
+    @tsstore = FactoryGirl.build(:transport_settings_store, :club_id => @club.id)
     sign_in_as(@admin_agent)
   end
 
@@ -31,15 +32,44 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     click_link_or_button 'Back'
   end
 
-  test "should create Facebook Transport Settings " do    
+  test "should create Facebook, Mailchimp, Google Tag Manager, Google Analytics and Store Transport Settings " do    
     visit transport_settings_path(@partner_prefix, @club.name)
     click_link_or_button 'new_transport_setting' 
-    fill_in_form('facebook', options ={client_id: @tsfacebook.client_id, client_secret: @tsfacebook.client_secret, access_token: @tsfacebook.access_token})       
+    fill_in_form('Facebook', options ={client_id: @tsfacebook.client_id, client_secret: @tsfacebook.client_secret, access_token: @tsfacebook.access_token})       
     click_link_or_button 'Create Transport setting'
-    assert page.has_content?("The transport setting for facebook was successfully created.")
+    assert page.has_content?("The transport setting for Facebook was successfully created.")
     assert page.has_content?(@tsfacebook.client_id)
     assert page.has_content?(@tsfacebook.client_secret)
     assert page.has_content?(@tsfacebook.access_token)
+
+    click_link_or_button 'Back'
+    click_link_or_button 'new_transport_setting'
+    fill_in_form('Mailchimp', {api_key: @tsmailchimp.api_key})              
+    click_link_or_button 'Create Transport setting'    
+    assert page.has_content?("The transport setting for Mailchimp was successfully created.")
+    assert page.has_content?(@tsmailchimp.api_key)
+
+    click_link_or_button 'Back'
+    click_link_or_button 'new_transport_setting' 
+    fill_in_form('Google Tag Manager', options ={container_id: @tsgoogletagmanager.container_id})       
+    click_link_or_button 'Create Transport setting'
+    assert page.has_content?("The transport setting for Google Tag Manager was successfully created.")
+    assert page.has_content?(@tsgoogletagmanager.container_id)
+
+    click_link_or_button 'Back'
+    click_link_or_button 'new_transport_setting' 
+    fill_in_form('Google Analytics', options ={tracking_id: @tsgoogleanalytics.tracking_id})       
+    click_link_or_button 'Create Transport setting'
+    assert page.has_content?("The transport setting for Google Analytics was successfully created.")
+    assert page.has_content?(@tsgoogleanalytics.tracking_id)
+
+    click_link_or_button 'Back'
+    click_link_or_button 'new_transport_setting' 
+    fill_in_form('Store', options ={url: @tsstore.url, api_token: @tsstore.api_token})       
+    click_link_or_button 'Create Transport setting'
+    assert page.has_content?("The transport setting for Store was successfully created.")
+    assert page.has_content?(@tsstore.url)
+    assert page.has_content?(@tsstore.api_token)
   end
 
   test "should edit Facebook Transport Settings" do
@@ -50,10 +80,10 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     end
     fill_in_form(nil, {client_id: @tsfacebook.client_id, client_secret: @tsfacebook.client_secret, access_token: @tsfacebook.access_token})           
     click_link_or_button 'Update Transport setting'
-    assert page.has_content?("The transport setting for facebook was successfully updated.")
+    assert page.has_content?("The transport setting for Facebook was successfully updated.")
     assert page.has_content?(@tsfacebook.client_id)
     assert page.has_content?(@tsfacebook.client_secret)
-    assert page.has_content?(@tsfacebook.access_token)
+    assert page.has_content?(@tsfacebook.access_token)      
   end
 
   test "should see Mailchimp Transport Settings" do
@@ -66,15 +96,6 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     click_link_or_button 'Back'
   end
 
-  test "should create Mailchimp Transport Settings " do
-    visit transport_settings_path(@partner_prefix, @club.name)
-    click_link_or_button 'new_transport_setting'
-    fill_in_form('mailchimp', {api_key: @tsmailchimp.api_key})              
-    click_link_or_button 'Create Transport setting'    
-    assert page.has_content?("The transport setting for mailchimp was successfully created.")
-    assert page.has_content?(@tsmailchimp.api_key)
-  end
-
   test "should edit Mailchimp Transport Settings" do
     transport_settings_mailchimp = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club.id)
     visit transport_settings_path(@partner_prefix, @club.name)
@@ -83,7 +104,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     end
     fill_in_form(nil, {api_key: @tsmailchimp.api_key})   
     click_link_or_button 'Update Transport setting'
-    assert page.has_content?("The transport setting for mailchimp was successfully updated.")
+    assert page.has_content?("The transport setting for Mailchimp was successfully updated.")
     assert page.has_content?(@tsmailchimp.api_key)
   end
 
@@ -93,17 +114,8 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     within("#transport_settings_table") do
       click_link_or_button 'Show'
     end
-    assert page.has_content?("Google tag manager")
+    assert page.has_content?("Google Tag Manager")
     click_link_or_button 'Back'
-  end
-
-  test "should create Google tag manager Transport Settings " do    
-    visit transport_settings_path(@partner_prefix, @club.name)
-    click_link_or_button 'new_transport_setting' 
-    fill_in_form('google_tag_manager', options ={container_id: @tsgoogletagmanager.container_id})       
-    click_link_or_button 'Create Transport setting'
-    assert page.has_content?("The transport setting for google_tag_manager was successfully created.")
-    assert page.has_content?(@tsgoogletagmanager.container_id)
   end
 
   test "should edit Google tag manager Transport Settings" do
@@ -114,7 +126,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     end
     fill_in_form(nil, {container_id: @tsgoogletagmanager.container_id})           
     click_link_or_button 'Update Transport setting'
-    assert page.has_content?("The transport setting for google_tag_manager was successfully updated.")
+    assert page.has_content?("The transport setting for Google Tag Manager was successfully updated.")
     assert page.has_content?(@tsgoogletagmanager.container_id)
   end
 
@@ -124,17 +136,8 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     within("#transport_settings_table") do
       click_link_or_button 'Show'
     end
-    assert page.has_content?("Google analytics")
+    assert page.has_content?("Google Analytics")
     click_link_or_button 'Back'
-  end
-
-  test "should create Google analytics Transport Settings " do
-    visit transport_settings_path(@partner_prefix, @club.name)
-    click_link_or_button 'new_transport_setting' 
-    fill_in_form('google_analytics', options ={tracking_id: @tsgoogleanalytics.tracking_id})       
-    click_link_or_button 'Create Transport setting'
-    assert page.has_content?("The transport setting for google_analytics was successfully created.")
-    assert page.has_content?(@tsgoogleanalytics.tracking_id)
   end
 
   test "should edit Google analytics Transport Settings" do
@@ -145,10 +148,34 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
     end
     fill_in_form(nil, {tracking_id: @tsgoogleanalytics.tracking_id})           
     click_link_or_button 'Update Transport setting'
-    assert page.has_content?("The transport setting for google_analytics was successfully updated.")
+    assert page.has_content?("The transport setting for Google Analytics was successfully updated.")
     assert page.has_content?(@tsgoogleanalytics.container_id)
-  end  
+  end 
+
+  test "should see Store Transport Settings" do
+    transport_settings_mailchimp = FactoryGirl.create(:transport_settings_store, :club_id => @club.id)
+    visit transport_settings_path(@partner_prefix, @club.name)
+    within("#transport_settings_table") do
+      click_link_or_button 'Show'
+    end
+    assert page.has_content?("Store")
+    click_link_or_button 'Back'
+  end 
+
+  test "should edit Store Transport Settings" do
+    transport_settings_store = FactoryGirl.create(:transport_settings_store, :club_id => @club.id)    
+    visit transport_settings_path(@partner_prefix, @club.name)
+    within("#transport_settings_table") do
+      click_link_or_button 'Edit'
+    end
+    fill_in_form(nil, {url: @tsstore.url, api_token: @tsstore.api_token})           
+    click_link_or_button 'Update Transport setting'
+    assert page.has_content?("The transport setting for Store was successfully updated.")
+    assert page.has_content?(@tsstore.url)
+    assert page.has_content?(@tsstore.api_token)
+  end
 end
+
 
 
 

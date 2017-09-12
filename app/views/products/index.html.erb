@@ -1,14 +1,6 @@
 <section>
   <div class="page-header">
     <h1>Product</h1>
-    <% if can? :create, Product %>
-      <%= link_to(new_product_path, :class => "btn btn-primary btn_on_header", :id => "new_product") do %> 
-        <i class="icon-plus"></i> New Product
-      <% end %>
-    <% end %>
-    <% if can? :bulk_process, Product, current_club.id %>
-      <%= link_to('Bulk Process', bulk_process_products_path, :class => "btn btn-success btn_on_header_additional") %> 
-    <% end %>
   </div>
 
   <table id="products_table" class="table table-bordered table-condensed dataTable" data-source="<%= products_url(format: "json") %>">

@@ -31,13 +31,14 @@ class Club < ActiveRecord::Base
 
   validates :partner_id, :cs_phone_number, :cs_email, presence: true
   validates :name, presence: true, uniqueness: true
-  validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :store_url, :checkout_url, :unavailable_campaign_url,
+  validates :member_banner_url, :non_member_banner_url, :member_landing_url, :non_member_landing_url, :checkout_url, :unavailable_campaign_url,
             format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validates :privacy_policy_url, :twitter_url, :facebook_url, format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validate :payment_gateway_errors_email_is_well_formated
   validates :cs_email, format: /\A[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+\z/
   validates_attachment_content_type :header_image_url, :favicon_url, :result_pages_image_url,
     :content_type => /\Aimage\/.*\Z/
+  validates :fulfillment_tracking_prefix, length: { maximum: 1 }
 
   scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' AND (marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes not like '%\"et_business_unit\":\"\"%') AND (marketing_tool_attributes like '%et_prospect_list%'AND marketing_tool_attributes not like '%\"et_prospect_list\":\"\"%') AND (marketing_tool_attributes like '%et_members_list%' AND marketing_tool_attributes not like '%\"et_members_list\":\"\"%') AND (marketing_tool_attributes like '%et_username%' AND marketing_tool_attributes not like '%\"et_username\":\"\"%') AND ( marketing_tool_attributes like '%et_password%' AND marketing_tool_attributes not like '%\"et_password\":\"\"%') AND (marketing_tool_attributes like '%et_endpoint%' AND marketing_tool_attributes not like '%\"et_endpoint\":\"\"%')") }
   scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' AND (marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes not like '%\"mailchimp_api_key\":\"\"%') AND (marketing_tool_attributes like '%mailchimp_list_id%'AND marketing_tool_attributes not like '%\"mailchimp_list_id\":\"\"%')") }
@@ -164,12 +165,18 @@ class Club < ActiveRecord::Base
   end
 
   def available_transport_settings
-    [
-      'facebook',
-      'mailchimp',
-      'google_analytics',
-      'google_tag_manager'
-    ] - transport_settings.select(:transport).map(&:transport)
+    used_transports = transport_settings.select(:transport).map(&:transport)
+    TransportSetting.transports_i18n.invert.select{|k,v| !used_transports.include?(v)}
+  end
+
+  def has_store_configured?
+    @transport_settings ||= transport_settings.store_spree.first
+    @transport_settings.present?
+  end
+
+  def store_url
+    store_transport_setting = self.transport_settings.store_spree.first
+    store_transport_setting.nil? ? '' : store_transport_setting.settings['url']
   end
 
   private

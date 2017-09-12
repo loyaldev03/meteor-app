@@ -75,13 +75,13 @@ module Users
         begin
           product = @user.current_membership.product
           fulfillment = Fulfillment.new product_sku: product.sku
-          fulfillment.product_package = product.package
           fulfillment.recurrent = product.recurrent 
           fulfillment.user_id = @user.id
           fulfillment.club_id = @user.club_id
           fulfillment.product = product
           fulfillment.save!
           if not @user.testing_account?
+            fulfillment.store_fulfillment.notify_fulfillment_assignation if defined?(SacStore::FulfillmentModel) and fulfillment.store_fulfillment
             proceed_with_gamer_analysis(fulfillment)
           else
             fulfillment.set_as_canceled

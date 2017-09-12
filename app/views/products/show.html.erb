@@ -6,16 +6,8 @@
   <%= @product.name %>
 </p>
 <p>
-  <strong><%= model_class.human_attribute_name(:package) %>:</strong><br>
-  <%= @product.package %>
-</p>
-<p>
   <strong><%= model_class.human_attribute_name(:sku) %>:</strong><br>
   <%= @product.sku %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:cost_center) %>:</strong><br>
-  <%= @product.cost_center %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:recurrent) %>:</strong><br>
@@ -24,10 +16,6 @@
 <p>
   <strong><%= model_class.human_attribute_name(:stock) %>:</strong><br>
   <%= @product.stock %>
-</p>
-<p>
-  <strong><%= model_class.human_attribute_name(:alert_on_low_stock) %>:</strong><br>
-  <%= @product.alert_on_low_stock %>
 </p>
 <p>
   <strong><%= model_class.human_attribute_name(:allow_backorder) %>:</strong><br>
@@ -53,9 +41,4 @@
 <div class="form-actions">
   <%= link_to t('back', :default => t("helpers.links.back")),
               products_path, :class => 'btn' %>
-  <%= link_to t('destroy', :default => t("helpers.links.destroy")),
-              product_path(@current_partner.prefix, @current_club.name, @product),
-              :method => 'delete',
-              data: {:confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?'))},
-              :class => 'btn btn-danger' %>
 </div>

@@ -2,8 +2,6 @@ FactoryGirl.define do
   factory :product do
     name Settings.others_product.capitalize
     sku Settings.others_product
-    package Settings.others_product
-    cost_center Settings.others_product.capitalize
     stock 10
     weight 5
     image_url 'https://assets.onmc.com/campaigns/products/2014calendars/dale_jr.jpg'

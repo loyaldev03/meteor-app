@@ -95,17 +95,18 @@ class CampaignTest < ActiveSupport::TestCase
     assert !@campaign.save, "Campaign was saved with finish_date before than initial_date "
   end
 
-  test 'should generate store URL when campaign_type is store_promotion or newsletter' do
-    club = FactoryGirl.create(:simple_club_with_gateway, :store_url => 'https://dailydeals.onmc.com')    
-    newsletter_campaign = FactoryGirl.create(:campaign_newsletter, :club_id => club.id)
+  test 'should generate store URL when campaign_type is store_promotion or newsletter' do    
+    club = FactoryGirl.create(:simple_club_with_gateway)
+    transport_setting = FactoryGirl.create(:transport_settings_store, :club_id => club.id)    
+    newsletter_campaign = FactoryGirl.create(:campaign_newsletter, :club_id => club.id)    
     assert newsletter_campaign.landing_url.include? newsletter_campaign.club.store_url
 
     store_promotion_campaign = FactoryGirl.create(:campaign_store_promotion, :club_id => club.id)
     assert store_promotion_campaign.landing_url.include? store_promotion_campaign.club.store_url 
   end
 
-  test 'should generate member_landing_url when campaign_type is NOT store_promotion or newsletter' do
-    club = FactoryGirl.create(:simple_club_with_gateway, :store_url => 'http://products.onmc.com')    
+  test 'should generate member_landing_url when campaign_type is NOT store_promotion or newsletter' do    
+    club = FactoryGirl.create(:simple_club_with_gateway, :member_landing_url => 'http://products.onmc.com')    
     terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => club.id)
     sloop_campaign = FactoryGirl.create(:campaign, :club_id => club.id, :terms_of_membership_id => terms_of_membership.id)
     assert sloop_campaign.landing_url.include? sloop_campaign.club.store_url    

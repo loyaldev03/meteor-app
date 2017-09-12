@@ -1,0 +1,1 @@
+class TransportDoesntSupportAction < Exception ; end

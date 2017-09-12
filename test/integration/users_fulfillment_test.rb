@@ -85,9 +85,9 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     fulfillment_file.generateXLS(change_status)
   end
 
-  ###########################################################
-  # TESTS
-  ###########################################################
+  ##########################################################
+  ##TESTS
+  ##########################################################
 
   test "cancel user and check if in_process fulfillments were updated to canceled" do
     setup_user
@@ -313,7 +313,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
     end
     stock = @product.stock
     @product.reload
@@ -471,7 +470,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process')
     end
 
@@ -508,7 +506,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process') 
     end
     update_status_on_fulfillments([fulfillment], "bad_address", false, true)
@@ -591,7 +588,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process') 
     end
     update_status_on_fulfillments([fulfillment], "bad_address", false, true)
@@ -637,7 +633,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('out_of_stock') 
     end
   end
@@ -671,17 +666,11 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('out_of_stock') 
     end
-    visit products_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    within("#products_table") do 
-      within("tr", :text => product.name, match: :prefer_exact){click_link_or_button 'Edit'}
-    end
 
-    page.has_content?('Edit Product')
-    fill_in 'product[stock]', :with => '10'
-    click_link_or_button('Update Product')
+    product.stock = 10
+    product.save
 
     click_link_or_button("My Clubs")
     within("#my_clubs_table") do
@@ -699,7 +688,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('out_of_stock') 
     end
   end
@@ -803,7 +791,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(@fulfillment.user.full_name)
       assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(@fulfillment.product_sku)
-      assert page.has_content?(@fulfillment.tracking_code)
       assert page.has_content?('bad_address')
     end
   end
@@ -831,7 +818,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(@fulfillment.user.full_name)
       assert page.has_content?((I18n.l(@fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(@fulfillment.product_sku)
-      assert page.has_content?(@fulfillment.tracking_code)
       assert page.has_content?('bad_address')
     end
 
@@ -1095,7 +1081,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('not_processed')
     end
   end
@@ -1140,7 +1125,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
         assert page.has_content?(fulfillment.user.full_name)
         assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
         assert page.has_content?('in_process') 
     end
   end 
@@ -1185,7 +1169,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
       assert page.has_content?(fulfillment.user.full_name)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?('in_process') 
     end
   end 
@@ -1375,7 +1358,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       assert page.has_content?('not_processed')
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
     end
     fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 
@@ -1424,7 +1406,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       assert page.has_content?('not_processed')
       assert page.has_content?(fulfillment.product_sku)
-      assert page.has_content?(fulfillment.tracking_code)
       assert page.has_content?((I18n.l(fulfillment.assigned_at, :format => :only_date)))
       assert page.has_content?((I18n.l(fulfillment.renewable_at, :format => :only_date)))
     end
@@ -1508,7 +1489,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     fulfillments = Fulfillment.joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ?', 'in_process', Date.today, Date.today, @club.id])
 
     csv_string = generate_xls_file(fulfillments, Settings.others_product, @saved_user.club, true)
-    ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service', fulfillment.tracking_code.to_s, fulfillment.product.cost_center.to_s, fulfillment.user.full_name, fulfillment.user.address, fulfillment.user.city, fulfillment.user.state, fulfillment.user.zip.to_s, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper', fulfillment.product.weight.to_s, 'MID'].each do |field|
+    ['PackageId', 'Costcenter', 'Companyname', 'Address', 'City', 'State', 'Zip', 'Endorsement', 'Packagetype', 'Divconf', 'Bill Transportation', 'Weight', 'UPS Service', fulfillment.tracking_code.to_s, fulfillment.product.sku.to_s, fulfillment.user.full_name, fulfillment.user.address, fulfillment.user.city, fulfillment.user.state, fulfillment.user.zip.to_s, 'Return Service Requested', 'Irregulars', 'Y', 'Shipper', fulfillment.product.weight.to_s, 'MID'].each do |field|
       csv_string.inspect.to_s.include? field
     end
   end
@@ -1561,7 +1542,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1571,7 +1551,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1593,7 +1572,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
+
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1602,8 +1581,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     search_fulfillments(false,nil,nil,'in_process')
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
-        assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
+        assert page.has_content?(fulfillment.product_sku) 
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1625,7 +1603,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1635,7 +1612,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1657,7 +1633,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1667,7 +1642,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1689,7 +1663,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1699,7 +1672,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1721,7 +1693,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1731,7 +1702,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1753,7 +1723,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -1763,7 +1732,6 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     within("#report_results")do
       @saved_user.fulfillments.each do |fulfillment|
         assert page.has_content?(fulfillment.product_sku)
-        assert page.has_content?(fulfillment.tracking_code)
       end
       assert page.has_content?(@saved_user.full_name)
       assert page.has_content?(@saved_user.id.to_s)
@@ -2625,36 +2593,69 @@ test "Update the status of all the fulfillments - In process using individual ch
     end  
   end
 
-  test "Search Fulfillments by package" do
+  test "Search Fulfillments by sku checking all times" do
     setup_user(false)
     active_merchant_stubs
     enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
-    product1 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAG", :sku => "Bracelet1")
-    product2 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAG", :sku => "Bracelet2")
-    product3 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAGTWO", :sku => "Bracelet3")
-    product4 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :package => "NCARFLAGTWO", :sku => "Bracelet4")
+    product1 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :sku => "NCARFLAGBRACELET1")
+    product2 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :sku => "NCARFLAGBRACELET2")
+    product3 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :sku => "NCARFLAGTWOBRACELET3")
+    product4 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :sku => "NCARFLAGTWOBRACELET4")
 
-    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'Bracelet1', :product_id => product1.id, :club_id => @club.id)}
-    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'Bracelet2', :product_id => product2.id, :club_id => @club.id)}
-    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'Bracelet3', :product_id => product3.id, :club_id => @club.id)}
-    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'Bracelet4', :product_id => product4.id, :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'NCARFLAGBRACELET1', :product_id => product1.id, :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'NCARFLAGBRACELET2', :product_id => product2.id, :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'NCARFLAGTWOBRACELET3', :product_id => product3.id, :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'NCARFLAGTWOBRACELET4', :product_id => product4.id, :club_id => @club.id)}
 
     search_fulfillments(true, nil, nil, nil, nil, 'NCARFLAG')
     within("#report_results")do
-      assert page.has_content? "Bracelet1"
-      assert page.has_content? "Bracelet2"
-      assert page.has_no_content? "Bracelet3"
-      assert page.has_no_content? "Bracelet4"
+      assert page.has_content? "NCARFLAGBRACELET1"
+      assert page.has_content? "NCARFLAGBRACELET2"
+      assert page.has_content? "NCARFLAGTWOBRACELET3"
+      assert page.has_content? "NCARFLAGTWOBRACELET4"
     end
 
     search_fulfillments(true, nil, nil, nil, nil, 'NCARFLAGTWO')
     within("#report_results")do
-      assert page.has_no_content? "Bracelet1"
-      assert page.has_no_content? "Bracelet2"
-      assert page.has_content? "Bracelet3"
-      assert page.has_content? "Bracelet4"
+      assert page.has_no_content? "NCARFLAGBRACELET1"
+      assert page.has_no_content? "NCARFLAGBRACELET2"
+      assert page.has_content? "NCARFLAGTWOBRACELET3"
+      assert page.has_content? "NCARFLAGTWOBRACELET4"
+    end
+  end
+
+  test "Search Fulfillments by sku selecting dates" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    create_user_throught_sloop(enrollment_info)
+
+    product1 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :sku => "NCARFLAGBRACELET1")
+    product2 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :sku => "NCARFLAGBRACELET2")
+    product3 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :sku => "NCARFLAGTWOBRACELET3")
+    product4 = FactoryGirl.create(:product, :club_id => @saved_user.club_id, :sku => "NCARFLAGTWOBRACELET4")
+
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'NCARFLAGBRACELET1', :product_id => product1.id, :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'NCARFLAGBRACELET2', :product_id => product2.id, :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'NCARFLAGTWOBRACELET3', :product_id => product3.id, :club_id => @club.id)}
+    2.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => 'NCARFLAGTWOBRACELET4', :product_id => product4.id, :club_id => @club.id)}
+
+    search_fulfillments(false, nil, nil, nil, nil, 'NCARFLAG')
+    within("#report_results")do
+      assert page.has_content? "NCARFLAGBRACELET1"
+      assert page.has_content? "NCARFLAGBRACELET2"
+      assert page.has_content? "NCARFLAGTWOBRACELET3"
+      assert page.has_content? "NCARFLAGTWOBRACELET4"
+    end
+
+    search_fulfillments(false, nil, nil, nil, nil, 'NCARFLAGTWO')
+    within("#report_results")do
+      assert page.has_no_content? "NCARFLAGBRACELET1"
+      assert page.has_no_content? "NCARFLAGBRACELET2"
+      assert page.has_content? "NCARFLAGTWOBRACELET3"
+      assert page.has_content? "NCARFLAGTWOBRACELET4"
     end
   end
 end

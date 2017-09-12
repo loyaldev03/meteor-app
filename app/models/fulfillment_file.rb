@@ -31,6 +31,13 @@ class FulfillmentFile < ActiveRecord::Base
 
   def mark_fulfillments_as_sent
     self.fulfillments.where_in_process.each { |x| x.update_status(agent, 'sent', 'Fulfillment file set as sent', self.id) }
+  
+    if club.has_store_configured?
+      fulfillments.pluck(:id).in_groups_of(100).each do |group|
+        Store::FulfillmentFileFulfillJob.perform_later(self, group.compact)
+      end
+      Store::NotifyFulfillmentFileFulfillJob.perform_later(self)
+    end
   end
 
   def generateXLS(change_status = false)

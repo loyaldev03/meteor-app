@@ -37,7 +37,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     end
   end
 
-  test "agents that should not show campaigns" do
+  test "agents that should not show transport settings" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent, 
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
@@ -89,7 +89,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     end
   end
 
-  test "agents that should create transport setting" do
+  test "agents that should create transport settings" do
     [:confirmed_admin_agent].each do |agent|            
       transportSetting = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)    
       sign_agent_with_global_role(agent)
@@ -104,7 +104,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     end
   end
 
-  test "agents that should not create transport setting" do
+  test "agents that should not create transport settings" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
@@ -130,7 +130,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     end
   end
 
-  test "agents that should not update campaign" do
+  test "agents that should not update transport settings" do
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
@@ -180,13 +180,13 @@ class TransportSettingsControllerTest < ActionController::TestCase
     end
   end
 
-  test "agents that should show campaigns with club roles" do
+  test "agents that should show transport settings with club roles" do
     sign_agent_with_club_role(:agent, 'admin')
     get :show, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name
     assert_response :success
   end
 
-  test "agents that should not show campaigns with club roles" do
+  test "agents that should not show transport settings with club roles" do
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do 
@@ -212,7 +212,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     end
   end
 
-  test "agents that should create transport setting with club roles" do
+  test "agents that should create transport settings with club roles" do
     sign_agent_with_club_role(:agent, 'admin')
     transportSetting = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)        
     assert_difference('TransportSetting.count',1) do        
@@ -225,7 +225,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, :club_prefix => @club.name, :id => transportsettingcreated.id )
   end
 
-  test "agents that should not create transport setting with club roles" do    
+  test "agents that should not create transport settings with club roles" do    
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
@@ -255,7 +255,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     end
   end
 
-  test "agents that should update campaign with club role" do
+  test "agents that should update transport settings with club role" do
     sign_agent_with_club_role(:agent, 'admin')
     @club1 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     transportSetting = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club1.id)       
@@ -263,7 +263,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, :club_prefix => @club.name, :id => @tsmailchimp.id )
   end
 
-  test "agents that should not update campaign with club role" do
+  test "agents that should not update transport settings with club role" do
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do

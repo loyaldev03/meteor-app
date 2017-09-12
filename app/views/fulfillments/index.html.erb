@@ -40,10 +40,6 @@
             :placeholder => "Sku" %>
           <%= hidden_field_tag :product_filter %>
           <br>
-          <%= radio_button_tag 'radio_product_filter', 'package', params[:radio_product_filter] == 'package' %>
-          <%= text_field_tag :input_product_package, (params[:radio_product_filter] == 'package' ? params[:product_filter] : '' ), :class => 'help-inline',
-            :placeholder => "Package" %>
-          <%= hidden_field_tag :product_package %>
         </td>
     	</tr>
     	<tr>

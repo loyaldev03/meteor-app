@@ -54,6 +54,8 @@ en:
   cancel_confirm_when_tom_change_scheduled: "The member you are about to cancel has a future subscription plan scheduled. If the cancelation date you will choose is before the one for the future subscription plan update then that scheduled subscription plan will have no effect."
   preference_management_notification: 'Any change made on the preference list has to be replicated in the list of preferences in Drupal.'
   no_toms_for_save_the_sale: 'No Subscription Plans set to be shown here. Go, enable some '
+  import_data: 'Import Data'
+  link_to_store_variant: 'Go to Store Variant'
   enums:
     campaign:
       transport:
@@ -69,6 +71,13 @@ en:
         newsletter: Newsletter
         daily_candy: Daily candy
         freemium: Freemium
+    transport_setting:
+      transport:
+        facebook: 'Facebook'
+        mailchimp: 'Mailchimp'
+        google_analytics: 'Google Analytics'
+        google_tag_manager: 'Google Tag Manager'
+        store_spree: 'Store'
   menu:
     admin_menu: 'Admin Menu'
     logout: 'Logout'
@@ -192,6 +201,7 @@ en:
     cannot_chargeback_transaction: "Transaction cannot be chargebacked."
     membership_billing_with_error: "This error should be checked during the same day it was reported in order to make sure that we are avoiding multiple unnecessary billings on the user. We should validate with the gateway if this transaction was correctly process, and in case it was we should proceed to update the transaction data according to it and also make sure to leave the user's next_retry_bill_date and bill_date set properly. In case the gateway confirms that the transaction was not process, we should delete this transaction to avoid having unnecessary records."
     campaign_is_not_active: 'This offer is not active at this moment.'
+    transport_setting_wrong_credentials: 'The Transport Setting does not have the correct credentials configured, make sure to configure them correctly.'
     club_cash:
       negative_amount: "Check amount value, please. Amount cannot be less than 0 (zero)."
       null_amount: "Check amount value, please. Amount cannot be blank or null."
@@ -446,6 +456,8 @@ en:
         payment_gateway_errors_email_help: 'Errors related to AUS service (CALL error), will be notified to the emails specified. You can add several emails separated by commas. (Eg: "email+one@example.com, email+two@example.com, email+three@example.com") '
         field_can_use_tokens: 'This field can use tokens'
         field_can_use_tokens_help: 'You can use tokens in the content of this field. These tokens will be replaced dinamically with values loaded from the club or the campaigns. You can use any of the tokens shown in the help located in the sidebar'
+        fulfillment_tracking_prefix: 'Fulfillment File Package ID prefix'
+        fulfillment_tracking_prefix_help: 'Prefix used within the PackageId column in the fulfillment file. It only allows one letter.'
         tokens_help:
           club_name: 'Name of the Club'
           landing_url: 'URL of the Landing page'
@@ -677,23 +689,17 @@ en:
         created_at: 'Created at'
         sku: SKU
         allow_backorder: 'Allow Backorder'
-        package: Package
-        package_help: 'This value is part of the Packageid on the fulfillment file. e.g: set as package NCARFLAG and platform will add the user id. The packageid obtained will be NCARFLAG20243911111'
         sku_help: 'Users get fulfills according to the list of SKUs stored while enrollment.'
         is_visible: 'Is Visible?'
         is_visible_label: 'Will product be visible?'
         is_visible_help: 'This option makes a product invisible in the fulfillment file manager.'
         bulk_process_help_title: 'Products bulk create'
-        bulk_process_help_content: "Allows to create/update several products at once using a csv file providing the required data. If the sku provided does belongs to an already created product we will proceed to update it, and in case it doesn't we will create it. Each column shall be separated by comma and each row by a new line. The format of each row is SKU, NAME, PACKAGE, STOCK TO ADD, ALLOW BACKORDER, WEIGHT, COST CENTER). Example: FLAGDALE,Flag Dale,Flag,100,yes,2.5,FDALE."
-        alert_on_low_stock_label: 'Alert on low Stock'
-        alert_on_low_stock_help: 'An User Story will be created if the quantity of the product is below '
+        bulk_process_help_content: "Allows to create/update several products at once using a csv file providing the required data. If the sku provided does belongs to an already created product we will proceed to update it, and in case it doesn't we will create it. Each column shall be separated by comma and each row by a new line. The format of each row is SKU, NAME, STOCK TO ADD, ALLOW BACKORDER, WEIGHT). Example: FLAGDALE,Flag Dale,100,yes,2.5"
         has_image: 'Has image'
         validations:
           sku: 'Required and unique string with at least 2 characters.'
           name: 'String of charactes. Accepts letters and numbers.'
-          package: 'String with a max amount of 20 characters. Only accepts letters.'
           stock_to_add: 'Numerical value. Max value: 1999999. Only accepts numbers.'
-          cost_center: 'String between 2 and 20 characters. Only accepts letters.'
           weight: 'Float value.'
           allow_backorder: 'String value. Only accepts "yes" or "no"'
       payment_gateway_configuration:
@@ -766,6 +772,9 @@ en:
         campaign_preference_groups: 'Campaign Preference Groups'
         available_preference_groups: 'Available Preference Groups'
         assigned_preference_groups: Assigned Preference Groups'
+      transport_setting:
+        id: ID
+        transport: Transport
   mailchimp:
     error_details:
       cant_subscribe: 'is in a compliance state due to unsubscribe, bounce, or compliance review and cannot be subscribed.'

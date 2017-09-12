@@ -8,6 +8,7 @@ FactoryGirl.define do
     billing_enable true
     family_memberships_allowed false
     association :partner
+    fulfillment_tracking_prefix 'T'
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end
 
@@ -22,6 +23,7 @@ FactoryGirl.define do
     api_password { Faker::Internet.user_name }
     family_memberships_allowed false
     association :partner
+    fulfillment_tracking_prefix 'T'
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end
 
@@ -78,6 +80,7 @@ FactoryGirl.define do
     time_zone { TZInfo::Timezone.all.sample.name }
     family_memberships_allowed false
     association :partner
+    fulfillment_tracking_prefix 'T'
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:authorize_net_payment_gateway_configuration) }
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
@@ -90,6 +93,7 @@ FactoryGirl.define do
     billing_enable true
     time_zone { TZInfo::Timezone.all.sample.name }
     family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:first_data_payment_gateway_configuration) }
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
@@ -103,6 +107,7 @@ FactoryGirl.define do
     billing_enable true
     time_zone { TZInfo::Timezone.all.sample.name }
     family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:stripe_payment_gateway_configuration) }
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
@@ -116,6 +121,7 @@ FactoryGirl.define do
     billing_enable true
     time_zone { TZInfo::Timezone.all.sample.name }
     family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
     association :partner
 
     marketing_tool_client :action_mailer
@@ -131,6 +137,7 @@ FactoryGirl.define do
     billing_enable true
     family_memberships_allowed true
     time_zone { TZInfo::Timezone.all.sample.name }
+    fulfillment_tracking_prefix 'T'
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     association :partner
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
@@ -148,6 +155,7 @@ FactoryGirl.define do
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
     family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
@@ -165,6 +173,7 @@ FactoryGirl.define do
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }
     family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
@@ -178,6 +187,7 @@ FactoryGirl.define do
     cs_email 'customer_service@example.com'
     billing_enable true
     family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
@@ -194,8 +204,21 @@ FactoryGirl.define do
     api_password { Faker::Internet.user_name }
     requires_external_id true
     family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
     association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payment_gateway_configuration) }
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
+  end
+
+  factory :club_without_product, class: Club do
+    sequence(:name) {|n| "club_#{Faker::Lorem.characters(10)}" }
+    cs_phone_number "123 456 7891"
+    cs_email 'customer_service@example.com'
+    time_zone { TZInfo::Timezone.all.sample.name }
+    description "My description"
+    billing_enable true
+    family_memberships_allowed false
+    association :partner
+    fulfillment_tracking_prefix 'T'
   end
 end
