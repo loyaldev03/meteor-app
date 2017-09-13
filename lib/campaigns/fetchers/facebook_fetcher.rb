@@ -29,7 +29,7 @@ class CampaignDataFetcher
           @report.spent     = 0
         end
       rescue => e
-        logger.error "FacebookFetcher Error: #{e.to_s}"
+        Rails.logger.error "FacebookFetcher Error: #{e.to_s}"
         @report.meta = :unexpected_error
       end
       @report
@@ -53,7 +53,7 @@ class CampaignDataFetcher
         params = ["time_range={'since':'#{date}','until':'#{date}'}",
           "fields=spend,impressions,actions",
           "access_token=#{access_token}"].join('&')
-        [ "v2.8",
+        [ "v2.9",
           @report.campaign_foreign_id.to_s,
           "insights"
         ].join("/") + "?" + params

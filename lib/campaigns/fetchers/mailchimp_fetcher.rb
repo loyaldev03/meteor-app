@@ -30,7 +30,7 @@ class CampaignDataFetcher
       report
     rescue Exception => e
       Auditory.report_issue("MailchimpFetcher campaign retrieval error.", 'Mailchimp returned an unexpected error', { exception: e.to_s, campaign_id: report.campaign_id }, false)
-      logger.error "MailchimpFetcher Error: #{e.to_s}"
+      Rails.logger.error "MailchimpFetcher Error: #{e.to_s}"
       report.meta = :unexpected_error
       report
     end
