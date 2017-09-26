@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170524202657) do
+ActiveRecord::Schema.define(version: 20170828174252) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -72,26 +72,27 @@ ActiveRecord::Schema.define(version: 20170524202657) do
   add_index "campaign_products", ["product_id"], name: "index_campaign_products_on_product_id", using: :btree
 
   create_table "campaigns", force: :cascade do |t|
-    t.string   "name",                   limit: 255
-    t.decimal  "enrollment_price",                     precision: 11, scale: 2, default: 0.0
+    t.string   "name",                             limit: 255
+    t.decimal  "enrollment_price",                               precision: 11, scale: 2, default: 0.0
     t.date     "initial_date"
     t.date     "finish_date"
-    t.integer  "campaign_type",          limit: 4
-    t.integer  "transport",              limit: 4
-    t.string   "transport_campaign_id",  limit: 255
-    t.string   "utm_medium",             limit: 255
-    t.string   "utm_content",            limit: 255
-    t.string   "audience",               limit: 255
-    t.string   "campaign_code",          limit: 255
-    t.integer  "club_id",                limit: 4
-    t.integer  "terms_of_membership_id", limit: 4
-    t.datetime "created_at",                                                                                              null: false
-    t.datetime "updated_at",                                                                                              null: false
-    t.string   "landing_name",           limit: 255
-    t.text     "landing_url",            limit: 65535
-    t.integer  "products_count",         limit: 4,                              default: 0
-    t.string   "delivery_date",          limit: 255,                            default: "3 - 5 weeks from date ordered"
-    t.string   "slug",                   limit: 100
+    t.integer  "campaign_type",                    limit: 4
+    t.integer  "transport",                        limit: 4
+    t.string   "transport_campaign_id",            limit: 255
+    t.string   "utm_medium",                       limit: 255
+    t.string   "utm_content",                      limit: 255
+    t.string   "audience",                         limit: 255
+    t.string   "campaign_code",                    limit: 255
+    t.integer  "club_id",                          limit: 4
+    t.integer  "terms_of_membership_id",           limit: 4
+    t.datetime "created_at",                                                                                                        null: false
+    t.datetime "updated_at",                                                                                                        null: false
+    t.string   "landing_name",                     limit: 255
+    t.text     "landing_url",                      limit: 65535
+    t.integer  "products_count",                   limit: 4,                              default: 0
+    t.string   "delivery_date",                    limit: 255,                            default: "3 - 5 weeks from date ordered"
+    t.string   "slug",                             limit: 100
+    t.boolean  "create_remote_user_in_background",                                        default: false
   end
 
   add_index "campaigns", ["club_id"], name: "index_campaigns_on_club_id", using: :btree

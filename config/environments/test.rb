@@ -48,7 +48,7 @@ Rails.application.configure do
       bucket: 'xagaxmarketingcampaignsdev',
       access_key_id: 'AKIAIDA572IAALRTB26Q',
       secret_access_key: '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',
-      s3_region: 'us-east-1',
+      s3_region: 'us-west-2'
     }
   }
 end

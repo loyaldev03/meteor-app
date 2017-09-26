@@ -36,23 +36,21 @@ class Club < ActiveRecord::Base
   validates :privacy_policy_url, :twitter_url, :facebook_url, format: /(^$)|(^(http|https):\/\/([\w]+:\w+@)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix
   validate :payment_gateway_errors_email_is_well_formated
   validates :cs_email, format: /\A[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]+\z/
-  validates_attachment_content_type :header_image_url, :favicon_url, :result_pages_image_url,
-    :content_type => /\Aimage\/.*\Z/
   validates :fulfillment_tracking_prefix, length: { maximum: 1 }
 
   scope :exact_target_related, lambda { where("marketing_tool_client = 'exact_target' AND (marketing_tool_attributes like '%et_business_unit%' AND marketing_tool_attributes not like '%\"et_business_unit\":\"\"%') AND (marketing_tool_attributes like '%et_prospect_list%'AND marketing_tool_attributes not like '%\"et_prospect_list\":\"\"%') AND (marketing_tool_attributes like '%et_members_list%' AND marketing_tool_attributes not like '%\"et_members_list\":\"\"%') AND (marketing_tool_attributes like '%et_username%' AND marketing_tool_attributes not like '%\"et_username\":\"\"%') AND ( marketing_tool_attributes like '%et_password%' AND marketing_tool_attributes not like '%\"et_password\":\"\"%') AND (marketing_tool_attributes like '%et_endpoint%' AND marketing_tool_attributes not like '%\"et_endpoint\":\"\"%')") }
   scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' AND (marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes not like '%\"mailchimp_api_key\":\"\"%') AND (marketing_tool_attributes like '%mailchimp_list_id%'AND marketing_tool_attributes not like '%\"mailchimp_list_id\":\"\"%')") }
   scope :is_enabled, -> { where(billing_enable: true) }
 
-
   has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename",
                            url: "/system/:attachment/:id/:style/:filename",
-                           styles: { header: "120x40", thumb: "100x100#", small: "150x150>" },
-                           s3_protocol: :https
-
-  has_attached_file :header_image_url, styles: { thumb: '300x' }, s3_protocol: :https
-  has_attached_file :favicon_url, s3_protocol: :https
-  has_attached_file :result_pages_image_url, styles: { thumb: '50x' }, s3_protocol: :https
+                           styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
+  has_attached_file :header_image_url, styles: { thumb: '300x' }
+  has_attached_file :favicon_url
+  has_attached_file :result_pages_image_url, styles: { thumb: '50x' }
+  # This validation MUST be placed after the has_attachment declaration. Otherwise, it will fail https://github.com/thoughtbot/paperclip/issues/1340
+  validates_attachment_content_type :header_image_url, :favicon_url, :result_pages_image_url,
+                                    content_type: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/x-icon', 'image/vnd.microsoft.icon']
 
   # marketing_tool_attributes possible keys:
   # Pardot : pardot_email, pardot_user_key, pardot_password

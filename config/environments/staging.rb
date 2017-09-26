@@ -96,8 +96,7 @@ Rails.application.configure do
       bucket: 'campaign-checkout-assets-staging',
       access_key_id: 'AKIAIDA572IAALRTB26Q',
       secret_access_key: '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',
-      s3_region: 'us-east-1',
-      s3_protocol: :https
+      s3_region: 'us-east-1'
     }
   }
 
