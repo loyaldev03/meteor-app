@@ -60,7 +60,7 @@ gem 'jquery-rails'
 
 gem "paranoia", "~> 2.0"
 gem 'exception_notification', github: 'stoneacre/exception_notification'
-gem 'pivotal-tracker'
+gem 'tracker_api'
 
 gem "newrelic_rpm"
 gem 'premailer-rails'

@@ -1,13 +1,13 @@
 class Auditory
   # current_agent : if null will find the "batch" agent used on scripts.
   # object : the object added/modify/deleted by agent
-  # description : custom message 
+  # description : custom message
   # user : user that must show this operation (only for operations that are related to users: e.g. CC management, Emails)
   # operation_type : operation type used by reporting/web to group operations
   # operation_date : date when the operation related was done. If this value is nil we save that operation with Time.zone.now
   def self.audit(current_agent, object, description, user = nil, operation_type = Settings.operation_types.others, operation_date = Time.zone.now, notes = nil)
     agent = current_agent || Agent.find_by(email: Settings.batch_agent_email)
-    o = Operation.new :operation_date => operation_date, 
+    o = Operation.new :operation_date => operation_date,
       :resource => object, :description => description, :operation_type => operation_type
     o.created_by = agent
     o.notes = notes
@@ -22,15 +22,16 @@ class Auditory
     Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
   end
 
-  def self.create_user_story(description, title, project_id = Settings.pivotal_tracker.project_id, story_type = 'bug')
-    PivotalTracker::Client.token = Settings.pivotal_tracker.token
-    PivotalTracker::Client.use_ssl = true
-    project = PivotalTracker::Project.find(project_id)
-    project.stories.create(name: "[#{Rails.env}] #{title}", story_type: story_type, description: description)
+  def self.create_user_story(description, title, project_id = Settings.pivotal_tracker.project_id, story_type = 'bug', assignee = nil)
+    client = TrackerApi::Client.new(token: Settings.pivotal_tracker.token)
+    project = client.project(project_id)
+    story = project.create_story(name: "[#{Rails.env}] #{title}", story_type: story_type, description: description)
+    story.attributes = { owner_ids: [assignee] } # Refer to config/initializers/pivotal_tracker.rb for a list of asignee ids.
+    story.save
   end
-  
+
   def self.report_issue(error = "Special Error", exception = '', params = {}, add_backtrace = true)
-    unless ['test', 'development'].include? Rails.env  
+    unless ['test', 'development'].include? Rails.env
       backtrace = add_backtrace ? "**Backtrace**\n #{(exception.kind_of?(Exception) ? exception.backtrace.join("\n").to_s : caller.join("\n").to_s)}" : ''
       description = <<-EOF
         **Message:**
@@ -50,14 +51,14 @@ class Auditory
   end
 
   def self.report_club_changed_marketing_client(club, subscribers_count)
-    unless ["test", "development"].include? Rails.env  
+    unless ["test", "development"].include? Rails.env
       tasks = if club.exact_target_client?
        ['mkt_tools:sync_members_to_exact_target', 'mkt_tools:sync_prospects_to_exact_target']
       elsif club.mailchimp_mandrill_client?
         ['mkt_tools:sync_members_to_mailchimp', 'mkt_tools:sync_prospects_to_mailchimp']
       end
       description = <<-EOF
-        Club #{club.id} - #{club.name} changed it's marketing client. We have to manually resync every member and prospect (total amount: #{subscribers_count}). 
+        Club #{club.id} - #{club.name} changed it's marketing client. We have to manually resync every member and prospect (total amount: #{subscribers_count}).
 
         -----------------------------
 
