@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170828174252) do
+ActiveRecord::Schema.define(version: 20170908115127) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -162,7 +162,6 @@ ActiveRecord::Schema.define(version: 20170828174252) do
     t.string   "payment_gateway_errors_email",         limit: 255
     t.string   "twitter_url",                          limit: 255
     t.string   "facebook_url",                         limit: 255
-    t.string   "store_url",                            limit: 255
     t.string   "checkout_url",                         limit: 255
     t.string   "cs_email",                             limit: 255
     t.text     "privacy_policy_url",                   limit: 65535
@@ -186,6 +185,7 @@ ActiveRecord::Schema.define(version: 20170828174252) do
     t.text     "result_page_footer",                   limit: 65535
     t.text     "css_style",                            limit: 65535
     t.text     "unavailable_campaign_url",             limit: 65535
+    t.string   "fulfillment_tracking_prefix",          limit: 1
   end
 
   add_index "clubs", ["drupal_domain_id"], name: "index_drupal_domain_id", using: :btree
@@ -385,7 +385,6 @@ ActiveRecord::Schema.define(version: 20170828174252) do
     t.string   "tracking_code",                   limit: 255
     t.boolean  "recurrent",                                                           default: false
     t.boolean  "renewed",                                                             default: false
-    t.string   "product_package",                 limit: 255
     t.integer  "user_id",                         limit: 8
     t.integer  "club_id",                         limit: 8
     t.string   "full_name",                       limit: 255
@@ -399,6 +398,8 @@ ActiveRecord::Schema.define(version: 20170828174252) do
     t.decimal  "average_match_age",                           precision: 6, scale: 2
     t.integer  "matching_fulfillments_count",     limit: 4
     t.integer  "product_id",                      limit: 4
+    t.integer  "store_id",                        limit: 4
+    t.string   "sync_result",                     limit: 255
   end
 
   add_index "fulfillments", ["club_id", "assigned_at", "status"], name: "index_fulfillments_on_club_id_and_assigned_at_and_status", using: :btree
@@ -409,6 +410,7 @@ ActiveRecord::Schema.define(version: 20170828174252) do
   add_index "fulfillments", ["full_phone_number"], name: "index_fulfillments_on_full_phone_number", using: :btree
   add_index "fulfillments", ["product_id"], name: "index_fulfillments_on_product_id", using: :btree
   add_index "fulfillments", ["status"], name: "index_fulfillments_on_status", using: :btree
+  add_index "fulfillments", ["store_id"], name: "index_fulfillments_on_store_id", using: :btree
   add_index "fulfillments", ["user_id"], name: "index2", using: :btree
 
   create_table "memberships", force: :cascade do |t|
@@ -525,22 +527,20 @@ ActiveRecord::Schema.define(version: 20170828174252) do
   end
 
   create_table "products", force: :cascade do |t|
-    t.string   "name",               limit: 255
-    t.string   "sku",                limit: 255
-    t.boolean  "recurrent",                      default: false
-    t.integer  "stock",              limit: 4
-    t.integer  "weight",             limit: 4
-    t.integer  "club_id",            limit: 8
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.string   "package",            limit: 255
-    t.boolean  "allow_backorder",                default: false
-    t.string   "cost_center",        limit: 255
-    t.boolean  "is_visible",                     default: true
+    t.string   "name",            limit: 255
+    t.string   "sku",             limit: 255
+    t.boolean  "recurrent",                   default: false
+    t.integer  "stock",           limit: 4
+    t.integer  "weight",          limit: 4
+    t.integer  "club_id",         limit: 8
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.boolean  "allow_backorder",             default: false
+    t.boolean  "is_visible",                  default: true
     t.datetime "deleted_at"
-    t.string   "image_url",          limit: 255
-    t.boolean  "alert_on_low_stock",             default: false
-    t.boolean  "low_stock_alerted",              default: false
+    t.string   "image_url",       limit: 255
+    t.integer  "store_id",        limit: 4
+    t.string   "store_slug",      limit: 255
   end
 
   add_index "products", ["club_id"], name: "index_products_on_club_id", using: :btree

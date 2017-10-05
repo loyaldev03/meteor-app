@@ -19,8 +19,8 @@ class Product < ActiveRecord::Base
   def self.datatable_columns
     ['id', 'name', 'sku', 'stock', 'allow_backorder']
   end
-  
-  def store_variant_url 
+
+  def store_variant_url
     club.store_url + "/admin/products/#{store_slug}/variants/#{store_id}/edit"
   end
 
@@ -57,6 +57,12 @@ class Product < ActiveRecord::Base
 
   def has_stock?
     allow_backorder? ? true : stock>0
+  end
+
+  def sanitized_name
+    # It is in two different expresions to clean product names without the
+    # driver's number too
+    name.sub(/.*\s-\s/, '').sub(/#\d+/, '').strip
   end
 
   def self.generate_xls(clubs_id = nil)
