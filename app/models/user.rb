@@ -36,6 +36,7 @@ class User < ActiveRecord::Base
   before_save :wrong_address_logic
   before_save :set_marketing_client_sync_as_needed
   before_save :apply_downcase_to_email
+  before_save :prepend_zeros_to_phone_number
   after_create :elasticsearch_asyn_call
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_save :create_operation_on_testing_account_toggle
@@ -1616,5 +1617,11 @@ class User < ActiveRecord::Base
 
     def slug_candidate
       [ (Digest::MD5.hexdigest(self.email) + self.club_id.to_s) ]
+    end
+    
+    def prepend_zeros_to_phone_number
+      self.phone_country_code = format('%03d', phone_country_code.to_i)
+      self.phone_area_code    = format('%03d', phone_area_code.to_i)
+      self.phone_local_number = format('%07d', phone_local_number.to_i)
     end
 end

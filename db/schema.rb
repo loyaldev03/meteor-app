@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170908115127) do
+ActiveRecord::Schema.define(version: 20171004143522) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -770,9 +770,9 @@ ActiveRecord::Schema.define(version: 20170908115127) do
     t.datetime "last_sync_error_at"
     t.string   "gender",                              limit: 1
     t.string   "type_of_phone_number",                limit: 255
-    t.integer  "phone_country_code",                  limit: 4
-    t.integer  "phone_area_code",                     limit: 4
-    t.integer  "phone_local_number",                  limit: 4
+    t.string   "phone_country_code",                  limit: 5
+    t.string   "phone_area_code",                     limit: 5
+    t.string   "phone_local_number",                  limit: 10
     t.text     "autologin_url",                       limit: 65535
     t.integer  "current_membership_id",               limit: 8
     t.string   "sync_status",                         limit: 255,                            default: "not_synced"
