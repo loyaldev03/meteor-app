@@ -5,7 +5,7 @@ class ChangePhoneColumnTypeOfUsers < ActiveRecord::Migration
       t.change :phone_area_code,    :string, limit: 10
       t.change :phone_local_number, :string, limit: 10
     end
-  end
+end
 
   def down
     change_table :users do |t|
