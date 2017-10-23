@@ -704,7 +704,11 @@ function new_user_functions() {
   });
 
   $('#states_div').attr('data-remote', 'true');
-};
+
+  $('#user_phone_country_code').focusout(function() {
+    setDefaultPhoneCountryCode($(this));
+  });
+}
 
 function edit_user_functions() {
   $('#error_explanation').hide();
@@ -742,7 +746,11 @@ function edit_user_functions() {
   $('#user_country').on('change',  function(){
     country = $('#user_country').val();
     $.get('', { country_code:country }, null, 'script');
-  })
+  });
+
+  $('#user_phone_country_code').focusout(function() {
+    setDefaultPhoneCountryCode($(this));
+  });
 };
 
 function club_cash_functions(clubCashTransactionUrl, userProfileUrl) {
@@ -772,6 +780,10 @@ function club_cash_functions(clubCashTransactionUrl, userProfileUrl) {
       },
     });
   });
+}
+
+function setDefaultPhoneCountryCode(formField) {
+  if($(formField).val() == '') { $(formField).val('1'); }
 }
 
 function sync_status_user_functions(column_count){
