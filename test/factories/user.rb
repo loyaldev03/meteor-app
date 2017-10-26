@@ -15,8 +15,8 @@ FactoryGirl.define do
     sequence(:email) {|n| "user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
     phone_country_code { rand(999-100) }
-    phone_area_code { rand(999-100) }
-    phone_local_number { rand(9999-1000) }
+    phone_area_code { rand(999-1) }
+    phone_local_number { rand(9999999-1) }
     bill_date { DateTime.now }
     birth_date { DateTime.now }
     gender "M"
@@ -34,9 +34,9 @@ FactoryGirl.define do
     state "AL"
     sequence(:email) {|n| "user_with_api#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     birth_date { DateTime.now }
     gender "M"
     status "none"
@@ -53,9 +53,9 @@ FactoryGirl.define do
     state "AL"
     sequence(:email) {|n| "user_with_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     birth_date { DateTime.now }
     gender "M"
     country "US"
@@ -75,9 +75,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state "AL"
     sequence(:email) {|n| "user_active#{n}@test.no" }
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     type_of_phone_number Settings.type_of_phone_number.home
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -98,9 +98,9 @@ FactoryGirl.define do
     zip { Faker::Address.zip }
     state "AL"
     sequence(:email) {|n| "active_user_with_external_id#{n}@test.no" }
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     type_of_phone_number Settings.type_of_phone_number.home
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
@@ -124,9 +124,9 @@ FactoryGirl.define do
     state "AL"
     sequence(:email) {|n| "active_user_without_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     next_retry_bill_date { DateTime.now } 
     bill_date { DateTime.now }
     birth_date { DateTime.now }
@@ -145,9 +145,9 @@ FactoryGirl.define do
     state "AL"
     sequence(:email) {|n| "lapsed_user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     next_retry_bill_date { DateTime.now } 
     birth_date { DateTime.now }
     country "US"
@@ -168,9 +168,9 @@ FactoryGirl.define do
     state "AL"
     sequence(:email) {|n| "provisional_user_with_cc#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
@@ -190,9 +190,9 @@ FactoryGirl.define do
     state "AL"
     sequence(:email) {|n| "provisional_user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0
@@ -211,9 +211,9 @@ FactoryGirl.define do
     state "AL"
     sequence(:email) {|n| "applied_user#{n}@test.no" }
     type_of_phone_number Settings.type_of_phone_number.home
-    phone_country_code 123
+    phone_country_code 1
     phone_area_code 123
-    phone_local_number 1234
+    phone_local_number 1234567
     birth_date { DateTime.now }
     country "US"
     club_cash_amount 0

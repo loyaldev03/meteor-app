@@ -351,7 +351,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     set_as_unreachable_user(@saved_user,'Unreachable')    
    
     click_link_or_button "Edit"
-    within("#table_contact_information"){ fill_in 'user[phone_country_code]', :with => '9876' }
+    within("#table_contact_information"){ fill_in 'user[phone_country_code]', :with => '987' }
     alert_ok_js
     click_link_or_button 'Update User'
     sleep 10
@@ -367,7 +367,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
   
     click_link_or_button "Edit"
     within("#table_contact_information")do
-      fill_in 'user[phone_area_code]', :with => '9876'
+      fill_in 'user[phone_area_code]', :with => '987'
     end
     alert_ok_js
     click_link_or_button 'Update User'

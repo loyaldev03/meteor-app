@@ -106,11 +106,11 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   
   test "search user by phone" do
     setup_search
-    @search_user.update_attribute :phone_country_code, "987"
-    @search_user.update_attribute :phone_area_code, "987"
-    @search_user.update_attribute :phone_local_number, "9685"
+    @search_user.update_attribute :phone_country_code, "1"
+    @search_user.update_attribute :phone_area_code, "123"
+    @search_user.update_attribute :phone_local_number, "1234567"
     @search_user.index.store @search_user
-    search_user({"user[phone_number]" => "987-987-9685"}, @search_user)
+    search_user({"user[phone_number]" => "1-123-1234567"}, @search_user)
   end
   
   test "search user by first_name" do
