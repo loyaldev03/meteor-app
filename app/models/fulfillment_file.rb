@@ -36,7 +36,6 @@ class FulfillmentFile < ActiveRecord::Base
       fulfillments.pluck(:id).in_groups_of(100).each do |group|
         Store::FulfillmentFileFulfillJob.perform_later(self, group.compact)
       end
-      Store::NotifyFulfillmentFileFulfillJob.perform_later(self)
     end
   end
 

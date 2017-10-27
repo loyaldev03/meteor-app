@@ -327,7 +327,7 @@ class User < ActiveRecord::Base
   end
 
   def full_phone_number
-    "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
+    "+#{self.phone_country_code} (#{self.phone_area_code}) #{self.phone_local_number}"
   end
 
   def payment_gateway_configuration
@@ -1620,7 +1620,6 @@ class User < ActiveRecord::Base
     end
     
     def prepend_zeros_to_phone_number
-      self.phone_country_code = format('%03d', phone_country_code.to_i)
       self.phone_area_code    = format('%03d', phone_area_code.to_i)
       self.phone_local_number = format('%07d', phone_local_number.to_i)
     end

@@ -126,10 +126,12 @@
             <th>
               <label class='help-inline required_asterisk'><%= t('activerecord.attributes.user.phone_number') %></label>
             </th>
-            <td> 
-              <%= f.text_field :phone_country_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_country_code') %> 
-              <%= f.text_field :phone_area_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_area_code') %> 
-              <%= f.text_field :phone_local_number, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_local_number') %> 
+            <td><strong>+</strong>
+              <%= f.number_field :phone_country_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_country_code'), :value => @user.new_record? ? '1' : @user.phone_country_code, :in => 1..999 %>
+              <strong>(</strong>
+              <%= f.number_field :phone_area_code, :class => 'text_field input-mini', :placeholder => t('activerecord.attributes.user.phone_area_code'), :in => 1..999 %>
+              <strong>)</strong>
+              <%= f.number_field :phone_local_number, :class => 'text_field input-small', :placeholder => t('activerecord.attributes.user.phone_local_number'), :in => 1..9999999 %>
               <% if !@user.new_record? && !@user.wrong_phone_number.nil? %>
               <br><%= t('activerecord.attributes.user.unset_wrong_phone_number') %>
                   <%= check_box :setter, :wrong_phone_number %>
@@ -300,4 +302,3 @@ Please, have in mind that fields with ' * ' are required.
   <%= f.hidden_field :ip_address, :value => request.env['REMOTE_ADDR'] %>
   <%= f.hidden_field :campaign_description, :value => Membership::CS_CAMPAIGN_DESCRIPTION %>
 <% end %>
-

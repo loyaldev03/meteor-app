@@ -234,11 +234,13 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     }
     alert_ok_js
     click_link_or_button 'Create User'
+    within("#table_contact_information") do
+      assert find_field('user[phone_country_code]').value == ('1') # Because it is set to its default value when lost focus
+    end
     within("#error_explanation")do
       assert page.has_content?("first_name: can't be blank,is invalid"), "Failure on first_name validation message"
       assert page.has_content?("last_name: can't be blank,is invalid"), "Failure on last_name validation message"
       assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
-      assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 character)"), "Failure on phone_country_code validation message"
       assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 character)"), "Failure on phone_area_code validation message"
       assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 character)"), "Failure on phone_local_number validation message"
       assert page.has_content?("address: is invalid"), "Failure on address validation message"
@@ -301,9 +303,6 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
         within('#states_td'){ select('Colorado', :from => 'user[state]') }
     end
     within("#table_contact_information") do
-        fill_in 'user[phone_country_code]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in 'user[phone_area_code]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
-        fill_in 'user[phone_local_number]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
         fill_in 'user[email]', :with => '~!@#$%^&*()_)(*&^%$#@!~!@#$%^&*('
     end
     alert_ok_js
@@ -312,33 +311,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
         assert page.has_content?("first_name: is invalid"), "Failure on first_name validation message"
         assert page.has_content?("last_name: is invalid"), "Failure on last_name validation message"
         assert page.has_content?("email: email address is invalid"), "Failure on email validation message"
-        assert page.has_content?("phone_country_code: is not a number"), "Failure on phone_country_code validation message"
-        assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
-        assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
         assert page.has_content?("address: is invalid"), "Failure on address validation message"
         assert page.has_content?("city: is invalid"), "Failure on city validation message"
         assert page.has_content?("zip: The zip code is not valid for the selected country."), "Failure on zip validation message"
-    end
-  end
-
-  test "create user with letter in phone field" do
-    setup_user(false)
-    visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    click_link_or_button 'New User'
-    within("#table_contact_information") do
-        fill_in 'user[phone_country_code]', :with => 'werqwr'
-        fill_in 'user[phone_area_code]', :with => 'werqwr'
-        fill_in 'user[phone_local_number]', :with => 'werqwr'
-    end
-    within("#table_demographic_information") do
-      select('United States', :from => 'user[country]')
-    end
-    alert_ok_js
-    click_link_or_button 'Create User'
-    within("#error_explanation") do
-        assert page.has_content?("phone_country_code: is not a number"), "Failure on phone_country_code validation message"
-        assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
-        assert page.has_content?("phone_area_code: is not a number"), "Failure on phone_area_code validation message"
     end
   end
 
@@ -385,8 +360,10 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     setup_user(false)
     unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id, :phone_country_code => nil, :phone_area_code => nil, :phone_local_number => nil)
     fill_in_user(unsaved_user)
+    within("#table_contact_information") do
+      assert find_field('user[phone_country_code]').value == ('1') # Because it is set to its default value when lost focus
+    end
     within("#error_explanation") do
-        assert page.has_content?("phone_country_code: can't be blank,is not a number,is too short (minimum is 1 character)")
         assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 character)")
         assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 character)")
     end

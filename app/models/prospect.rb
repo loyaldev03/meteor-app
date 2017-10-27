@@ -22,7 +22,7 @@ class Prospect < ActiveRecord::Base
   #           :need_sync_to_marketing_client
 
   def full_phone_number
-    "(#{self.phone_country_code}) #{self.phone_area_code} - #{self.phone_local_number}"
+    "+#{self.phone_country_code} (#{self.phone_area_code}) #{self.phone_local_number}"
   end
 
   def marketing_tool_sync
