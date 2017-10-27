@@ -576,7 +576,9 @@ module ActionDispatch
           assert_equal user.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
           assert_equal user.status, user.current_membership.status
           within(".nav-tabs"){ click_on 'Operations' }
-          within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
+          within("#operations") do 
+            find("tr", :text => "Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")
+          end
         end
       end
     end
