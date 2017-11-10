@@ -1137,6 +1137,7 @@ function user_save_the_sale_functions(allToms, stsToms) {
       data = stsToms;
     }
     tomsDropdown.empty();
+    tomsDropdown.append($('<option>', { value: '', text: 'Choose one...' }, '</option>'));
     $.each(data, function(index, item) {
       tomsDropdown.append(
         $('<option>', { value: item.id, text: item.name }, '</option>')

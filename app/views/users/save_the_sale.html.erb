@@ -11,11 +11,11 @@
       <td>
         <% if @sts_toms.first.present? %>
           <%= label_tag :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %>:
-          <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@sts_toms, "id", "name") %>
+          <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@sts_toms, "id", "name"), { :prompt => 'Choose one...', required: true } %>
           <label><%= check_box_tag :show_all_toms, false %> Show all Subscription Plans</label>
         <% else %>
           <%= label_tag :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %>:
-          <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@all_toms, "id", "name") %>
+          <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@all_toms, "id", "name"), { :prompt => 'Choose one...', required: true } %>
         <% end %>
       </td>
     </tr>
