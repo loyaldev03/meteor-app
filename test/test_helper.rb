@@ -124,7 +124,22 @@ class ActiveSupport::TestCase
     ActiveMerchant::Billing::TrustCommerceGateway.any_instance.stubs(:credit).returns(answer)
     ActiveMerchant::Billing::TrustCommerceGateway.any_instance.stubs(:store).returns(answer)
   end
-
+  
+  
+  def active_merchant_stubs_payeezy(code = "100", message = "Transaction Normal - Approved with Stub", success = true)
+    response = {"correlation_id"=>"228.5060252765196", "transaction_status"=> (success ? 'approved' : 'declined'), 
+                "validation_status"=>"success", "transaction_type"=>"purchase", "transaction_id"=>"ET131616", 
+                "transaction_tag"=>"2218270190", "method"=>"token", "amount"=>"100", "currency"=>"USD", 
+                "cvv2"=>"I", "token"=>{"token_type"=>"FDToken", "token_data"=>{"value"=>"1072051183520026", "type"=>"Visa", "cardholder_name"=>"sebastian testing", "exp_date"=>"0318", "value"=>"2175871555790026"}}, 
+                "bank_resp_code"=> code , "bank_message"=>"Approved", "gateway_resp_code"=>"00", 
+                "gateway_message"=>"Transaction Normal"}                
+    answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'ET131616|2218270190|token|100')
+    ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:authorize).returns(answer)
+    ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:purchase).returns(answer)
+    refund_answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'RETURN|2218270190|direct_debit|100')
+    ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:refund).returns(refund_answer)
+  end
+  
   def active_merchant_stubs_store(number = nil, code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message, { "transaction_id"=>CREDIT_CARD_TOKEN[number], "error_code"=> code, "auth_response_text"=>"No Match" })
     ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:store).returns(answer)
@@ -166,6 +181,7 @@ class ActiveSupport::TestCase
 
     membership = FactoryGirl.create("#{user_type}_membership", { terms_of_membership: tom }.merge(membership_args))
     active_user = FactoryGirl.create(user_type, { club: tom.club, current_membership: membership }.merge(user_args))
+    active_user.active_credit_card.update_attribute :gateway, tom.club.payment_gateway_configurations.first.gateway if active_user.active_credit_card 
     active_user.memberships << membership
     active_user.current_membership = membership
     active_user.save
@@ -576,7 +592,9 @@ module ActionDispatch
           assert_equal user.current_membership.status, (new_terms_of_membership.needs_enrollment_approval? ? "applied" : "provisional")
           assert_equal user.status, user.current_membership.status
           within(".nav-tabs"){ click_on 'Operations' }
-          within("#operations"){assert page.has_content?("Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")}
+          within("#operations") do 
+            find("tr", :text => "Save the sale from TOM(#{old_membership.terms_of_membership.id}) to TOM(#{new_terms_of_membership.id})")
+          end
         end
       end
     end

@@ -121,8 +121,9 @@ group :test, :development do
   gem 'byebug'
 end
 
-gem 'activemerchant'
+gem 'activemerchant', github: 'activemerchant/active_merchant', :branch => 'master'
 gem 'LitleOnline', '8.16.0'
+gem 'ruby-gmail'
 
 # TODO => remove the following requires after tokenization is implemented
 ### only for Auth.Net  without tokenization.

@@ -35,3 +35,5 @@
 coverage
 
 /public/system/*
+
+/account_updater_files

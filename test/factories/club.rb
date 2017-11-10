@@ -129,6 +129,22 @@ FactoryGirl.define do
     after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }
   end  
 
+  factory :simple_club_with_payeezy_gateway, class: Club do
+    sequence(:name) {|n| "simple_club_with_gateway_#{Faker::Lorem.characters(10)}" }
+    description "My description"
+    cs_phone_number "123 456 7891"
+    cs_email 'customer_service@example.com'
+    billing_enable true
+    time_zone { TZInfo::Timezone.all.sample.name }
+    family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
+    association :partner
+
+    marketing_tool_client :action_mailer
+    after(:create) { |club| club.payment_gateway_configurations << FactoryGirl.build(:payeezy_payment_gateway_configuration) }
+    after(:create) { |club| FactoryGirl.create(:product, club_id: club.id) }    
+  end
+
   factory :simple_club_with_gateway_with_family, class: Club do
     sequence(:name) {|n| "simple_club_with_gateway_with_family_#{Faker::Lorem.characters(10)}" }
     description "My description"

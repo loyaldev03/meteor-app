@@ -11,7 +11,7 @@ defaults: &defaults
   campaign_manager_recipients: 'sonia@xagax.com,sebastian@xagax.com,platform@xagax.com'
   batch_agent_email: 'batch@xagax.com'
   others_product: "SLOOPS"
-  payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe']
+  payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe', 'payeezy']
   logger_level_for_tasks: 'DEBUG'
   pivotal_tracker:
     project_id: 840477
@@ -30,6 +30,17 @@ defaults: &defaults
   mes_aus_service:
     folder: <%= "#{Rails.root}/account_updater_files/mes/" %>
     url: https://www.merchante-solutions.com/
+  payeezy_report_service:
+    gmail_account: 'platform@xagax.com'
+    gmail_account_password: 'a4my0fm3'
+  payeezy_aus_service:
+    folder: <%= "#{Rails.root}/account_updater_files/payeezy" %>
+    url: 'prod-gw-na.firstdataclients.com'
+    merchant_name: 'OFFICIAL NASCAR CAU'
+    merchant_number: '372654450884'
+    bank_name: 'BANK OF AMERICA'
+    visa_acquirer_bin: '443106'
+    master_card_ica: '010100'
   # Link to update operation for Reporting: https://docs.google.com/spreadsheets/d/1I76qwZfe3SdtQCg4gRNOPc09M5i9xWdz0w-a1NGEC-A/edit#gid=0
   operation_types:
     #billing
@@ -119,6 +130,7 @@ defaults: &defaults
     testing_account_unmarked: 254
     resend_communication: 255
     resend_communication_error: 256
+    aus_update_credit_card: 257
     #communication
     active_email: 300
     prebill_email: 301

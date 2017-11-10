@@ -1,7 +1,7 @@
 class Transaction < ActiveRecord::Base
   belongs_to :user
   belongs_to :membership
-  belongs_to :payment_gateway_configuration
+  belongs_to :payment_gateway_configuration, -> { with_deleted }
   belongs_to :decline_strategy
   belongs_to :credit_card
   # This value will be not nil only if we are billing
@@ -22,7 +22,8 @@ class Transaction < ActiveRecord::Base
     'mes' => %w{117},
     'trust_commerce' => %w{decline call carderror rejected baddata error},
     'stripe' => %w{card_declined incorrect_number},
-    'litle' => %{}
+    'litle' => %w{},
+    'payeezy' => %w{invalid_card_number invalid_exp_date incorrect_card_digits card_expired missing_card_type}
   }
 
   def full_label
@@ -119,7 +120,8 @@ class Transaction < ActiveRecord::Base
   end
 
   def has_same_pgc_as_current?
-    gateway == user.club.payment_gateway_configurations.first.gateway
+    #TODO make sure to remove the this condition after TRUST COMMERCE removes our priviledge to keep refunding.
+    trust_commerce? || gateway == user.club.payment_gateway_configurations.first.gateway
   end
 
   def process
@@ -171,6 +173,10 @@ class Transaction < ActiveRecord::Base
     gateway == "stripe"
   end
 
+  def payeezy?
+    gateway == "payeezy"
+  end
+
   def one_time_type?
     operation_type == Settings.operation_types.no_recurrent_billing
   end
@@ -189,6 +195,8 @@ class Transaction < ActiveRecord::Base
       TrustCommerceTransaction.store!(am_credit_card, pgc)
     elsif pgc.stripe?
       StripeTransaction.store!(am_credit_card, pgc, user)
+    elsif pgc.payeezy?
+      PayeezyTransaction.store!(am_credit_card, pgc)
     else
       raise "No payment gateway configuration set for gateway \"#{pgc.gateway}\""
     end
@@ -208,6 +216,8 @@ class Transaction < ActiveRecord::Base
       TrustCommerceTransaction.new
     when 'stripe'
       StripeTransaction.new
+    when 'payeezy'
+      PayeezyTransaction.new
     else
       raise "No payment gateway configuration set for gateway \"#{gateway}\""
     end

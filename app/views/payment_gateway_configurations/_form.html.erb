@@ -19,7 +19,7 @@
   </div>
 <% end %>
 
-<% if @payment_gateway_configuration.new_record? or @payment_gateway_configuration.litle? %>
+<% if @payment_gateway_configuration.new_record? or (@payment_gateway_configuration.litle? or @payment_gateway_configuration.payeezy?) %>
   <div class="control-group"  id="div_merchant_key">
     <%= f.label :merchant_key, :class => 'control-label required_asterisk' %>
     <div class="controls">

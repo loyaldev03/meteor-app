@@ -26,6 +26,10 @@ class CreditCard < ActiveRecord::Base
   def number
     @number
   end
+  
+  def payment_gateway_configuration
+    user.club.payment_gateway_configurations.with_deleted.find_by(gateway: gateway)
+  end
 
   def confirm_presence_of_another_credit_card_related_to_user
     if self.active 
@@ -110,6 +114,7 @@ class CreditCard < ActiveRecord::Base
     if not self.token
       pgc ||= user.terms_of_membership.payment_gateway_configuration
       am = CreditCard.am_card(number, expire_month, expire_year, puser.first_name || user.first_name, puser.last_name || user.last_name)
+      
       if am.valid?
         self.cc_type = am.brand
         begin
