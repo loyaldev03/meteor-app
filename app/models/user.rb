@@ -331,7 +331,7 @@ class User < ActiveRecord::Base
   end
 
   def payment_gateway_configuration
-    @payment_gateway_configuration ||= terms_of_membership.payment_gateway_configuration
+    @payment_gateway_configuration ||= active_credit_card.payment_gateway_configuration
   end
 
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
@@ -799,7 +799,7 @@ class User < ActiveRecord::Base
     amount_to_process = ((tom.installment_amount - amount_in_favor)*100).round / 100.0
 
     if amount_to_process >= 0
-      trans = Transaction.obtain_transaction_by_gateway!(payment_gateway_configuration.gateway)
+      trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
       trans.transaction_type = "sale"
       trans.prepare(self, credit_card, amount_to_process, tom.payment_gateway_configuration, tom.id, nil, operation_type)
       answer = trans.process
@@ -1264,7 +1264,7 @@ class User < ActiveRecord::Base
       begin    
         new_credit_card.user = self
         new_credit_card.active = set_active
-        new_credit_card.gateway = payment_gateway_configuration.gateway if new_credit_card.gateway.nil?
+        new_credit_card.gateway = terms_of_membership.payment_gateway_configuration.gateway if new_credit_card.gateway.nil?
         if new_credit_card.errors.size == 0
           new_credit_card.save!
           message = "Credit card #{new_credit_card.last_digits} added" + (set_active ? " and activated." : ".")

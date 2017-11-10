@@ -599,16 +599,19 @@ function new_payment_gateway_configuration_functions(confirmationText, reConfirm
   }
 
   $('#payment_gateway_configuration_gateway').change(function(){
+    if($(this).val()!='litle' && $(this).val()!='payeezy'){
+      $('#div_merchant_key').hide('fast');
+    }else {
+      $('#div_merchant_key').show('fast');
+    }
     if($(this).val()!='litle'){
       $('#div_report_group').hide('fast');
       $('#div_descriptor_name').hide('fast');
       $('#div_descriptor_phone').hide('fast');
-      $('#div_merchant_key').hide('fast');
     }else{
       $('#div_report_group').show('fast');
       $('#div_descriptor_name').show('fast');
       $('#div_descriptor_phone').show('fast');
-      $('#div_merchant_key').show('fast');
     }
     if($(this).val()=='stripe'){
       $('#div_aus_login').hide('fast');

@@ -14,6 +14,7 @@ class TransactionTest < ActiveSupport::TestCase
     @sd_auth_net_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "316", :gateway => "authorize_net")
     @sd_first_data_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "605", :gateway => "first_data")
     @sd_stripe_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "card_declined", :gateway => "stripe")
+    @sd_payeezy_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "302", :gateway => "payeezy")
     @hd_strategy = FactoryGirl.create(:hard_decline_strategy)
     FactoryGirl.create(:without_grace_period_decline_strategy_monthly)
     FactoryGirl.create(:without_grace_period_decline_strategy_yearly)
@@ -1440,12 +1441,12 @@ class TransactionTest < ActiveSupport::TestCase
     @first_data_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @first_data_club.id)
     @credit_card_first_data = FactoryGirl.build(:credit_card_visa_first_data)
   end
-
+  
   test "Enroll with FirstData" do
     club_with_first_data
     enroll_user(@first_data_terms_of_membership, 23, false, @credit_card_first_data)
   end
-
+  
   test "Bill membership with FirstData" do
     club_with_first_data
     active_user = enroll_user(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
@@ -1456,7 +1457,7 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal active_user.status, 'active'
     end
   end
-
+  
   test "Full refund with FirstData" do
     club_with_first_data
     active_user = enroll_user(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
@@ -1471,7 +1472,7 @@ class TransactionTest < ActiveSupport::TestCase
     end
     assert_equal Transaction.find_by_transaction_type('refund').operation_type, Settings.operation_types.credit
   end
-
+  
   test "Partial refund with FirstData" do
     club_with_first_data
     active_user = enroll_user(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
@@ -1487,7 +1488,7 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal Transaction.where("user_id = ? and operation_type = ? and transaction_type = 'refund'", active_user.id, Settings.operation_types.credit).count, 1
     end
   end
-
+  
   # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for FirstData
   test "Try billing an user's membership when he was previously SD for credit_card_expired for FirstData" do 
     club_with_first_data
@@ -1498,7 +1499,7 @@ class TransactionTest < ActiveSupport::TestCase
     Timecop.travel(active_user.next_retry_bill_date) do
       active_user.bill_membership
     end
-
+  
     active_merchant_stubs_first_data
     Timecop.travel(active_user.next_retry_bill_date) do
       old_year = active_user.active_credit_card.expire_year
@@ -1512,13 +1513,13 @@ class TransactionTest < ActiveSupport::TestCase
       assert_equal active_user.active_credit_card.expire_year, old_year+2
       assert_equal active_user.active_credit_card.expire_month, old_month
     end
-
+  
     Timecop.travel(active_user.next_retry_bill_date) do
       old_year = active_user.active_credit_card.expire_year
       old_month = active_user.active_credit_card.expire_month
       active_user.bill_membership
       active_user.reload
-
+  
       assert_equal active_user.active_credit_card.expire_year, old_year
       assert_equal active_user.active_credit_card.expire_month, old_month
     end
@@ -1619,6 +1620,65 @@ class TransactionTest < ActiveSupport::TestCase
     club_with_stripe
     active_user = enroll_user(@stripe_terms_of_membership, 100, false, @credit_card_stripe)
     amount = @stripe_terms_of_membership.installment_amount
+    Timecop.travel(active_user.next_retry_bill_date) do
+      answer = active_user.bill_membership
+      active_user.reload
+      assert_equal active_user.status, 'active'
+      trans = active_user.transactions.find_by(transaction_type: 'sale')
+      refunded_amount = amount-0.34
+      answer = Transaction.refund(refunded_amount, trans.id)
+      assert_equal answer[:code], "000", answer[:message] # refunds cant be processed on Auth.net test env
+      assert_equal Transaction.where("user_id = ? and operation_type = ? and transaction_type = 'refund'", active_user.id, Settings.operation_types.credit).count, 1
+    end
+  end
+  
+  ######################################################
+  #######  Payeezy #####################################
+  ######################################################
+
+  # Tets Stripe transactions
+  def club_with_payeezy
+    @payeezy_club                 = FactoryGirl.create(:simple_club_with_payeezy_gateway)
+    @payeezy_terms_of_membership  = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @payeezy_club.id)
+    @credit_card_payeezy          = FactoryGirl.build(:credit_card_visa_payeezy)
+    active_merchant_stubs_payeezy
+  end
+
+  test "Enroll with Payeezy" do
+    club_with_payeezy
+    enroll_user(@payeezy_terms_of_membership, 23, false, @credit_card_payeezy)
+  end
+
+  test "Bill membership with Payeezy" do
+    club_with_payeezy
+    active_user = enroll_user(@payeezy_terms_of_membership, 100, false, @credit_card_payeezy)
+    amount = @payeezy_terms_of_membership.installment_amount
+    Timecop.travel(active_user.next_retry_bill_date) do
+      answer = active_user.bill_membership
+      active_user.reload
+      assert_equal active_user.status, 'active'
+    end
+  end
+  
+  test "Full refund with Payeezy" do
+    club_with_payeezy
+    active_user = enroll_user(@payeezy_terms_of_membership, 100, false, @credit_card_payeezy)
+    amount = @payeezy_terms_of_membership.installment_amount
+    Timecop.travel(active_user.next_retry_bill_date) do
+      answer = active_user.bill_membership
+      active_user.reload
+      assert_equal active_user.status, 'active'
+      trans = active_user.transactions.last
+      answer = Transaction.refund(amount, trans.id)
+      assert_equal answer[:code], "000", answer[:message]
+    end
+    assert_equal Transaction.find_by_transaction_type('refund').operation_type, Settings.operation_types.credit
+  end
+  
+  test "Partial refund with Payeezy" do
+    club_with_payeezy
+    active_user = enroll_user(@payeezy_terms_of_membership, 100, false, @credit_card_payeezy)
+    amount = @payeezy_terms_of_membership.installment_amount
     Timecop.travel(active_user.next_retry_bill_date) do
       answer = active_user.bill_membership
       active_user.reload

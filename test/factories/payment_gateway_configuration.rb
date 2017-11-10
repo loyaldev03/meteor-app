@@ -41,4 +41,12 @@ FactoryGirl.define do
     gateway "trust_commerce"
     report_group ""
   end
+  
+  factory :payeezy_payment_gateway_configuration, class: PaymentGatewayConfiguration do
+    login  'apikey'
+    password 'apisecret'
+    merchant_key 'token'
+    gateway "payeezy"
+    report_group ""
+  end
 end

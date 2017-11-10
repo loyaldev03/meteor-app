@@ -14,6 +14,8 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
 
   before_create :only_one_is_allowed
   
+  scope :where_active, -> (gateway) { joins(:club).where(clubs: {billing_enable: true}).where(gateway: gateway) }
+  
   def trust_commerce?
     gateway == "trust_commerce"
   end
@@ -36,6 +38,10 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
 
   def stripe?
     self.gateway == "stripe"
+  end
+  
+  def payeezy?
+    self.gateway == 'payeezy'
   end
 
   def only_one_is_allowed

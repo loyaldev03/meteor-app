@@ -50,7 +50,7 @@ class Notifier < ActionMailer::Base
   def call_these_users(csv, contact_email_list)
     attachments["call_users_#{Date.today}.csv"] = { :mime_type => 'text/csv', :content => csv }
     mail :to => contact_email_list, 
-         :subject => "AUS answered CALL to these users #{Date.today}",
+         :subject => "Account Updater [#{Date.today}] - List of users to contact.",
          :bcc => Settings.platform_admins_email
   end
 

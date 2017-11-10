@@ -68,4 +68,12 @@ FactoryGirl.define do
     number "4242424242424242" # VISA credit card number is provided by Stripe
     gateway "stripe"
   end
+
+  factory :credit_card_visa_payeezy, class: CreditCard do
+    active true
+    expire_month { (Date.today + 2.month).month }
+    expire_year { (Date.today + 2.year).year }
+    number "4111111111111111" # VISA credit card number is provided by Payeezy
+    gateway "payeezy"
+  end
 end
