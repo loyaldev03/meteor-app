@@ -88,7 +88,12 @@ module Drupal
       end
 
       def generate_session_id!
-        res = simple_connection.post SESSION_PATH
+        res = nil
+        time_elapsed = Benchmark.ms do
+          res = simple_connection.post SESSION_PATH
+        end
+        Drupal.logger.info "Drupal::GenerateSessionId took #{time_elapsed}ms"
+        
         raise AuthError.new("HTTP #{res.status} when getting session id") unless res.status == 200
         JSON.parse(res.body)['sessid']
       end
