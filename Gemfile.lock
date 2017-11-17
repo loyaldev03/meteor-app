@@ -1,15 +1,4 @@
 GIT
-  remote: git://github.com/activemerchant/active_merchant.git
-  revision: d0e1b4c93303bb04704f669480c25d364cdc0e7b
-  branch: master
-  specs:
-    activemerchant (1.73.0)
-      activesupport (>= 3.2.14, < 6.x)
-      builder (>= 2.1.2, < 4.0.0)
-      i18n (>= 0.6.9)
-      nokogiri (~> 1.4)
-
-GIT
   remote: git://github.com/amro/gibbon.git
   revision: c07f0923372244bf50983cb4752ceb3f254461a1
   specs:
@@ -89,6 +78,11 @@ GEM
     activejob (4.2.6)
       activesupport (= 4.2.6)
       globalid (>= 0.3.0)
+    activemerchant (1.75.0)
+      activesupport (>= 3.2.14, < 6.x)
+      builder (>= 2.1.2, < 4.0.0)
+      i18n (>= 0.6.9)
+      nokogiri (~> 1.4)
     activemodel (4.2.6)
       activesupport (= 4.2.6)
       builder (~> 3.1)
@@ -265,7 +259,7 @@ GEM
     httpclient (2.8.0)
     httpi (2.4.1)
       rack
-    i18n (0.9.0)
+    i18n (0.9.1)
       concurrent-ruby (~> 1.0)
     i18n-country-translations (1.0.1)
       i18n (~> 0.5)
@@ -314,8 +308,6 @@ GEM
     newrelic_rpm (4.2.0.334)
     nokogiri (1.8.1)
       mini_portile2 (~> 2.3.0)
-    nokogiri-happymapper (0.5.9)
-      nokogiri (~> 1.5)
     nori (2.6.0)
     options (2.3.0)
       fattr
@@ -496,7 +488,7 @@ GEM
       eventmachine (>= 0.12.8)
       http_parser.rb (~> 0.5.1)
       simple_oauth (~> 0.1.4)
-    tzinfo (1.2.3)
+    tzinfo (1.2.4)
       thread_safe (~> 0.1)
     uber (0.1.0)
     uglifier (2.7.2)
@@ -535,7 +527,7 @@ PLATFORMS
 
 DEPENDENCIES
   LitleOnline (= 8.16.0)
-  activemerchant!
+  activemerchant (= 1.75)
   acts_as_list
   aws-sdk (~> 2.10.0)
   axlsx (~> 2.0.1)

@@ -48,5 +48,6 @@ FactoryGirl.define do
     merchant_key 'token'
     gateway "payeezy"
     report_group ""
+    additional_attributes {{js_security_key: 'js_security_key', ta_token: 'ta_token'}}
   end
 end

@@ -1,20 +1,26 @@
 class PayeezyTransaction < Transaction
 
+  delegate :additional_attributes, to: :payment_gateway_configuration
+
+
   def self.store!(am_credit_card, pgc)
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
     login_data = { 
       apikey: pgc.login,
       apisecret: pgc.password,
-      token: pgc.merchant_key
+      token: pgc.merchant_key,
+      js_security_key: pgc.additional_attributes['js_security_key'], 
+      ta_token: pgc.additional_attributes['ta_token']
     }
     gateway     = ActiveMerchant::Billing::PayeezyGateway.new(login_data)
     answer      = nil
+    am_credit_card.verification_value = 123 # (for cvv validation) According to Jay from Payeezy we can set any numeric value since it doesn't matter.
     time_elapsed = Benchmark.ms do
-      answer = gateway.authorize(0,am_credit_card)
+      answer = gateway.store(am_credit_card, login_data)
     end
     logger.info "AM::Store::Answer (#{pgc.gateway} took #{time_elapsed}ms) => " + answer.inspect
-    raise answer.error_code if answer.params['results'] and answer.params['transaction_status'] != 'approved'
-    answer.params['token']['token_data']['value']
+    raise answer.params['results']['Error']['messages'].first['code'] if answer.params['results'] and answer.params['results']['status'] != 'success'
+    answer.params['results']['token']['value']
   end
 
   def fill_transaction_type_for_credit(sale_transaction)
@@ -44,7 +50,7 @@ class PayeezyTransaction < Transaction
   private
     def credit_card_token
       # visa|sebastian sebastian|0318|#{response.params['token']['token_data']['value']}
-      [ cc_type, 
+      [ ActiveMerchant::Billing::PayeezyGateway::CREDIT_CARD_BRAND[cc_type], 
         first_name + ' ' + last_name,
         ("%.2d" % expire_month).to_s + (expire_year % 100).to_s,
         token
@@ -70,7 +76,7 @@ class PayeezyTransaction < Transaction
     end
 
     def load_gateway
-      login_data = { apikey: login, apisecret: password, token: merchant_key }
+      login_data = { apikey: login, apisecret: password, token: merchant_key, js_security_key: additional_attributes['js_security_key'], ta_token: additional_attributes['ta_token'] }
       @gateway = ActiveMerchant::Billing::PayeezyGateway.new(login_data)
     end
 end

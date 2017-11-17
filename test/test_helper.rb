@@ -127,6 +127,11 @@ class ActiveSupport::TestCase
   
   
   def active_merchant_stubs_payeezy(code = "100", message = "Transaction Normal - Approved with Stub", success = true)
+    response = {'results' => {"correlation_id"=>"228.1085182325738", "status"=>"success", "type"=>"FDToken", 
+                "token"=>{"type"=>"Mastercard", "cardholder_name"=>"test test", "exp_date"=>"0320", 
+                "value"=>"9782465740991323"}}}
+    answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'Mastercard|test test|0320|9782465740991323')
+    ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:store).returns(answer)
     response = {"correlation_id"=>"228.5060252765196", "transaction_status"=> (success ? 'approved' : 'declined'), 
                 "validation_status"=>"success", "transaction_type"=>"purchase", "transaction_id"=>"ET131616", 
                 "transaction_tag"=>"2218270190", "method"=>"token", "amount"=>"100", "currency"=>"USD", 
@@ -134,7 +139,6 @@ class ActiveSupport::TestCase
                 "bank_resp_code"=> code , "bank_message"=>"Approved", "gateway_resp_code"=>"00", 
                 "gateway_message"=>"Transaction Normal"}                
     answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'ET131616|2218270190|token|100')
-    ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:authorize).returns(answer)
     ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:purchase).returns(answer)
     refund_answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'RETURN|2218270190|direct_debit|100')
     ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:refund).returns(refund_answer)

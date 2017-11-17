@@ -40,7 +40,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert_equal user.status, 'provisional'
     user
   end
-
+ 
   test "save operation" do
     user = enroll_user(@terms_of_membership)
     assert_difference('Operation.count') do

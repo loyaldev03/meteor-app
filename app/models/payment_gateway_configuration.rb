@@ -4,6 +4,8 @@ class PaymentGatewayConfiguration < ActiveRecord::Base
 
   acts_as_paranoid
 
+  serialize :additional_attributes, JSON
+
   validates :login, presence: true
   validates :merchant_key, presence: true, if: Proc.new { |pgc| pgc.litle? }
   validates :password, presence: true

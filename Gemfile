@@ -121,7 +121,7 @@ group :test, :development do
   gem 'byebug'
 end
 
-gem 'activemerchant', github: 'activemerchant/active_merchant', :branch => 'master'
+gem 'activemerchant', '1.75'
 gem 'LitleOnline', '8.16.0'
 gem 'ruby-gmail'
 
