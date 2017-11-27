@@ -56,6 +56,7 @@ module SacMailchimp
         'EMAIL' => 'email',
         'FNAME' => 'first_name',
         'LNAME' => 'last_name',
+        'ADDRESS' => 'address',
         'CITY' => 'city',
         'STATE' => 'state',
         'ZIP' => 'zip',
