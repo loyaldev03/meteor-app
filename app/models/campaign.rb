@@ -19,7 +19,7 @@ class Campaign < ActiveRecord::Base
 
   TRANSPORTS_FOR_MANUAL_UPDATE  = ['twitter', 'adwords']
   NO_ENROLLMENT_CAMPAIGN_TYPE   = ['store_promotion', 'newsletter']
-  AVAILABLE_MEDIUMS             = ['display', 'email', 'search', 'referral']
+  AVAILABLE_MEDIUMS             = ['display', 'email', 'search', 'referral', 'website']
   MAX_PRODUCTS_ALLOWED          = 25
 
   validates :name, :landing_name, :initial_date, :campaign_type, :transport,
@@ -46,7 +46,8 @@ class Campaign < ActiveRecord::Base
     mailchimp:  1,
     twitter:    2,
     adwords:    3,
-    nascar:     4
+    nascar:     4,
+    other:      5
   }
 
   scope :active, -> (date = nil) {

@@ -13,7 +13,7 @@ class Checkout
     @prospect.city                  = params[:city]
     @prospect.address               = params[:address]
     @prospect.state                 = (Carmen::Country.coded('US').subregions.named(params[:state]).code if params[:state]) rescue nil
-    @prospect.email                 = fix_email(params[:email].downcase) if params[:email]
+    @prospect.email                 = params[:email].downcase.clean_up_typoed_email if params[:email]
     @prospect.zip                   = params[:zip]
     @prospect.country               = 'US'
     @prospect.birth_date            = ''
@@ -67,12 +67,6 @@ class Checkout
     end
   end
 
-  def fix_email(email_address)
-    mailcheck = Mailcheck.new
-    result = mailcheck.suggest(email_address)
-    result ? result[:full] : email_address
-  end
-
   def validate_data(params)
     errors = Hash.new { |h, k| h[k] = [] }
     [:first_name, :last_name, :address, :city, :state, :email].each do |field|
@@ -90,24 +84,9 @@ class Checkout
     @prospect.update_attribute :error_messages, errors
   end
 
-  def set_default_data(prospect_params)
-    # Empty values
-    prospect_params[:address]               = 'Not currently set'
-    prospect_params[:city]                  = 'Abbeville'
-    prospect_params[:state]                 = 'Alabama'
-    prospect_params[:zip]                   = '00000'
-    prospect_params[:country]               = 'US'
-    prospect_params[:phone]                 = '0000000000'
-    prospect_params[:gender]                = ''
-    prospect_params[:birth_date]            = ''
-    prospect_params[:preference]            = nil
-    prospect_params[:received_preferences]  = nil    
-  end
-
   def find_or_create_prospect_by(params)
     prospect_params = params.with_indifferent_access
     @prospect       = prospect_params[:token].nil? ? Prospect.new : Prospect.where_token(prospect_params[:token])
-    set_default_data(prospect_params) unless @campaign.credit_card_and_geographic_required?
     if @prospect
       set_data(prospect_params)
       validate_data(prospect_params)

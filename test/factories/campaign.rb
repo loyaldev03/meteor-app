@@ -32,5 +32,10 @@ FactoryGirl.define do
     factory :campaign_store_promotion do
       campaign_type { Campaign.campaign_types['store_promotion'] }
     end
+    
+    factory :campaign_without_cc_and_geographic do
+      enrollment_price 0.0
+      credit_card_and_geographic_required false
+    end
   end  
 end

@@ -18,13 +18,18 @@ class Campaigns::CheckoutsController < ApplicationController
     my_authorize! :checkout_submit, Campaign, @club.id
     if @club && @campaign && (@club.id == @campaign.club_id) # @campaign.landing_url.include? params[:landing_url]
       prospect = Checkout.new(campaign: @campaign).find_or_create_prospect_by params
+      
       if prospect.nil?
         Rails.logger.error 'Checkout::SubmitError: Prospect not found.'
         redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
       elsif prospect.error_messages && prospect.error_messages.any?
         redirect_to generate_edit_user_info_url(prospect)
       else
-        redirect_to new_checkout_url(token: prospect.token, campaign_id: @campaign)
+        if @campaign.credit_card_and_geographic_required?
+          redirect_to new_checkout_url(token: prospect.token, campaign_id: @campaign)
+        else
+          create_user(prospect, @campaign, true)
+        end
       end
     else
       Rails.logger.error 'Checkout::SubmitError: Campaign and Club inconsistencies '
@@ -49,28 +54,9 @@ class Campaigns::CheckoutsController < ApplicationController
 
   def create
     @campaign = Campaign.find_by!(slug: params[:credit_card][:campaign_id])
-    prospect_attributes = @prospect.attributes.with_indifferent_access
-    prospect_attributes[:campaign_id] = @prospect.campaign_code
-    prospect_attributes[:prospect_id] = @prospect.id
-    prospect_attributes[:preferences] = @prospect.preferences
     if @prospect && @campaign
       my_authorize! :checkout_create, Campaign, @prospect.club_id
-      response = User.enroll(
-        @campaign.terms_of_membership,
-        nil, # current_agent .. which current agent should we use here?
-        @campaign.enrollment_price,
-        prospect_attributes,
-        params[:credit_card],
-        nil,
-        @campaign.create_remote_user_in_background
-      )
-      if response[:code] == Settings.error_codes.success
-        Rails.logger.info "Checkout::CreateSuccess: Response: #{response.inspect}"
-        redirect_to thank_you_checkout_path(campaign_id: @campaign, user_id: User.find(response[:member_id]).to_param)
-      else
-        Rails.logger.error "Checkout::CreateError: #{response.inspect}"
-        redirect_to (%w(407 409 9507).include?(response[:code]) ? duplicated_checkout_path(campaign_id: @campaign, token: @prospect.token) : error_checkout_path(campaign_id: @campaign, token: @prospect.token)), alert: response[:message]
-      end
+      create_user(@prospect, @campaign)
     end
   rescue
     Rails.logger.error "Checkout::CreateError: #{$ERROR_INFO}"
@@ -163,5 +149,28 @@ class Campaigns::CheckoutsController < ApplicationController
     end
     return if agent_signed_in?
     render file: "#{Rails.root}/public/401", status: 401, layout: false, formats: [:html]
+  end
+  
+  def create_user(prospect, campaign, cc_blank = false)
+    prospect_attributes = prospect.attributes.with_indifferent_access
+    prospect_attributes[:campaign_id] = prospect.campaign_code
+    prospect_attributes[:prospect_id] = prospect.id
+    prospect_attributes[:preferences] = prospect.preferences
+    response = User.enroll(
+      campaign.terms_of_membership,
+      nil, # current_agent .. which current agent should we use here?
+      campaign.enrollment_price,
+      prospect_attributes,
+      params[:credit_card],
+      cc_blank,
+      @campaign.create_remote_user_in_background
+    )
+    if response[:code] == Settings.error_codes.success
+      Rails.logger.info "Checkout::CreateSuccess: Response: #{response.inspect}"
+      redirect_to thank_you_checkout_path(campaign_id: @campaign, user_id: User.find(response[:member_id]).to_param)
+    else
+      Rails.logger.error "Checkout::CreateError: #{response.inspect}"
+      redirect_to (%w(407 409 9507).include?(response[:code]) ? duplicated_checkout_path(campaign_id: @campaign, token: prospect.token) : error_checkout_path(campaign_id: @campaign, token: prospect.token)), alert: response[:message]
+    end
   end
 end
