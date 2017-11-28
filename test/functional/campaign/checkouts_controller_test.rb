@@ -11,7 +11,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
     @credit_card = FactoryGirl.create :credit_card_american_express
     @email_local = 'test@'
     @email_domains =
-      { good: 'aim.com', wrong: ['aim.con'] },
+      { good: 'aim.com', wrong: ['aim.con'] },      
       { good: 'aol.com', wrong: [
         'all.com',
         'aol.clm',
@@ -25,6 +25,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
         'aol.ocm',
         'aol.om'
       ] },
+      { good: 'aom.com', wrong: [] },       
       { good: 'att.net', wrong: [
         'at.net',
         'att.bet',
@@ -100,6 +101,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
       { good: 'icloud.com', wrong: [] },
       { good: 'insightbb.com', wrong: [] },
       { good: 'juno.com', wrong: [] },
+      { good: 'kc.com', wrong: [] },
       { good: 'live.com', wrong: [
         'live.comb',
         'live.come',
@@ -107,6 +109,8 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
         'llive.com',
         'lllive.com'
       ] },
+      { good: 'mail.com', wrong: [] }, 
+      { good: 'me.com', wrong: [] },     
       { good: 'meteoraffinity.com', wrong: [] },
       { good: 'mchsi.com', wrong: [] },
       { good: 'msn.com', wrong: [] },
@@ -152,6 +156,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
         'yyahoo.com',
         'yyyahoo.com'
       ] },
+      { good: 'yahoo.co.uk', wrong: [] },
       { good: 'ymail.com', wrong: [
         'yamil.com',
         'yymail.com',
