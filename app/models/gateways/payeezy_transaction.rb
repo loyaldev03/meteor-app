@@ -2,6 +2,10 @@ class PayeezyTransaction < Transaction
 
   delegate :additional_attributes, to: :payment_gateway_configuration
 
+  def user=(user)
+    super(user)
+    self.invoice_number = user.id
+  end
 
   def self.store!(am_credit_card, pgc)
     ActiveMerchant::Billing::Base.mode = ( Rails.env.production? ? :production : :test )
