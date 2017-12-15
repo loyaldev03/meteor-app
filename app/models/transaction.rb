@@ -23,7 +23,7 @@ class Transaction < ActiveRecord::Base
     'trust_commerce' => %w{decline call carderror rejected baddata error},
     'stripe' => %w{card_declined incorrect_number},
     'litle' => %w{},
-    'payeezy' => %w{invalid_card_number invalid_exp_date incorrect_card_digits card_expired missing_card_type}
+    'payeezy' => %w{invalid_card_number invalid_exp_date incorrect_card_digits card_expired missing_card_type invalid_card_type}
   }
 
   def full_label
