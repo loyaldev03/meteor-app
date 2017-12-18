@@ -181,6 +181,10 @@ class Transaction < ActiveRecord::Base
     operation_type == Settings.operation_types.no_recurrent_billing
   end
 
+  def failure_due_to_cut_off?
+    payeezy? and response_code == 'Not Processed' and response_result.include? "Terminal locked for settlement" 
+  end
+
   # answer credit card token
   def self.store!(am_credit_card, pgc, user=nil)
     if pgc.mes?
@@ -338,7 +342,7 @@ class Transaction < ActiveRecord::Base
         save_custom_response({ message: "Payment gateway not found.", code: Settings.error_codes.not_found })
       elsif amount.to_f == 0.0
         save_custom_response({ message: "Transaction success. Amount $0.0", code: Settings.error_codes.success }, true)
-      elsif self.token.nil? or self.token.size < 4
+      elsif self.token.nil? or self.token.size < 4 
         save_custom_response({ code: Settings.error_codes.credit_card_blank_without_grace, message: "Credit card is blank we wont bill" })
       else
         load_gateway

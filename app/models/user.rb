@@ -256,8 +256,11 @@ class User < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-
-    Users::PostEnrollmentTasks.perform_later(self.id, skip_send_fulfillment)
+    if @skip_post_enrollment_tasks
+      Users::RetryEnrollmentBillingJob.set(wait: 10.minutes).perform_later(self.id)
+    else
+      Users::PostEnrollmentTasks.perform_later(self.id, skip_send_fulfillment)
+    end
     
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -736,14 +739,18 @@ class User < ActiveRecord::Base
         trans.transaction_type = "sale"
         trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration, tom.id, nil, operation_type)
         answer = trans.process
-        unless trans.success?
-          operation_type = Settings.operation_types.error_on_enrollment_billing
-          Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
-        # TODO: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
-          trans.operation_type = operation_type
-          trans.save
-          replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
-          return answer
+        unless trans.success? 
+          if trans.failure_due_to_cut_off?
+            @skip_post_enrollment_tasks = true
+          else
+            operation_type = Settings.operation_types.error_on_enrollment_billing
+            Auditory.audit(agent, trans, "Transaction was not successful.", self, operation_type) 
+          # TODO: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
+            trans.operation_type = operation_type
+            trans.save
+            replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
+            return answer
+          end
         end
       end
 

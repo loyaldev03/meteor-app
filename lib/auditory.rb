@@ -30,7 +30,7 @@ class Auditory
     story.save
   end
 
-  def self.report_issue(error = "Special Error", exception = '', params = {}, add_backtrace = true)
+  def self.report_issue(error = "Special Error", exception = '', params = {}, add_backtrace = true, assignee = nil)
     unless ['test', 'development'].include? Rails.env
       backtrace = add_backtrace ? "**Backtrace**\n #{(exception.kind_of?(Exception) ? exception.backtrace.join("\n").to_s : caller.join("\n").to_s)}" : ''
       description = <<-EOF
@@ -46,7 +46,7 @@ class Auditory
 
         #{backtrace}
       EOF
-      Auditory.create_user_story(description, error)
+      Auditory.create_user_story(description, error, Settings.pivotal_tracker.project_id, 'bug', assignee)
     end
   end
 

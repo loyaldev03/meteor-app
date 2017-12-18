@@ -621,4 +621,30 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
       assert_redirected_to thank_you_checkout_path(campaign_id: campaign_without_cc_and_geographic.to_param, user_id: User.last.to_param)
     end
   end
+  
+  test "Phoenix should not stop enrollment process during Cut-off-time (Payeezy Batching process)" do
+    payeezy_club                 = FactoryGirl.create(:simple_club_with_payeezy_gateway)
+    payeezy_terms_of_membership  = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => payeezy_club.id)
+    credit_card_payeezy          = FactoryGirl.build(:credit_card_visa_payeezy)
+    campaign                     = FactoryGirl.create(:campaign, :club_id => payeezy_club.id, :terms_of_membership_id => payeezy_terms_of_membership.id)
+    active_merchant_stubs_payeezy    
+    sign_agent_with_global_role(:confirmed_admin_agent)
+    prospect = FactoryGirl.create(:prospect, :club_id => payeezy_club.id)
+    
+    # stubing error 
+    answer =  ActiveMerchant::Billing::Response.new(false, 'Bad Request (07) - Terminal locked for settlement, please try again l', {"correlation_id":"128.1250563829934","Error":{"messages":[{"code":"400","description":"Bad Request (07) - Terminal locked for settlement, please try again l"}]},"transaction_status":"Not Processed"},"message":"Bad Request (07) - Terminal locked for settlement, please try again l", "success":false,"test":false,"authorization":"||direct_debit|","fraud_review":nil,"error_code":"400","emv_authorization":nil,"avs_result":{"code":nil,"message":nil,"street_match":nil,"postal_match":nil})
+    ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:purchase).returns(answer)
+    
+    Delayed::Worker.delay_jobs = true
+    
+    assert_difference('User.count',1) do
+     assert_difference('Membership.count', 1) do
+       post :create, credit_card: { campaign_id: campaign.to_param, prospect_token: prospect.token, :number => credit_card_payeezy.number, :expire_month => credit_card_payeezy.expire_month, :expire_year => credit_card_payeezy.expire_year }
+     end
+    end
+    assert_redirected_to thank_you_checkout_path(campaign_id: campaign.to_param, user_id: User.last.to_param)
+    
+    delayed_job = Delayed::Job.find_by queue: 'enrollment_delayed_billing'
+    assert (delayed_job and delayed_job.handler.include? User.last.id.to_s)
+  end
 end

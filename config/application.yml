@@ -13,6 +13,7 @@ defaults: &defaults
   others_product: "SLOOPS"
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe', 'payeezy']
   logger_level_for_tasks: 'DEBUG'
+  retry_enrollment_process_fail_assignee:
   pivotal_tracker:
     project_id: 840477
     token: "93edf6fdb44a44b280a675b85c464c5b"
@@ -433,6 +434,7 @@ production:
   pivotal_tracker:
     project_id: 840771
     token: "93edf6fdb44a44b280a675b85c464c5b"
+  retry_enrollment_process_fail_assignee: PIVOTAL_TRACKER_MEMBER_ID_KINCHELOE_CHRIS
 prototype:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8

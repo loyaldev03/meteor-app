@@ -26,7 +26,7 @@ class Club < ActiveRecord::Base
 
   before_validation :complete_urls
   before_save :not_allow_multiple_mailchimp_clients_with_same_list_id
-  after_create :add_default_member_groups, :add_default_disposition_type
+  after_create :add_default_member_groups, :add_default_disposition_type, :add_default_terms_of_membership
   after_update :resync_with_merketing_tool_process
 
   validates :partner_id, :cs_phone_number, :cs_email, presence: true
@@ -196,6 +196,14 @@ class Club < ActiveRecord::Base
         d.club_id = self.id
         d.save
       end
+    end
+    
+    def add_default_terms_of_membership
+      terms_of_membership_default = TermsOfMembership.new club_id: self.id, name: 'Limited access members', provisional_days: 0, needs_enrollment_approval: false,
+                                                          installment_amount: 0.00, installment_type: 1.month, api_role: 7, is_payment_expected: true, 
+                                                          installment_period: 365000, subscription_limits: 0, if_cannot_bill: 'cancel', initial_club_cash_amount: 0.00,
+                                                          club_cash_installment_amount: 0.00, skip_first_club_cash: false, show_in_save_the_sale: 1     
+      terms_of_membership_default.save(validate: false)
     end
 
     def complete_urls
