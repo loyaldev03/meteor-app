@@ -1,4 +1,10 @@
-function doOnReadyforAllPages() {}
+function doOnReadyforAllPages() {
+  // Fix for IE versions that don't support consoles
+  if (typeof console == "undefined" || typeof console.log == "undefined") {
+    console = {};
+    console.log = function () {};
+  }
+}
 
 function checkoutPageFunctions() {
   $('#modal').modal({
@@ -47,7 +53,7 @@ function checkoutPageFunctions() {
     }
   });
 
-  $('body').keydown(function() {
+  $('body').keydown(function(event) {
     if (event.keyCode == 13) {
       document.activeElement.blur();
       return false;
