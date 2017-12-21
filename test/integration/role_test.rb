@@ -757,7 +757,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       assert page.has_selector?("#fulfillment_files")
     }
 
-    @saved_user = create_user(unsaved_user)
+    @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
     FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
     validate_view_user_base(@saved_user)
 
@@ -808,7 +808,7 @@ class RolesTest < ActionDispatch::IntegrationTest
         assert page.has_no_selector?("#fulfillment_files")
       }
 
-      @saved_user = create_user(unsaved_user)
+      @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
       FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
@@ -851,7 +851,7 @@ class RolesTest < ActionDispatch::IntegrationTest
         assert page.has_no_selector?("#fulfillment_files")
       }
 
-      @saved_user = create_user(unsaved_user)
+      @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
       FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
@@ -934,65 +934,63 @@ class RolesTest < ActionDispatch::IntegrationTest
       within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:class].exclude? 'disabled'}
     end
 
-    #Profile fulfillment_managment - Delete Credit Card
-    test "club role fulfillment_managment available actions" do
-      setup_user false
-      setup_agent_with_club_role(@club, 'fulfillment_managment')
-      unsaved_user = FactoryGirl.build(:user_with_api, :club_id => @club.id)
+#Profile fulfillment_managment - Delete Credit Card
+  test "club role fulfillment_managment available actions" do
+    setup_user false
+    setup_agent_with_club_role(@club, 'fulfillment_managment')
+    unsaved_user = FactoryGirl.build(:user_with_api, :club_id => @club.id)
 
-      within('#my_clubs_table'){
-        assert page.has_selector?("#users")
-        assert page.has_selector?("#products")
-        assert page.has_selector?("#fulfillments")
-        assert page.has_selector?("#fulfillment_files")
-      }
+    within('#my_clubs_table'){
+      assert page.has_selector?("#users")
+      assert page.has_selector?("#products")
+      assert page.has_selector?("#fulfillments")
+      assert page.has_selector?("#fulfillment_files")
+    }
 
-      @saved_user = create_user(unsaved_user)
-      FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
-      validate_view_user_base(@saved_user)
+    @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
+    FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+    validate_view_user_base(@saved_user)
 
-      assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='save_the_sale']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='blacklist_btn']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='add_user_note']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='cancel']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
-      assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].include? 'disabled'
-      within('.nav-tabs'){click_on 'Credit Cards'}
-      within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
-    
-      @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
-      active_merchant_stubs
-      @saved_user.bill_membership
-      visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-      within('.nav-tabs'){click_on 'Transactions'}
-      within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:class].exclude? 'disabled' }
+    assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='save_the_sale']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='blacklist_btn']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='add_user_note']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='cancel']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='link_user_set_undeliverable']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='link_user_set_unreachable']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='add_credit_card']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='link_user_change_next_bill_date']")[:class].exclude? 'disabled'
+    assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].include? 'disabled'
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
+  
+    @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
+    active_merchant_stubs
+    @saved_user.bill_membership
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    within('.nav-tabs'){click_on 'Transactions'}
+    within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:class].exclude? 'disabled' }
 
-      @saved_user.set_as_canceled
-      visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
-      assert find(:xpath, "//a[@id='recovery']")[:class].exclude? 'disabled'
-      within('.nav-tabs'){click_on 'Credit Cards'}
-      within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
+    @saved_user.set_as_canceled
+    visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
+    assert find(:xpath, "//a[@id='recovery']")[:class].exclude? 'disabled'
+    within('.nav-tabs'){click_on 'Credit Cards'}
+    within('#credit_cards'){ assert page.has_no_selector?("#destroy") }
 
-      visit products_path(@partner.prefix, @club.name)    
-      within('#products_table')do
-        assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'    
-      end
-
-      visit fulfillments_index_path(@partner.prefix, @club.name)
-      within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:class].exclude? 'disabled'}
+    visit products_path(@partner.prefix, @club.name)    
+    within('#products_table')do
+      assert find(:xpath, "//a[@id='show']")[:class].exclude? 'disabled'    
     end
 
-    test "fulfillment_managment role - Fulfillment File page" do
-      setup_fulfillment_managment
-      setup_user
-      visit fulfillments_index_path( :partner_prefix => @partner.prefix, :club_prefix => @club.name)
-    end
+    visit fulfillments_index_path(@partner.prefix, @club.name)
+    within('#fulfillments_table'){ assert find(:xpath, "//input[@id='make_report']")[:class].exclude? 'disabled'}
+  end
 
-
+  test "fulfillment_managment role - Fulfillment File page" do
+    setup_fulfillment_managment
+    setup_user
+    visit fulfillments_index_path( :partner_prefix => @partner.prefix, :club_prefix => @club.name)
+  end
 
   test "Should see every club on my clubs table when has agency role." do
     setup_agency

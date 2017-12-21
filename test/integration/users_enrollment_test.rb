@@ -164,7 +164,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   	setup_user(false)
 
   	unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-	  created_user = create_user(unsaved_user)
+    created_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
 
     validate_view_user_base(created_user)
     within(".nav-tabs"){ click_on 'Operations' }
@@ -1147,10 +1147,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     setup_user(false)
     product = FactoryGirl.create(:product, :club_id => @club.id, sku: 'PRODUCT_RANDOM')
     unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    created_user = create_user(unsaved_user,nil,nil,false,'')
-    
+    created_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name,false,'')    
     validate_view_user_base(created_user)
-    within(".nav-tabs"){ click_on 'Operations' }
+    within(".nav-tabs"){ click_on 'Operations' }    
     within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
     within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.user.has_no_preferences_saved')) }
     within(".nav-tabs"){ click_on 'Transactions' }
