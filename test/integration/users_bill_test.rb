@@ -378,7 +378,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     active_merchant_stubs("9997", "This transaction has not been approved with stub", false)
     
     unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
-    @saved_user = create_user(unsaved_user, nil, nil, true)
+    @saved_user = create_user(unsaved_user, nil, @terms_of_membership_with_gateway.name, true)
 
     within("#table_active_credit_card")do
       assert page.has_content?("0000 (unknown)")

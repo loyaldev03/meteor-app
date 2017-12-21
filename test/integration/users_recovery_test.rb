@@ -40,10 +40,11 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
     click_on 'Recover'
 
-    if tom.name != @terms_of_membership_with_gateway.name
-      select(tom.name, :from => 'terms_of_membership_id')
+    if @new_terms_of_membership_with_gateway.name != @terms_of_membership_with_gateway.name
+      select(@new_terms_of_membership_with_gateway.name, :from => 'terms_of_membership_id')
     end
-    sleep 50
+
+    sleep 3
     if product
       select(product.name, :from => 'product_sku')
     end
@@ -83,7 +84,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
       click_on("Operations")
     end
     within("#operations_table")do
-      assert page.has_content?("Member recovered successfully $0.0 on TOM(#{tom.id}) -#{tom.name}-")
+      assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@new_terms_of_membership_with_gateway.id}) -#{@new_terms_of_membership_with_gateway.name}-")
     end
 
     within(".nav-tabs") do
@@ -146,8 +147,8 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
   test "Recover an user by Annual membership" do
     setup_user
-    @terms_of_membership_with_gateway.update_attribute(:installment_type, "1.year")
-    recover_user(@saved_user, @terms_of_membership_with_gateway)
+    @new_terms_of_membership_with_gateway.update_attribute(:installment_type, "1.year")
+    recover_user(@saved_user, @new_terms_of_membership_with_gateway.name)
 
     assert find_field('input_first_name').value == @saved_user.first_name 
     page.has_content? "Member recovered successfully $0.0 on TOM(1) -#{@terms_of_membership_with_gateway.name}-"
@@ -156,13 +157,11 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
   test "Recovery an user with Paid TOM" do
     setup_user
-    actual_tom = @saved_user.current_membership
-
-    recover_user(@saved_user,@terms_of_membership_with_gateway)
+    actual_tom = @saved_user.current_membership   
+    recover_user(@saved_user,@new_terms_of_membership_with_gateway)
     assert find_field('input_first_name').value == @saved_user.first_name
     assert page.has_content?("Member recovered successfully $0.0 on TOM(#{@saved_user.current_membership.terms_of_membership.id}) -#{@saved_user.current_membership.terms_of_membership.name}-")
-
-    assert_equal(@saved_user.current_membership.terms_of_membership_id, actual_tom.terms_of_membership_id)
+    assert_equal(@saved_user.current_membership.terms_of_membership_id, @new_terms_of_membership_with_gateway.id)
     validate_user_recovery(@saved_user, @terms_of_membership_with_gateway)
   end
 
@@ -285,7 +284,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     end
   end
 
-  # Complimentary users should be active (Recover)
+  #Complimentary users should be active (Recover)
   test "Complimentary users should be active (Enroll)" do
     setup_user false, false
     @terms_of_membership_with_gateway.provisional_days = 0
