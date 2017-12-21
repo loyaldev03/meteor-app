@@ -66,7 +66,7 @@ class CheckoutTest < ActionDispatch::IntegrationTest
   test "do not create a user when it does not enter credit card" do    
     visit new_checkout_path(campaign_id: @campaign.to_param, token: @prospect.token)
     click_link_or_button 'Submit'   
-    assert page.has_content?("Can't be blank.")    
+    assert page.has_content?("This field is required.")    
   end
 
   test "do not create a user when it enter expired CC" do  
