@@ -53,7 +53,7 @@ class CampaignDataFetcher
         params = ["time_range={'since':'#{date}','until':'#{date}'}",
           "fields=spend,impressions,actions",
           "access_token=#{access_token}"].join('&')
-        [ "v2.9",
+        [ "v2.10",
           @report.campaign_foreign_id.to_s,
           "insights"
         ].join("/") + "?" + params
