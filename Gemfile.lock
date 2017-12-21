@@ -303,6 +303,8 @@ GEM
     mysql2 (0.4.5)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
+    net-sftp (2.1.2)
+      net-ssh (>= 2.6.5)
     net-ssh (4.1.0)
     netrc (0.11.0)
     newrelic_rpm (4.2.0.334)
@@ -576,6 +578,7 @@ DEPENDENCIES
   minitest (~> 5.1)
   mocha
   mysql2 (= 0.4.5)
+  net-sftp
   newrelic_rpm
   nokogiri
   paperclip (~> 5.1.0)

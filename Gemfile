@@ -48,6 +48,7 @@ gem 'bootstrap-will_paginate'
 gem 'nokogiri'
 gem 'faraday', '>= 0.9.1'
 gem 'faraday_middleware', '>= 0.9.0'
+gem 'net-sftp', require: false
 gem 'hashie'
 gem 'state_machine', '1.1.2'
 gem 'cancan'

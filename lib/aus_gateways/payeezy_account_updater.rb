@@ -1,4 +1,5 @@
 require 'gmail'
+require 'net/sftp'
 module PayeezyAccountUpdater
 
   ################################################
