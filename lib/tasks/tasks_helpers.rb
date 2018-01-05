@@ -303,7 +303,7 @@ module TasksHelpers
         UserPreference.delete_all(["user_id = ?", user.id])
         CreditCard.delete_all(["user_id = ?", user.id])
         Transaction.delete_all(["user_id = ?", user.id])
-        Fulfillment.delete_all(["user_id = ?", user.id])
+        Fulfillment.destroy_all(["user_id = ?", user.id])
         Communication.delete_all(["user_id = ?", user.id])
         ClubCashTransaction.delete_all(["user_id = ?", user.id])
         Membership.delete_all(["user_id = ?", user.id])

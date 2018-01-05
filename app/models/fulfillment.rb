@@ -12,8 +12,9 @@ class Fulfillment < ActiveRecord::Base
   belongs_to :product, -> { with_deleted }
 
   has_and_belongs_to_many :fulfillment_files
-  has_many :suspected_fulfillment_evidences
-
+  has_many :suspected_fulfillment_evidences, dependent: :destroy 
+  has_many :related_evidences, class_name: 'SuspectedFulfillmentEvidence', foreign_key: :matched_fulfillment_id, dependent: :destroy
+  
   before_create :set_default_values
   after_update :replenish_stock
 
