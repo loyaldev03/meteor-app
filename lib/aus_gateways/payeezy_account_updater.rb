@@ -55,7 +55,8 @@ module PayeezyAccountUpdater
     end
     send_email_with_contact_users(gateway.club_id)
   end
-    
+  
+  private
     def self.process_chargebacks_file(chargeback_data, gateway)
       chargeback_data.each do |data|
         begin
