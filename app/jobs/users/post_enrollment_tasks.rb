@@ -52,8 +52,15 @@ module Users
         suspected_of_gamer = true
       end
 
-      matched_fulfillments = Fulfillment.where("club_id = ? AND full_phone_number = ? AND NOT id = ? AND full_phone_number IS NOT NULL", fulfillment.club_id, fulfillment.full_phone_number, fulfillment.id)
-        matched_fulfillments.each do |matched_fulfillment|
+      allowed_phone_numbers = ['0, 000, 0000000']
+      matched_fulfillments = Fulfillment.where(
+        'club_id = ? AND full_phone_number NOT IN (?) AND full_phone_number = ? AND NOT id = ? AND full_phone_number IS NOT NULL',
+        fulfillment.club_id,
+        allowed_phone_numbers,
+        fulfillment.full_phone_number,
+        fulfillment.id
+      )
+      matched_fulfillments.each do |matched_fulfillment|
         evidence = SuspectedFulfillmentEvidence.where(fulfillment_id: fulfillment.id, matched_fulfillment_id: matched_fulfillment.id).first_or_create
         evidence.update_attribute :full_phone_number_match, true
         suspected_of_gamer = true
