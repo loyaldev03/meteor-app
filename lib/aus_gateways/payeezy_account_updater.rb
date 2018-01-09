@@ -56,7 +56,6 @@ module PayeezyAccountUpdater
     send_email_with_contact_users(gateway.club_id)
   end
     
-  private
     def self.process_chargebacks_file(chargeback_data, gateway)
       chargeback_data.each do |data|
         begin
@@ -76,8 +75,8 @@ module PayeezyAccountUpdater
         next if line[0..1] != 'C1'
         current_token        = line[3..18]
         current_exp_date     = line[19..22]
-        new_expiration_month = line[40..41]
-        new_expiration_year  = '20' + line[42..44]
+        new_expiration_month = line[40..41].to_i
+        new_expiration_year  = ('20' + line[42..43]).to_i
         response_code        = line[59..64]
         credit_card          = CreditCard.joins(:user).find_by(users: {club_id: club_id}, token: current_token)
         

@@ -12,7 +12,7 @@ namespace 'payeezy' do
   end
   
   desc 'Download and process CAU response'
-  task :account_updater_process_process => [:environment, :setup_logger] do
+  task :account_updater_process_response => [:environment, :setup_logger] do
     PayeezyAccountUpdater.account_updater_process_response
   end
 end
