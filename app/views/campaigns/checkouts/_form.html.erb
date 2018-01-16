@@ -40,6 +40,7 @@
 
 <div class="row">
   <div class='col-xs-12 text-left'>
-    <%= image_tag('checkout/ab_seal_horizontal.png', :style => 'height: 50px;') if @club.name.downcase.include? 'onmc' %>
+    <%= image_tag('checkout/ab_seal_horizontal.png', :style => 'height: 50px;') if ['onmc', 'nascar'].any? { 
+|club_name| @club.name.downcase.include? club_name } %>
   </div>
 </div>
