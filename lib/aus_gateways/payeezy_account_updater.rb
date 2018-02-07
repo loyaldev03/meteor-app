@@ -154,6 +154,8 @@ module PayeezyAccountUpdater
           credit_card = user.active_credit_card
           expire_date = '%02i' % credit_card.expire_month + credit_card.expire_year.to_s[2..3]
           file.write ["C1T", credit_card.token, expire_date, filler * 57].join() + "\n"
+          credit_card.aus_sent_at = Time.zone.now
+          credit_card.save
           count += 1
         end
           
