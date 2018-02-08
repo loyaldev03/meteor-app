@@ -1497,7 +1497,7 @@ class User < ActiveRecord::Base
         operation_type = Settings.operation_types.membership_billing_without_decline_strategy
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save(validate: false)
-        Auditory.report_issue("Decline rule not found TOM ##{tom.id}", 
+        Auditory.report_issue("Decline rule not found. User ##{self.id}", 
           "MID ##{self.id} TID ##{trans.id}. Message: #{message}. CC type: #{trans.cc_type}. " + 
           "We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.",
           { member: self.inspect })
