@@ -4,7 +4,8 @@ class PayeezyTransaction < Transaction
 
   def user=(user)
     super(user)
-    self.invoice_number = user.id
+    # IMPORTANT: Payeezy only saves up to 20 characters in the invoice number
+    self.invoice_number = user.id || user.email
   end
 
   def self.store!(am_credit_card, pgc)
@@ -82,5 +83,7 @@ class PayeezyTransaction < Transaction
     def load_gateway
       login_data = { apikey: login, apisecret: password, token: merchant_key, js_security_key: additional_attributes['js_security_key'], ta_token: additional_attributes['ta_token'] }
       @gateway = ActiveMerchant::Billing::PayeezyGateway.new(login_data)
+      @options[:level2] = {}
+      @options[:level2][:tax1_amount] = '25'
     end
 end

@@ -122,7 +122,7 @@ group :test, :development do
   gem 'byebug'
 end
 
-gem 'activemerchant', '1.75'
+gem 'activemerchant', github: 'sebastianGitDL/active_merchant', branch: 'payeezy-purchase-level2-data'
 gem 'LitleOnline', '8.16.0'
 gem 'ruby-gmail'
 
