@@ -113,8 +113,8 @@ class UsersController < ApplicationController
   end
 
   def save_the_sale
-    @sts_toms = TermsOfMembership.select(:id, :name).where(club_id: @current_club, show_in_save_the_sale: true)
-    @all_toms = TermsOfMembership.select(:id, :name).where(club_id: @current_club)
+    @sts_toms = current_club.terms_of_memberships.select(:id, :name).where(show_in_save_the_sale: true)
+    @all_toms = current_club.terms_of_memberships.select(:id, :name)
     return unless request.post?
     if TermsOfMembership.find_by(id: params[:terms_of_membership_id], club_id: @current_club.id).nil?
       flash[:error] = 'Subscription plan not found'

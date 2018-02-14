@@ -541,7 +541,7 @@ module ActionDispatch
       end
     end
 
-    def add_credit_card(user,credit_card)
+    def add_credit_card(user,credit_card, subscription_plan = nil)
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => user.id)
       click_on 'Add a credit card'
       active_merchant_stubs_store(credit_card.number)
@@ -549,6 +549,7 @@ module ActionDispatch
       fill_in 'credit_card[number]', :with => credit_card.number
       select credit_card.expire_month.to_s, :from => 'credit_card[expire_month]'
       select credit_card.expire_year.to_s, :from => 'credit_card[expire_year]'
+      select subscription_plan, :from => 'terms_of_membership_id' if subscription_plan
 
       click_on 'Save credit card'
     end

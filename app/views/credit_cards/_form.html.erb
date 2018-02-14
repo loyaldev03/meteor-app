@@ -10,6 +10,14 @@
       <%= f.select( :expire_year, @years, {:include_blank => true}, {:class => 'input-small'} ) %>
     </td>
   </tr>
+  <tr>
+    <td colspan='2'> 
+      <%= label_tag :terms_of_membership_id, t('activerecord.attributes.user.terms_of_membership_id'), :class => 'help-inline' %>:
+      <%= select_tag :terms_of_membership_id, options_from_collection_for_select(@terms_of_memberships, "id", "name", params['terms_of_membership_id']), { :prompt => 'Choose one if needed' } %>
+      <%= render :partial => "shared/help", :locals => { :title => t('change_membership_upon_new_cc'), :content => t('change_membership_upon_new_cc_help')} %> 
+      <label class="help-inline">Current Subscription Plan: <%= current_user.terms_of_membership.name %></label>
+    </td>
+  </tr>
   <tr class="control-group">
     <th colspan="2"> <%= f.submit t('buttons.save_credit_card'), :class => 'btn btn-primary' %>
     <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %> </th>

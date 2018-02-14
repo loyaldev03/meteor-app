@@ -56,6 +56,8 @@ en:
   no_toms_for_save_the_sale: 'No Subscription Plans set to be shown here. Go, enable some '
   import_data: 'Import Data'
   link_to_store_variant: 'Go to Store Variant'
+  change_membership_upon_new_cc: 'Change Membership'
+  change_membership_upon_new_cc_help: "If a Subscription Plan is selected and if the credit card information is valid, the user will have it's membership changed as well (following the same logic as a save the sale)"
   enums:
     campaign:
       transport:

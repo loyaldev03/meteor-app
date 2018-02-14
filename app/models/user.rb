@@ -770,6 +770,7 @@ class User < ActiveRecord::Base
       membership.product = product
       membership.user = self
       membership.save!
+
       self.update_attribute :current_membership_id, membership.id
       
       

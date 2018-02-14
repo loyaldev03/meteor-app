@@ -227,6 +227,32 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     }
   end
 
+  test "add new CC and new Subscription Plan" do
+    setup_user
+    
+    new_cc = FactoryGirl.build(:credit_card, :number => "378282246310005", :expire_month => Time.new.month, :expire_year => Time.new.year+10)
+    new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+
+    last_digits = new_cc.last_digits
+    add_credit_card(@saved_user, new_cc, new_terms_of_membership_with_gateway.name)
+    @saved_user.reload
+
+    cc_saved = @saved_user.active_credit_card    
+    assert page.has_content?("Credit card #{cc_saved.last_digits} added and activated.Member enrolled successfully $0.0 on TOM(#{new_terms_of_membership_with_gateway.id}) -#{new_terms_of_membership_with_gateway.name}-")    
+
+    within("#table_active_credit_card") do
+      assert page.has_content?(last_digits)
+      assert page.has_content?("#{cc_saved.expire_month} / #{cc_saved.expire_year}")
+    end
+
+    within(".nav-tabs"){ click_on("Operations") }
+    within("#operations_table") do
+      assert page.has_content?("Credit card #{cc_saved.last_digits} added and activated") 
+      assert page.has_content?("Rollback to previous Membership")
+      assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{new_terms_of_membership_with_gateway.id}) -#{new_terms_of_membership_with_gateway.name}-")      
+    end
+  end
+
   # edit a note at operations tab
   test "edit a note and click on link" do
     setup_user
