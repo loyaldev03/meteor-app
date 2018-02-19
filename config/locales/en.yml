@@ -245,7 +245,7 @@ en:
       credit_exp_month: 'Month *'
       credit_exp_year: 'Year *'
       credit_card_expired: 'Your credit card has expired'
-      please_wait: 'Please Wait'
+      please_wait: 'Please Wait...'
       while_creating_account: 'While we are creating your account.'
       login_now: 'Login Now!'
       email_us: 'Email Us'

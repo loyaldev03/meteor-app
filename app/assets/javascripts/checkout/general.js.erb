@@ -7,12 +7,6 @@ function doOnReadyforAllPages() {
 }
 
 function checkoutPageFunctions() {
-  $('#modal').modal({
-    show: false,
-    backdrop: 'static',
-    keyboard: false
-  });
-
   $.validator.addMethod(
     'expirationDate',
     function(value, element, params) {
@@ -28,6 +22,22 @@ function checkoutPageFunctions() {
     },
     "<%= I18n.t('checkout.checkout_page.credit_card_expired') %>"
   );
+
+  // jQuery plugin to prevent double submission of forms
+  jQuery.fn.preventDoubleSubmission = function () {
+    $(this).on('submit', function (e) {
+      var $form = $(this);
+      if ($form.data('submitted') === true) {
+        // Previously submitted - don't submit again
+        e.preventDefault();
+      } else {
+        // Mark it so that the next submit can be ignored
+        $form.data('submitted', true);
+      }
+    });
+    // Keep chainability
+    return this;
+  };
 
   $('#credit_card').validate({
     rules: {
@@ -53,6 +63,14 @@ function checkoutPageFunctions() {
     }
   });
 
+  $("form#credit_card").preventDoubleSubmission();
+
+  $('#modal').modal({
+    show: false,
+    backdrop: 'static',
+    keyboard: false
+  });
+
   $('body').keydown(function(event) {
     if (event.keyCode == 13) {
       document.activeElement.blur();
@@ -63,7 +81,7 @@ function checkoutPageFunctions() {
   $('#submit').click(function() {
     toggleFields(false);
   });
-
+  
   function toggleFields(fieldsEnabled) {
     if (fieldsEnabled) {
       $('#modal').modal('hide');
@@ -75,6 +93,7 @@ function checkoutPageFunctions() {
       $('#credit_card_expire_year').removeClass('disabled');
       $('#submit').removeAttr('disabled');
       $('#submit').removeClass('disabled');
+      $('#submit').val("<%= I18n.t('checkout.checkout_page.submit') %>");
     } else {
       $('#modal').modal('show');
       $('#credit_card_number').attr('disabled');
@@ -85,6 +104,7 @@ function checkoutPageFunctions() {
       $('#credit_card_expire_year').addClass('disabled');
       $('#submit').attr('disabled');
       $('#submit').addClass('disabled');
+      $('#submit').val("<%= I18n.t('checkout.checkout_page.please_wait') %>");
     }
   }
 }
