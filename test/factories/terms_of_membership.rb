@@ -82,6 +82,7 @@ FactoryGirl.define do
     club_cash_installment_amount 100
     skip_first_club_cash 0
     provisional_days 30
+    show_in_save_the_sale true
     # association :club, factory: :simple_club_with_gateway
   end
 

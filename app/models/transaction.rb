@@ -181,10 +181,6 @@ class Transaction < ActiveRecord::Base
     operation_type == Settings.operation_types.no_recurrent_billing
   end
 
-  def failure_due_to_cut_off?
-    payeezy? and response_code == 'Not Processed' and response_result.include? "Terminal locked for settlement" 
-  end
-
   # answer credit card token
   def self.store!(am_credit_card, pgc, user=nil)
     if pgc.mes?
