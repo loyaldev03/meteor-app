@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: git://github.com/dmferrari/mailcheck-ruby.git
-  revision: b44f22693f6108ad3339847daf5a6f87a19a8cd3
+  revision: 19ff4cc6730aa60e8aa3e15b1f1da583663eda2a
   specs:
-    mailcheck (1.0.7)
+    mailcheck (1.0.8)
 
 GIT
   remote: git://github.com/ifad/data-confirm-modal.git

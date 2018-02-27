@@ -42,6 +42,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
         'comcat.net'
       ] },
       { good: 'cox.net', wrong: [] },
+      { good: 'dza.com', wrong: [] },
       { good: 'earthlink.com', wrong: [] },
       { good: 'email.com', wrong: [] },
       { good: 'embarqmail.com', wrong: [
