@@ -359,7 +359,7 @@ class TransactionTest < ActiveSupport::TestCase
     assert !active_user.lapsed?, "user cant be lapsed"
     
     trans = Transaction.where("operation_type = 101").first
-    active_user.chargeback!(trans,{:reason => "testing", :transaction_amount => trans.amount, :auth_code => trans.response_auth_code, adjudication_date: (Time.zone.now).to_s })
+    active_user.chargeback!(trans,{:reason => "testing", :transaction_amount => trans.amount, :auth_code => trans.response_auth_code, adjudication_date: (Time.zone.now).to_s }, "testing")
     chargeback_trans = Transaction.find_by_operation_type 110
     assert_equal chargeback_trans.amount, -trans.amount
   end

@@ -34,21 +34,33 @@ class PayeezyTransaction < Transaction
   end
   
   def new_chargeback!(sale_transaction, args)
-    trans = PayeezeTransaction.find_by(response: args.to_json)
+    trans = PayeezyTransaction.find_by(response: args.to_json)
     if trans.nil?
-      chargeback_amount       = -args['Chargeback Amount'].to_f
+      case args['Chargeback Status']
+      when 'OPEN'
+        chargeback_amount     = -args['Chargeback Amount'].to_f
+        operation_type        = Settings.operation_types.chargeback
+        operation_description = "Chargeback processed $#{chargeback_amount}"
+      when 'REVERSED'
+        chargeback_amount     = args['Chargeback Amount'].to_f
+        operation_type        = Settings.operation_types.chargeback_rebutted
+        operation_description = "Rebutted Chargeback processed $#{chargeback_amount}"
+      else
+        raise "Wrong status received: #{args['Chargeback Status']}"
+      end
+      
       self.transaction_type   = "chargeback"
       self.response           = args
       self.prepare(sale_transaction.user, sale_transaction.credit_card, chargeback_amount, 
-                    sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, nil, Settings.operation_types.chargeback)
+                    sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, nil, operation_type)
       self.response_auth_code = args['Authorization Code']
-      self.response_result    = args['Chargeback Reason Code']
+      self.response_result    = args['Chargeback Reason Code'] + '-' + args['Chargeback Description']
       self.response_code      = '000'
       self.success            = true
       self.membership_id      = sale_transaction.membership_id
-      self.created_at         = args['Adjustment Date']
+      self.created_at         = args['Adjustment Date'].to_time
       self.save!
-      Auditory.audit(nil, self, "Chargeback processed $#{chargeback_amount}", sale_transaction.user, Settings.operation_types.chargeback)
+      Auditory.audit(nil, self, operation_description, sale_transaction.user, operation_type)
     end
   end
 

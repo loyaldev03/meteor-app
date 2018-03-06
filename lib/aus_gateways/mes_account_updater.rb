@@ -240,9 +240,9 @@ module MesAccountUpdater
           if transaction_chargebacked.nil?
             raise "Chargeback ##{args[:control_number]} could not be processed. user or transaction_chargebacked are null! #{line}"
           elsif user.nil?
-            transaction_chargebacked.user.chargeback! transaction_chargebacked, args
+            transaction_chargebacked.user.chargeback! transaction_chargebacked, args, args[:reason]
           elsif transaction_chargebacked.user_id == user.id
-            user.chargeback! transaction_chargebacked, args
+            user.chargeback! transaction_chargebacked, args, args[:reason]
           else
             raise "Chargeback ##{args[:control_number]} could not be processed. user and transaction_chargebacked are different! #{line}"
           end

@@ -30,8 +30,8 @@ if [ "$1" == "production" ]; then
   # echo "`date` rake mes:account_updater_send_file_to_process"
   # cd /var/www/$2/current && bundle exec rake mes:account_updater_send_file_to_process  >> $LOGFILE 2>&1 
   
-  # echo "`date` rake payeezy:chargeback_report"
-  # cd /var/www/$2/current && bundle exec rake payeezy:chargeback_report  >> $LOGFILE 2>&1 
+  echo "`date` rake payeezy:chargeback_report"
+  cd /var/www/$2/current && bundle exec rake payeezy:chargeback_report  >> $LOGFILE 2>&1 
   echo "`date` rake payeezy:account_updater_send_file_to_process"
   cd /var/www/$2/current && bundle exec rake payeezy:account_updater_send_file_to_process  >> $LOGFILE 2>&1
   echo "`date` rake payeezy:account_updater_process_response"

@@ -1105,12 +1105,12 @@ class User < ActiveRecord::Base
     self.type_of_phone_number = params[:type_of_phone_number].to_s.downcase if params.include? :type_of_phone_number
   end
 
-  def chargeback!(transaction_chargebacked, args)
+  def chargeback!(transaction_chargebacked, args, reason = '')
     if can_be_chargeback?
       begin
         trans = Transaction.obtain_transaction_by_gateway!(transaction_chargebacked.gateway)
         trans.new_chargeback!(transaction_chargebacked, args)
-        self.blacklist nil, "Chargeback - "+args[:reason]
+        self.blacklist nil, "Chargeback - " + reason
       rescue ActiveRecord::RecordNotSaved
         raise trans.errors.messages.map{|k,v| "#{k.to_s.humanize}: #{v.join(', ')}"}.join(".")
       rescue Exception => e

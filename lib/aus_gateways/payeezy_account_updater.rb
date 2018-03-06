@@ -60,11 +60,13 @@ module PayeezyAccountUpdater
     def self.process_chargebacks_file(chargeback_data, gateway)
       chargeback_data.each do |data|
         begin
-          transaction_chargebacked  = Transaction.find_by(payment_gateway_configuration_id: gateway.id, response_transaction_id: data['Reference Number'])
-          raise "Chargeback ##{data['Tracking Number']} could not be processed: transaction_chargebacked is null! #{data.to_s}" if transaction_chargebacked.nil?
-          user = transaction_chargebacked.user
-          user.chargeback! transaction_chargebacked, data
-        rescue 
+          user = User.find_by('id = :invoice_number OR email LIKE ":invoice_number%"', invoice_number: data['Invoice Number'])
+          raise "Chargeback ##{data['Invoice Number']} could not be processed: Could not find user! #{data.to_s}" unless user
+          transaction_chargebacked = user.transactions.find_by("payment_gateway_configuration_id = ? AND DATE(created_at) = ? AND last_digits = ? AND amount = ", gateway.id, data['Transaction Date'], data['Cardholder Number'][-4,4], data['Processed Transaction Amount'])
+          raise "Chargeback ##{data['Invoice Number']} could not be processed: Could not find transaction! #{data.to_s}" unless transaction_chargebacked
+
+          user.chargeback! transaction_chargebacked, data, data['Chargeback Description']
+        rescue
           Auditory.report_issue("PAYEEZY::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :user => user.id, :data => data, :transaction_chargebacked_id => transaction_chargebacked.id.to_s })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
