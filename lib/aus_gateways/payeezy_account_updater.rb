@@ -134,7 +134,7 @@ module PayeezyAccountUpdater
     
     def self.generate_request_file(filename, gateway)
       # users with expired credit card and active
-      users     = User.joins(:credit_cards).billable.where([ 'date(bill_date) = ? AND club_id = ? AND active = 1 AND gateway = ?', (Time.current + 1.week).to_date, gateway.club_id, gateway.gateway ])
+      users     = User.joins(:credit_cards).billable.where([ 'date(bill_date) = ? AND club_id = ? AND active = 1 AND gateway = ? AND cc_type != ?', (Time.current + 1.week).to_date, gateway.club_id, gateway.gateway, 'american_express' ])
       if users.any?
         file_path     = "#{Settings.payeezy_aus_service.folder}/#{filename}"
         file          = File.open(file_path, 'wb')
