@@ -38,14 +38,24 @@ module Users
         suspected_of_gamer = true
       end
 
-      matched_fulfillments = Fulfillment.where("club_id = ? AND full_address = ? AND NOT id = ?", fulfillment.club_id, fulfillment.full_address, fulfillment.id)
+      matched_fulfillments = Fulfillment.where(
+        "club_id = ? AND LCASE(REPLACE(full_address, ' ', '')) = ? AND NOT id = ?",
+        fulfillment.club_id,
+        fulfillment.full_address.downcase.gsub(/\s+/, ''),
+        fulfillment.id
+      )
       matched_fulfillments.each do |matched_fulfillment|
         evidence = SuspectedFulfillmentEvidence.where(fulfillment_id: fulfillment.id, matched_fulfillment_id: matched_fulfillment.id).first_or_create
         evidence.update_attribute :full_address_match, true
         suspected_of_gamer = true
       end
 
-      matched_fulfillments = Fulfillment.where("club_id = ? AND full_name = ? AND NOT id = ? ", fulfillment.club_id, fulfillment.full_name, fulfillment.id)
+      matched_fulfillments = Fulfillment.where(
+        "club_id = ? AND LCASE(REPLACE(full_name, ' ', '')) = ? AND NOT id = ? ",
+        fulfillment.club_id,
+        fulfillment.full_name.downcase.gsub(/\s+/, ''),
+        fulfillment.id
+      )
       matched_fulfillments.each do |matched_fulfillment|
         evidence = SuspectedFulfillmentEvidence.where(fulfillment_id: fulfillment.id, matched_fulfillment_id: matched_fulfillment.id).first_or_create
         evidence.update_attribute :full_name_match, true 
