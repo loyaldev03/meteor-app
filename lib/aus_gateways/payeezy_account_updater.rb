@@ -66,8 +66,8 @@ module PayeezyAccountUpdater
           raise "Chargeback ##{data['Invoice Number']} could not be processed: Could not find transaction! #{data.to_s}" unless transaction_chargebacked
 
           user.chargeback! transaction_chargebacked, data, data['Chargeback Description']
-        rescue Exception
-          Auditory.report_issue("PAYEEZY::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :user => user.id, :data => data, :transaction_chargebacked_id => transaction_chargebacked.id.to_s })
+        rescue Exception => e
+          Auditory.report_issue("PAYEEZY::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :data => data })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
