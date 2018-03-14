@@ -58,7 +58,7 @@ class PayeezyTransaction < Transaction
       self.response_code      = '000'
       self.success            = true
       self.membership_id      = sale_transaction.membership_id
-      self.created_at         = args['Adjustment Date'].to_time
+      self.created_at         = args['Received Date'].to_time
       self.save!
       Auditory.audit(nil, self, operation_description, sale_transaction.user, operation_type)
     end
