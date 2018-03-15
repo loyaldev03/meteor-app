@@ -11,7 +11,7 @@ module Campaigns
         end
         CampaignNotifier.campaign_all_days_fetcher_result(campaign_id: campaign_id).deliver_later
       else
-        Auditory.report_issue("DataFetcherJob", 'No date or campaign_id provided.', { club_id: club_id })
+        Auditory.report_issue('DataFetcherJob - No date or campaign_id provided.', nil, { club_id: club_id })
       end
     end
   end

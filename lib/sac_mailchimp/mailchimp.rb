@@ -40,8 +40,6 @@ module SacMailchimp
     logger.info error.inspect
     if not subscriber.club.billing_enable
       subscriber.class.where(id: subscriber.id).update_all(need_sync_to_marketing_client: false)
-    elsif error.instance_of?(Gibbon::MailChimpError) and error.body.nil? # Timeout
-      raise NonReportableException.new if raise_exception
     else
       raise error if raise_exception
     end

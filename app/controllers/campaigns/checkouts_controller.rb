@@ -37,7 +37,7 @@ class Campaigns::CheckoutsController < ApplicationController
     end
   rescue
     Rails.logger.error "Checkout::SubmitError: Error: #{$ERROR_INFO}"
-    Auditory.report_issue('Checkout::SubmitError', $ERROR_INFO.to_s, {campaign_slug: params[:landing_id]})
+    Auditory.report_issue('Checkout::SubmitError', $ERROR_INFO)
     redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
@@ -47,7 +47,7 @@ class Campaigns::CheckoutsController < ApplicationController
     @edit_info_url = generate_edit_user_info_url(@prospect)
   rescue
     Rails.logger.error "Checkout::NewError: Error: #{$ERROR_INFO}"
-    Auditory.report_issue('Checkout::NewError', $ERROR_INFO.to_s, {campaign_slug: params[:campaign_id], prospect_token: params[:token]})
+    Auditory.report_issue('Checkout::NewError', $ERROR_INFO)
     @club = @prospect ? @prospect.club : load_club_based_on_host
     redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
@@ -60,7 +60,7 @@ class Campaigns::CheckoutsController < ApplicationController
     end
   rescue
     Rails.logger.error "Checkout::CreateError: #{$ERROR_INFO}"
-    Auditory.report_issue('Checkout::CreateError', $ERROR_INFO.to_s, {campaign_slug: params[:credit_card][:campaign_id], prospect_token: params[:credit_card][:prospect_token]})
+    Auditory.report_issue('Checkout::CreateError', $ERROR_INFO)
     redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
@@ -136,7 +136,7 @@ class Campaigns::CheckoutsController < ApplicationController
   def campaign_active
     return if @campaign.nil? || @campaign.active?
     Rails.logger.error 'Checkout::CheckIfActiveError: Campaign is not active'
-    Auditory.report_issue('Checkout::CheckIfActiveError', '', {campaign_id: @campaign.id, initial_date: @campaign.initial_date, finish_date: @campaign.finish_date, today: Date.today.to_s})
+    Auditory.notify_pivotal_tracker('Checkout: User tried enrolling to a closed campaign', 'There was an enrollment try to an already closed campaign. Please make sure that the campaign is properly closed in the Source.', {campaign_id: @campaign.id, initial_date: @campaign.initial_date, finish_date: @campaign.finish_date, today: Date.today.to_s})
     redirect_to error_checkout_path, alert: I18n.t('error_messages.campaign_is_not_active')
   end
 

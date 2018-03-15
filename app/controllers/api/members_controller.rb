@@ -99,7 +99,7 @@ class Api::MembersController < ApplicationController
   #   </ul> 
   #
   def create
-    tom = TermsOfMembership.find(params[:member][:terms_of_membership_id])  
+    tom = TermsOfMembership.find(params[:member][:terms_of_membership_id])
     my_authorize! :api_enroll, User, tom.club_id
     render json: User.enroll(
       tom, 
@@ -112,8 +112,8 @@ class Api::MembersController < ApplicationController
     )
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Subscription plan not found", :code => Settings.error_codes.not_found }
-  rescue NoMethodError => e
-    Auditory.report_issue("API::User::create", e, { :params => params.inspect })
+  rescue NoMethodError
+    Auditory.report_issue("API::User::create", $!)
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
@@ -213,8 +213,8 @@ class Api::MembersController < ApplicationController
     render json: response
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
-  rescue NoMethodError => e
-    Auditory.report_issue("API::Member::update", e, { :params => params.inspect })
+  rescue NoMethodError
+    Auditory.report_issue("API::Member::update", $!)
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   rescue ActiveRecord::RecordNotUnique => e
     errors = {}
@@ -547,8 +547,8 @@ class Api::MembersController < ApplicationController
       message = "Member not found"
     end
     render json: { :message => message, :code => Settings.error_codes.not_found }
-  rescue NoMethodError => e
-    Auditory.report_issue("API::TermsOfMembership::change", e, { :params => params.inspect })
+  rescue NoMethodError
+    Auditory.report_issue("API::TermsOfMembership::change", $!)
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
   end
 
@@ -609,11 +609,11 @@ class Api::MembersController < ApplicationController
   rescue ActiveRecord::RecordNotFound => e
     message = (e.to_s.include? "TermsOfMembership") ? "Subscription plan not found" : "Member not found"
     render json: { :message => message, :code => Settings.error_codes.not_found }
-  rescue NoMethodError => e
-    Auditory.report_issue("API::TermsOfMembership::update", e, { :params => params.inspect })
+  rescue NoMethodError
+    Auditory.report_issue("API::TermsOfMembership::update", $!)
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
-  rescue Exception => e
-    Auditory.report_issue("API::TermsOfMembership::update", e, { :params => params.inspect })
+  rescue Exception
+    Auditory.report_issue("API::TermsOfMembership::update", $!)
     render json: { :message => I18n.t('error_messages.unrecoverable_error'), :code => Settings.error_codes.wrong_data }
   end
 

@@ -23,7 +23,7 @@ module Pardot
         end
         logger.info "Pardot::sync took #{time_elapsed}ms"
       rescue Exception => e
-        Auditory.report_issue("Prospect:sync", e, { :prospect => self.inspect })
+        Auditory.report_issue("Prospect:sync", e, { :prospect => self.id })
       end
 
     end

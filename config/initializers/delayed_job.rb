@@ -21,17 +21,6 @@ Delayed::Worker.queue_attributes = {
   enrollment_delayed_billing: { priority: 10}
 }
 
-Delayed::Worker.class_eval do
-  def handle_failed_job_with_notification(job, error)
-    handle_failed_job_without_notification(job, error)
-    if not error.instance_of? NonReportableException and not %w(test development).include? Rails.env
-      user_story_title = YAML.load(job.handler).job_data['job_class']
-      Auditory.report_issue(user_story_title, error, { error: error.inspect, job: job.inspect })
-    end
-  end
-  alias_method_chain :handle_failed_job, :notification
-end
-
 Delayed::Backend::ActiveRecord.configure do |config|
   config.reserve_sql_strategy = :default_sql
 end

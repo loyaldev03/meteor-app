@@ -22,6 +22,12 @@ class Auditory
     Rails.logger.error " * * * * * CANT SAVE OPERATION #{e}"
   end
 
+  def self.report_issue(description = "", exception = nil, params = nil)
+    unless ['test', 'development'].include? Rails.env
+      Rollbar.error(exception, description, params)
+    end
+  end
+
   def self.create_user_story(description, title, project_id = Settings.pivotal_tracker.project_id, story_type = 'bug', assignee = nil)
     client = TrackerApi::Client.new(token: Settings.pivotal_tracker.token)
     project = client.project(project_id)
@@ -30,9 +36,8 @@ class Auditory
     story.save
   end
 
-  def self.report_issue(error = "Special Error", exception = '', params = {}, add_backtrace = true, assignee = nil)
+  def self.notify_pivotal_tracker(error, exception = '', params = {}, assignee = nil)
     unless ['test', 'development'].include? Rails.env
-      backtrace = add_backtrace ? "**Backtrace**\n #{(exception.kind_of?(Exception) ? exception.backtrace.join("\n").to_s : caller.join("\n").to_s)}" : ''
       description = <<-EOF
         **Message:**
         ```#{exception}```
@@ -42,9 +47,6 @@ class Auditory
         **Parameters**
         \n#{params.collect{|k,v| "* #{k}: #{v}" }.join("\n")}
 
-        -----------------------------
-
-        #{backtrace}
       EOF
       Auditory.create_user_story(description, error, Settings.pivotal_tracker.project_id, 'bug', assignee)
     end

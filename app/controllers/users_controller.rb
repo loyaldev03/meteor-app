@@ -65,10 +65,10 @@ class UsersController < ApplicationController
     end
   rescue Errno::ECONNREFUSED
     @elasticsearch_is_down = true
-    Auditory.report_issue("User:search_result", "Elasticsearch is down. Confirm that server is running, if problem persist restart it")
+    Auditory.report_issue("User:search_result : Elasticsearch is down. Confirm that server is running, if problem persist restart it.", $!)
   rescue Errno::ETIMEDOUT
     @elasticsearch_is_down = true
-    Auditory.report_issue("User:search_result", "Elasticsearch Timeout Error received. Confirm that service is available.")
+    Auditory.report_issue("User:search_result : Elasticsearch Timeout Error received. Confirm that service is available.", $!)
   rescue Exception => e
     @elasticsearch_is_down = true
     Auditory.report_issue("User:search_result", e)

@@ -19,7 +19,7 @@ module Pardot
         end
       rescue
         flash[:error] = t('error_messages.airbrake_error_message')
-        Auditory.report_issue("Member:pardot_sync", "Error on members#pardot_sync: #{$!}", { :member => @current_user.inspect })
+        Auditory.report_issue("Member:pardot_sync", $!, { :member => @current_user.id })
         redirect_to show_user_path
       end
     end

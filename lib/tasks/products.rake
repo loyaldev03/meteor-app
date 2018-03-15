@@ -10,7 +10,7 @@ namespace :products do
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting products:send_product_list_email rake task"
       Product.send_product_list_email([1,15])
     rescue Exception => e
-      Auditory.report_issue("Products::SendProductList", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+      Auditory.report_issue("Products::SendProductList", e)
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run products:send_product_list_email task"
@@ -26,7 +26,7 @@ namespace :products do
         club.import_products_data
       end
     rescue Exception => e
-      Auditory.report_issue("Products::ImportProductDataFromStore", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
+      Auditory.report_issue("Products::ImportProductDataFromStore", e)
       Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
     ensure
       Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run products:import_products_data_from_store task"

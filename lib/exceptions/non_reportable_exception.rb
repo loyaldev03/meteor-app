@@ -1,1 +1,0 @@
-class NonReportableException < Exception ; end

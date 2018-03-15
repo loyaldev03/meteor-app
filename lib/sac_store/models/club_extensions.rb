@@ -72,7 +72,7 @@ module SacStore
           response = conn.post VARIANTS_URL, { api_key: settings['api_token'], page: page }
           response.body.data
         rescue Exception => e
-          Auditory.report_issue("Products::FetchStoreProducts", "Unable to fetch products. Error: #{e}", { club: self.id })
+          Auditory.report_issue("Products::FetchStoreProducts", e, { club: self.id })
           []
         end
     end

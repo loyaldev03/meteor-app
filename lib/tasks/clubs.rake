@@ -10,9 +10,6 @@ namespace :clubs do
       Club.where(billing_enable: true).each do |club|
         club.update_attribute(:members_count, club.users.count + 0)
       end
-    rescue Exception => e
-      Auditory.report_issue("Clubs::count_members_in_clubs", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-      Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"      
     ensure 
       Rails.logger.info "It all took #{Time.zone.now - tall}seconds to run clubs:count_members_in_clubs task"
     end 

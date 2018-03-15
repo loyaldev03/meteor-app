@@ -15,7 +15,7 @@ module SacStore
         fulfillment.save(validate: false)
       end
     rescue => e
-      Auditory.report_issue("Fulfillment::NotifyFulfillmentAssignation", "Unable to notify fulfillment assignation. Error: #{e}", { fulfillment_id: fulfillment.id, club: fulfillment.club_id })
+      Auditory.report_issue("Fulfillment::NotifyFulfillmentAssignation", e, { fulfillment_id: fulfillment.id, club: fulfillment.club_id })
       fulfillment.update_attribute :sync_result, e.to_s
     end
 
@@ -27,13 +27,13 @@ module SacStore
           fulfillment.store_id = nil
           'success'
         else
-          Auditory.report_issue("Fulfillment::NotifyFulfillmentCancelation", "Unable to notify fulfillment cancellation. Error: #{result.message}", { fulfillment_id: fulfillment.id, club: fulfillment.club_id })
+          Auditory.report_issue("Fulfillment::NotifyFulfillmentCancelation", nil, { response: response.inspect, fulfillment_id: fulfillment.id, club: fulfillment.club_id })
           result.message
         end
         fulfillment.save(validate: false)
       end
     rescue => e
-      Auditory.report_issue("Fulfillment::NotifyFulfillmentCancelation", "Unable to notify fulfillment cancellation. Error: #{e}", { fulfillment_id: fulfillment.id, club: fulfillment.club_id })
+      Auditory.report_issue("Fulfillment::NotifyFulfillmentCancelation", e, { fulfillment_id: fulfillment.id, club: fulfillment.club_id })
       fulfillment.update_attribute :sync_result, e.to_s
     end
 
@@ -47,7 +47,7 @@ module SacStore
       end
       fulfillment.save(validate: false)
     rescue => e
-      Auditory.report_issue("Fulfillment::NotifyFulfillmentSend", "Unable to notify fulfillment send. Error: #{e}", { fulfillment_id: fulfillment.id, club: fulfillment.club_id })
+      Auditory.report_issue("Fulfillment::NotifyFulfillmentSend", e, { fulfillment_id: fulfillment.id, club: fulfillment.club_id })
       fulfillment.update_attribute :sync_result, e.to_s
     end
 

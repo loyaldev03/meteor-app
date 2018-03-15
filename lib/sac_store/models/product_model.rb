@@ -34,7 +34,7 @@ module SacStore
           product.errors.add :store, I18n.t('error_messages.transport_setting_wrong_credentials')
           nil
         else
-          Auditory.report_issue("Products::FetchStoreProduct", "Unable to fetch product.", { response: response.inspect })
+          Auditory.report_issue("Products::FetchStoreProduct", nil, { response: response.inspect })
           product.errors.add :store, I18n.t('error_messages.airbrake_error_message')
           nil
         end
@@ -45,7 +45,7 @@ module SacStore
         response = conn.post VARIANT_URL, { api_key: settings['api_token'], id: variant_id.to_s }
         validate_result response
       rescue Exception => e
-        Auditory.report_issue("Products::FetchStoreProduct", "Unable to fetch product. Error: #{e}", { product_id: product.id, club: product.club_id })
+        Auditory.report_issue("Products::FetchStoreProduct", e, { product_id: product.id, club: product.club_id })
         product.errors.add :store, e.to_s
         nil
       end

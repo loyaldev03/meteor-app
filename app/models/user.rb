@@ -59,7 +59,7 @@ class User < ActiveRecord::Base
     # refs #21133
     # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
     # Because maybe we have already bill this user.
-    Auditory.report_issue("User:drupal_sync", e, { user: self.inspect })
+    Auditory.report_issue("User:drupal_sync", e, { user: self.id })
   end
 
   validates :country, 
@@ -303,7 +303,7 @@ class User < ActiveRecord::Base
   rescue ArgumentError => e
     return { message: "Next bill date wrong format.", errors: { next_bill_date: "invalid date"}, code: Settings.error_codes.wrong_data } 
   rescue Exception => e
-    Auditory.report_issue("User:change_next_bill_date", e, { user: self.inspect })
+    Auditory.report_issue("User:change_next_bill_date", e, { user: self.id })
     return { message: I18n.t('error_messages.airbrake_error_message'), code: Settings.error_codes.could_not_change_next_bill_date }
   end
 
@@ -503,7 +503,7 @@ class User < ActiveRecord::Base
     message = "Downgraded member from TOM(#{self.terms_of_membership_id}) to TOM(#{new_tom.id})"
     answer = change_terms_of_membership(new_tom, message, Settings.operation_types.downgrade_user, nil, false, nil, { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM_DOWNGRADE })
     if answer[:code] != Settings.error_codes.success
-      Auditory.report_issue("DowngradeUser::Error", answer[:message], { user: self.inspect, answer: answer })
+      Auditory.report_issue(answer[:message], nil, { user: self.id, answer: answer })
     else
       self.bill_date = current_membership.join_date + terms_of_membership.provisional_days.days
       self.next_retry_bill_date = current_membership.join_date + terms_of_membership.provisional_days.days
@@ -542,7 +542,7 @@ class User < ActiveRecord::Base
       if payment_gateway_configuration.nil?
         message = "TOM ##{terms_of_membership.id} does not have a gateway configured."
         Auditory.audit(nil, terms_of_membership, message, self, Settings.operation_types.membership_billing_without_pgc)
-        Auditory.report_issue("Billing", message, { user: self.inspect, membership: current_membership.inspect })
+        Auditory.notify_pivotal_tracker(message, '', { user: self.id, membership: current_membership.id })
         { code: Settings.error_codes.tom_wihtout_gateway_configured, message: message }
       else
         credit_card = active_credit_card
@@ -608,7 +608,7 @@ class User < ActiveRecord::Base
     answer
   rescue Exception => e
     trans.update_attribute :operation_type, Settings.operation_types.no_recurrent_billing_with_error if trans
-    Auditory.report_issue("Billing:no_recurrent_billing", e, { user: self.inspect, amount: amount, description: description })
+    Auditory.report_issue("Billing:no_recurrent_billing", e, { user: self.id, amount: amount, description: description })
     { message: I18n.t('error_messages.airbrake_error_message'), code: Settings.error_codes.no_reccurent_billing_error }
   end
 
@@ -639,7 +639,7 @@ class User < ActiveRecord::Base
   rescue Exception => e
     logger.error e.inspect
     trans.update_attribute :operation_type, Settings.operation_types.manual_billing_with_error if trans
-    Auditory.report_issue("Billing:manual_billing", e, { user: self.inspect, amount: amount, payment_type: payment_type })
+    Auditory.report_issue("Billing:manual_billing", e, { user: self.id, amount: amount, payment_type: payment_type })
     { message: I18n.t('error_messages.airbrake_error_message'), code: Settings.error_codes.membership_billing_error } 
   end
 
@@ -788,7 +788,7 @@ class User < ActiveRecord::Base
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
       replenish_stock_on_enrollment_failure(product.id) if not skip_product_validation and product
       trans.update_attribute(:operation_type, Settings.operation_types.error_on_enrollment_billing) if trans and not trans.success
-      Auditory.report_issue(error_message, e, { user: self.inspect, credit_card: credit_card.inspect, membership: membership.inspect })
+      Auditory.report_issue(error_message, e, { user: self.id, credit_card: credit_card.id, membership: membership.id })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       # TODO2: Make sure to leave an operation related to the prospect if we have prospects and users merged in one unique table.
       Auditory.audit(agent, self, error_message, self, Settings.operation_types.error_on_enrollment_billing) unless self.new_record?
@@ -894,7 +894,7 @@ class User < ActiveRecord::Base
       response
     rescue Exception => e
       logger.error e.inspect
-      Auditory.report_issue("User:prorated_enroll -- user turned invalid while enrolling", e, { user: self.inspect, credit_card: credit_card.inspect, membership: membership.inspect })
+      Auditory.report_issue("User:prorated_enroll -- user turned invalid while enrolling", e, { user: self.id, credit_card: credit_card.id, membership: membership.id })
       # TODO: this can happend if in the same time a new member is enrolled that makes this an invalid one. Do we have to revert transaction?
       Auditory.audit(agent, self, "User:prorated_enroll", self, Settings.operation_types.tom_change_billing_with_error)
       { message: I18n.t('error_messages.user_not_saved', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.user_not_saved }
@@ -1025,7 +1025,7 @@ class User < ActiveRecord::Base
             end
           rescue Exception => e
             answer[:errors] = cct.errors_merged(self) unless cct.nil?
-            Auditory.report_issue('Club cash Transaction', e, { answer_message: answer[:message], user: self.inspect, amount: amount, description: description, club_cash_transaction: (cct.inspect unless cct.nil?) })
+            Auditory.report_issue('Club cash Transaction', e, { answer_message: answer[:message], user: self.id, amount: amount, description: description, club_cash_transaction: cct.try(:id) })
             answer[:message] = I18n.t('error_messages.airbrake_error_message')
             raise ActiveRecord::Rollback
           end
@@ -1044,7 +1044,7 @@ class User < ActiveRecord::Base
         Auditory.audit(agent, self, answer[:message], self, auditory_code)
       end
     rescue Exception => e
-      Auditory.report_issue('Club cash Transaction', e, { answer_message: answer[:message], user: self.inspect, amount: amount, description: description })
+      Auditory.report_issue('Club cash Transaction', e, { answer_message: answer[:message], user: self.id, amount: amount, description: description })
       answer[:message] = I18n.t('error_messages.airbrake_error_message')
       answer[:errors] = { amount: "There has been an error while adding club cash amont." }
     end
@@ -1061,7 +1061,7 @@ class User < ActiveRecord::Base
           Auditory.audit(agent, self, "Un-blacklisted member and all its credit cards.", self, Settings.operation_types.unblacklisted)
           self.credit_cards.each { |cc| cc.unblacklist }
         rescue Exception => e
-          Auditory.report_issue("User::unblacklist", e, { user: self.inspect })
+          Auditory.report_issue("User::unblacklist", e, { user: self.id })
           raise ActiveRecord::Rollback
         end
       end
@@ -1085,7 +1085,7 @@ class User < ActiveRecord::Base
           end
           answer = { message: message, code: Settings.error_codes.success }
         rescue Exception => e
-          Auditory.report_issue("User::blacklist", e, { user: self.inspect })
+          Auditory.report_issue("User::blacklist", e, { user: self.id })
           answer = { message: I18n.t('error_messages.airbrake_error_message')+e.to_s, success: Settings.error_codes.user_could_no_be_blacklisted }
           raise ActiveRecord::Rollback
         end
@@ -1114,7 +1114,7 @@ class User < ActiveRecord::Base
       rescue ActiveRecord::RecordNotSaved
         raise trans.errors.messages.map{|k,v| "#{k.to_s.humanize}: #{v.join(', ')}"}.join(".")
       rescue Exception => e
-        Auditory.report_issue("Users::chargeback", e, { :user => self.inspect, :transaction => trans.inspect })
+        Auditory.report_issue("Users::chargeback", e, { :user => self.id, :transaction => trans.id })
         raise I18n.t("error_messages.airbrake_error_message")
       end
     else
@@ -1219,7 +1219,7 @@ class User < ActiveRecord::Base
               new_credit_card.set_as_active! if set_active
             end
           rescue Exception => e
-            Auditory.report_issue("Users::update_credit_card_from_drupal", e, { new_active_credit_card: new_credit_card.inspect, user: self.inspect })
+            Auditory.report_issue("Users::update_credit_card_from_drupal", e, { new_active_credit_card: new_credit_card.try(:id), user: self.id })
             raise ActiveRecord::Rollback
           end
         end
@@ -1277,7 +1277,7 @@ class User < ActiveRecord::Base
         end        
       rescue Exception => e
         answer = { errors: e, message: I18n.t('error_messages.airbrake_error_message'), code: Settings.error_codes.invalid_credit_card }
-        Auditory.report_issue("User:update_credit_card", e, { user: self.inspect, credit_card: new_credit_card.inspect })
+        Auditory.report_issue("User:update_credit_card", e, { user: self.id, credit_card: new_credit_card.try(:id) })
         raise ActiveRecord::Rollback
       end
     end
@@ -1315,7 +1315,7 @@ class User < ActiveRecord::Base
     end
   rescue Exception => e
     logger.error "* * * * * #{e}"
-    Auditory.report_issue("User::unsubscribe", e, { user: self.inspect })
+    Auditory.report_issue("User::unsubscribe", e, { user: self.id })
   end
 
   # used for member unblacklist
@@ -1398,7 +1398,7 @@ class User < ActiveRecord::Base
     def proceed_with_manual_billing_logic(trans, operation_type)
       first_time = self.provisional?
       unless set_as_active
-        Auditory.report_issue("Billing:manual_billing::set_as_active", "we cant set as active this user.", { user: self.inspect, membership: current_membership.inspect, trans: "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
+        Auditory.report_issue("Billing:manual_billing::set_as_active - Can't set as active after manual billing", nil, { user: self.id, membership: current_membership.id, transaction_id: trans.id, transaction_amount: trans.amount, transaction_response: trans.response })
       end
       first_time ? assign_first_club_cash : assign_club_cash
       message = "Member manually billed successfully $#{trans.amount} Transaction id: #{trans.id}"
@@ -1412,7 +1412,7 @@ class User < ActiveRecord::Base
     def proceed_with_billing_logic(trans)
       first_time = self.provisional?
       unless set_as_active
-        Auditory.report_issue("Billing::set_as_active", "we cant set as active this user.", { user: self.inspect, membership: current_membership.inspect, trans: "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
+        Auditory.report_issue("Billing::set_as_active - Can't set as active this user.", nil, { user: self.id, membership: current_membership.id, transaction_id: trans.id, transaction_amount: trans.amount, transaction_response: trans.response })
       end
 
       Communication.deliver!(:membership_bill, self)
@@ -1433,7 +1433,7 @@ class User < ActiveRecord::Base
 
     def proceed_with_prorated_logic(agent, trans, amount_in_favor, former_membership, club_cash_to_substract, sale_transaction)
       unless set_as_active
-        Auditory.report_issue("Billing::set_as_active", "we cant set as active this member after prorated update of subscription plan.", { member: self.inspect, membership: current_membership.inspect, trans: "ID: #{trans.id}, amount: #{trans.amount}, response: #{trans.response}" })
+        Auditory.report_issue("Billing::set_as_active - Can't set as active after prorated update", nil, { member: self.id, membership: current_membership.id, transaction_id: trans.id, transaction_amount: trans.amount, transaction_response: trans.response })
       end
 
       if amount_in_favor > 0.0
@@ -1491,8 +1491,10 @@ class User < ActiveRecord::Base
         operation_type = Settings.operation_types.membership_billing_without_decline_strategy
         self.next_retry_bill_date = Time.zone.now + eval(Settings.next_retry_on_missing_decline)
         self.save(validate: false)
-        Auditory.report_issue("Decline rule not found. User ##{self.id}", 
-          "We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.", {'Member ID' => self.id, 'Transaction ID' => trans.id, 'Message' => message, 'CC type' => trans.cc_type}, false)
+        Auditory.notify_pivotal_tracker("Decline rule not found. User ##{self.id}", 
+                                        "We have scheduled this billing to run again in #{Settings.next_retry_on_missing_decline} days.", 
+                                        {'Member ID' => self.id, 'Transaction ID' => trans.id, 'Message' => message, 'CC type' => trans.cc_type})
+          
         if self.recycled_times < Settings.number_of_retries_on_missing_decline
           Auditory.audit(nil, trans, message, self, operation_type)
           trans.update_attribute :operation_type, operation_type

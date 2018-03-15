@@ -113,7 +113,7 @@ module PayeezyAccountUpdater
               if answer[:code] == Settings.error_codes.success
                 Auditory.audit(nil, credit_card, "Credit card #{credit_card.last_digits} AUS updated to #{new_last_digits}", credit_card.user, Settings.operation_types.aus_update_credit_card)
               else
-                Auditory.report_issue("Payeezy::aus_update_process", response_code, { :credit_card => credit_card.id, :answer => answer, :file => file_path, line: index+1 })
+                Auditory.report_issue("Payeezy::aus_update_process #{response_code}", nil, { :credit_card => credit_card.id, :answer => answer, :file => file_path, line: index+1 })
               end
             when 'EXPIRY'
               new_expire_year   = new_expiration_year
@@ -123,7 +123,7 @@ module PayeezyAccountUpdater
             when 'CONTAC'
               # do nothing. User will enter in SD cicle upon billing. 
             else
-              Auditory.report_issue("Payeezy::aus_update_process", "Unexpected response code: #{response_code}.", { :file => file_path, line: index+1 })
+              Auditory.report_issue("Payeezy::aus_update_process : Unexpected response code: #{response_code}.", nil, { :file => file_path, line: index+1 })
             end
           end
         end

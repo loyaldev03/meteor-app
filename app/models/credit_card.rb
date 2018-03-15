@@ -121,7 +121,8 @@ class CreditCard < ActiveRecord::Base
           self.token = Transaction.store!(am, pgc, puser||user)
         rescue Exception => e
           if Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway] and not Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway].include? e.to_s
-            Auditory.report_issue("CreditCard:GetToken", e, { credit_card: self.inspect, user: puser.inspect || self.user.inspect })
+            user = puser || self.user
+            Auditory.report_issue("CreditCard:GetToken", e, { credit_card_expire_month: self.expire_month, credit_card_expire_year: self.expire_year, credit_card_type: self.cc_type, club_id: user.club_id, user_name: user.full_name, user: user.email })
           end
           logger.error e.inspect
           self.errors[:number] << I18n.t('error_messages.get_token_mes_error')

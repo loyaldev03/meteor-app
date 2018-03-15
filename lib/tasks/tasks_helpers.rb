@@ -16,15 +16,12 @@ module TasksHelpers
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id} nbd: #{user.next_retry_bill_date}"
         user.bill_membership
       rescue Exception => e
-        Auditory.report_issue("Billing::Today", e, { :user => user.inspect, :credit_card => user.active_credit_card.inspect })
+        Auditory.report_issue("Billing::Today", e, { :user => user.id, :credit_card => user.active_credit_card.id })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
     end
     file.flock(File::LOCK_UN)
-  rescue Exception => e
-    Auditory.report_issue("Billing::Today", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.refresh_autologin
@@ -35,7 +32,7 @@ module TasksHelpers
         Rails.logger.info "   *[#{index}] processing user ##{user.id}"
         user.refresh_autologin_url!
       rescue
-        Auditory.report_issue("Users::Users", e, { :user => user.inspect })
+        Auditory.report_issue("Users::Users", e, { :user => user.id })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
@@ -55,13 +52,10 @@ module TasksHelpers
         Communication.deliver!(template, user)
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
       rescue Exception => e
-        Auditory.report_issue("Users::SendPillar", e, { :template => template.inspect, :membership => user.current_membership.inspect })
+        Auditory.report_issue("Users::SendPillar", e, { :template => template.id, :membership => user.current_membership.id })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end
-  rescue Exception => e
-    Auditory.report_issue("Users::SendPillar", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   # Method used from rake task and also from tests!
@@ -74,14 +68,11 @@ module TasksHelpers
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
         user.reset_club_cash
       rescue Exception => e
-        Auditory.report_issue("User::ClubCash", e, { :user => user.inspect })
+        Auditory.report_issue("User::ClubCash", e, { :user => user.id })
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
     end
-  rescue Exception => e
-    Auditory.report_issue("Users::ClubCash", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   # Method used from rake task and also from tests!
@@ -99,15 +90,12 @@ module TasksHelpers
           user.cancel!(Time.zone.now.in_time_zone(user.get_club_timezone), "Billing date is overdue.", nil, Settings.operation_types.bill_overdue_cancel) if user.manual_payment and not user.cancel_date
           user.set_as_canceled!
         rescue Exception => e
-          Auditory.report_issue("Users::Cancel", e, { :user => user.inspect })
+          Auditory.report_issue("Users::Cancel", e, { :user => user.id })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
       end
     end
-  rescue Exception => e
-    Auditory.report_issue("Users::Cancel", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.process_scheduled_membership_changes
@@ -124,7 +112,7 @@ module TasksHelpers
         if answer[:code] == Settings.error_codes.success
           user.nillify_club_cash("Removing club cash upon scheduled tom change.") if change_tom_attributes['remove_club_cash']
         else      
-          Auditory.report_issue("Users::ProcessScheduledMembershipChange", answer[:message], { :user => user.id })
+          Auditory.report_issue("Users::ProcessScheduledMembershipChange", nil, { message: answer, :user => user.id })
         end
       rescue Exception => e
         Auditory.report_issue("Users::ProcessScheduledMembershipChange", e, { :user => user.id })
@@ -132,9 +120,6 @@ module TasksHelpers
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
     end
-  rescue Exception => e
-    Auditory.report_issue("Users::ProcessScheduledMembershipChange", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.process_sync 
@@ -151,7 +136,7 @@ module TasksHelpers
             Auditory.audit(nil, user, "User's drupal account destroyed by batch script", user, Settings.operation_types.user_drupal_account_destroyed_batch)
           end
         rescue Exception => e
-          Auditory.report_issue("Users::Sync", e, {:user => (user.nil? ? user_id : user.inspect)})
+          Auditory.report_issue("Users::Sync", e, {:user => user_id})
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
@@ -186,7 +171,7 @@ module TasksHelpers
           end
           index = index + 1
         rescue Exception => e
-          Auditory.report_issue("Users::Sync", e, {:user => (user.nil? ? user_id : user.inspect)})
+          Auditory.report_issue("Users::Sync", e, {:user => user_id})
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
@@ -209,15 +194,11 @@ module TasksHelpers
           end
         end
       rescue Exception => e
-        Auditory.report_issue("Users::Sync", e, {:user => (user.nil? ? user_id : user.inspect)})
+        Auditory.report_issue("Users::Sync", e, {:user => user_id})
         Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
       end
     end       
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
-
-  rescue Exception => e
-    Auditory.report_issue("Users::Sync", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.process_email_sync_error
@@ -231,10 +212,7 @@ module TasksHelpers
         user_list.merge!("user#{index+1}" => row)
       end
     end
-    Auditory.report_issue("Users::DuplicatedEmailSyncError.", "The following users are having problems with the syncronization due to duplicated emails.", user_list, false) unless user_list.empty?
-  rescue Exception => e
-    Auditory.report_issue("Users::SyncErrorEmail", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"  
+    Auditory.notify_pivotal_tracker("Users::DuplicatedEmailSyncError.", "The following users are having problems with the syncronization due to duplicated emails.", user_list) unless user_list.empty?
   end
 
   def self.send_happy_birthday
@@ -248,15 +226,12 @@ module TasksHelpers
           Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
           Communication.deliver!(:birthday, user)
         rescue Exception => e
-          Auditory.report_issue("Users::sendHappyBirthday", e, { :user => user.inspect })
+          Auditory.report_issue("Users::sendHappyBirthday", e, { :user => user.id })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
       end
     end
-  rescue Exception => e
-    Auditory.report_issue("Users::sendHappyBirthday", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.send_prebill
@@ -276,15 +251,12 @@ module TasksHelpers
           Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
           user.send_pre_bill
         rescue Exception => e
-          Auditory.report_issue("Billing::SendPrebill", e, { :user => user.inspect })
+          Auditory.report_issue("Billing::SendPrebill", e, { :user => user.id })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
         Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
       end
     end
-  rescue Exception => e
-    Auditory.report_issue("Users::SendPrebill", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
   def self.delete_testing_accounts
@@ -315,9 +287,6 @@ module TasksHelpers
       end
       Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
     end
-  rescue Exception => e
-    Auditory.report_issue("Users::DeleteTestingAccount", e)
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
 
 
@@ -335,45 +304,33 @@ module TasksHelpers
           Rails.logger.info "  *[#{index}] processing member ##{fulfillment.user_id} fulfillment ##{fulfillment.id}"
           fulfillment.renew!
         rescue Exception => e
-          Auditory.report_issue("User::Fulfillment", e, { :fulfillment => fulfillment.inspect })
+          Auditory.report_issue("User::Fulfillment", e, { :fulfillment => fulfillment.id })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
     end
-  rescue Exception => e
-    Auditory.report_issue("Users::ProcessFulfillmentsUpToday", e)
-    Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
   end
-
-  #######################################################
-  ################ FULFILLMENT ##########################
-  #######################################################
 
   #######################################################
   ################ CAMPAIGN #############################
   #######################################################
 
   def self.fetch_campaigns_data
-    begin
-      date = Date.current.yesterday
-      club_ids = Club.is_enabled.ids
-      club_ids.each do |club_id|
-        ['facebook', 'mailchimp'].each do |transport|
-          Campaigns::DataFetcherJob.perform_later(club_id: club_id, transport: transport, date: date.to_s)
-        end
+    date = Date.current.yesterday
+    club_ids = Club.is_enabled.ids
+    club_ids.each do |club_id|
+      ['facebook', 'mailchimp'].each do |transport|
+        Campaigns::DataFetcherJob.perform_later(club_id: club_id, transport: transport, date: date.to_s)
       end
-      # re-try those campaign days with unexpected error
-      Campaigns::UnexpectedErrorDaysDataFetcherJob.perform_later
-      # send communications
-      Campaigns::NotifyMissingCampaignDaysJob.perform_later((date -1.day).to_s)
-      Campaigns::NotifyCampaignDaysWithErrorJob.perform_later
-      # creates missing campaign days for yesterday for those campaigns that are not automatically updated.
-      Campaign::TRANSPORTS_FOR_MANUAL_UPDATE.each do |transport|
-        Campaign.by_transport(transport).where(club_id: club_ids).map{|c| c.missing_days(date: date)}
-      end
-    rescue Exception => e
-      Auditory.report_issue("Campaigns::fetch_data", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-      Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"      
+    end
+    # re-try those campaign days with unexpected error
+    Campaigns::UnexpectedErrorDaysDataFetcherJob.perform_later
+    # send communications
+    Campaigns::NotifyMissingCampaignDaysJob.perform_later((date -1.day).to_s)
+    Campaigns::NotifyCampaignDaysWithErrorJob.perform_later
+    # creates missing campaign days for yesterday for those campaigns that are not automatically updated.
+    Campaign::TRANSPORTS_FOR_MANUAL_UPDATE.each do |transport|
+      Campaign.by_transport(transport).where(club_id: club_ids).map{|c| c.missing_days(date: date)}
     end
   end
 

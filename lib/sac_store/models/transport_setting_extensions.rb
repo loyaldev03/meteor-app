@@ -16,7 +16,7 @@ module SacStore
       rescue Faraday::ConnectionFailed, URI::BadURIError
         answer 
       rescue Exception => e
-        Auditory.report_issue("SacStore::TransportSettingsExtensions::test_stroe_connection", e, { club_id: club_id, settings: settings })
+        Auditory.report_issue("SacStore::TransportSettingsExtensions::test_store_connection", e, { club_id: club_id })
         { success: false, message: I18n.t('error_messages.airbrake_error_message') }
       end
     end

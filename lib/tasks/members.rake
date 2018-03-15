@@ -34,17 +34,12 @@ end
 namespace :users do
   desc "Refresh autologin_url for ALL members"
   task :Members => :environment do
-    begin
-      Rails.logger = Logger.new("#{Rails.root}/log/members_members.log")
-      Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
-      ActiveRecord::Base.logger = Rails.logger
-      tall = Time.zone.now
-      Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{User.count} members"
-      TasksHelpers.refresh_autologin
-    rescue Exception => e
-      Auditory.report_issue("Users::Users", e, {:backtrace => "#{$@[0..9] * "\n\t"}"})
-      Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"})"
-    end    
+    Rails.logger = Logger.new("#{Rails.root}/log/members_members.log")
+    Rails.logger.level = Logger.const_get(Settings.logger_level_for_tasks)
+    ActiveRecord::Base.logger = Rails.logger
+    tall = Time.zone.now
+    Rails.logger.info "*** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:refresh_autologin_url rake task, processing #{User.count} members"
+    TasksHelpers.refresh_autologin
   end
 
   desc "Cancel members"

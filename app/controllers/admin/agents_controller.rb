@@ -78,8 +78,8 @@ class Admin::AgentsController < ApplicationController
       rescue ActiveRecord::RecordInvalid => e
         logger.error e
         flash.now[:error] = 'Agent was not saved.'
-      rescue Exception => e
-        Auditory.report_issue("Agent:Create", e, { :agent => @agent.inspect, :club_roles_attributes => params[:club_roles_attributes] })
+      rescue Exception
+        Auditory.report_issue("Agent:Create", $!)
         flash.now[:error] = I18n.t('error_messages.airbrake_error_message')
         raise ActiveRecord::Rollback
       end
@@ -115,8 +115,8 @@ class Admin::AgentsController < ApplicationController
       rescue ActiveRecord::RecordInvalid => e
         logger.error e
         flash.now[:error] = 'Agent was not updated.'
-      rescue Exception => e
-        Auditory.report_issue("Agent:Update", e, { :agent => @agent.inspect, :club_roles_attributes => params[:club_roles_attributes] })
+      rescue Exception
+        Auditory.report_issue("Agent:Update", $!)
         flash.now[:error] = I18n.t('error_messages.airbrake_error_message')
         raise ActiveRecord::Rollback
       end

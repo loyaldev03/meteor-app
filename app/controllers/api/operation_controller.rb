@@ -28,22 +28,21 @@ class Api::OperationController < ApplicationController
   #   {"message":"Operation created succesfully.", "code":"000"}
   # @example_response_description Example response to valid request.
   #
-	def create
-  	user = User.find(params[:member_id])
-    o = Operation.new( params.permit(:operation_date, :description, :operation_type) )
-    o.created_by_id = @current_agent.id
-    o.resource = user
-    o.user = user
-    o.save!
+	def create 
+  	user                    = User.find(params[:member_id])
+    operation               = Operation.new( params.permit(:operation_date, :description, :operation_type) )
+    operation.created_by_id = @current_agent.id
+    operation.resource      = user
+    operation.user          = user
+    operation.save!
     render json: { :message => 'Operation created succesfully.', :code => Settings.error_codes.success }
     rescue ActiveRecord::RecordInvalid => e
-      Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
-      render json: { :message => "Operation was not created. Errors: #{e.message}", :code => Settings.error_codes.wrong_data}
+      render json: { :message => "Operation was not created. Errors: #{operation.errors.full_message}", :code => Settings.error_codes.wrong_data}
     rescue ActiveRecord::RecordNotFound => e
-      Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
+      Auditory.report_issue("API::Operation::create", e)
       render json: { :message => "Operation was not created. Errors: Member not found", :code => Settings.error_codes.not_found}
     rescue Exception => e
-      Auditory.report_issue("API::Operation::create", e, { :params => params.inspect })
+      Auditory.report_issue("API::Operation::create", e)
       render json: { :message => "Operation was not created. Errors: #{e}", :code => Settings.error_codes.operation_not_saved}
   end
 

@@ -125,6 +125,7 @@ end
 gem 'activemerchant', github: 'sebastianGitDL/active_merchant', branch: 'payeezy-purchase-level2-data'
 gem 'LitleOnline', '8.16.0'
 gem 'ruby-gmail'
+gem 'rollbar'
 
 # TODO => remove the following requires after tokenization is implemented
 ### only for Auth.Net  without tokenization.

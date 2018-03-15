@@ -109,7 +109,7 @@ module Users
         end
       else
         message = "The user has already a not processed fulfillment and we cannot assign the requested fulfillment. Contact a Fulfillment Manager to decide what to do."
-        Auditory.report_issue("Send Fulfillment", message, { user: @user.id, product: @user.current_membership.product_sku })
+        Auditory.notify_pivotal_tracker("Send Fulfillment", message, { user: @user.id, product: @user.current_membership.product_sku })
       end
     end
 

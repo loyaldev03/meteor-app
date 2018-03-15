@@ -308,7 +308,7 @@ class Transaction < ActiveRecord::Base
       save_custom_response({ code: Settings.error_codes.payment_gateway_time_out, message: I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
       response = save_custom_response({ code: Settings.error_codes.payment_gateway_error, message: I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Credit", e, {user: self.user.id, transaction: "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
+      Auditory.report_issue("Transaction::Credit", e, {user: self.user.id, transaction_id: self.id, transaction_amount: amount, transaction_response: self.response})
       response
     end
 
@@ -330,7 +330,7 @@ class Transaction < ActiveRecord::Base
       save_custom_response({ code: Settings.error_codes.payment_gateway_time_out, message: I18n.t('error_messages.payment_gateway_time_out') })
     rescue Exception => e
       response = save_custom_response({ code: Settings.error_codes.payment_gateway_error, message: I18n.t('error_messages.airbrake_error_message') })
-      Auditory.report_issue("Transaction::Refund", e, {user: self.user.id, transaction: "ID: #{self.id}, amount: #{self.amount}, response: #{self.response}"})
+      Auditory.report_issue("Transaction::Refund", e, {user: self.user.id, transaction_id: self.id, transaction_amount: amount, transaction_response: self.response})
       response
     end
 

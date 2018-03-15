@@ -19,8 +19,8 @@ class CreditCardsController < ApplicationController
       end
       begin
         current_user.api_user.save!(force: true)
-      rescue 
-        Auditory.report_issue("CreditCardsController::create", 'Could not sync user with Drupal after updating credit card. Error: #{e}', { :user => current_user.id })
+      rescue
+        Auditory.report_issue("CreditCardsController::create - Could not sync user with Drupal", $!)
       end
       redirect_to show_user_path, notice: response[:message] + (membership_update_response[:message] if membership_update_response).to_s
     else
@@ -57,7 +57,7 @@ class CreditCardsController < ApplicationController
         flash[:error] = t('error_messages.credit_card_gateway_differs_from_current')
         redirect_to show_user_path
       rescue Exception => e
-        Auditory.report_issue("CreditCardsController::activate", e, { :params => params.inspect, :user => @current_user.id })
+        Auditory.report_issue("CreditCardsController::activate", e)
         flash[:error] = t('error_messages.airbrake_error_message')
         redirect_to show_user_path
         logger.error e.inspect
@@ -68,7 +68,7 @@ class CreditCardsController < ApplicationController
       begin
         current_user.api_user.save!(force: true)
       rescue 
-        Auditory.report_issue("CreditCardsController::activate", 'Could not sync user with Drupal after updating credit card. Error: #{e}', { :user => current_user.id })
+        Auditory.report_issue("CreditCardsController::activate - Could not sync user with Drupal", $!)
       end
       redirect_to show_user_path, notice: "Credit card #{new_credit_card.last_digits} activated."
     end

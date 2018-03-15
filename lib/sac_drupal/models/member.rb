@@ -59,7 +59,7 @@ module Drupal
       self.user.update_column :autologin_url, uri.path if uri
       @token
     rescue Exception => e
-      Auditory.report_issue('Drupal:Member:login_token', e, { :member => self.user.inspect })
+      Auditory.report_issue('Drupal:Member:login_token', e, { :member => self.user.id })
       nil
     end
 

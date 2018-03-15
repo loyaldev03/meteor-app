@@ -197,7 +197,7 @@ module MesAccountUpdater
                 new_credit_card.cc_type = new_account_type_am
                 answer = cc.user.add_new_credit_card(new_credit_card)
                 unless answer[:code] == Settings.error_codes.success
-                  Auditory.report_issue("MES::aus_update_process", response_code, { :credit_card => cc.inspect, :answer => answer, :line => line })
+                  Auditory.report_issue("MES::aus_update_process : #{response_code}", nil, { :credit_card => cc.id, :answer => answer, :line => line })
                 end
               when 'NEWEXP'
                 Auditory.audit(nil, cc, "AUS expiration update from #{cc.expire_month}/#{cc.expire_year} to #{new_expire_month}/#{new_expire_year}", cc.user, Settings.operation_types.aus_recycle_credit_card)
@@ -247,7 +247,7 @@ module MesAccountUpdater
             raise "Chargeback ##{args[:control_number]} could not be processed. user and transaction_chargebacked are different! #{line}"
           end
         rescue 
-          Auditory.report_issue("MES::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :user => user.inspect, :line => line, :transaction_chargebacked_id => transaction_chargebacked.id.to_s })
+          Auditory.report_issue("MES::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :user => user.id, :line => line, :transaction_chargebacked_id => transaction_chargebacked.id })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end

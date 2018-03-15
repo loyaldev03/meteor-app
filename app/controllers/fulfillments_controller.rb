@@ -110,7 +110,7 @@ class FulfillmentsController < ApplicationController
         end       
       rescue Exception => e
         flash.now[:error] = t('error_messages.airbrake_error_message')
-        Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e, { :fulfillment_file => ff.inspect })
+        Auditory.report_issue("FulfillmentFile turn inalid when generating it.", e)
         raise ActiveRecord::Rollback
       end
     else
@@ -139,7 +139,7 @@ class FulfillmentsController < ApplicationController
     end
   rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    Auditory.report_issue("FulfillmentFile:mark_file_as_sent", e, { :file => file.inspect })
+    Auditory.report_issue("FulfillmentFile:mark_file_as_sent", e)
   ensure
     redirect_to list_fulfillment_files_path
   end

@@ -80,7 +80,7 @@ class CampaignDataFetcher
             Campaigns::DataFetcherJob.set(wait: 30.minutes).perform_later(club_id: Campaign.find(@report.campaign_id).club_id, transport: 'facebook', date: @report.date.to_s, campaign_id: @report.campaign_id)
             raise "Facebook Limit Reached."
           else
-            Auditory.report_issue("FacebookFetcher campaign retrieval error.", 'Facebook returned an unexpected code', {unexpected_error_code: response.body.error.code, unexpected_error_message: response.body.error.message, campaign_id: @report.campaign_id}, false)
+            Auditory.report_issue('FacebookFetcher: Facebook returned an unexpected code', nil, {unexpected_error_code: response.body.error.code, unexpected_error_message: response.body.error.message, campaign_id: @report.campaign_id})
             raise "Unexpected error code. Response: #{response}"
         end
       end
