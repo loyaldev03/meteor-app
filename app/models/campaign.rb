@@ -42,12 +42,13 @@ class Campaign < ActiveRecord::Base
   }
 
   enum transport: {
-    facebook:   0,
-    mailchimp:  1,
-    twitter:    2,
-    adwords:    3,
-    nascar:     4,
-    other:      5
+    facebook:     0,
+    mailchimp:    1,
+    twitter:      2,
+    adwords:      3,
+    nascar:       4,
+    other:        5,
+    bing_adwords: 6
   }
 
   scope :active, -> (date = nil) {
