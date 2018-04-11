@@ -31,6 +31,14 @@ class Campaign < ActiveRecord::Base
   validates_date :finish_date, after: :initial_date, if: -> { finish_date.present? }
   validates_date :initial_date, after: lambda { Time.zone.now }, if: -> { (initial_date_changed? || finish_date_changed?) && !can_set_dates_in_the_past? }
   validates :transport_campaign_id, presence: true, if: -> { has_campaign_day_associated? }
+
+  has_attached_file :header_image_url, styles: { thumb: '300x' }
+  has_attached_file :result_pages_image_url, styles: { thumb: '50x' }
+
+  # This validation MUST be placed after the has_attachment declaration. Otherwise, it will fail https://github.com/thoughtbot/paperclip/issues/1340
+  validates_attachment_content_type :header_image_url, :result_pages_image_url,
+                                    content_type: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif']
+
   enum campaign_type: {
     sloop:           0,
     ptx:             1,
@@ -129,6 +137,25 @@ class Campaign < ActiveRecord::Base
     else
       Date.today >= initial_date
     end
+  end
+
+  def with_products_assigned?
+    @with_products_assigned ||= !products.count.zero?
+  end
+
+  def checkout_settings
+    {
+      checkout_page_bonus_gift_box_content: checkout_page_bonus_gift_box_content.present? ? checkout_page_bonus_gift_box_content : club.checkout_page_bonus_gift_box_content,
+      checkout_page_footer: checkout_page_footer.present? ? checkout_page_footer : club.checkout_page_footer,
+      css_style: css_style.present? ? css_style : club.css_style,
+      duplicated_page_content: duplicated_page_content.present? ? duplicated_page_content : club.duplicated_page_content,
+      error_page_content: error_page_content.present? ? error_page_content : club.error_page_content,
+      favicon_url: club.favicon_url,
+      header_image_url: header_image_url.present? ? header_image_url : club.header_image_url,
+      result_page_footer: result_page_footer.present? ? result_page_footer : club.result_page_footer,
+      result_pages_image_url: result_pages_image_url.present? ? result_pages_image_url : club.result_pages_image_url,
+      thank_you_page_content: thank_you_page_content.present? ? thank_you_page_content : club.thank_you_page_content
+    }
   end
 
   private

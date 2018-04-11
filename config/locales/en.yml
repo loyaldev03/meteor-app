@@ -203,7 +203,9 @@ en:
     chargeback_adjudication_date_not_blank: "Adjudication date cannot be blank."
     cannot_chargeback_transaction: "Transaction cannot be chargebacked."
     membership_billing_with_error: "This error should be checked during the same day it was reported in order to make sure that we are avoiding multiple unnecessary billings on the user. We should validate with the gateway if this transaction was correctly process, and in case it was we should proceed to update the transaction data according to it and also make sure to leave the user's next_retry_bill_date and bill_date set properly. In case the gateway confirms that the transaction was not process, we should delete this transaction to avoid having unnecessary records."
+    campaign_not_found: 'Campaign not found.'
     campaign_is_not_active: 'This offer is not active at this moment.'
+    campaign_no_products_available: 'No products available for this campaign'
     transport_setting_wrong_credentials: 'The Transport Setting does not have the correct credentials configured, make sure to configure them correctly.'
     club_cash:
       negative_amount: "Check amount value, please. Amount cannot be less than 0 (zero)."
@@ -747,6 +749,21 @@ en:
         preference_groups: Preference Group
         slug: 'Landing ID'
         slug_help: 'This value must be configured in landing_id field within the landing page.'
+        checkout_pages_settings: 'Checkout Settings'
+      checkout_settings:
+        common_settings: 'Common Settings'
+        checkout_page: 'Checkout Page'
+        result_pages: 'Result Pages'
+        edit_settings: 'Edit Settings'
+        clear_all_settings: 'Clear All Settings'
+        clear_all_settings_prompt: 'If you continue, this will remove all the custom settings for this campaign. This campaign will use the settings defined for the Club. Are you sure?'
+        clear_image_prompt: 'Removing this image will make this campaign use the image defined in the Club settings. Are you sure?'
+        settings_update_success: 'Checkout Pages Settings Set'
+        settings_update_error: 'There was a problem updating the settings'
+        all_settings_clear_success: 'Checkout Pages Settings Cleared'
+        all_settings_clear_error: 'There was a problem clearing the settings for this campaign'
+        image_remove_success: "Image %{image_name} removed!"
+        image_remove_error: "There was a problem removing the image %{image_name}"
       campaign_day:
         date: 'Date'
         spent: 'Spent'

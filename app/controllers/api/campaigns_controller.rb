@@ -6,7 +6,7 @@ class Api::CampaignsController < ApplicationController
   ##
   # Returns the campaign data to be used in landing pages
   #
-  # @resource /api/v1/campaigns/:id/metadata
+  # @resource /api/v1/campaigns/:slug/metadata
   # @action POST
   #
   # @required [String] api_key Agent's authentication token. This token allows
@@ -18,7 +18,7 @@ class Api::CampaignsController < ApplicationController
   # @response_field [Hash] preferences Preferences assigned to this campaign
   #
   # @example_request
-  #   curl -v -k -X POST -d "api_key=yS6PAUwgbt81yR3dZCxP" http://127.0.0.1:3000/api/v1/campaigns/1/metadata
+  #   curl -v -k -X POST -d "api_key=yS6PAUwgbt81yR3dZCxP" http://127.0.0.1:3000/api/v1/campaigns/506568ebfe6c1f86a003f6ca278230b239/metadata
   # @example_request_description Example of valid request.
   #
   # @example_response
@@ -29,13 +29,22 @@ class Api::CampaignsController < ApplicationController
     @campaign = Campaign.find_by!(slug: params[:id])
     my_authorize! :api_campaign_get_data, @campaign, @campaign.club_id
     products = get_products
-    if @campaign.active? && products.first.present?
-      render json: {
-        code: Settings.error_codes.success,
-        campaign: get_campaign,
-        get_products: products,
-        get_preferences: get_preferences
-      }
+    if @campaign.active?
+      if products.first.present? || !@campaign.with_products_assigned?
+        render json: {
+          code: Settings.error_codes.success,
+          campaign: get_campaign,
+          without_products_assigned: !@campaign.with_products_assigned?,
+          get_products: products,
+          get_preferences: get_preferences
+        }
+      else
+        render json: {
+          code: Settings.error_codes.campaign_no_products_available,
+          jump_url: @campaign.club.unavailable_campaign_url,
+          message: I18n.t('error_messages.campaign_no_products_available')
+        }
+      end
     else
       render json: {
         code: Settings.error_codes.campaign_not_active,
@@ -46,7 +55,7 @@ class Api::CampaignsController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     render json: {
       code: Settings.error_codes.not_found,
-      message: 'Campaign not found.'
+      message: I18n.t('error_messages.campaign_not_found')
     }
   end
 

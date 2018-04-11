@@ -1,28 +1,10 @@
-<div id='merchandise_box' class='panel panel-info'>
-  <div class='panel-heading'>
-    <h3 class='panel-title'><%= t('checkout.checkout_page.merchandise') %></h3>
-  </div>
-  <div class='panel-body'>
-    <div class="row">
-      <div class='center-block col-xs-12'>
-        <%= image_tag @product.image_url, class: 'img-responsive center-block', :alt => @product.name if @product.present? %>
-      </div>
-    </div>
-    <div class="row">
-      <div class='col-xs-12 text-center'>
-        <h4><strong><%= @product.name if @product.present? %></strong></h4>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div id='todays_total_box' class='panel panel-info'>
   <div class='panel-heading'>
     <h3 class='panel-title'><%= t('checkout.checkout_page.todays_total') %></h3>
   </div>
   <div class='panel-body'>
     <div class="row">
-      <div class='col-xs-7 text-left'><p><%= @product.name if @product.present? %></p></div>
+      <div class='col-xs-7 text-left'><p><%= @product.name %></p></div>
       <div class='col-xs-5 text-right'><p><%= number_to_currency(0) %></p></div>
     </div>
     <div class="row">

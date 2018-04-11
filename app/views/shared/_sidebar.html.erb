@@ -18,7 +18,8 @@
       <% end %>
     </div><!--/.well -->
 
-    <% if (params[:controller] == 'clubs') && (['new', 'edit', 'show'].include? params[:action]) %>
+    
+    <% if (['clubs', 'campaigns/checkout_settings'].include? params[:controller]) && (['new', 'edit', 'show'].include? params[:action]) %>
       <%= render partial: 'clubs/tokens_help' %>
     <% end %>
   </div><!--/span-->

@@ -1,0 +1,8 @@
+<div class='panel panel-info'>
+  <div class='panel-heading'>
+    <h3 class='panel-title'><%= t('checkout.checkout_page.step_3_title') %></h3>
+  </div>
+  <div class='panel-body'>
+    <%= replace_tokens(@checkout_settings[:checkout_page_bonus_gift_box_content], @club, @campaign).html_safe %>
+  </div>
+</div>

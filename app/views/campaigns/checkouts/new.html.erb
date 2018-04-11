@@ -1,6 +1,6 @@
 <div class='content'>
 
-  <%= render partial: 'modal' %>
+  <%= render partial: 'campaigns/checkouts/new/modal' %>
 
   <div class="row">
     <div class="col-sm-12">
@@ -10,39 +10,38 @@
 
   <div class='row'>
     <div class='col-sm-12 col-md-4 col-md-push-8'>
-      <%= render :partial => 'merchandise_box' %>
+      <% if @campaign.with_products_assigned? %>
+        <%= render :partial => 'campaigns/checkouts/new/merchandise_box' %>
+        <%= render :partial => 'campaigns/checkouts/new/todays_total' %>
+      <% end %>
       <% if @club.cs_phone_number || @club.cs_email %>
         <div class='visible-md visible-lg'>
-          <%= render :partial => 'contact_box' %>
+          <%= render :partial => 'campaigns/checkouts/new/contact_box' %>
         </div>
       <% end %>
     </div>
 
     <div class='col-sm-12 col-md-8 col-md-pull-4'>
-      <%= render :partial => 'prospect_data' %>
+      <%= render :partial => 'campaigns/checkouts/new/delivered_to' if @campaign.with_products_assigned? %>
+      <%= render :partial => 'campaigns/checkouts/new/prospect_data' %>
     </div>
 
-    <div class='col-sm-12 col-md-8 col-md-pull-4'>
+    <div class='col-sm-12 col-md-8 <%= 'col-md-pull-4' if @campaign.with_products_assigned? %>'>
       <div class='panel panel-info'>
         <div class='panel-heading'>
           <h3 class='panel-title'><%= t('checkout.checkout_page.step_2_title') %></h3>
         </div>
         <div class='panel-body'>
           <%= form_for :credit_card, html: { id: :credit_card }, url: checkout_path, method: 'post' do |f| %>
-            <%= render :partial => 'form', :locals => { :f => f } %>
+            <%= render :partial => 'campaigns/checkouts/new/form', :locals => { :f => f } %>
           <% end %>
         </div>
       </div>
 
-      <% if @club.checkout_page_bonus_gift_box_content.present? %>
-      <div class='panel panel-info'>
-        <div class='panel-heading'>
-          <h3 class='panel-title'><%= t('checkout.checkout_page.step_3_title') %></h3>
-        </div>
-        <div class='panel-body'>
-          <%= replace_tokens(@club.checkout_page_bonus_gift_box_content, @club, @campaign).html_safe %>
-        </div>
-      </div>
+      <% if @campaign.with_products_assigned? %>
+        <% if @checkout_settings[:checkout_page_bonus_gift_box_content].present? %>
+          <%= render :partial => 'campaigns/checkouts/new/bonus_gift' %>
+        <% end %>
       <% end %>
     </div>
   </div>

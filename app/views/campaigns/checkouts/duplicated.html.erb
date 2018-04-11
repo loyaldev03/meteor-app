@@ -1,10 +1,10 @@
 <div class='content'>
   <div class="row">
     <div class="col-sm-12 col-md-4">
-      <%= image_tag(@club.result_pages_image_url, id: 'result_image', class: 'img-responsive') if @club.result_pages_image_url.present? %>
+      <%= image_tag(@checkout_settings[:result_pages_image_url], id: 'result_image', class: 'img-responsive') if @checkout_settings[:result_pages_image_url].present? %>
     </div>
     <div class="col-sm-12 col-md-8">
-      <%= replace_tokens(@club.duplicated_page_content, @club, @campaign).html_safe %>
+      <%= replace_tokens(@checkout_settings[:duplicated_page_content], @club, @campaign).html_safe %>
     </div>
   </div>
 </div>

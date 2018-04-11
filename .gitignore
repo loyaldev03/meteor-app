@@ -22,11 +22,7 @@
 .ruby-gemset
 #######
 
-
-/test/fixtures
-
 /Gemfile.lock
-/test/fixtures/*
 
 /*~
 
@@ -37,3 +33,5 @@ coverage
 /public/system/*
 
 /account_updater_files
+
+.byebug_history

@@ -37,5 +37,17 @@ FactoryGirl.define do
       enrollment_price 0.0
       credit_card_and_geographic_required false
     end
-  end  
+
+    factory :campaign_with_checkout_settings do
+      checkout_page_bonus_gift_box_content 'Campaign Specific Bonus gift box content'
+      checkout_page_footer 'Campaign Specific Page footer'
+      css_style 'p { font-weight: "bold"; }'
+      duplicated_page_content 'Campaign Specific Duplicated page content'
+      error_page_content 'Campaign Specific Error page content'
+      result_page_footer 'Campaign Specific Result page footer'
+      thank_you_page_content 'Campaign Specific Thank you page content'
+      header_image_url Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png'))
+      result_pages_image_url Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png'))
+    end
+  end
 end
