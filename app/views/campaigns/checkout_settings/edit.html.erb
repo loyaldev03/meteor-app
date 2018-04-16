@@ -1,0 +1,19 @@
+<%- model_class = @campaign.class -%>
+
+<%= render partial: 'campaigns/checkout_settings/modal' %>
+
+<div class='row-fluid'>
+  <div class='span12'>
+    <h2><%= @campaign.name %></h2>
+    <h4><%= t('campaign.checkout_settings') %></h4>
+    <hr />
+  </div>
+</div>
+
+<%= form_for @campaign, :as => :campaign, :url => campaign_checkout_settings_path(:id => @campaign.id), :html => { :class => 'form-horizontal' } do |f| %>
+  <%= render :partial => 'form', :locals => { :f => f } %>
+<% end %>
+
+<% content_for :javascript do %>
+  checkoutSettingsEditFunctions();
+<% end %>

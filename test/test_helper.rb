@@ -807,4 +807,3 @@ module Airbrake
     # do nothing.
   end
 end
-

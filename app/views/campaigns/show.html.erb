@@ -82,6 +82,7 @@
 <div class='row-fluid'>
   <div class='span12'>
     <div class="form-actions">
+      <%= link_to t('activerecord.attributes.campaign.checkout_pages_settings'), campaign_checkout_settings_url(campaign_id: @campaign.id), :class => 'btn' %>
       <%= link_to t('back', default: t('helpers.links.back')), campaigns_path, class: 'btn' %>
     </div>
   </div>

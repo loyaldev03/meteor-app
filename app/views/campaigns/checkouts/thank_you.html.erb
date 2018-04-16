@@ -1,10 +1,11 @@
 <div class='content'>
   <div class="row">
     <div class="col-sm-12 col-md-4">
-      <%= image_tag(@club.result_pages_image_url.url, id: 'result_image', class: 'img-responsive') if @club.result_pages_image_url.present? %>
+      <%= image_tag(@checkout_settings[:result_pages_image_url].url, id: 'result_image', class: 'img-responsive') if @checkout_settings[:result_pages_image_url].present? %>
     </div>
     <div class="col-sm-12 col-md-8">
-      <%= replace_tokens((@campaign.credit_card_and_geographic_required? ? @club.thank_you_page_content : @club.thank_you_page_content_when_no_cc_required), @club, @campaign).html_safe %>
+      <%= replace_tokens(
+        (@campaign.credit_card_and_geographic_required? ? @checkout_settings[:thank_you_page_content] : @club.thank_you_page_content_when_no_cc_required), @club, @campaign).html_safe %>
       <% if @user.full_autologin_url.present? %>
       <div style="text-align: center;">
         <a href="<%= @user.full_autologin_url %>" class="btn btn-danger btn-lg"><%= t('checkout.checkout_page.login_now') %></a>

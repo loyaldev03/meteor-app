@@ -533,6 +533,26 @@ function clubs_show_functions() {
   });
 }
 
+function checkoutSettingsShowFunctions() {
+  $('.sidebar-nav').hide();
+  $('#tokens-help').show();
+}
+
+function checkoutSettingsEditFunctions() {
+  $('.sidebar-nav').hide();
+  $('#tokens-help').show();
+
+  $('#modal-checkout-settings').modal({
+    show: false,
+    backdrop: 'static',
+    keyboard: false
+  });
+
+  $(document).on("submit", function () {
+    $('#modal-checkout-settings').modal('show');
+  });
+}
+
 function retrieve_information(){
   var skus = [];
   if ($('#product_sku option:selected').text().length > 0) {

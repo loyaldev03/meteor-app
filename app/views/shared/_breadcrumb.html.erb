@@ -81,6 +81,11 @@
       <% if params[:controller] == 'campaign_days' && params[:action] == 'index' %>
         <li class="active"><%= delimiter %>Campaign Days</li>
       <% end %>
+      <% if params[:controller] == 'campaigns/checkout_settings' and ['show','edit'].include? params[:action]  %>
+        <li><%= delimiter %><a href="<%= campaigns_path %>"><%= t('activerecord.model.campaigns') %></a></li>
+        <li><%= delimiter %><%= link_to @campaign.name, campaign_path(@current_partner.prefix, @current_club.name, id: @campaign.id) %></li>
+        <li class="active"><%= delimiter %><%= I18n.t('activerecord.attributes.campaign.checkout_pages_settings') %>
+      <% end %>
 
       <% if params[:controller] == 'transport_settings' && params[:action] == 'new' %>
         <li><%= delimiter %><a href="<%= transport_settings_path %>">Transport Settings</a></li>

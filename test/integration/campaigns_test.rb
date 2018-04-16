@@ -7,7 +7,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     @partner = FactoryGirl.create(:partner)    
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
+    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )      
     @preference_group = FactoryGirl.create(:preference_group, :club_id => @club.id)    
     sign_in_as(@admin_agent)
   end
@@ -30,6 +30,16 @@ class CampaignTest < ActionDispatch::IntegrationTest
     fill_in 'campaign[delivery_date]', with: unsaved_campaign.delivery_date 
     find(:xpath, "//body").find(".select2-search__field").set(@preference_group.name) 
     find(:xpath, "//body").find(".select2-results__option--highlighted").click  
+  end
+
+  def configure_checkout_pages(unsaved_campaign)
+    fill_in 'campaign[css_style]', with: unsaved_campaign.css_style
+    fill_in 'campaign[checkout_page_bonus_gift_box_content]', with: unsaved_campaign.checkout_page_bonus_gift_box_content
+    fill_in 'campaign[checkout_page_footer]', with: unsaved_campaign.checkout_page_footer
+    fill_in 'campaign[thank_you_page_content]', with: unsaved_campaign.thank_you_page_content
+    fill_in 'campaign[duplicated_page_content]', with: unsaved_campaign.duplicated_page_content
+    fill_in 'campaign[error_page_content]', with: unsaved_campaign.error_page_content
+    fill_in 'campaign[result_page_footer]', with: unsaved_campaign.result_page_footer
   end
 
   test "create campaign" do    
@@ -116,5 +126,23 @@ class CampaignTest < ActionDispatch::IntegrationTest
     find(:xpath, "//body").find(".select2-results__option--highlighted").click
     click_link_or_button 'Update Campaign'
     assert page.has_content?("Campaign #{@campaign.name} was updated succesfully.")
+  end
+
+  test "configure and update checkout settings" do
+    unsaved_campaign = FactoryGirl.build(:campaign_with_checkout_settings)
+    @campaign1 = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
+    visit campaign_path(@partner.prefix, @club.name, @campaign1.id)    
+    click_link_or_button 'Checkout Settings'
+    click_link_or_button 'Edit Settings'
+    configure_checkout_pages(unsaved_campaign)
+    click_link_or_button 'Update Campaign'
+
+    assert page.has_content? "Checkout Pages Settings Set"
+    assert page.has_content? unsaved_campaign.checkout_page_bonus_gift_box_content
+    assert page.has_content? unsaved_campaign.checkout_page_footer
+    assert page.has_content? unsaved_campaign.thank_you_page_content
+    assert page.has_content? unsaved_campaign.duplicated_page_content
+    assert page.has_content? unsaved_campaign.error_page_content
+    assert page.has_content? unsaved_campaign.result_page_footer
   end
 end

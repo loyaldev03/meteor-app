@@ -131,6 +131,18 @@ class CampaignTest < ActiveSupport::TestCase
     assert !@campaign.save, "Campaign allows to assign products that does not have image_url."
   end
 
+  test 'Should use Checkout Settings from itself if they are set' do
+    club = FactoryGirl.create(:simple_club_with_gateway, checkout_page_footer: 'Club Checkout Page Footer')
+    campaign = FactoryGirl.build(:campaign_with_checkout_settings, club_id: club.id, checkout_page_footer: 'Campaign Checkout Page Footer')
+    assert_equal 'Campaign Checkout Page Footer', campaign.checkout_settings[:checkout_page_footer], 'Campaign doesn\'t use its checkout settings'
+  end
+
+  test 'Should use Checkout Settings from its Club if theirs are not set' do
+    club = FactoryGirl.create(:simple_club_with_gateway, checkout_page_footer: 'Club Checkout Page Footer')
+    campaign = FactoryGirl.build(:campaign_with_checkout_settings, club_id: club.id, checkout_page_footer: nil)
+    assert_equal 'Club Checkout Page Footer', campaign.checkout_settings[:checkout_page_footer], 'Campaign doesn\'t use the Club checkout settings'
+  end
+
   ################################################
   ##############FACEBOOK##########################
   ################################################

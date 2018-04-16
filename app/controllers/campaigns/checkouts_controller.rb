@@ -11,6 +11,7 @@ class Campaigns::CheckoutsController < ApplicationController
   before_filter :load_prospect, only: [:new, :duplicated, :error, :create]
   before_filter :load_ga_tracking_id, only: [:new, :thank_you, :duplicated, :error, :critical_error]
   before_filter :setup_request_params, only: [:submit]
+  before_filter :checkout_settings, only: [:new, :thank_you, :duplicated, :error]
 
   layout 'checkout'
 
@@ -18,7 +19,6 @@ class Campaigns::CheckoutsController < ApplicationController
     my_authorize! :checkout_submit, Campaign, @club.id
     if @club && @campaign && (@club.id == @campaign.club_id) # @campaign.landing_url.include? params[:landing_url]
       prospect = Checkout.new(campaign: @campaign).find_or_create_prospect_by params
-      
       if prospect.nil?
         Rails.logger.error 'Checkout::SubmitError: Prospect not found.'
         redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
@@ -150,7 +150,7 @@ class Campaigns::CheckoutsController < ApplicationController
     return if agent_signed_in?
     render file: "#{Rails.root}/public/401", status: 401, layout: false, formats: [:html]
   end
-  
+
   def create_user(prospect, campaign, cc_blank = false)
     prospect_attributes = prospect.attributes.with_indifferent_access
     prospect_attributes[:campaign_id] = prospect.campaign_code
@@ -172,5 +172,9 @@ class Campaigns::CheckoutsController < ApplicationController
       Rails.logger.error "Checkout::CreateError: #{response.inspect}"
       redirect_to (%w(407 409 9507).include?(response[:code]) ? duplicated_checkout_path(campaign_id: @campaign, token: prospect.token) : error_checkout_path(campaign_id: @campaign, token: prospect.token)), alert: response[:message]
     end
+  end
+
+  def checkout_settings
+    @checkout_settings ||= @campaign.checkout_settings
   end
 end

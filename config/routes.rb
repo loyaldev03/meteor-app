@@ -155,6 +155,11 @@ SacPlatform::Application.routes.draw do
         get 'products/edit_label', to: "campaigns/products#edit_label"
         put 'products/label', to: "campaigns/products#label"
         put 'products/set_position', to: 'campaigns/products#set_position'
+        get 'checkout_settings', to: 'campaigns/checkout_settings#show'
+        get 'checkout_settings/edit', to: 'campaigns/checkout_settings#edit'
+        patch 'checkout_settings', to: 'campaigns/checkout_settings#update'
+        delete 'checkout_settings/destroy', to: 'campaigns/checkout_settings#destroy'
+        delete 'checkout_settings/remove_image', to: 'campaigns/checkout_settings#remove_image'
         collection do
           get 'facebook/request_code', to: "campaigns/facebook#request_code", as: :campaign_facebook_request_code
           get 'facebook/access_token', to: "campaigns/facebook#generate_token", as: :campaign_facebook_access_token

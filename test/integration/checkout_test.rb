@@ -14,6 +14,9 @@ class CheckoutTest < ActionDispatch::IntegrationTest
     @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)       
     @prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :campaign_id => @campaign.id, :terms_of_membership_id => @terms_of_membership.id)
     @credit_card = FactoryGirl.create :credit_card_american_express  
+    @product = FactoryGirl.create(:random_product, :club_id => @club.id)
+    @campaign.products << @product 
+    @campaign1 = FactoryGirl.create(:campaign_with_checkout_settings, club_id: @club.id, terms_of_membership_id: @terms_of_membership.id)
     sign_in_as(@landing_agent)
   end
 
@@ -83,5 +86,14 @@ class CheckoutTest < ActionDispatch::IntegrationTest
     fill_in_credit_card(445124454477885445555, @credit_card.expire_month, @credit_card.expire_year)
     click_link_or_button 'Submit'
     assert page.has_content?("Please enter a valid credit card number.")      
+  end
+
+  test "display checkout when campaign does not have products" do
+    visit new_checkout_path(campaign_id:@campaign1.to_param, token: @prospect.token)    
+    assert page.has_content?("Name #{@prospect.first_name} #{@prospect.last_name}")    
+    assert page.has_content?("Address #{@prospect.address}")
+    assert page.has_content?("Email #{@prospect.email}")
+    assert page.has_content?("City / State / Zip #{@prospect.city} / #{@prospect.state} / #{@prospect.zip}") 
+    assert page.has_no_content?("Shipping & Processing $#{@campaign.enrollment_price}")
   end
 end
