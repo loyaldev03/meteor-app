@@ -387,7 +387,12 @@ class Transaction < ActiveRecord::Base
     end
 
     def validate_adjudication_date
-      if HashWithIndifferentAccess.new(self.response)[:adjudication_date].blank?
+      adjudication_date = if payeezy?
+        HashWithIndifferentAccess.new(self.response)['Adjustment Date']
+      else
+        HashWithIndifferentAccess.new(self.response)[:adjudication_date]
+      end
+      if adjudication_date.blank?
         errors[:adjudication_date] << "cannot be blank"
         return false
       end
