@@ -34,7 +34,7 @@ class PayeezyTransaction < Transaction
   end
   
   def new_chargeback!(sale_transaction, args)
-    trans = PayeezyTransaction.find_by(response: args.to_hash.to_s)
+    trans = PayeezyTransaction.find_by(response: args.to_hash.to_json)
     if trans.nil?
       case args['Chargeback Status']
       when 'OPEN'
@@ -50,7 +50,7 @@ class PayeezyTransaction < Transaction
       end
       
       self.transaction_type   = "chargeback"
-      self.response           = args.to_hash
+      self.response           = args.to_hash.to_json
       self.prepare(sale_transaction.user, sale_transaction.credit_card, chargeback_amount, 
                     sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, nil, operation_type)
       self.response_auth_code = args['Authorization Code']
