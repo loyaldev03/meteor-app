@@ -10,8 +10,9 @@
           <br />
         <% end %>
         <% if @club.cs_phone_number.present? %>
-          <%= t('checkout.call') %>: <a href="tel:<%= @club.cs_phone_number %>"><%= @club.cs_phone_number %></a><br />9AM to 5PM EST
-          <br />
+          <%= t('checkout.call') %>: <a href="tel:<%= @club.cs_phone_number %>"><%= @club.cs_phone_number %></a><br />
+          9AM to 5PM EST<br />
+          Monday - Friday<br />
         <% end %>
       </div>
     </div>
