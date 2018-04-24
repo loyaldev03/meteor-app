@@ -32,7 +32,7 @@ class Auditory
     client = TrackerApi::Client.new(token: Settings.pivotal_tracker.token)
     project = client.project(project_id)
     story = project.create_story(name: "[#{Rails.env}] #{title}", story_type: story_type, description: description)
-    story.attributes = { owner_ids: [assignee] } # Refer to config/initializers/pivotal_tracker.rb for a list of asignee ids.
+    story.attributes = { owner_ids: [assignee] } if assignee # Refer to config/initializers/pivotal_tracker.rb for a list of asignee ids.
     story.save
   end
 
