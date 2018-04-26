@@ -16,9 +16,12 @@ module PayeezyAccountUpdater
     client = Gmail.new(Settings.payeezy_report_service.gmail_account, Settings.payeezy_report_service.gmail_account_password)
     emails = client.inbox.emails(:unread, :from => "reports@businesstrack.com", subject: 'ONMC - Chargeback List')
     emails.each do |email|
-      chargeback_data = CSV.parse(email.message.attachments.first.body.decoded.gsub(/\x00|\x07/, ""), {col_sep: "\t", headers: true})
-      Rails.logger.info "[PayeezyChargebackReport-#{Date.yesterday.strftime('%m/%d/%Y')}] Processing file: #{chargeback_data.to_s}"
-      process_chargebacks_file(chargeback_data, gateway) if chargeback_data.any?
+      if email.attachments.any?
+        local_filename = "tmp/#{email.attachments.first.filename}"
+        File.open(local_filename,"wb"){|local| local << email.message.attachments.first.body.decoded}
+        process_chargebacks_file(local_filename, gateway)
+        File.delete(local_filename)
+      end
       email.mark(:read)
     end
     client.logout
@@ -57,7 +60,9 @@ module PayeezyAccountUpdater
   end
   
   private
-    def self.process_chargebacks_file(chargeback_data, gateway)
+    def self.process_chargebacks_file(chargeback_file, gateway)
+      chargeback_data = CSV.read(chargeback_file, {col_sep: "\t", headers:true, encoding: 'UTF-16'})
+      Rails.logger.info "[PayeezyChargebackReport-#{Date.yesterday.strftime('%m/%d/%Y')}] Processing file: #{chargeback_data.to_s}"
       chargeback_data.each do |data|
         begin
           user = User.find_by('id = :invoice_number OR email LIKE ":invoice_number%"', invoice_number: data['Invoice Number'])
