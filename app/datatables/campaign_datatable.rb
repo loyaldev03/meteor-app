@@ -14,6 +14,7 @@ private
       [ 
         campaign.id,
         campaign.name,
+        campaign.title,
         campaign.campaign_type,
         campaign.products_count,
         campaign.transport,

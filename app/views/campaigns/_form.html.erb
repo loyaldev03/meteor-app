@@ -11,6 +11,20 @@
 <div class='row-fluid'>
   <div class='span12'>
     <div class="control-group">
+      <%= f.label :title, :class => 'control-label required_asterisk' %>
+      <div class="controls">
+        <%= f.text_field :title, :class => 'text_field input-xxlarge', required: true %>
+        <%= render  :partial => 'shared/help', 
+                    :locals => { :title => t('activerecord.attributes.campaign.title'), 
+                    :content => t('activerecord.attributes.campaign.title_help') } %>
+        <button id="btn-copy-campaign-name" class="btn btn-mini btn-info" title="<%= t('activerecord.attributes.campaign.copy_title_from_name') %>"><i class="icon-paste"></i>&nbsp;<%= t('copy') %></button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class='row-fluid'>
+  <div class='span12'>
+    <div class="control-group">
       <%= f.label :landing_name, :class => 'control-label required_asterisk' %>
       <div class="controls">
         <%= f.text_field :landing_name, :class => 'text_field input-xxlarge', required: true %>

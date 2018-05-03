@@ -7,6 +7,11 @@
 </div>
 
 <p>
+  <strong><%= I18n.t('activerecord.attributes.campaign.title') %>:</strong>
+  <%= @campaign.title %>
+  <%= render :partial => 'shared/help', :locals => { :title => t('activerecord.attributes.campaign.title'), :content => t('activerecord.attributes.campaign.title_help')} %>
+</p>
+<p>
   <strong><%= I18n.t('activerecord.attributes.campaign.campaign_type') %>:</strong>
   <%= @campaign.campaign_type %>
 </p>

@@ -116,7 +116,7 @@ class Campaigns::CheckoutsController < ApplicationController
     @page_title = if @campaign.nil?
                     t('checkout.pages_titles.error')
                   else
-                    "#{@campaign.name} - " + t('checkout.pages_titles.' + params[:action])
+                    "#{@campaign.title} - " + t('checkout.pages_titles.' + params[:action])
                   end
   end
 

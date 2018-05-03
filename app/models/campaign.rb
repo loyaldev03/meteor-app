@@ -22,7 +22,7 @@ class Campaign < ActiveRecord::Base
   AVAILABLE_MEDIUMS             = ['display', 'email', 'search', 'referral', 'website']
   MAX_PRODUCTS_ALLOWED          = 25
 
-  validates :name, :landing_name, :initial_date, :campaign_type, :transport,
+  validates :name, :title, :landing_name, :initial_date, :campaign_type, :transport,
     :utm_medium, :utm_content, :audience, :campaign_code,
     presence: true
   validates :terms_of_membership, :enrollment_price, presence: true, if: -> { enrollment_related? }
@@ -73,7 +73,7 @@ class Campaign < ActiveRecord::Base
   }
 
   def self.datatable_columns
-    [ 'id', 'name', 'campaign_type', 'products_count', 'transport', 'initial_date', 'finish_date' ]
+    [ 'id', 'name', 'title', 'campaign_type', 'products_count', 'transport', 'initial_date', 'finish_date' ]
   end
 
   def enrollment_related?

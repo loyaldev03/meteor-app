@@ -59,7 +59,7 @@ class CampaignsController < ApplicationController
   private
 
   def campaign_params
-    params.require(:campaign).permit(:name, :landing_name, :enrollment_price, :transport, :audience, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :utm_content, :utm_medium, :transport_campaign_id, :campaign_code, :delivery_date)
+    params.require(:campaign).permit(:name, :title, :landing_name, :enrollment_price, :transport, :audience, :campaign_type, :terms_of_membership_id, :initial_date, :finish_date, :utm_content, :utm_medium, :transport_campaign_id, :campaign_code, :delivery_date)
   end
 
   def sanitize_preference_groups
@@ -68,9 +68,9 @@ class CampaignsController < ApplicationController
 
   def campaign_params_on_update
     if @campaign.can_edit_transport_id?
-      params.require(:campaign).permit(:name, :initial_date, :finish_date, :transport_campaign_id, :delivery_date)
+      params.require(:campaign).permit(:name, :title, :initial_date, :finish_date, :transport_campaign_id, :delivery_date)
     else
-      params.require(:campaign).permit(:name, :initial_date, :finish_date, :delivery_date)
+      params.require(:campaign).permit(:name, :title, :initial_date, :finish_date, :delivery_date)
     end
   end
 

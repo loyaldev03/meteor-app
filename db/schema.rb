@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180314195341) do
+ActiveRecord::Schema.define(version: 20180502125023) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -109,6 +109,7 @@ ActiveRecord::Schema.define(version: 20180314195341) do
     t.text     "error_page_content",                   limit: 65535
     t.text     "result_page_footer",                   limit: 65535
     t.text     "thank_you_page_content",               limit: 65535
+    t.string   "title",                                limit: 255
   end
 
   add_index "campaigns", ["club_id"], name: "index_campaigns_on_club_id", using: :btree

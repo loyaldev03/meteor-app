@@ -14,6 +14,7 @@ en:
   unlock: 'Unlock'
   new: 'New'
   back: 'Back'
+  copy: 'Copy'
   dashboard: 'Dashboard'
   cancel: 'Cancel'
   do_not_honor: 'Do not honor'
@@ -729,7 +730,7 @@ en:
         aus_password_update_help: "Account Updater Service service password. Leaving this field empty will not change current password."
       campaign:
         id: 'ID'
-        name: 'Name'
+        name: 'Internal Name'
         campaign_type: 'Campaign Type'
         transport: 'Source'
         initial_date: 'Initial Date'
@@ -750,6 +751,9 @@ en:
         slug: 'Landing ID'
         slug_help: 'This value must be configured in landing_id field within the landing page.'
         checkout_pages_settings: 'Checkout Settings'
+        title: 'Title'
+        title_help: 'Text shown in the tab of the browser.'
+        copy_title_from_name: 'Copy Title from the Internal Name'
       checkout_settings:
         common_settings: 'Common Settings'
         checkout_page: 'Checkout Page'

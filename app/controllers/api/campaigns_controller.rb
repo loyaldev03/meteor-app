@@ -62,7 +62,7 @@ class Api::CampaignsController < ApplicationController
   private
 
   def get_campaign
-    [{ title: @campaign.name, favicon_url: @campaign.club.favicon_url.url }]
+    [{ title: @campaign.title, favicon_url: @campaign.club.favicon_url.url }]
   end
 
   def get_products

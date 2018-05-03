@@ -909,7 +909,7 @@ function campaigns_functions(){
     "bServerSide": true,
     "bLengthChange": false,
     "iDisplayLength": 25,
-    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 7 ] }],
+    "aoColumnDefs": [{ "bSortable": false, "aTargets": [ 8 ] }],
     "sAjaxSource": $('#campaigns_table').data('source'),
     "aaSorting": [ [0,'desc'] ]
   });
@@ -971,6 +971,11 @@ function newCampaignFunctions(clubId, getSubscriptionPlansUrl, getFulfillmentCod
     disableEnrollRelatedField($(this).val());
   });
   $('#campaign_preference_groups').select2({allowClear: true});
+
+  $("#btn-copy-campaign-name").click(function(e){
+    $("#campaign_title").val($("#campaign_name").val());
+    e.preventDefault();
+  });
 }
 
 function editCampaignFunctions(canEditTransportId, canSetDatesInThePast, initialDate) {
@@ -995,6 +1000,11 @@ function editCampaignFunctions(canEditTransportId, canSetDatesInThePast, initial
   if (canEditTransportId) { $('#campaign_transport_campaign_id').prop('disabled', false); }
 
   $('#campaign_preference_groups').select2({ allowClear: true });
+
+  $("#btn-copy-campaign-name").click(function(e){
+    $("#campaign_title").val($("#campaign_name").val());
+    e.preventDefault();
+  });
 }
 
 function transportSettingsIndexFunctions() {
