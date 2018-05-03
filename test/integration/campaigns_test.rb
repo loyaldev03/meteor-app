@@ -14,6 +14,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
 
   def fill_in_form(unsaved_campaign, campaign_type, transport)
     fill_in 'campaign[name]', with: unsaved_campaign.name
+    fill_in 'campaign[title]', with: unsaved_campaign.title
     fill_in 'campaign[landing_name]', with: unsaved_campaign.landing_name  
     first("#select2-campaign_terms_of_membership_id-container").click 
     find('body > .select2-container .select2-search input.select2-search__field').set(@terms_of_membership.name)      
@@ -81,7 +82,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     assert page.has_content?("Campaign #{@campaign.name} was not updated.")    
   end
 
-  test "should only update name, initial_date, finish_date and source id fields on campaign" do        
+  test "should only update name, title, initial_date, finish_date and source id fields on campaign" do        
     visit campaigns_path(@partner.prefix, @club.name)
     within("#campaigns_table") do
       click_link_or_button 'Edit'
@@ -98,6 +99,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
 
     unsaved_campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
     fill_in 'campaign[name]', with: unsaved_campaign.name
+    fill_in 'campaign[title]', with: unsaved_campaign.title
     select_from_datepicker("campaign_initial_date", unsaved_campaign.initial_date + 3.days)
     select_from_datepicker("campaign_finish_date", unsaved_campaign.finish_date + 10.days)
     fill_in 'campaign[transport_campaign_id]', with: unsaved_campaign.transport_campaign_id
