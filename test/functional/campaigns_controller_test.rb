@@ -12,7 +12,7 @@ class CampaignsControllerTest < ActionController::TestCase
 
   def post_create_campaign(campaign)
     post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: {
-      name: campaign.name, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
+      name: campaign.name, title: campaign.title, landing_name: campaign.landing_name, initial_date: campaign.initial_date, finish_date: campaign.finish_date,
        enrollment_price: campaign.enrollment_price, campaign_type: campaign.campaign_type,
        transport: campaign.transport, transport_campaign_id: campaign.transport_campaign_id,
        utm_medium: campaign.utm_medium, utm_content: campaign.utm_content,

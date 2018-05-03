@@ -29,6 +29,11 @@ class CampaignTest < ActiveSupport::TestCase
     assert !@campaign.save, "Campaign was saved without a name"
   end
 
+  test 'Should not save campaign without title' do
+    @campaign.title = nil
+    assert !@campaign.save, "Campaign was saved without a title"
+  end
+
   test 'Should not save campaign without landing name' do
     @campaign.landing_name = nil
     assert !@campaign.save, "Campaign was saved without landing name"

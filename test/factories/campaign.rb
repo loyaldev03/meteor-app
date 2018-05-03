@@ -1,6 +1,7 @@
 FactoryGirl.define do
   factory :campaign do
     sequence(:name) {|n| "Campaign_#{Faker::Commerce.product_name}" }
+    sequence(:title) {|n| "Title_#{Faker::Commerce.product_name}" }
     landing_name "flag"
     initial_date Time.zone.today
     finish_date Time.zone.tomorrow + 7.days    
