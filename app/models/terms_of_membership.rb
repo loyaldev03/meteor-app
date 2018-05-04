@@ -29,11 +29,17 @@ class TermsOfMembership < ActiveRecord::Base
   validates :if_cannot_bill, presence: true
   validates :downgrade_tom_id, presence: true, if: Proc.new { |tom| tom.downgradable? }
   validates :upgrade_tom_period, presence: true, numericality: { greater_than_or_equal_to: 1 }, if: Proc.new { |tom| tom.upgradable? }
-  validates :api_role, numericality: { only_integer: true, allow_blank: true }
+  validates :api_role, presence: true, numericality: { only_integer: true, allow_blank: false }
+  validate :api_role_must_exist
   validate :validate_payment_gateway_configuration
 
   before_destroy :can_delete?
   before_update :can_update?
+
+  AVAILABLE_API_ROLES = [
+    ['6 - Paid Users', '6'],
+    ['7 - Free Users', '7']
+  ].freeze
 
   ###########################################
   
@@ -102,5 +108,8 @@ class TermsOfMembership < ActiveRecord::Base
         end
       end
     end
-    
+
+    def api_role_must_exist
+      errors.add(:base, I18n.t('error_messages.api_role_not_found')) unless AVAILABLE_API_ROLES.any? { |_text, id| id == api_role }
+    end
 end

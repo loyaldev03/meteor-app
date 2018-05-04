@@ -1537,39 +1537,39 @@ function agent_form_functions(agent_id, roles, clubs){
 // Creates the wizard
 function new_tom_functions() {
   tom_create_wizard();
+  $("#terms_of_membership_api_role").select2(
+    { minimumResultsForSearch: -1 }
+  );
 }
 
 function tom_create_wizard() {
+  // Trigger Select2 validation after selection
+  $("#terms_of_membership_api_role").on("select2:close", function (e) {
+    $(this).valid(); 
+  });
+
   $("#tom_wizard_form").formwizard({
     formPluginEnabled: false,
     validationEnabled: true,
-    validationOptions:{
-      errorPlacement: function(error, element) {
-        if(error.text().length > 0 ){
-          $("label[for="+error.attr("for")+"][generated=true]").each(function(){
-            if($(this).text() == error.text() || $(this).text() != error.text()){
-              $(this).remove();
-            }
-          })
-          error.removeClass('error');
-          error.addClass('help-inline');
-          $("#"+error.attr("for")).parents('.control-group').addClass("error");
-          $("#"+error.attr("for")).parent().append(error);
-        }
+    validationOptions: {
+      errorPlacement: function (error, element) {
+        $("label[for=" + error.attr("for") + "].help-inline").remove();
+        error.removeClass("error");
+        error.addClass("help-inline");
+        $("#" + error.attr("for")).parents(".control-group").addClass("error");
+        $("#" + error.attr("for")).parent().append(error);
       },
-      success: function(error){
-        if(error.attr("for").indexOf("time_span") < 0){
-          $("#"+error.attr("for")).parents('.control-group').removeClass("error");
-          $("label[for="+error.attr("for")+"][generated=true]").each(function(){
-            $(this).remove();
-          });
+      success: function (error) {
+        if (error.attr("for").indexOf("time_span") < 0) {
+          $("#" + error.attr("for")).parents(".control-group").removeClass("error");
+          $("label[for=" + error.attr("for") + "].help-inline").remove();
         }
       }
     },
-    focusFirstInput : true,
+    focusFirstInput: true,
     disableUIStyles: true,
-    textNext: '',
-    textSubmit: ''
+    textNext: "",
+    textSubmit: ""
   });
 }
 

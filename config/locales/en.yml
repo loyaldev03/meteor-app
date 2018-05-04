@@ -208,6 +208,7 @@ en:
     campaign_is_not_active: 'This offer is not active at this moment.'
     campaign_no_products_available: 'No products available for this campaign'
     transport_setting_wrong_credentials: 'The Transport Setting does not have the correct credentials configured, make sure to configure them correctly.'
+    api_role_not_found: 'External Code not found.'
     club_cash:
       negative_amount: "Check amount value, please. Amount cannot be less than 0 (zero)."
       null_amount: "Check amount value, please. Amount cannot be blank or null."
@@ -552,7 +553,7 @@ en:
           step_1_instructions: '<STEP_1_INSTRUCTIONS_HERE>'
           plan_name: 'Subscription Plan Name'
           plan_name_help: 'The name the subscription plan will be identified by.'
-          external_code: 'External Code (optional)'
+          external_code: 'External Code'
           external_code_help: 'A value to be used by an external system, usually a CMS. If you are using Drupal, this should be set as the role to be granted to the member in Drupal when enrolled with this subscription plan.'
           description: 'Description (optional)'
           description_help: "Short text describing for what the subscription plan will be used to."

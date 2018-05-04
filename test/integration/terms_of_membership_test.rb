@@ -24,7 +24,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   def fill_in_step_1(name = nil, external_code = nil, description = nil)
     find(".step_selected", :text => "1")
     fill_in 'terms_of_membership[name]', :with => name if name
-    fill_in 'terms_of_membership[api_role]', :with => external_code if external_code
+    select('6 - Paid Users', from: 'terms_of_membership[api_role]')
     fill_in 'terms_of_membership[description]', :with => description if description
   end
 
@@ -821,6 +821,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   # end
 
   # test "Create subcription plan with Downgrade to option - No membership associated" do
+  #   sign_in_as(@admin_agent)
   #   tom_name = 'TOM Name'
   #   tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
   #   tom_to_downgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Downgradable TOM')
