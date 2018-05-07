@@ -36,7 +36,7 @@ class PayeezyTransaction < Transaction
   def new_chargeback!(sale_transaction, args)
     trans = PayeezyTransaction.find_by(response: args.to_hash.to_json)
     if trans.nil?
-      if (args['Chargeback Status'] == 'OPEN' or (args['Chargeback Category'] == 'PRE-ARBITRATION' and args['Chargeback Status'] == 'CLOSED'))
+      if (args['Chargeback Status'] == 'OPEN' || (args['Chargeback Status'] == 'CLOSED' && args['Chargeback Category'] == 'PRE-ARBITRATION'))
         chargeback_amount     = -args['Chargeback Amount'].to_f
         operation_type        = Settings.operation_types.chargeback
         operation_description = "Chargeback processed $#{chargeback_amount}"
@@ -44,8 +44,8 @@ class PayeezyTransaction < Transaction
         chargeback_amount     = args['Chargeback Amount'].to_f
         operation_type        = Settings.operation_types.chargeback_rebutted
         operation_description = "Rebutted Chargeback processed $#{chargeback_amount}"
-      else
-        raise "Wrong status received: #{args['Chargeback Status']}"
+      elsif args['Chargeback Status'] != 'CLOSED' || (args['Chargeback Status'] == 'CLOSED' && args['Chargeback Category'] != 'DEBITED')
+        raise "Wrong status received: Status: #{args['Chargeback Status']} and Category: #{args['Chargeback Category']}"
       end
       
       self.transaction_type   = "chargeback"
