@@ -7,11 +7,11 @@ class Campaigns::CheckoutsController < ApplicationController
   before_filter :load_club_based_on_host, only: [:submit, :new, :create, :thank_you, :duplicated, :error, :critical_error]
   before_filter :load_campaign, only: [:submit, :new, :thank_you, :duplicated, :error]
   before_filter :set_page_title, only: [:new, :thank_you, :duplicated, :error, :critical_error]
+  before_filter :load_prospect, only: [:new, :duplicated, :create]
   before_filter :campaign_active, only: [:submit, :new, :thank_you, :duplicated]
-  before_filter :load_prospect, only: [:new, :duplicated, :error, :create]
   before_filter :load_ga_tracking_id, only: [:new, :thank_you, :duplicated, :error, :critical_error]
   before_filter :setup_request_params, only: [:submit]
-  before_filter :checkout_settings, only: [:new, :thank_you, :duplicated, :error]
+  before_filter :checkout_settings, only: [:new, :thank_you, :duplicated, :error, :critical_error]
 
   layout 'checkout'
 
@@ -21,7 +21,7 @@ class Campaigns::CheckoutsController < ApplicationController
       prospect = Checkout.new(campaign: @campaign).find_or_create_prospect_by params
       if prospect.nil?
         Rails.logger.error 'Checkout::SubmitError: Prospect not found.'
-        redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
+        redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
       elsif prospect.error_messages && prospect.error_messages.any?
         redirect_to generate_edit_user_info_url(prospect)
       else
@@ -38,7 +38,7 @@ class Campaigns::CheckoutsController < ApplicationController
   rescue
     Rails.logger.error "Checkout::SubmitError: Error: #{$ERROR_INFO}"
     Auditory.report_issue('Checkout::SubmitError', $ERROR_INFO)
-    redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
+    redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
   def new
@@ -49,7 +49,7 @@ class Campaigns::CheckoutsController < ApplicationController
     Rails.logger.error "Checkout::NewError: Error: #{$ERROR_INFO}"
     Auditory.report_issue('Checkout::NewError', $ERROR_INFO)
     @club = @prospect ? @prospect.club : load_club_based_on_host
-    redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
+    redirect_to error_checkout_path(campaign_id: @campaign, token: @prospect.token), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
   def create
@@ -61,7 +61,7 @@ class Campaigns::CheckoutsController < ApplicationController
   rescue
     Rails.logger.error "Checkout::CreateError: #{$ERROR_INFO}"
     Auditory.report_issue('Checkout::CreateError', $ERROR_INFO)
-    redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
+    redirect_to error_checkout_path(campaign_id: @campaign, token: @prospect.token), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
   def thank_you
@@ -69,7 +69,9 @@ class Campaigns::CheckoutsController < ApplicationController
     sign_out current_agent if agent_signed_in?
   end
 
-  def error; end
+  def error; 
+    @prospect = Prospect.where_token(params[:token])
+  end
 
   def critical_error; end
 
@@ -137,7 +139,7 @@ class Campaigns::CheckoutsController < ApplicationController
     return if @campaign.nil? || @campaign.active?
     Rails.logger.error 'Checkout::CheckIfActiveError: Campaign is not active'
     Auditory.notify_pivotal_tracker('Checkout: User tried enrolling to a closed campaign', 'There was an enrollment try to an already closed campaign. Please make sure that the campaign is properly closed in the Source.', {campaign_id: @campaign.id, initial_date: @campaign.initial_date, finish_date: @campaign.finish_date, today: Date.today.to_s})
-    redirect_to error_checkout_path, alert: I18n.t('error_messages.campaign_is_not_active')
+    redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.campaign_is_not_active')
   end
 
   def authenticate_campaign_agent_from_token!
@@ -175,6 +177,10 @@ class Campaigns::CheckoutsController < ApplicationController
   end
 
   def checkout_settings
-    @checkout_settings ||= @campaign.checkout_settings
+    @checkout_settings ||= if @campaign
+      @campaign.checkout_settings
+    else
+      @club.as_json(only: [:checkout_page_bonus_gift_box_content, :checkout_page_footer, :css_style, :duplicated_page_content, :error_page_content, :result_page_footer, :thank_you_page_content], methods:[:favicon_url, :result_pages_image_url, :header_image_url]).with_indifferent_access
+    end 
   end
 end

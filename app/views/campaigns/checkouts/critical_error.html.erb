@@ -1,15 +1,15 @@
 <div class='content'>
   <div class="row">
     <div class="col-sm-12 col-md-4">
-      <%= image_tag(@checkout_settings[:result_pages_image_url].url, id: 'result_image', class: 'img-responsive') if @checkout_settings[:result_pages_image_url].present? %>
+      <%= image_tag(@checkout_settings[:result_pages_image_url].url, id: 'result_image', class: 'img-responsive') if @checkout_settings and @checkout_settings[:result_pages_image_url].present? %>
     </div>
     <div class="col-sm-12 col-md-8">
       <h3>There was an error processing your request</h3>
       <p>Contact customer service for more information:</p>
-      <% if @club.cs_email.present? %>
+      <% if @club && @club.cs_email.present? %>
         <%= mail_to @club.cs_email, t('checkout.checkout_page.email_us') %><br />
       <% end %>
-      <% if @club.cs_phone_number.present? %>
+      <% if @club && @club.cs_phone_number.present? %>
         <%= t('checkout.checkout_page.call') %>: <a href="tel:<%= @club.cs_phone_number %>"><%= @club.cs_phone_number %></a> 9AM to 5PM EST<br />
       <% end %>
     </div>

@@ -1,1 +1,1 @@
-<div class="footer result"><%= replace_tokens(@checkout_settings[:result_page_footer], @club, @campaign).html_safe %></div>
+<div class="footer result"><%= replace_tokens(@checkout_settings[:result_page_footer], @club, @campaign).html_safe if @checkout_settings and @checkout_settings[:result_page_footer]%></div>

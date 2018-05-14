@@ -56,8 +56,10 @@ class Prospect < ActiveRecord::Base
   end
 
   def self.where_token(token)
-    id, created_at = Base64.urlsafe_decode64(token).split(',')
-    Prospect.find_by(id: id, created_at: Time.parse(created_at).utc)
+    if token
+      id, created_at = Base64.urlsafe_decode64(token).split(',')
+      Prospect.find_by(id: id, created_at: Time.parse(created_at).utc)
+    end
   rescue ArgumentError => e
     Auditory.report_issue('Prospect:where_token', e, {token: token})
     return nil

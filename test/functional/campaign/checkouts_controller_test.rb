@@ -207,7 +207,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
           generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
         end
       end
-      assert_redirected_to error_checkout_path
+      assert_redirected_to error_checkout_path(campaign_id: @campaign.to_param)
     end
   end
   
@@ -234,7 +234,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
       assert_redirected_to critical_error_checkout_path
     end
   end
-  
+
   test "should not create prospect if it has wrong data" do
     [:confirmed_admin_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
@@ -357,7 +357,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
             post :create, credit_card: { campaign_id: @campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
           end
         end
-        assert_redirected_to error_checkout_path
+        assert_redirected_to error_checkout_path(campaign_id: @campaign.to_param, token: prospect.token)
       end
     end
   end
@@ -389,7 +389,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
             post :create, campaign_id:@campaign.to_param, prospect_id:prospect.id, credit_card: { prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
           end
         end
-        assert_redirected_to error_checkout_path
+        assert_redirected_to error_checkout_path(token: prospect.token)
       end
     end
   end
@@ -447,7 +447,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
           generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
         end
       end
-      assert_redirected_to error_checkout_path
+      assert_redirected_to error_checkout_path(campaign_id: @campaign.to_param)
     end
   end
   
@@ -560,7 +560,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
             post :create, credit_card: { campaign_id:@campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
           end
         end
-        assert_redirected_to error_checkout_path
+        assert_redirected_to error_checkout_path(campaign_id: @campaign.to_param, token: prospect.token)
       end
     end
   end
@@ -590,7 +590,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
             post :create, credit_card: { campaign_id:@campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
           end
         end
-        assert_redirected_to error_checkout_path
+        assert_redirected_to error_checkout_path(campaign_id: @campaign.to_param, token: prospect.token)
       end
     end
   end
