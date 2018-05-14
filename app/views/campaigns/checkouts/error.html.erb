@@ -1,11 +1,11 @@
 <div class='content'>
   <div class="row">
     <div class="col-sm-12 col-md-4">
-      <%= image_tag(@checkout_settings[:result_pages_image_url].url, id: 'result_image', class: 'img-responsive') if @checkout_settings and @checkout_settings[:result_pages_image_url].present? %>
+      <%= image_tag(@checkout_settings[:result_pages_image_url].url, id: 'result_image', class: 'img-responsive') if @checkout_settings[:result_pages_image_url].present? %>
     </div>
     <div class="col-sm-12 col-md-8">
       <% if @campaign && @prospect %>
-        <%= replace_tokens(@checkout_settings[:error_page_content], @club, @campaign, @prospect).html_safe if @checkout_settings %>
+        <%= replace_tokens(@checkout_settings[:error_page_content], @club, @campaign, @prospect).html_safe %>
       <% else %>
         <h3>There was an error processing your request</h3>
         <p>Contact customer service for more information:</p>

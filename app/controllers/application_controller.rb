@@ -43,7 +43,7 @@ class ApplicationController < ActionController::Base
   private
 
     def authenticate_agent_from_token!
-      if params and params[:api_key]
+      if params[:api_key]
         agent = Agent.find_for_authentication(:authentication_token => params[:api_key])
         if agent && Devise.secure_compare(agent.authentication_token, params[:api_key])
           sign_in agent, store: false
