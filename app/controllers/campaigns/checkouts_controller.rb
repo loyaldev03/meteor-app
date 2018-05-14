@@ -38,7 +38,7 @@ class Campaigns::CheckoutsController < ApplicationController
   rescue
     Rails.logger.error "Checkout::SubmitError: Error: #{$ERROR_INFO}"
     Auditory.report_issue('Checkout::SubmitError', $ERROR_INFO)
-    redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
+    redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
   def new
@@ -49,7 +49,7 @@ class Campaigns::CheckoutsController < ApplicationController
     Rails.logger.error "Checkout::NewError: Error: #{$ERROR_INFO}"
     Auditory.report_issue('Checkout::NewError', $ERROR_INFO)
     @club = @prospect ? @prospect.club : load_club_based_on_host
-    redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
+    redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
   def create
@@ -61,7 +61,7 @@ class Campaigns::CheckoutsController < ApplicationController
   rescue
     Rails.logger.error "Checkout::CreateError: #{$ERROR_INFO}"
     Auditory.report_issue('Checkout::CreateError', $ERROR_INFO)
-    redirect_to error_checkout_path, alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
+    redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.user_not_saved', cs_phone_number: @club.cs_phone_number)
   end
 
   def thank_you
