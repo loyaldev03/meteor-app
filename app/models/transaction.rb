@@ -130,8 +130,8 @@ class Transaction < ActiveRecord::Base
         sale
       when "sale_manual_cash", "sale_manual_check"
         sale_manual
-      #when "authorization"
-      #  authorization
+      when "authorization"
+       authorization
       #when "capture"
       #  capture
       when "credit"
@@ -349,6 +349,22 @@ class Transaction < ActiveRecord::Base
           purchase_response = @gateway.purchase(amount_to_send, credit_card_token, @options)
         end
         logger.info "AM::Sale::Answer #{gateway} took #{time_elapsed}ms"
+        save_response(purchase_response)
+      end
+    end
+    
+    def authorization
+      if payment_gateway_configuration.nil?
+        save_custom_response({ message: "Payment gateway not found.", code: Settings.error_codes.not_found })
+      elsif self.token.nil? or self.token == CreditCard::BLANK_CREDIT_CARD_TOKEN
+        save_custom_response({ message: "Credit card is blank we won't authorize", code: Settings.error_codes.success }, true)
+      else
+        load_gateway
+        purchase_response = nil
+        time_elapsed = Benchmark.ms do
+          purchase_response = @gateway.authorize(amount_to_send, credit_card_token, @options)
+        end
+        logger.info "AM::Authorization::Answer #{gateway} took #{time_elapsed}ms"
         save_response(purchase_response)
       end
     end

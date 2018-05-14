@@ -731,9 +731,9 @@ class User < ActiveRecord::Base
 
     begin
       operation_type = check_enrollment_operation(tom)
-      if amount.to_f != 0.0      
+      if amount.to_f != 0.0 or (amount.to_f == 0.0 and tom.payment_gateway_configuration.payeezy?)
         trans = Transaction.obtain_transaction_by_gateway!(tom.payment_gateway_configuration.gateway)
-        trans.transaction_type = "sale"
+        trans.transaction_type = amount.to_f != 0.0 ? "sale" : "authorization"
         trans.prepare(self, credit_card, amount, tom.payment_gateway_configuration, tom.id, nil, operation_type)
         answer = trans.process
         unless trans.success? 

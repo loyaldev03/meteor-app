@@ -313,6 +313,7 @@ en:
           balance: Balance
           authorization_capture: 'Authorization-Capture'
           chargeback: Chargeback
+          authorization: Authorization
         transaction_types_messages:
           type_100: 'Billing: Enrollment Fee' # enrollment_billing
           type_101: 'Billing: Membership Fee' # membership_billing

@@ -112,31 +112,32 @@ class CreditCard < ActiveRecord::Base
 
   def get_token(pgc, puser, allow_cc_blank = false)
     if not self.token
-      pgc ||= user.terms_of_membership.payment_gateway_configuration
-      am = CreditCard.am_card(number, expire_month, expire_year, puser.first_name || user.first_name, puser.last_name || user.last_name)
-      
-      if am.valid?
-        self.cc_type = am.brand
-        begin
-          self.token = Transaction.store!(am, pgc, puser||user)
-        rescue Exception => e
-          if Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway] and not Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway].include? e.to_s
-            user = puser || self.user
-            Auditory.report_issue("CreditCard:GetToken", e, { credit_card_expire_month: self.expire_month, credit_card_expire_year: self.expire_year, credit_card_type: self.cc_type, club_id: user.club_id, user_name: user.full_name, user: user.email })
-          end
-          logger.error e.inspect
-          self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
-        end
-      elsif allow_cc_blank
+      if allow_cc_blank
         self.cc_type = 'unknown'
         self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards
       else
-        # uncomment this line ONLY If #55804192 is approved
-        # self.errors[:number] << "is not a valid credit card number" if am.errors["number"].empty? and not am.errors["brand"].empty?
-        self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
-        self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
-        self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
-        self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards. #54934966
+        pgc ||= user.terms_of_membership.payment_gateway_configuration
+        am = CreditCard.am_card(number, expire_month, expire_year, puser.first_name || user.first_name, puser.last_name || user.last_name)
+        if am.valid?
+          self.cc_type = am.brand
+          begin
+            self.token = Transaction.store!(am, pgc, puser||user)
+          rescue Exception => e
+            if Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway] and not Transaction::STORE_ERROR_NOT_REPORTABLE[pgc.gateway].include? e.to_s
+              user = puser || self.user
+              Auditory.report_issue("CreditCard:GetToken", e, { credit_card_expire_month: self.expire_month, credit_card_expire_year: self.expire_year, credit_card_type: self.cc_type, club_id: user.club_id, user_name: user.full_name, user: user.email })
+            end
+            logger.error e.inspect
+            self.errors[:number] << I18n.t('error_messages.get_token_mes_error')
+          end
+        else
+          # uncomment this line ONLY If #55804192 is approved
+          # self.errors[:number] << "is not a valid credit card number" if am.errors["number"].empty? and not am.errors["brand"].empty?
+          self.errors[:number] << am.errors["number"].join(", ") unless am.errors["number"].empty?
+          self.errors[:expire_month] << am.errors["month"].join(", ") unless am.errors["month"].empty?
+          self.errors[:expire_year] << am.errors["year"].join(", ") unless am.errors["year"].empty?
+          self.token = BLANK_CREDIT_CARD_TOKEN # fixing this token for blank credit cards. #54934966
+        end
       end
     end
     self.gateway = pgc.gateway
