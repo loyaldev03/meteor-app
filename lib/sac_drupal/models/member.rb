@@ -11,15 +11,13 @@ module Drupal
     end
 
     def update!(options = {})
-      if options[:force] || sync_fields.present? # change tracking
-        begin
-          res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.user.api_id }, fieldmap)
-        rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
-          Drupal.logger.info "  => #{$!.to_s}"
-        ensure
-          update_user(res)
-          res
-        end
+      begin
+        res = conn.put('/api/user/%{drupal_id}' % { drupal_id: self.user.api_id }, fieldmap)
+      rescue Faraday::Error::ParsingError # Drupal sends invalid application/json when something goes wrong
+        Drupal.logger.info "  => #{$!.to_s}"
+      ensure
+        update_user(res)
+        res
       end
     end
 
@@ -74,10 +72,6 @@ module Drupal
     end
 
   private
-    def sync_fields
-      OBSERVED_FIELDS.intersection(self.user.changed)
-    end
-
     def conn
       self.user.club.drupal
     end

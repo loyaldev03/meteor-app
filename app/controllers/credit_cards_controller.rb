@@ -17,11 +17,7 @@ class CreditCardsController < ApplicationController
       membership_update_response = if params[:terms_of_membership_id].present?
         current_user.change_terms_of_membership(params[:terms_of_membership_id], "Rollback to previous Membership", Settings.operation_types.membership_and_credit_card_update, current_agent, false, nil, { utm_campaign: Membership::CS_UTM_CAMPAIGN, utm_medium: Membership::CS_UTM_MEDIUM })
       end
-      begin
-        current_user.api_user.save!(force: true)
-      rescue
-        Auditory.report_issue("CreditCardsController::create - Could not sync user with Drupal", $!)
-      end
+      Users::SyncToRemoteDomainJob.perform_later(user_id: current_user.id)
       redirect_to show_user_path, notice: response[:message] + (membership_update_response[:message] if membership_update_response).to_s
     else
       flash.now[:error] = "#{response[:message]} #{response[:errors].to_s}"
@@ -65,11 +61,7 @@ class CreditCardsController < ApplicationController
       end
     end
     if success
-      begin
-        current_user.api_user.save!(force: true)
-      rescue 
-        Auditory.report_issue("CreditCardsController::activate - Could not sync user with Drupal", $!)
-      end
+      Users::SyncToRemoteDomainJob.perform_later(user_id: current_user.id)
       redirect_to show_user_path, notice: "Credit card #{new_credit_card.last_digits} activated."
     end
   end

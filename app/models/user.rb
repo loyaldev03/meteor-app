@@ -52,14 +52,9 @@ class User < ActiveRecord::Base
   end
 
   def after_save_sync_to_remote_domain
-    unless @skip_api_sync || api_user.nil?
-      api_user.save!
+    if defined? Drupal::Member && Drupal::Member::OBSERVED_FIELDS.intersection(self.changed) #change tracker
+      Users::SyncToRemoteDomainJob.perform_now(user_id: self.id) unless @skip_api_sync || api_user.nil?
     end
-  rescue Exception => e
-    # refs #21133
-    # If there is connectivity problems or data errors with drupal. Do not stop enrollment!! 
-    # Because maybe we have already bill this user.
-    Auditory.report_issue("User:drupal_sync", e, { user: self.id })
   end
 
   validates :country, 
