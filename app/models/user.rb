@@ -52,7 +52,7 @@ class User < ActiveRecord::Base
   end
 
   def after_save_sync_to_remote_domain
-    if defined? Drupal::Member && Drupal::Member::OBSERVED_FIELDS.intersection(self.changed) #change tracker
+    if defined? Drupal::Member and Drupal::Member::OBSERVED_FIELDS.intersection(self.changed) #change tracker
       Users::SyncToRemoteDomainJob.perform_now(user_id: self.id) unless @skip_api_sync || api_user.nil?
     end
   end
@@ -1106,6 +1106,8 @@ class User < ActiveRecord::Base
         trans = Transaction.obtain_transaction_by_gateway!(transaction_chargebacked.gateway)
         trans.new_chargeback!(transaction_chargebacked, args)
         self.blacklist nil, "Chargeback - " + reason
+      rescue NonReportableException
+        # do nothing
       rescue ActiveRecord::RecordNotSaved
         raise trans.errors.messages.map{|k,v| "#{k.to_s.humanize}: #{v.join(', ')}"}.join(".")
       rescue Exception => e

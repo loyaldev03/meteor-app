@@ -44,8 +44,10 @@ class PayeezyTransaction < Transaction
         chargeback_amount     = args['Chargeback Amount'].to_f
         operation_type        = Settings.operation_types.chargeback_rebutted
         operation_description = "Rebutted Chargeback processed $#{chargeback_amount}"
-      elsif args['Chargeback Status'] != 'CLOSED' || (args['Chargeback Status'] == 'CLOSED' && args['Chargeback Category'] != 'DEBITED')
-        raise "Wrong status received: Status: #{args['Chargeback Status']} and Category: #{args['Chargeback Category']}"
+      elsif args['Chargeback Status'] == 'CLOSED' && args['Chargeback Category'] == 'DEBITED'
+        raise NonReportableException.new
+      elsif args['Chargeback Status'] != 'CLOSED'
+        raise "Wrong status received: Status: #{args['Chargeback Status']}}"
       end
       
       self.transaction_type   = "chargeback"
