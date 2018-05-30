@@ -56,7 +56,7 @@ module SacStore
       end
     
       def handle_error_on_call(fulfillment, result, method)
-        message = result.is_a? String ? result : result.message
+        message = result.is_a?(String) ? result : result.message
         Auditory.notify_pivotal_tracker(message, method, {fulfillment_id: fulfillment.id, club: fulfillment.club_id})
         message
       end
