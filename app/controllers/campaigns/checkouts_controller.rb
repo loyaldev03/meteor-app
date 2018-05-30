@@ -45,6 +45,7 @@ class Campaigns::CheckoutsController < ApplicationController
     my_authorize! :checkout_new, Campaign, @prospect.club_id
     @product = Product.find_by(club_id: @prospect.club_id, sku: @prospect.product_sku)
     @edit_info_url = generate_edit_user_info_url(@prospect)
+    @show_bbb_seal = Settings['club_params'][@club.id]['show_bbb_seal']
   rescue
     Rails.logger.error "Checkout::NewError: Error: #{$ERROR_INFO}"
     Auditory.report_issue('Checkout::NewError', $ERROR_INFO)

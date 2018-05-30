@@ -408,13 +408,34 @@ defaults: &defaults
 
 development:
   <<: *defaults
-  xxxyyyzzz: reibel3y5estrada8
-
+  xxxyyyzzz: reibel3y5estrada8z
+  club_params:
+    39:
+      show_bbb_seal: true
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
+    100:
+      show_bbb_seal: false
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
 
 test:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
-
+  club_params:
+    1234:
+      show_bbb_seal: true
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
 
 production:
   <<: *defaults
@@ -435,15 +456,55 @@ production:
   pivotal_tracker:
     project_id: 840771
     token: "93edf6fdb44a44b280a675b85c464c5b"
+  retry_enrollment_process_fail_assignee: PIVOTAL_TRACKER_MEMBER_ID_KINCHELOE_CHRIS
+  club_params:
+    1:
+      show_bbb_seal: true
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
+    15:
+      show_bbb_seal: false
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
+
 prototype:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
+  club_params:
+    39:
+      show_bbb_seal: true
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
+    100:
+      show_bbb_seal: false
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
   elasticsearch:
     url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
 
 staging:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
+  club_params:
+    36:
+      show_bbb_seal: true
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
   elasticsearch:
     url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
 

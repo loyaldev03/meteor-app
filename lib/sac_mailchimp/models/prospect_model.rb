@@ -75,41 +75,9 @@ module SacMailchimp
     end
 
     def preferences_fieldmap
-      if Rails.env.production?
-        case self.prospect.club_id
-          when 1 # ONMC
-            {
-              "PREF1" => "driver_1",
-              "PREF2" => "driver_2",
-              "PREF3" => "car",
-              "PREF4" => "track"
-            }
-          when 15 # SCRF
-            {
-              "PREF1" => "driver_1",
-              "PREF2" => "driver_2",
-              "PREF3" => "car",
-              "PREF4" => "track"
-            }
-        end
-      elsif Rails.env.prototype?
-        case self.prospect.club_id
-          when 39 # ONMC
-            {
-              "PREF1" => "driver_1",
-              "PREF2" => "driver_2",
-              "PREF3" => "car",
-              "PREF4" => "track"
-            }
-          when 100 # SCRF
-            {
-              "PREF1" => "driver_1",
-              "PREF2" => "driver_2",
-              "PREF3" => "car",
-              "PREF4" => "track"
-            }
-        end
-      end
+      Settings['club_params'][user.club_id]['preferences']
+    rescue NoMethodError => e
+      Auditory.audit(nil, user.club, I18n.t('error_messages.preferences_not_set_for_club') + " - #{e}")
     end
 
     def client

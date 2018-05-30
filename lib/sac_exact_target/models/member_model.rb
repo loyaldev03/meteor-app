@@ -168,22 +168,9 @@ module SacExactTarget
     end
 
     def preferences_fieldmap
-      case self.user.club_id
-        when 1
-          {
-            "pref_field_1" => "driver_1",
-            "pref_field_2" => "driver_2",
-            "pref_field_3" => "car",
-            "pref_field_4" => "track"
-          }
-        when 15 # SCRF
-          {
-            "PREF1" => "driver_1",
-            "PREF2" => "driver_2",
-            "PREF3" => "car",
-            "PREF4" => "track"
-          }
-      end
+      Settings['club_params'][user.club_id]['preferences']
+    rescue NoMethodError => e
+      Auditory.audit(nil, user.club, I18n.t('error_messages.preferences_not_set_for_club') + " - #{e}")
     end
 
     def subscriber_key

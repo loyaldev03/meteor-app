@@ -4,7 +4,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
 
   def setup
     @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)        
     @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
     @prospect = FactoryGirl.create(:prospect, :club_id => @club.id)
@@ -327,6 +327,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   test "Admin and landing should get news" do
     [:confirmed_admin_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
+      Settings['club_params'][@club.id] = Settings['club_params'][1234]
       get :new, campaign_id:@campaign.to_param, token: @prospect.token
       assert_response :success
     end
@@ -532,6 +533,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   test "Admin and landing roles by club should get news" do
     ['admin', 'landing'].each do |role|
     sign_agent_with_club_role(:agent, role)
+      Settings['club_params'][@club.id] = Settings['club_params'][1234]
       get :new, campaign_id: @campaign.to_param, token: @prospect.token
       assert_response :success
     end

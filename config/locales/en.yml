@@ -208,6 +208,7 @@ en:
     campaign_is_not_active: 'This offer is not active at this moment.'
     campaign_no_products_available: 'No products available for this campaign'
     transport_setting_wrong_credentials: 'The Transport Setting does not have the correct credentials configured, make sure to configure them correctly.'
+    preferences_not_set_for_club: "Preferences for this Club aren't set in application.yml."
     api_role_not_found: 'External Code not found.'
     club_cash:
       negative_amount: "Check amount value, please. Amount cannot be less than 0 (zero)."

@@ -6,6 +6,7 @@ class CheckoutTest < ActionDispatch::IntegrationTest
     @landing_agent = FactoryGirl.create(:confirmed_landing_agent)   
     @partner = FactoryGirl.create(:partner)
     @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    Settings['club_params'][@club.id] = Settings['club_params'][1234]
     host = Capybara.current_session.server.host
     port = Capybara.current_session.server.port
     @club.checkout_url = "http://#{host}:#{port}"
