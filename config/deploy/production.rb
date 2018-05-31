@@ -8,6 +8,6 @@ set :database_name,    'sac_production'
 set :rails_env,        "production"
 set :keep_releases,    5
 set :rvm_type,         :system 
-set :rvm_ruby_version, '2.2.0@global'
+set :rvm_ruby_version, '2.4.2@global'
 set :rvm_custom_path,  '/usr/local/rvm'
 set :sudo,             'rvmsudo'

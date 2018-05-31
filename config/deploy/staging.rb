@@ -8,6 +8,6 @@ set :database_name,    'sac_platform_staging'
 set :rails_env,        "staging"
 set :keep_releases,    3
 set :rvm_type,         :system 
-set :rvm_ruby_version, '2.2.0@global'
+set :rvm_ruby_version, '2.4.2@ruby-2.4'
 set :rvm_custom_path,  '/usr/local/rvm'
 set :sudo,             'rvmsudo'

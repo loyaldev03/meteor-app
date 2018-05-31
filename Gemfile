@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '4.2.6'
+gem 'rails', '4.2.10'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -17,7 +17,7 @@ gem "delayed_job_web" # FIXME it is not working in rails 4
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
 
-gem 'json', '1.8.3'
+gem 'json'
 
 gem 'turnout'
 gem 'exact_target_sdk', github: 'daws/exact_target_sdk'
@@ -94,7 +94,7 @@ group :development do
   gem "capistrano", "3.8.0"
   gem 'capistrano-rails', '1.3'
   gem 'capistrano-rvm'
-  gem 'tinder'
+  gem 'tinder', '~>1.10'
   #####
   gem 'foreman'
   gem 'quiet_assets'
