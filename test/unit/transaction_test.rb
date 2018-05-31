@@ -74,14 +74,16 @@ class TransactionTest < ActiveSupport::TestCase
   test "Enrollment without approval" do
     active_merchant_stubs
     assert_difference('Operation.count',4) do   #EnrollBilling, club cash and EnrollmentInfo operations, fulfillment_creation
-      assert_difference('Fulfillment.count') do
-        user = enroll_user(@terms_of_membership)
-        assert_not_nil user.next_retry_bill_date, "NBD should not be nil"
-        assert_not_nil user.join_date, "join date should not be nil"
-        assert_not_nil user.bill_date, "bill date should not be nil"
-        assert_equal user.recycled_times, 0, "recycled_times should be 0"
-        assert_not_nil user.transactions.find_by(operation_type: Settings.operation_types.enrollment_billing, transaction_type: 'sale')
-      end
+      assert_difference('Transaction.count',1) do
+        assert_difference('Fulfillment.count') do
+          user = enroll_user(@terms_of_membership)
+          assert_not_nil user.next_retry_bill_date, "NBD should not be nil"
+          assert_not_nil user.join_date, "join date should not be nil"
+          assert_not_nil user.bill_date, "bill date should not be nil"
+          assert_equal user.recycled_times, 0, "recycled_times should be 0"
+          assert_not_nil user.transactions.find_by(operation_type: Settings.operation_types.enrollment_billing, transaction_type: 'sale')
+        end
+      end  
     end
   end
 
@@ -335,7 +337,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "Billing with SD is re-scheduled" do 
     active_merchant_stubs_store
     assert_difference('Operation.count', 3) do
-      assert_difference('Transaction.count') do
+      assert_difference('Transaction.count',1) do
         active_user = create_active_user(@terms_of_membership)
         active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
         nbd = active_user.bill_date
@@ -412,19 +414,21 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs_store
     assert_difference('Operation.count', 6) do
       assert_difference('Communication.count', 2) do
-        active_user = create_active_user(@terms_of_membership)
-        active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
-        amount = @terms_of_membership.installment_amount
-        active_user.recycled_times = 4
-        active_user.save
-        answer = active_user.bill_membership
-        active_user.reload
-        assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
-        assert active_user.lapsed?, "user should be lapsed after recycle limit is reached"
-        assert_nil active_user.next_retry_bill_date, "next_retry_bill_date should be nil"
-        assert_nil active_user.bill_date, "bill_date should be nil"
-        assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
-        assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_hard_decline_by_max_retries, transaction_type: 'sale')
+        assert_difference('Transaction.count',1) do
+          active_user = create_active_user(@terms_of_membership)
+          active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
+          amount = @terms_of_membership.installment_amount
+          active_user.recycled_times = 4
+          active_user.save
+          answer = active_user.bill_membership
+          active_user.reload
+          assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
+          assert active_user.lapsed?, "user should be lapsed after recycle limit is reached"
+          assert_nil active_user.next_retry_bill_date, "next_retry_bill_date should be nil"
+          assert_nil active_user.bill_date, "bill_date should be nil"
+          assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
+          assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_hard_decline_by_max_retries, transaction_type: 'sale')
+        end
       end
     end
   end
@@ -435,14 +439,16 @@ class TransactionTest < ActiveSupport::TestCase
     active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
     assert_difference('Operation.count', 5) do
       assert_difference('Communication.count', 2) do
-        amount = @terms_of_membership.installment_amount
-        answer = active_user.bill_membership
-        active_user.reload
-        assert active_user.lapsed?, "user should be lapsed after HD"
-        assert_nil active_user.next_retry_bill_date, "next_retry_bill_date should be nil"
-        assert_nil active_user.bill_date, "bill_date should be nil"
-        assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
-        assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_hard_decline, transaction_type: 'sale')
+        assert_difference('Transaction.count',1) do
+          amount = @terms_of_membership.installment_amount
+          answer = active_user.bill_membership
+          active_user.reload
+          assert active_user.lapsed?, "user should be lapsed after HD"
+          assert_nil active_user.next_retry_bill_date, "next_retry_bill_date should be nil"
+          assert_nil active_user.bill_date, "bill_date should be nil"
+          assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
+          assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_hard_decline, transaction_type: 'sale')
+        end
       end
     end
   end
@@ -455,18 +461,20 @@ class TransactionTest < ActiveSupport::TestCase
 
     active_merchant_stubs_store
     assert_difference('Operation.count', 5) do
-      active_user = create_active_user(@terms_of_membership)
-      active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
-      amount = @terms_of_membership.installment_amount
-      active_user.recycled_times = 4
-      active_user.save
-      answer = active_user.bill_membership
-      active_user.reload
-      assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
-      assert active_user.provisional?
-      assert_equal active_user.recycled_times, 0
-      assert_equal active_user.terms_of_membership.id, @terms_of_membership_for_downgrade.id
-      assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries, transaction_type: 'sale')
+      assert_difference('Transaction.count',1) do
+        active_user = create_active_user(@terms_of_membership)
+        active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
+        amount = @terms_of_membership.installment_amount
+        active_user.recycled_times = 4
+        active_user.save
+        answer = active_user.bill_membership
+        active_user.reload
+        assert (answer[:code] != Settings.error_codes.success), "#{answer[:code]} cant be 000 (success)"
+        assert active_user.provisional?
+        assert_equal active_user.recycled_times, 0
+        assert_equal active_user.terms_of_membership.id, @terms_of_membership_for_downgrade.id
+        assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries, transaction_type: 'sale')
+      end
     end
   end
 
@@ -478,14 +486,16 @@ class TransactionTest < ActiveSupport::TestCase
 
     active_merchant_stubs_store
     assert_difference('Operation.count', 5) do
-      active_user = create_active_user(@terms_of_membership)
-      active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
-      amount = @terms_of_membership.installment_amount
-      answer = active_user.bill_membership
-      active_user.reload
-      assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
-      assert_equal active_user.terms_of_membership.id, @terms_of_membership_for_downgrade.id
-      assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.downgraded_because_of_hard_decline, transaction_type: "sale")
+      assert_difference('Transaction.count',1) do
+        active_user = create_active_user(@terms_of_membership)
+        active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
+        amount = @terms_of_membership.installment_amount
+        answer = active_user.bill_membership
+        active_user.reload
+        assert_equal active_user.recycled_times, 0, "recycled_times should be 0"
+        assert_equal active_user.terms_of_membership.id, @terms_of_membership_for_downgrade.id
+        assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.downgraded_because_of_hard_decline, transaction_type: "sale")
+      end
     end
   end
 
@@ -539,10 +549,11 @@ class TransactionTest < ActiveSupport::TestCase
     @tom = FactoryGirl.create(:terms_of_membership_monthly_without_provisional_day_and_amount, :club_id => @club.id)
     @credit_card.number = "0000000000"
     active_merchant_stubs
+ 
     user = enroll_user(@tom, 0, true)
 
     assert_difference("Operation.count",4) do  # club cash | renewal schedule NBD | billing | memberhsip_bill_communication
-      assert_difference("Transaction.count") do
+      assert_difference("Transaction.count",1) do
         user.bill_membership
       end
     end
@@ -556,7 +567,7 @@ class TransactionTest < ActiveSupport::TestCase
     user = enroll_user(@tom, 0, true)
     
     assert_difference("Operation.count",4) do  # club_cash | renewal schedule NBD | billing | membership_bill_communication
-      assert_difference("Transaction.count") do
+      assert_difference("Transaction.count",1) do
         user.bill_membership
       end
     end
@@ -803,7 +814,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "Should event bill an user, and also refund it." do
     user = enroll_user(@terms_of_membership, 0, false)
     amount = 200
-    assert_difference("Transaction.count") do
+    assert_difference("Transaction.count",1) do
       assert_difference("Operation.count") do
         user.no_recurrent_billing(amount,"testing event", "one-time")
       end
@@ -846,7 +857,7 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
     user = enroll_user(@terms_of_membership_not_expected_to_be_billed, 0, false)
     amount = 200
-    assert_difference("Transaction.count") do
+    assert_difference("Transaction.count",1) do
       assert_difference("Operation.count") do
         user.no_recurrent_billing(amount,"testing event", "one-time")
       end
@@ -948,7 +959,7 @@ class TransactionTest < ActiveSupport::TestCase
       old_month = active_user.active_credit_card.expire_month
       
       assert_difference('Operation.count', 4) do
-        assert_difference('Transaction.count') do
+        assert_difference('Transaction.count',1) do
           active_user.bill_membership
         end
       end
@@ -1016,7 +1027,7 @@ class TransactionTest < ActiveSupport::TestCase
     user.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = user.club_cash_amount
     assert_difference("Operation.count",3) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",0) do
           user.bill_membership
         end
@@ -1063,7 +1074,7 @@ class TransactionTest < ActiveSupport::TestCase
     club_cash = user.club_cash_amount
 
     assert_difference("Operation.count",4) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",0) do
           user.bill_membership
         end
@@ -1097,7 +1108,7 @@ class TransactionTest < ActiveSupport::TestCase
     club_cash = user.club_cash_amount
 
     assert_difference("Operation.count",4) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",0) do
           user.bill_membership
         end
@@ -1118,7 +1129,7 @@ class TransactionTest < ActiveSupport::TestCase
     user.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = user.club_cash_amount
     assert_difference("Operation.count",3) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",0) do
           user.bill_membership
         end
@@ -1131,7 +1142,7 @@ class TransactionTest < ActiveSupport::TestCase
     club_cash = user.club_cash_amount
 
     assert_difference("Operation.count",4) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",0) do
           user.bill_membership
         end
@@ -1165,7 +1176,7 @@ class TransactionTest < ActiveSupport::TestCase
     club_cash = user.club_cash_amount
 
     assert_difference("Operation.count",5) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",1) do
           user.bill_membership
         end
@@ -1187,7 +1198,7 @@ class TransactionTest < ActiveSupport::TestCase
     club_cash = user.club_cash_amount
 
     assert_difference("Operation.count",3) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",0) do
           user.bill_membership
         end
@@ -1221,7 +1232,7 @@ class TransactionTest < ActiveSupport::TestCase
     user.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = user.club_cash_amount
     assert_difference("Operation.count",4) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",1) do
           user.bill_membership
         end
@@ -1255,7 +1266,7 @@ class TransactionTest < ActiveSupport::TestCase
     user.update_attribute :next_retry_bill_date, Time.zone.now
     club_cash = user.club_cash_amount
     assert_difference("Operation.count",3) do
-      assert_difference("Transaction.count")do
+      assert_difference("Transaction.count",1)do
         assert_difference("ClubCashTransaction.count",0) do
           user.bill_membership
         end
@@ -1646,17 +1657,21 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enroll with Payeezy" do
     club_with_payeezy
-    enroll_user(@payeezy_terms_of_membership, 23, false, @credit_card_payeezy)
+    assert_difference('Transaction.count',1) do
+      enroll_user(@payeezy_terms_of_membership, 23, false, @credit_card_payeezy)
+    end
   end
 
   test "Bill membership with Payeezy" do
     club_with_payeezy
     active_user = enroll_user(@payeezy_terms_of_membership, 100, false, @credit_card_payeezy)
     amount = @payeezy_terms_of_membership.installment_amount
-    Timecop.travel(active_user.next_retry_bill_date) do
-      answer = active_user.bill_membership
-      active_user.reload
-      assert_equal active_user.status, 'active'
+    assert_difference('Transaction.count',1) do
+      Timecop.travel(active_user.next_retry_bill_date) do
+        answer = active_user.bill_membership
+        active_user.reload
+        assert_equal active_user.status, 'active'
+      end
     end
   end
   
