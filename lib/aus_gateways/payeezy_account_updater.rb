@@ -195,11 +195,13 @@ module PayeezyAccountUpdater
     end
     
     def self.send_email_with_contact_users(club_id)
+      contact_email_list = Club.find(club_id).payment_gateway_errors_email
+      return unless contact_email_list.present?
       credit_cards = CreditCard.joins(:user).where(users: {club_id: club_id}, aus_status: 'CONTAC', aus_answered_at: Time.current.beginning_of_day..Time.current.end_of_day)
       if credit_cards.size > 0
         csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"
         csv += credit_cards.collect {|cc| [ cc.user_id, cc.user.first_name, cc.user.last_name, cc.user.email, cc.user.full_phone_number, cc.user.status, cc.user.next_retry_bill_date ].join(',') }.join("\n")
-        Notifier.call_these_users(csv, Club.find(club_id).payment_gateway_errors_email).deliver_later!
+        Notifier.call_these_users(csv, contact_email_list).deliver_later!
       end
     rescue
       Auditory.report_issue("PAYEEZY::send_email_with_contact_users", $!, {club_id: club_id})

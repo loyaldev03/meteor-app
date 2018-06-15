@@ -62,6 +62,7 @@ module MesAccountUpdater
 
   private
     def self.send_email_with_call_users(contact_email_list)
+      return unless contact_email_list.present?
       ccs = CreditCard.where([" aus_status = 'CALL' AND date(aus_answered_at) = ? ", Time.zone.now.to_date ])
       if ccs.size > 0
         csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"

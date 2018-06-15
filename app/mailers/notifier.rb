@@ -48,6 +48,7 @@ class Notifier < ActionMailer::Base
   end
 
   def call_these_users(csv, contact_email_list)
+    return unless contact_email_list.present?
     attachments["call_users_#{Date.today}.csv"] = { :mime_type => 'text/csv', :content => csv }
     mail :to => contact_email_list, 
          :subject => "Account Updater [#{Date.today}] - List of users to contact.",
