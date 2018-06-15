@@ -35,6 +35,8 @@ defaults: &defaults
     gmail_account_password: 'a4my0fm3'
   payeezy_aus_service:
     folder: <%= "#{Rails.root}/account_updater_files/payeezy" %>
+    unsent_folder: <%= "#{Rails.root}/account_updater_files/payeezy/unsent" %>
+    sent_folder: <%= "#{Rails.root}/account_updater_files/payeezy/sent" %>
     url: 'prod-gw-na.firstdataclients.com'
     merchant_name: 'OFFICIAL NASCAR CAU'
     merchant_number: '372654450884'
