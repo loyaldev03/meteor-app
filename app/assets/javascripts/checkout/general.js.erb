@@ -4,12 +4,20 @@ function doOnReadyforAllPages() {
     console = {};
     console.log = function () {};
   }
+
+  // Reload page if using back button
+  window.addEventListener("pageshow", function (event) {
+    var historyTraversal = event.persisted || (typeof window.performance != "undefined" && window.performance.navigation.type === 2);
+    if (historyTraversal) {
+      window.location.reload();
+    }
+  });
 }
 
 function checkoutPageFunctions() {
   $.validator.addMethod(
     'expirationDate',
-    function(value, element, params) {
+    function (value, element, params) {
       var minMonth = new Date().getMonth() + 1;
       var minYear = new Date().getFullYear();
       var month = parseInt($(params.month).val(), 10);
@@ -41,8 +49,15 @@ function checkoutPageFunctions() {
 
   $('#credit_card').validate({
     rules: {
-      'credit_card[number]': { required: true, creditcard: true },
-      'credit_card[expire_month]': { required: true, number: true, maxlength: 2 },
+      'credit_card[number]': {
+        required: true,
+        creditcard: true
+      },
+      'credit_card[expire_month]': {
+        required: true,
+        number: true,
+        maxlength: 2
+      },
       'credit_card[expire_year]': {
         required: true,
         number: true,
@@ -53,7 +68,7 @@ function checkoutPageFunctions() {
         }
       }
     },
-    invalidHandler: function(event, validator) {
+    invalidHandler: function (event, validator) {
       var errors = validator.numberOfInvalids();
       if (errors) {
         toggleFields(true);
@@ -78,7 +93,7 @@ function checkoutPageFunctions() {
     }
   });
 
-  $('#submit').click(function() {
+  $('#submit').click(function () {
     toggleFields(false);
   });
   
@@ -111,7 +126,9 @@ function checkoutPageFunctions() {
 
 function thankYouPageFunctions(autologinUrl) {
   if (autologinUrl.length > 0) {
-    window.setTimeout(function() { document.location = autologinUrl; }, 15000);
+    window.setTimeout(function () {
+      document.location = autologinUrl;
+    }, 15000);
   }
 }
 

@@ -45,7 +45,8 @@ module PayeezyAccountUpdater
   def self.account_updater_send_file_to_process_for_gateway(gateway)
     return if gateway.aus_login.nil? or gateway.aus_password.nil?
     local_filename = "#{Time.current.strftime("%Y%m%d")}_aus_request_#{gateway.club_id}.txt"
-    send_request_file_to_payeezy(local_filename, gateway) if generate_request_file(local_filename, gateway)
+    generate_request_file(local_filename, gateway)
+    send_request_files_to_payeezy(gateway)
   end
   
   def self.account_updater_process_response_for_gateway(gateway)
@@ -141,7 +142,7 @@ module PayeezyAccountUpdater
       # users with expired credit card and active
       users     = User.joins(:credit_cards).billable.where([ 'date(bill_date) = ? AND club_id = ? AND active = 1 AND gateway = ? AND cc_type != ?', (Time.current + 1.week).to_date, gateway.club_id, gateway.gateway, 'american_express' ])
       if users.any?
-        file_path     = "#{Settings.payeezy_aus_service.folder}/#{filename}"
+        file_path     = File.join(Settings.payeezy_aus_service.unsent_folder, filename)
         file          = File.open(file_path, 'wb')
         filler        = ' '
         count         = 5
@@ -184,22 +185,29 @@ module PayeezyAccountUpdater
       Auditory.report_issue("PAYEEZY::generate_aus_request_file", $!, { :gateway_id => gateway.id.to_s, filename: filename })
       false
     end
-        
-    def self.send_request_file_to_payeezy(local_filename, gateway)
-      file_path = "#{Settings.payeezy_aus_service.folder}/#{local_filename}"
-      Net::SFTP.start(Settings.payeezy_aus_service.url, gateway.aus_login, {password: gateway.aus_password, port: 6522, keys:'~/.ssh/bam-key'}) do |sftp|
-        sftp.upload!(file_path, 'RCDMONCU.'+local_filename)
+
+    def self.send_request_files_to_payeezy(gateway)
+      file_name = ''
+      Dir[File.join(Settings.payeezy_aus_service.unsent_folder, '*.txt')].each do |source_file|
+        file_name = File.basename(source_file)
+        Net::SFTP.start(Settings.payeezy_aus_service.url, gateway.aus_login, password: gateway.aus_password, port: 6522, keys: '~/.ssh/bam-key') do |sftp|
+          sftp.upload!(source_file, 'RCDMONCU.' + file_name)
+        end
+        # If no error, we assume that the file was uploaded and move it to the sent/ folder
+        File.rename source_file, File.join(Settings.payeezy_aus_service.sent_folder, file_name)
       end
     rescue
-      Auditory.report_issue("PAYEEZY::aus_send_request_file", $!, { :gateway_id => gateway.id.to_s, local_filename: local_filename })
+      Auditory.report_issue('PAYEEZY::aus_send_request_file', $ERROR_INFO, gateway_id: gateway.id.to_s, local_filename: file_name)
     end
     
     def self.send_email_with_contact_users(club_id)
+      contact_email_list = Club.find(club_id).payment_gateway_errors_email
+      return unless contact_email_list.present?
       credit_cards = CreditCard.joins(:user).where(users: {club_id: club_id}, aus_status: 'CONTAC', aus_answered_at: Time.current.beginning_of_day..Time.current.end_of_day)
       if credit_cards.size > 0
         csv = "id,first_name,last_name,email,phone,status,cs_next_bill_date\n"
         csv += credit_cards.collect {|cc| [ cc.user_id, cc.user.first_name, cc.user.last_name, cc.user.email, cc.user.full_phone_number, cc.user.status, cc.user.next_retry_bill_date ].join(',') }.join("\n")
-        Notifier.call_these_users(csv, Club.find(club_id).payment_gateway_errors_email).deliver_later!
+        Notifier.call_these_users(csv, contact_email_list).deliver_later!
       end
     rescue
       Auditory.report_issue("PAYEEZY::send_email_with_contact_users", $!, {club_id: club_id})

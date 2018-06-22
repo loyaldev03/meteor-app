@@ -55,8 +55,7 @@ module SacMailchimp
       begin
         client.lists(mailchimp_list_id).members.create(body: { email_address: self.user.email.downcase, status: subscriber_status, merge_fields: subscriber_data })
       rescue Gibbon::MailChimpError => e
-        update_member e
-        raise e
+        handle_exception_upon_sync e
       end
     end
 
@@ -65,8 +64,7 @@ module SacMailchimp
         data = { body: { status: subscriber_status , merge_fields:  subscriber_data } }
         client.lists(mailchimp_list_id).members(email).update(data)
       rescue Gibbon::MailChimpError => e
-        update_member e
-        raise e
+        handle_exception_upon_sync e
     	end
     end
 
@@ -190,6 +188,11 @@ module SacMailchimp
 
     def mailchimp_list_id
     	@list_id ||= self.user.club.marketing_tool_attributes["mailchimp_list_id"]
+    end
+    
+    def handle_exception_upon_sync(exception)
+      update_member exception
+      raise exception unless exception.detail.include? SacMailchimp::MULTIPLE_SIGNED_ERROR_MESSAGE
     end
 
     def has_fake_email?(subscriber_email = nil)

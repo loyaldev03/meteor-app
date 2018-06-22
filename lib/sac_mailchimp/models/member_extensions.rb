@@ -7,7 +7,7 @@ module SacMailchimp
 
     module ClassMethods
       def sync_members_to_mailchimp
-        base = User.where("need_sync_to_marketing_client = 1 AND club_id in (?)", Club.mailchimp_related.pluck(:id))
+        base = User.where("(need_sync_to_marketing_client = 1 OR (marketing_client_synced_status = 'error' AND marketing_client_last_sync_error LIKE ? AND DATE(marketing_client_last_sync_error_at) = ?)) AND club_id IN (?)", "%#{SacMailchimp::MULTIPLE_SIGNED_ERROR_MESSAGE}%", (Time.current - 4.days).to_date, Club.mailchimp_related.pluck(:id))
         Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_mailchimp, processing #{base.count} members"
         base.find_in_batches do |group|
           group.each_with_index do |member,index|
