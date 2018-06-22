@@ -65,7 +65,7 @@ module PayeezyAccountUpdater
       Rails.logger.info "[PayeezyChargebackReport-#{Date.yesterday.strftime('%m/%d/%Y')}] Processing file: #{chargeback_data.to_s}"
       chargeback_data.each do |data|
         begin
-          user = User.find_by('id = :invoice_number OR email LIKE ":invoice_number%"', invoice_number: data['Invoice Number'])
+          user = User.find_by('id = ? OR email LIKE ?', data['Invoice Number'], "#{data['Invoice Number']}%")
           raise "Chargeback ##{data['Invoice Number']} could not be processed: Could not find user! #{data.to_s}" unless user
           transaction_chargebacked = user.transactions.find_by("payment_gateway_configuration_id = ? AND DATE(created_at) = ? AND last_digits = ? AND amount = ?", gateway.id, data['Transaction Date'], data['Cardholder Number'][-4,4], data['Processed Transaction Amount'])
           raise "Chargeback ##{data['Invoice Number']} could not be processed: Could not find transaction! #{data.to_s}" unless transaction_chargebacked
