@@ -1,6 +1,8 @@
 module SacMailchimp
   mattr_accessor :logger 
 
+  MULTIPLE_SIGNED_ERROR_MESSAGE = "has signed up to a lot of lists very recently"
+
   def self.enable_integration!
     logger.info " ** Initializing SAC Mailchimp integration at #{I18n.l(Time.zone.now)}"
 
