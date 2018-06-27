@@ -33,7 +33,7 @@ group :assets do
 end
 
 
-gem 'jquery-ui-rails'
+gem 'jquery-ui-rails', '6.0.1'
 gem 'jquery-datatables', github: 'sebastianGitDL/jquery-datatables'
 
 gem 'carmen-rails'
@@ -45,7 +45,7 @@ gem 'devise-encryptable'
 gem 'settingslogic', '2.0.8'
 gem 'wirble'
 gem 'bootstrap-will_paginate'
-gem 'nokogiri'
+gem 'nokogiri', '1.8.3'
 gem 'faraday', '>= 0.9.1'
 gem 'faraday_middleware', '>= 0.9.0'
 gem 'net-sftp', require: false
@@ -57,7 +57,7 @@ gem "axlsx", "~> 2.0.1"
 
 gem 'twitter-bootstrap-rails', '2.2.7'
 
-gem 'jquery-rails'
+gem 'jquery-rails', '4.3.3'
 
 gem "paranoia", "~> 2.0"
 gem 'exception_notification', github: 'stoneacre/exception_notification'
@@ -98,7 +98,7 @@ group :development do
   #####
   gem 'foreman'
   gem 'quiet_assets'
-  gem 'mailcatcher', require: false
+  # gem 'mailcatcher', require: false
 end
 
 gem 'tire'
