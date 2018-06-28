@@ -4,10 +4,10 @@ export RAILS_ENV=$1
 
 # needs to find ruby and rake binaries
 if [ "$1" == "production" ]; then
-  export PATH=$PATH:/usr/local/rvm/gems/ruby-2.2.0@sac-platform-rails4/bin:/usr/local/rvm/gems/ruby-2.2.0@sac-platform-rails4/bin:/usr/local/rvm/rubies/ruby-2.2.0/bin:/usr/local/rvm/bin:/usr/local/sbin:/usr/local/bin
-  [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm" && rvm use ruby-2.2.0@global
+  export PATH=$PATH:/usr/local/rvm/gems/ruby-2.4.2@sac-platform-rails4/bin:/usr/local/rvm/gems/ruby-2.4.2@sac-platform-rails4/bin:/usr/local/rvm/rubies/ruby-2.4.2/bin:/usr/local/rvm/bin:/usr/local/sbin:/usr/local/bin
+  [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm" && rvm use ruby-2.4.2@global
 else
-  [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm" && rvm use ruby-2.2.0@global
+  [[ -s "/usr/local/rvm/scripts/rvm" ]] && . "/usr/local/rvm/scripts/rvm" && rvm use ruby-2.4.2@global
 fi
 
 # 15 0 * * * rake_task_runner
