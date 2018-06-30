@@ -11,7 +11,8 @@ class CampaignDataFetcher
     def fetch!(report)
       report            = report.dup
       report.date       = :summary
-      data              = client.reports(report.campaign_foreign_id).retrieve
+      response          = client.reports(report.campaign_foreign_id).retrieve
+      data              = response.body
       report.reached    = data['emails_sent'].to_i
       report.converted  = data['clicks']['unique_subscriber_clicks'].to_i
       report.spent      = 0
