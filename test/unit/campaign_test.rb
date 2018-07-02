@@ -210,8 +210,8 @@ class CampaignTest < ActiveSupport::TestCase
   ##############MAILCHIMP#########################
   ################################################  
 
-  def stubsmailchimp
-    answer = {'emails_sent' => 3305, 'clicks' => {'unique_subscriber_clicks' => 104}}    
+  def stubsmailchimp    
+    answer = Gibbon::Response.new({body: {'emails_sent' => 3305, 'clicks' => {'unique_subscriber_clicks' => 104}}})
     Gibbon::Request.any_instance.stubs(:retrieve).returns(answer)
   end
 
