@@ -262,7 +262,6 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     click_link_or_button 'Set undeliverable'
     click_link_or_button 'Set wrong address'
     confirm_ok_js
-    operation = @saved_user.operations.first
     
     within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table") do
@@ -289,7 +288,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     within(".nav-tabs"){ click_on("Operations") }
     within("#operations_table") do
       assert page.has_content?("Edited operation note")
-      assert page.has_content?(operation.id.to_s)
+      assert page.has_content?(@saved_user.operations.first.id)
     end
   end
 
@@ -531,9 +530,9 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     within("#credit_cards"){ assert page.has_no_selector?("#destroy") }
   end
 
-  # # Do not allow to remove credit card from users that are Blacklisted
-  # # Do not see Destroy button at Credit Card tab
-  # # Credit card 7913 added and activated.
+  # Do not allow to remove credit card from users that are Blacklisted
+  # Do not see Destroy button at Credit Card tab
+  # Credit card 7913 added and activated.
   test "Delete credit card only when user is lapsed and is not blacklisted (and credit card is not the last one)" do
     setup_user
     second_credit_card = FactoryGirl.create(:credit_card_american_express , :user_id => @saved_user.id, :active => false)

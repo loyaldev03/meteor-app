@@ -124,7 +124,7 @@ class ClubTest < ActionDispatch::IntegrationTest
     fill_in_club(unsaved_club)    
     click_link_or_button 'Update'
     saved_club.reload    
-    assert page.has_content?(" The club #{saved_club.name} was successfully updated.")    
+    assert page.has_content?("The club #{saved_club.name} was successfully updated.")    
     assert_equal(saved_club.reload.description, 'My description')
   end
 

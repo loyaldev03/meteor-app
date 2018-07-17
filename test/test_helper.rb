@@ -11,7 +11,6 @@ require 'mocha/setup'
 require "timeout"
 require 'tasks/tasks_helpers'
 #require 'capybara-screenshot'
-
 # require 'capybara-webkit'
 
 Devise.stretches = 1
@@ -279,6 +278,10 @@ module ActionDispatch
       evaluate_script("window.alert = function(msg) { return true; }")
     end
 
+    def select_into_dropdown(field, value)            
+      page.execute_script("$('#{field} option:contains(' + '#{value}' + ')').attr('selected', 'selected'); $('#{field}').change();")      
+    end
+
     def select_country_and_state(country = 'US')
       if country == 'US'
         select('United States', :from => 'user[country]')
@@ -500,9 +503,8 @@ module ActionDispatch
       within("#transactions") do
         assert page.has_selector?("#transactions_table")
         Transaction.all.each do |transaction|
-          assert (page.has_content?("Sale : This transaction has been approved") or page.has_content?("Billing:  Membership Fee - This transaction has been approved")  )
+          assert (page.has_content?("Sale : This transaction has been approved") or page.has_content?("Billing: Membership Fee - This transaction has been approved")  )
         end
-        # assert page.has_content?("Sale : This transaction has been approved")
         assert page.has_content?(user.terms_of_membership.installment_amount.to_s)
       end
 

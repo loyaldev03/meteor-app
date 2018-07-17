@@ -171,8 +171,6 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
       assert page.has_content?("cancellation")
     end
     assert_equal(Communication.last.template_type, 'cancellation')
-   
-    click_link_or_button 'Cancel'
     assert assert find_field('input_first_name').value == @saved_user.first_name
   end
 

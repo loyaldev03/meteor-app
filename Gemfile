@@ -111,11 +111,12 @@ group :test do
   gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'
-  gem 'selenium-webdriver', '2.53.4'
+  gem 'selenium-webdriver'
   gem 'brakeman'
   gem 'simplecov'
   gem "timecop"
   gem 'connection_pool'
+  gem 'puma'
 end
 
 group :test, :development do

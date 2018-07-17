@@ -24,7 +24,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   def fill_in_step_1(name = nil, external_code = nil, description = nil)
     find(".step_selected", :text => "1")
     fill_in 'terms_of_membership[name]', :with => name if name
-    select('6 - Paid Users', from: 'terms_of_membership[api_role]')
+    select_into_dropdown('#terms_of_membership_api_role', '6 - Paid User')        
     fill_in 'terms_of_membership[description]', :with => description if description
   end
 

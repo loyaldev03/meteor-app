@@ -22,12 +22,12 @@ class CheckoutTest < ActionDispatch::IntegrationTest
   end
 
   def show_new_checkout(prospect)    
-    visit new_checkout_path(campaign_id:@campaign.to_param, token: prospect.token)    
-    assert page.has_content?("Name #{prospect.first_name} #{prospect.last_name}")    
-    assert page.has_content?("Address #{prospect.address}")
-    assert page.has_content?("Email #{prospect.email}")
-    assert page.has_content?("City / State / Zip #{prospect.city} / #{prospect.state} / #{prospect.zip}") 
-    assert page.has_content?("Shipping & Processing $#{@campaign.enrollment_price}")
+    visit new_checkout_path(campaign_id:@campaign.to_param, token: prospect.token)   
+    assert page.has_content?("#{prospect.first_name} #{prospect.last_name}")    
+    assert page.has_content?("#{prospect.address}")
+    assert page.has_content?("#{prospect.email}")
+    assert page.has_content?("#{prospect.city} / #{prospect.state} / #{prospect.zip}") 
+    assert page.has_content?("$#{@campaign.enrollment_price}")
   end
 
   def fill_in_credit_card(number, expire_month, expire_year)
@@ -41,7 +41,8 @@ class CheckoutTest < ActionDispatch::IntegrationTest
     assert_difference('User.count',1) do
       fill_in_credit_card(@credit_card.number, @credit_card.expire_month, @credit_card.expire_year)
       click_link_or_button 'Submit'
-    end    
+      sleep(5)
+    end  
     assert page.has_content?("Thank you for your order!")
   end
 
@@ -90,11 +91,11 @@ class CheckoutTest < ActionDispatch::IntegrationTest
   end
 
   test "display checkout when campaign does not have products" do
-    visit new_checkout_path(campaign_id:@campaign1.to_param, token: @prospect.token)    
-    assert page.has_content?("Name #{@prospect.first_name} #{@prospect.last_name}")    
-    assert page.has_content?("Address #{@prospect.address}")
-    assert page.has_content?("Email #{@prospect.email}")
-    assert page.has_content?("City / State / Zip #{@prospect.city} / #{@prospect.state} / #{@prospect.zip}") 
+    visit new_checkout_path(campaign_id:@campaign1.to_param, token: @prospect.token) 
+    assert page.has_content?("#{@prospect.first_name} #{@prospect.last_name}")
+    assert page.has_content?("#{@prospect.address}")
+    assert page.has_content?("#{@prospect.email}")
+    assert page.has_content?("#{@prospect.state} / #{@prospect.zip}") 
     assert page.has_no_content?("Shipping & Processing $#{@campaign.enrollment_price}")
   end
 end

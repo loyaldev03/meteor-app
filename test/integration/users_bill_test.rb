@@ -462,7 +462,6 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     @saved_user.club.update_attribute( :billing_enable, false)
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     assert find(:xpath, "//a[@id='no_recurrent_bill_btn']")[:class].include? 'disabled'
-    click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     assert page.has_selector?('#blacklist_btn')
   end
 

@@ -32,7 +32,7 @@ class CampaignDaysTest < ActionDispatch::IntegrationTest
     fill_in 'campaign_day[reached]', with: 36365
     fill_in 'campaign_day[converted]', with: 1630
     click_link_or_button 'Update Campaign day'
-    assert page.has_content?("Campaign day #{@missing_campaign_days.date} for Campaign #{@campaign.name} was update successfuly. ")
+    assert page.has_content?("Campaign day #{@missing_campaign_days.date} for Campaign #{@campaign.name} was update successfuly.")
   end
 
   test "should enter values on missing campaign date - Admin by club" do
@@ -45,6 +45,6 @@ class CampaignDaysTest < ActionDispatch::IntegrationTest
     fill_in 'campaign_day[reached]', with: 36365
     fill_in 'campaign_day[converted]', with: 1630
     click_link_or_button 'Update Campaign day'
-    assert page.has_content?("Campaign day #{@missing_campaign_days.date} for Campaign #{@campaign.name} was update successfuly. ")
+    assert page.has_content?("Campaign day #{@missing_campaign_days.date} for Campaign #{@campaign.name} was update successfuly.")
   end
 end

@@ -22,15 +22,15 @@ class CampaignTest < ActionDispatch::IntegrationTest
     fill_in 'campaign[enrollment_price]', with: unsaved_campaign.enrollment_price   
     select_from_datepicker("campaign_initial_date", unsaved_campaign.initial_date)
     select_from_datepicker("campaign_finish_date", unsaved_campaign.finish_date)
-    select(campaign_type.capitalize, from: "campaign[campaign_type]")
-    select(transport.capitalize, from: 'campaign[transport]')
-    select(unsaved_campaign.utm_medium, from: 'campaign[utm_medium]')
+    select_into_dropdown('#campaign_campaign_type', campaign_type.capitalize)
+    select_into_dropdown('#campaign_transport', transport.capitalize)
+    select_into_dropdown('#campaign_utm_medium', unsaved_campaign.utm_medium)    
     fill_in 'campaign[transport_campaign_id]', with: unsaved_campaign.transport_campaign_id
     fill_in 'campaign[utm_content]', with: unsaved_campaign.utm_content    
     fill_in 'campaign[audience]', with: unsaved_campaign.audience  
-    fill_in 'campaign[delivery_date]', with: unsaved_campaign.delivery_date 
+    fill_in 'campaign[delivery_date]', with: unsaved_campaign.delivery_date     
     find(:xpath, "//body").find(".select2-search__field").set(@preference_group.name) 
-    find(:xpath, "//body").find(".select2-results__option--highlighted").click  
+    find(:xpath, "//body").find(".select2-results__option--highlighted").click 
   end
 
   def configure_checkout_pages(unsaved_campaign)
@@ -109,12 +109,12 @@ class CampaignTest < ActionDispatch::IntegrationTest
 
   test "should display subscription_plan and enrollment_price disabled when campaign_type is Newsletter or Store promotion" do       
     visit campaigns_path(@partner.prefix, @club.name)
-    click_link_or_button 'New Campaign' 
-    select('Newsletter', from: "campaign[campaign_type]")
+    click_link_or_button 'New Campaign'
+    select_into_dropdown('#campaign_campaign_type', 'Newsletter')    
     assert page.has_css?("#campaign_enrollment_price[disabled]")
-    assert page.has_css?("#campaign_terms_of_membership_id[disabled]")
+    assert page.has_css?("#campaign_terms_of_membership_id[disabled]") 
 
-    select('Store promotion', from: "campaign[campaign_type]")
+    select_into_dropdown('#campaign_campaign_type', 'Store promotion')
     assert page.has_css?("#campaign_enrollment_price[disabled]")
     assert page.has_css?("#campaign_terms_of_membership_id[disabled]")
   end
