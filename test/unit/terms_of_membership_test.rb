@@ -4,11 +4,11 @@ require 'test_helper'
 class TermsOfMembershipTest < ActiveSupport::TestCase
 
   setup do
-    @current_agent = FactoryGirl.create(:agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @user = FactoryGirl.build(:user)
-    @credit_card = FactoryGirl.build(:credit_card)
+    @current_agent = FactoryBot.create(:agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @user = FactoryBot.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)
   end
 
   def enroll_user(tom, amount=23, cc_blank=false, cc_card = nil)
@@ -33,13 +33,13 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   end
 
   test "Should not allow to save toms with same name within same club" do
-  	@new_terms_of_membership = FactoryGirl.build(:terms_of_membership_with_gateway, :club_id => @club.id, :name => @terms_of_membership.name)
+  	@new_terms_of_membership = FactoryBot.build(:terms_of_membership_with_gateway, :club_id => @club.id, :name => @terms_of_membership.name)
   	assert !@new_terms_of_membership.save
   end
 
   test "Should allow to save toms with same name in different clubs" do
-  	@new_club = FactoryGirl.create(:simple_club_with_gateway)
-  	@new_terms_of_membership = FactoryGirl.build(:terms_of_membership_with_gateway, :club_id => @new_club.id, :name => @terms_of_membership.name)
+  	@new_club = FactoryBot.create(:simple_club_with_gateway)
+  	@new_terms_of_membership = FactoryBot.build(:terms_of_membership_with_gateway, :club_id => @new_club.id, :name => @terms_of_membership.name)
   	assert @new_terms_of_membership.save
   end
 
@@ -61,7 +61,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   # Create a TOM with upgrate to >1
   test "Create an user with TOM upgrate to >1" do
     active_merchant_stubs
-    @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
+    @terms_of_membership_with_upgrade = FactoryBot.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 65, :provisional_days => 30, :installment_period => 30 )
 
@@ -98,7 +98,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   #Create a TOM with upgrate to = 1
   test "Create an user with TOM upgrate to = 1" do
     active_merchant_stubs
-    @terms_of_membership_with_upgrade = FactoryGirl.build(:terms_of_membership_with_gateway, 
+    @terms_of_membership_with_upgrade = FactoryBot.build(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 1, :provisional_days => 30, :installment_period => 30 )
     assert @terms_of_membership_with_upgrade.save
@@ -107,7 +107,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
 
   test "Create an user with Manual Payment with TOM upgrate to >1" do
     active_merchant_stubs
-    @terms_of_membership_with_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, 
+    @terms_of_membership_with_upgrade = FactoryBot.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 65, :provisional_days => 30, :installment_period => 30 )
 
@@ -149,7 +149,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     assert !@terms_of_membership.save
     user.update_attribute :testing_account, true
     assert @terms_of_membership.save
-    FactoryGirl.create(:prospect, terms_of_membership_id: @terms_of_membership.id)
+    FactoryBot.create(:prospect, terms_of_membership_id: @terms_of_membership.id)
     @terms_of_membership.name = "NewNameToTest2"
     assert @terms_of_membership.save
   end
@@ -161,7 +161,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     assert !@terms_of_membership.destroy
     User.delete_all
     Membership.delete_all
-    prospect = FactoryGirl.create(:prospect, terms_of_membership_id: @terms_of_membership.id)
+    prospect = FactoryBot.create(:prospect, terms_of_membership_id: @terms_of_membership.id)
     assert !@terms_of_membership.destroy
     prospect.delete
     assert @terms_of_membership.destroy

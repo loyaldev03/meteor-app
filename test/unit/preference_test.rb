@@ -3,7 +3,7 @@ require 'test_helper'
 class PreferenceTest < ActiveSupport::TestCase
 
   setup do    
-    @preference = FactoryGirl.build(:preference)
+    @preference = FactoryBot.build(:preference)
   end
 
   test 'Should save preference when saving all data' do

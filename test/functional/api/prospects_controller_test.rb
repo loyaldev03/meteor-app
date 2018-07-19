@@ -2,9 +2,9 @@ require 'test_helper'
 
 class Api::ProspectsControllerTest < ActionController::TestCase
   setup do
-    @club = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
+    @club = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
     # request.env["devise.mapping"] = Devise.mappings[:agent]
   end
 
@@ -49,8 +49,8 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     [:confirmed_admin_agent, :confirmed_api_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        @user = FactoryGirl.build :user_with_api
-        @enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+        @user = FactoryBot.build :user_with_api
+        @enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
         @current_club = @terms_of_membership.club
         assert_difference('Operation.count') do
           assert_difference('Prospect.count') do
@@ -71,8 +71,8 @@ class Api::ProspectsControllerTest < ActionController::TestCase
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do     
-        @user = FactoryGirl.build :user_with_api
-        @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+        @user = FactoryBot.build :user_with_api
+        @enrollment_info = FactoryBot.build :membership_with_enrollment_info
         @current_club = @terms_of_membership.club
         assert_difference('Prospect.count',0) do
           do_post
@@ -86,8 +86,8 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     [:confirmed_admin_agent, :confirmed_api_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        @user = FactoryGirl.build :user_with_api
-        @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+        @user = FactoryBot.build :user_with_api
+        @enrollment_info = FactoryBot.build :membership_with_enrollment_info
         @current_club = @terms_of_membership.club
         post( :create, {:format => :json})
         assert @response.body.include? "There are some params missing. Please check them."
@@ -104,7 +104,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     [ :confirmed_admin_agent, :confirmed_api_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)        
+        prospect = FactoryBot.create(:prospect, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)        
         token = prospect.token
         result = post(:show, { :token => token, :format => :json} ) 
         assert_response :success
@@ -141,7 +141,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
       :confirmed_agency_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)        
+        prospect = FactoryBot.create(:prospect, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)        
         token = prospect.token
         result = post(:show, { :token => token, :format => :json} ) 
         assert_response :unauthorized
@@ -157,8 +157,8 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     ['admin', 'api'].each do |role|      
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do 
-        @user = FactoryGirl.build :user_with_api
-        @enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+        @user = FactoryBot.build :user_with_api
+        @enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
         @current_club = @terms_of_membership.club
         assert_difference('Operation.count') do
           assert_difference('Prospect.count') do
@@ -177,8 +177,8 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'agency', 'fulfillment_managment', 'landing'].each do |role|      
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do    
-        @user = FactoryGirl.build :user_with_api
-        @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+        @user = FactoryBot.build :user_with_api
+        @enrollment_info = FactoryBot.build :membership_with_enrollment_info
         @current_club = @terms_of_membership.club
         assert_difference('Prospect.count',0) do
           do_post
@@ -192,8 +192,8 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     ['admin', 'api'].each do |role|      
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
-        @user = FactoryGirl.build :user_with_api
-        @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+        @user = FactoryBot.build :user_with_api
+        @enrollment_info = FactoryBot.build :membership_with_enrollment_info
         @current_club = @terms_of_membership.club
         post( :create, {:format => :json})
         assert @response.body.include? "There are some params missing. Please check them."
@@ -210,7 +210,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     ['admin', 'api', 'landing'].each do |role|      
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
-        prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)        
+        prospect = FactoryBot.create(:prospect, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)        
         token = prospect.token
         result = post(:show, { :token => token, :format => :json} ) 
         assert_response :success
@@ -245,7 +245,7 @@ class Api::ProspectsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'agency', 'fulfillment_managment'].each do |role|      
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
-        prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)        
+        prospect = FactoryBot.create(:prospect, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)        
         token = prospect.token
         result = post(:show, { :token => token, :format => :json} ) 
         assert_response :unauthorized

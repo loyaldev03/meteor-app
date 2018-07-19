@@ -3,8 +3,8 @@ require 'test_helper'
 class DomainTest < ActionDispatch::IntegrationTest
  
   setup do
-    @partner = FactoryGirl.create(:partner)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
     sign_in_as(@admin_agent)
   end
 
@@ -27,7 +27,7 @@ class DomainTest < ActionDispatch::IntegrationTest
   end
 
   test "create domain" do
-    unsaved_domain = FactoryGirl.build(:simple_domain)
+    unsaved_domain = FactoryBot.build(:simple_domain)
     visit domains_path(@partner.prefix)
     click_link_or_button 'New Domain'
     
@@ -39,7 +39,7 @@ class DomainTest < ActionDispatch::IntegrationTest
   end
 
   test "create duplicate domain" do
-    saved_domain = FactoryGirl.create(:simple_domain)
+    saved_domain = FactoryBot.create(:simple_domain)
     visit domains_path(@partner.prefix)
     click_link_or_button 'New Domain'
     fill_in 'domain[url]', with: saved_domain.url
@@ -48,7 +48,7 @@ class DomainTest < ActionDispatch::IntegrationTest
   end
 
   test "can read domain" do
-    saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
+    saved_domain = FactoryBot.create(:simple_domain, partner_id: @partner.id)
     visit admin_partners_path
     within("#partners_table") do
       within('tr', text: @partner.name, match: :prefer_exact){click_link_or_button 'Dashboard'}
@@ -58,7 +58,7 @@ class DomainTest < ActionDispatch::IntegrationTest
   end
 
   test "can update domain" do
-    saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
+    saved_domain = FactoryBot.create(:simple_domain, partner_id: @partner.id)
     visit domains_path(@partner.prefix)
     within("#domains_table") do
       click_link_or_button 'Edit'
@@ -76,8 +76,8 @@ class DomainTest < ActionDispatch::IntegrationTest
   end
 
   test "should delete domain" do
-    saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
-    second_saved_domain = FactoryGirl.create(:simple_domain, partner_id: @partner.id)
+    saved_domain = FactoryBot.create(:simple_domain, partner_id: @partner.id)
+    second_saved_domain = FactoryBot.create(:simple_domain, partner_id: @partner.id)
     visit domains_path(@partner.prefix)
 
     within("#domains_table") do

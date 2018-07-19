@@ -182,8 +182,8 @@ class ActiveSupport::TestCase
       active_merchant_stubs_store
     end
 
-    membership = FactoryGirl.create("#{user_type}_membership", { terms_of_membership: tom }.merge(membership_args))
-    active_user = FactoryGirl.create(user_type, { club: tom.club, current_membership: membership }.merge(user_args))
+    membership = FactoryBot.create("#{user_type}_membership", { terms_of_membership: tom }.merge(membership_args))
+    active_user = FactoryBot.create(user_type, { club: tom.club, current_membership: membership }.merge(user_args))
     active_user.active_credit_card.update_attribute :gateway, tom.club.payment_gateway_configurations.first.gateway if active_user.active_credit_card 
     active_user.memberships << membership
     active_user.current_membership = membership
@@ -213,12 +213,12 @@ def perform_call_as(agent)
 end
 
 def sign_agent_with_global_role(type)
-   @agent = FactoryGirl.create type
+   @agent = FactoryBot.create type
    sign_in @agent
 end
 
 def sign_agent_with_club_role(type, role)
-  @agent = FactoryGirl.create(type, roles: '')
+  @agent = FactoryBot.create(type, roles: '')
   ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
   sign_in @agent
 end
@@ -231,7 +231,7 @@ module ActionDispatch
 
     def setup
       stubs_elasticsearch_index
-      FactoryGirl.create(:batch_agent, :id => 1) unless Agent.find_by(email: Settings.batch_agent_email)
+      FactoryBot.create(:batch_agent, :id => 1) unless Agent.find_by(email: Settings.batch_agent_email)
       page.driver.browser.manage.window.resize_to(1024,720)
     end
 
@@ -318,11 +318,11 @@ module ActionDispatch
     end
 
     def create_user_by_sloop(agent, user, credit_card, membership, terms_of_membership, validate = true, cc_blank = false)
-      membership = FactoryGirl.build(:membership_with_enrollment_info) if membership.nil?
+      membership = FactoryBot.build(:membership_with_enrollment_info) if membership.nil?
       if cc_blank
-        credit_card_to_load = FactoryGirl.build(:blank_credit_card)
+        credit_card_to_load = FactoryBot.build(:blank_credit_card)
       elsif credit_card.nil?
-        credit_card_to_load = FactoryGirl.build(:credit_card)
+        credit_card_to_load = FactoryBot.build(:credit_card)
       else
         credit_card_to_load = credit_card
       end
@@ -388,7 +388,7 @@ module ActionDispatch
       visit users_path( :partner_prefix => unsaved_user.club.partner.prefix, :club_prefix => unsaved_user.club.name )
       click_link_or_button 'New User'
 
-      credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
+      credit_card = FactoryBot.build(:credit_card_master_card) if credit_card.nil?
 
       type_of_phone_number = (unsaved_user[:type_of_phone_number].blank? ? '' : unsaved_user.type_of_phone_number.capitalize)
 

@@ -14,15 +14,15 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   end
 
   def setup_user(create_new_user = true)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
     @partner = @club.partner
 
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    # @communication_type = FactoryGirl.create(:communication_type)
-    # @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    # @communication_type = FactoryBot.create(:communication_type)
+    # @disposition_type = FactoryBot.create(:disposition_type, :club_id => @club.id)
     
     if create_new_user
       @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
@@ -98,21 +98,21 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
 
   def generate_operations(user)
-  	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'user',
+  	FactoryBot.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'user',
   										 :user_id => user.id, :operation_type => Settings.operation_types.enrollment_billing, :description => 'user was enrolled' )
-  	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'user',
+  	FactoryBot.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'user',
   										 :user_id => user.id, :operation_type => Settings.operation_types.cancel, :description => 'Blacklisted user. Reason: Too much spam' )
-  	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'user',
+  	FactoryBot.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'user',
   										 :user_id => user.id, :operation_type => Settings.operation_types.save_the_sale, :description => 'Blacklisted user. Reason: dont like it' )
-  	FactoryGirl.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'user',
+  	FactoryBot.create(:operation_profile, :created_by_id => @admin_agent.id, :resource_type => 'user',
   										 :user_id => user.id, :operation_type => Settings.operation_types.recovery, :description => 'Blacklisted user. Reason: testing' )
-  	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'user',
+  	FactoryBot.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'user',
   										 :user_id => user.id, :operation_type => Settings.operation_types.active_email, :description => 'Communication sent successfully' )
-  	FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'user',
+  	FactoryBot.create(:operation_communication, :created_by_id => @admin_agent.id, :resource_type => 'user',
                        :user_id => user.id, :operation_type => Settings.operation_types.prebill_email, :description => 'Communication was not sent' )
- 		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'user',
+ 		FactoryBot.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'user',
   										 :user_id => user.id, :operation_type => Settings.operation_types.others, :description => 'user updated successfully' )
- 		FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'user',
+ 		FactoryBot.create(:operation_other, :created_by_id => @admin_agent.id, :resource_type => 'user',
   										 :user_id => user.id, :operation_type => Settings.operation_types.others, :description => 'user was recovered' )
   end
 
@@ -134,9 +134,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     setup_user(false)
     setup_email_templates
 
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by_email(unsaved_user.email)  
 
@@ -163,7 +163,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   test "create user" do
   	setup_user(false)
 
-  	unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
+  	unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
     created_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
 
     validate_view_user_base(created_user)
@@ -183,7 +183,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   test "create user with billing disabled" do
     setup_user(false)
     @club.update_attribute :billing_enable, false
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
     fill_in_user(unsaved_user)
 
     assert page.has_content? I18n.t('error_messages.club_is_not_enable_for_new_enrollments', :cs_phone_number => @club.cs_phone_number)
@@ -191,18 +191,18 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Join an user with auth.net PGC" do
     setup_user(false)
-    @club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @club = FactoryBot.create(:simple_club_with_authorize_net_gateway)
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)  
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)  
     created_user = create_user(unsaved_user, nil, nil, false)
   end
 
   test "Create an user with CC blank" do
     setup_user(false)
 
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
     created_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name,true)
 
     validate_view_user_base(created_user)
@@ -215,7 +215,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   	@club.requires_external_id = true
   	@club.save!
 
-  	unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
+  	unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
     created_user = create_user(unsaved_user)
   end
 
@@ -254,8 +254,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   # test "create user without information and with MeS internar error" do
   #   setup_user(false)
   #   active_merchant_stubs(code = "999", message = "internal server error", false )
-  #   credit_card = FactoryGirl.build(:credit_card_master_card, :number => "370848940762929", :expire_year => 2020)
-  #   unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id, :first_name => "x", :last_name => "x")
+  #   credit_card = FactoryBot.build(:credit_card_master_card, :number => "370848940762929", :expire_year => 2020)
+  #   unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id, :first_name => "x", :last_name => "x")
 
   #   visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
   #   click_link_or_button 'New User'
@@ -344,21 +344,21 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "create user with gender male" do
     setup_user
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id, :gender => 'M')
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id, :gender => 'M')
     create_user(unsaved_user)
     assert find_field('input_gender').value == ('Male')
   end
 
   test "create user with gender female" do
     setup_user
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id, :gender => 'F')
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id, :gender => 'F')
     create_user(unsaved_user)
     assert find_field('input_gender').value == ('Female')  
   end
 
   test "create user without phone number" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id, :phone_country_code => nil, :phone_area_code => nil, :phone_local_number => nil)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id, :phone_country_code => nil, :phone_area_code => nil, :phone_local_number => nil)
     fill_in_user(unsaved_user)
     within("#table_contact_information") do
       assert find_field('user[phone_country_code]').value == ('1') # Because it is set to its default value when lost focus
@@ -373,8 +373,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   # create user with 'home' telephone type
   test "should create user and display type of phone number" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id, :type_of_phone_number => 'home')
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id, :type_of_phone_number => 'home')
+    credit_card = FactoryBot.build(:credit_card_master_card)
     
     saved_user = create_user(unsaved_user, credit_card)
     validate_view_user_base(saved_user)
@@ -382,7 +382,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "create user with canadian zip" do
   	setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, 
+    unsaved_user =  FactoryBot.build(:active_user, 
                                          :club_id => @club.id, 
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
                                          :state => 'QC',
@@ -395,7 +395,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "create user with invalid canadian zip" do
   	setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, 
+    unsaved_user =  FactoryBot.build(:active_user, 
                                          :club_id => @club.id, 
                                          :address => '1455 De Maisonneuve Blvd. W. Montreal',
                                          :state => 'QC',
@@ -425,7 +425,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "display all operations on user profile" do
   	setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
     
     saved_user = create_user(unsaved_user)
     generate_operations(saved_user)
@@ -449,12 +449,12 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     setup_user
     generate_operations(@saved_user)
     10.times{ |time|
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id, 
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id, 
                                 :resource_type => 'user', :user_id => @saved_user.id, 
                                 :description => 'user updated succesfully before' )
       operation.update_attribute :operation_date, operation.operation_date + (time+1).minute
     }
-    operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id, 
+    operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id, 
                                 :resource_type => 'user', :user_id => @saved_user.id, 
                                 :description => 'user updated succesfully last' )
     operation.update_attribute :operation_date, operation.operation_date + 11.minute
@@ -470,7 +470,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     generate_operations(@saved_user)
     time = 1
     3.times{
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 100,
                                 :description => 'member enrolled - 100')
@@ -478,7 +478,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
       time=time+1
     }
     3.times{
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 101,
                                 :description => 'member enrolled - 101')
@@ -486,7 +486,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
       time=time+1
     }
     3.times{
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 103,
                                 :description => 'member enrolled - 102')
@@ -494,7 +494,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
       time=time+1
     }
     4.times{
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 104,
                                 :description => 'member enrolled - 103')
@@ -517,7 +517,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     generate_operations(@saved_user)
     time = 1
     3.times{
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 200,
                                 :description => 'Blacklisted user. Reason: Too much spam - 200')
@@ -525,7 +525,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
       time=time+1
     }
     3.times{
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 201,
                                 :description => 'Blacklisted user. Reason: Too much spam - 201')
@@ -533,7 +533,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
       time=time+1
     }
     3.times{
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 202,
                                 :description => 'Blacklisted user. Reason: Too much spam - 202')
@@ -541,7 +541,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
       time=time+1
     }
     4.times{
-      operation = FactoryGirl.create(:operation_billing, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_billing, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 203,
                                 :description => 'Blacklisted user. Reason: Too much spam - 203')
@@ -564,7 +564,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     generate_operations(@saved_user)
     time = 1
     3.times{
-      operation = FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 300,
                                 :description => 'Communication sent - 300')
@@ -573,7 +573,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     }
     sleep 1
     3.times{
-      operation = FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 301,
                                 :description => 'Communication sent - 301')
@@ -582,7 +582,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     }
     sleep 1
     3.times{
-      operation = FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 302,
                                 :description => 'Communication sent - 302')
@@ -591,7 +591,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     }
     sleep 1
     4.times{
-      operation = FactoryGirl.create(:operation_communication, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_communication, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 303,
                                 :description => 'Communication sent - 303')
@@ -614,14 +614,14 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     generate_operations(@saved_user)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     10.times{ |time|
-      operation = FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id,
+      operation = FactoryBot.create(:operation_other, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 1000,
                                 :description => 'user was updated successfully - 1000')
       operation.update_attribute :operation_date, operation.operation_date + (time+1).minute
       operation.update_attribute :created_at, operation.created_at + (time+1).minute
     }
-    operation = FactoryGirl.create(:operation_other, :created_by_id => @admin_agent.id,
+    operation = FactoryBot.create(:operation_other, :created_by_id => @admin_agent.id,
                                 :resource_type => 'user', :user_id => @saved_user.id,
                                 :operation_type => 1000,
                                 :description => 'user was updated successfully last - 1000')
@@ -635,8 +635,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   test "create an user with an expired credit card (if actual month is not january)" do
     setup_user(false)
     unless(Time.zone.now.month == 1)
-      unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-      credit_card = FactoryGirl.build(:credit_card_master_card, :expire_month => 1, :expire_year => Time.zone.now.year)
+      unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+      credit_card = FactoryBot.build(:credit_card_master_card, :expire_month => 1, :expire_year => Time.zone.now.year)
       
       visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
       click_link_or_button 'New User'
@@ -665,7 +665,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   #Recovery time on approval users
   test "Approve user" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
     
     @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_approval.name,false)
     membership = @saved_user.current_membership
@@ -701,9 +701,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Recover user from sloop with the same credit card" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
+    credit_card = FactoryBot.build(:credit_card_master_card)
     active_merchant_stubs_store(credit_card.number)    
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_approval.name,false)
     membership = @saved_user.current_membership
@@ -731,7 +731,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Reject user" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
     
     @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_approval.name,false)
     membership = @saved_user.current_membership
@@ -765,7 +765,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   test "create user without gender" do
     setup_user(false)
 
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id, :gender => '')
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id, :gender => '')
     @saved_user = create_user(unsaved_user)
 
     validate_view_user_base(@saved_user)
@@ -773,8 +773,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Create an user without Telephone Type" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :type_of_phone_number => '', :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_user =  FactoryBot.build(:active_user, :type_of_phone_number => '', :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
 
     saved_user = create_user(unsaved_user)
 
@@ -787,7 +787,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Enroll an user with user approval TOM" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
     
     @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_approval.name,false)
     page.has_selector?('#approve')
@@ -809,7 +809,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Enroll an user should create membership" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
     
     @saved_user = create_user(unsaved_user)
     validate_view_user_base(@saved_user)
@@ -819,9 +819,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Update Birthday after 12 like a day" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by_email(unsaved_user.email)  
 
@@ -850,7 +850,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Check Birthday email -  It is send it by CS at night" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
     
     @saved_user = create_user(unsaved_user)
 
@@ -900,33 +900,33 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     setup_user(false)
     setup_email_templates
 
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     created_user = User.find_by_email(unsaved_user.email)  
 
     #billing
-    FactoryGirl.create(:operation, :description => 'enrollment_billing', :operation_type => Settings.operation_types.enrollment_billing, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'membership_billing', :operation_type => Settings.operation_types.membership_billing, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'full_save', :operation_type => Settings.operation_types.full_save, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'enrollment_billing', :operation_type => Settings.operation_types.enrollment_billing, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'membership_billing', :operation_type => Settings.operation_types.membership_billing, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'full_save', :operation_type => Settings.operation_types.full_save, :user_id => created_user.id, :created_by_id => @admin_agent.id)
     #profile
-    FactoryGirl.create(:operation, :description => 'reset_club_cash', :operation_type => Settings.operation_types.reset_club_cash, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'future_cancel', :operation_type => Settings.operation_types.future_cancel, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'save_the_sale', :operation_type => Settings.operation_types.save_the_sale, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'reset_club_cash', :operation_type => Settings.operation_types.reset_club_cash, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'future_cancel', :operation_type => Settings.operation_types.future_cancel, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'save_the_sale', :operation_type => Settings.operation_types.save_the_sale, :user_id => created_user.id, :created_by_id => @admin_agent.id)
     #communications
-    FactoryGirl.create(:operation, :description => 'active_email', :operation_type => Settings.operation_types.active_email, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'soft_decline_email', :operation_type => Settings.operation_types.soft_decline_email, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'pillar_email', :operation_type => Settings.operation_types.pillar_email, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'active_email', :operation_type => Settings.operation_types.active_email, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'soft_decline_email', :operation_type => Settings.operation_types.soft_decline_email, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'pillar_email', :operation_type => Settings.operation_types.pillar_email, :user_id => created_user.id, :created_by_id => @admin_agent.id)
     #fulfillments
-    FactoryGirl.create(:operation, :description => 'from_not_processed_to_in_process', :operation_type => Settings.operation_types.from_not_processed_to_in_process, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'from_sent_to_not_processed', :operation_type => Settings.operation_types.from_sent_to_not_processed, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'from_sent_to_bad_address', :operation_type => Settings.operation_types.from_sent_to_bad_address, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'from_not_processed_to_in_process', :operation_type => Settings.operation_types.from_not_processed_to_in_process, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'from_sent_to_not_processed', :operation_type => Settings.operation_types.from_sent_to_not_processed, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'from_sent_to_bad_address', :operation_type => Settings.operation_types.from_sent_to_bad_address, :user_id => created_user.id, :created_by_id => @admin_agent.id)
     #vip
-    FactoryGirl.create(:operation, :description => 'vip_event_registration', :operation_type => Settings.operation_types.vip_event_registration, :user_id => created_user.id, :created_by_id => @admin_agent.id)
-    FactoryGirl.create(:operation, :description => 'vip_event_cancelation', :operation_type => Settings.operation_types.vip_event_cancelation, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'vip_event_registration', :operation_type => Settings.operation_types.vip_event_registration, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'vip_event_cancelation', :operation_type => Settings.operation_types.vip_event_cancelation, :user_id => created_user.id, :created_by_id => @admin_agent.id)
     #others
-    FactoryGirl.create(:operation, :description => 'others', :operation_type => Settings.operation_types.others, :user_id => created_user.id, :created_by_id => @admin_agent.id)
+    FactoryBot.create(:operation, :description => 'others', :operation_type => Settings.operation_types.others, :user_id => created_user.id, :created_by_id => @admin_agent.id)
 
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => created_user.id)
@@ -1038,33 +1038,33 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Update a profile with CC used by another user and Family membership = True" do
     setup_user(false)
-    @club_with_family = FactoryGirl.create(:simple_club_with_gateway_with_family)
+    @club_with_family = FactoryBot.create(:simple_club_with_gateway_with_family)
     @partner = @club_with_family.partner
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club_with_family.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club_with_family.id)
 
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club_with_family.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club_with_family.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     created_user = User.find_by_email(unsaved_user.email)  
 
     visit edit_club_path(@club_with_family.partner.prefix, @club_with_family.id)
     assert page.has_checked_field?('club_club_cash_enable')
 
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club_with_family.id)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club_with_family.id)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
   end
 
   test "Create an user and update an user with letters at Credit Card" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     
     visit users_path( :partner_prefix => unsaved_user.club.partner.prefix, :club_prefix => unsaved_user.club.name )
     click_link_or_button 'New User'
 
-    credit_card = FactoryGirl.build(:credit_card_master_card) if credit_card.nil?
+    credit_card = FactoryBot.build(:credit_card_master_card) if credit_card.nil?
 
     type_of_phone_number = (unsaved_user[:type_of_phone_number].blank? ? '' : unsaved_user.type_of_phone_number.capitalize)
 
@@ -1123,9 +1123,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   # # Remove/Add Club Cash on an user with lifetime TOM
   test "Create a new user in the CS using the Lifetime TOM" do
     setup_user(false)
-    @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, :club_id => @club.id)
+    @lifetime_terms_of_membership = FactoryBot.create(:life_time_terms_of_membership, :club_id => @club.id)
 
-    unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
     @saved_user = create_user(unsaved_user, nil, @lifetime_terms_of_membership.name, true)
     validate_view_user_base(@saved_user)
     add_club_cash(@saved_user, 10, "Generic description",true)
@@ -1134,8 +1134,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   test "Do not enroll an user with wrong payment gateway" do
     setup_user(false)
     @club.payment_gateway_configurations.first.update_attribute(:gateway,'fail')
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     fill_in_user(unsaved_user, credit_card, @terms_of_membership_with_gateway.name)
     within("#error_explanation") do
       assert page.has_content?("Member information is invalid.")
@@ -1145,8 +1145,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
   test "Create an user without selecting any " do
     setup_user(false)
-    product = FactoryGirl.create(:product, :club_id => @club.id, sku: 'PRODUCT_RANDOM')
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
+    product = FactoryBot.create(:product, :club_id => @club.id, sku: 'PRODUCT_RANDOM')
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
     created_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name,false,'')    
     validate_view_user_base(created_user)
     within(".nav-tabs"){ click_on 'Operations' }    

@@ -10,16 +10,16 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
     Drupal.enable_integration!
     Drupal.test_mode!
 
-    @admin_agent = Agent.find_by(roles: 'admin') || FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(:club_with_api)
-    @club_without_api = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership_with_gateway_and_api = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id)
-    @terms_of_membership_without_api = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club_without_api.id)
+    @admin_agent = Agent.find_by(roles: 'admin') || FactoryBot.create(:confirmed_admin_agent)
+    @club = FactoryBot.create(:club_with_api)
+    @club_without_api = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership_with_gateway_and_api = FactoryBot.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id)
+    @terms_of_membership_without_api = FactoryBot.create(:terms_of_membership_with_gateway_and_api, :club_id => @club_without_api.id)
     
     Time.zone = @club.time_zone
     @partner = @club.partner
-    @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
-    @unsaved_user = FactoryGirl.build(:active_user)
+    @disposition_type = FactoryBot.create(:disposition_type, :club_id => @club.id)
+    @unsaved_user = FactoryBot.build(:active_user)
 
     if with_api
       body = { uid: 43655, uri: 'https://test/api/user/43655', urllogin: { token: 'PWWDuGc-elRE', url: 'https://test/l/PWWDuGc-elRE' } }
@@ -50,8 +50,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
 
   # # generate stubs related to conn in order to set as nill the api_id
   # test "Allow enter api_id empty when Cancel a member" do
-  #   unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
+  #   unsaved_member = FactoryBot.build(:active_member, :club_id => @club.id)
+  #   credit_card = FactoryBot.build(:credit_card_master_card)
   #   @saved_member = create_member(unsaved_member, credit_card)
   #   @saved_member.update_attribute(:api_id, "1234")
   #   @saved_member.set_as_canceled!
@@ -136,8 +136,8 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   #   end
 
   #   # do not allow to use another user's same api_id
-  #   @unsaved_user2 = FactoryGirl.build(:active_user, :club_id => @club.id)
-  #   credit_card2 = FactoryGirl.build(:credit_card_american_express)
+  #   @unsaved_user2 = FactoryBot.build(:active_user, :club_id => @club.id)
+  #   credit_card2 = FactoryBot.build(:credit_card_american_express)
   #   @saved_user2 = create_user_by_sloop(@admin_agent, @unsaved_user2, credit_card2, nil, @terms_of_membership_with_gateway_and_api)
   #   @saved_user2.update_attribute(:api_id, "5678")
   
@@ -216,7 +216,7 @@ class UsersSyncronizeTest < ActionDispatch::IntegrationTest
   # TODO: Fix this test. It is not working on Jenkins
   # test 'Should not let agent to update api_id when user is applied' do
   #   setup_user
-  #   approval_tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id, needs_enrollment_approval: true)
+  #   approval_tom = FactoryBot.create(:terms_of_membership_with_gateway_and_api, :club_id => @club.id, needs_enrollment_approval: true)
   #   @saved_user = create_user_by_sloop(@admin_agent, @unsaved_user, nil, nil, approval_tom)
   #   visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     

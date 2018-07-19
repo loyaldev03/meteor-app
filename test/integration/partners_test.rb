@@ -3,7 +3,7 @@ require 'test_helper'
 class PartnersTest < ActionDispatch::IntegrationTest
  
   setup do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
     sign_in_as(@admin_agent)
   end
 
@@ -30,8 +30,8 @@ class PartnersTest < ActionDispatch::IntegrationTest
   end
 
   test "create partner" do
-    unsaved_partner = FactoryGirl.build(:partner)
-    unsaved_domain = FactoryGirl.build(:simple_domain)
+    unsaved_partner = FactoryBot.build(:partner)
+    unsaved_domain = FactoryBot.build(:simple_domain)
 
     visit new_admin_partner_path
     fill_in 'partner[name]', with: unsaved_partner.name
@@ -49,8 +49,8 @@ class PartnersTest < ActionDispatch::IntegrationTest
   end
   
   test "create duplicated partner" do
-    saved_partner = FactoryGirl.create(:partner)
-    saved_domain = FactoryGirl.create(:simple_domain)
+    saved_partner = FactoryBot.create(:partner)
+    saved_domain = FactoryBot.create(:simple_domain)
     visit new_admin_partner_path
     fill_in 'partner[name]', with: saved_partner.name
     fill_in 'partner[prefix]', with: saved_partner.prefix
@@ -63,7 +63,7 @@ class PartnersTest < ActionDispatch::IntegrationTest
 
   test "create a partner with invalid characters" do
     visit new_admin_partner_path
-    saved_domain = FactoryGirl.create(:simple_domain)
+    saved_domain = FactoryBot.create(:simple_domain)
     fill_in 'partner[name]', with: '!"#$%&/()'
     fill_in 'partner[prefix]', with: '!"#$%&/()'
     fill_in 'domain_url', with: saved_domain.url
@@ -76,7 +76,7 @@ class PartnersTest < ActionDispatch::IntegrationTest
   end
 
   test "Should display partner" do
-    saved_partner = FactoryGirl.create(:partner)
+    saved_partner = FactoryBot.create(:partner)
     visit admin_partners_path
     within("#partners_table") do
       within('tr', text: saved_partner.name, match: :prefer_exact){ click_link_or_button 'Dashboard' }
@@ -88,7 +88,7 @@ class PartnersTest < ActionDispatch::IntegrationTest
   end
 
   test "Should update partner" do
-    saved_partner = FactoryGirl.create(:partner)
+    saved_partner = FactoryBot.create(:partner)
     visit admin_partners_path
     within("#partners_table") do
       within('tr', text: saved_partner.name, match: :prefer_exact){ click_link_or_button 'Edit' }

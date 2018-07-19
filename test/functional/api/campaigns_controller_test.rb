@@ -2,20 +2,20 @@ require 'test_helper'
 
 class Api::CampaignsControllerTest < ActionController::TestCase
   setup do
-    @landing_user = FactoryGirl.create(:confirmed_landing_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)    
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
-    @preference_group = FactoryGirl.create(:preference_group_with_preferences, :club_id => @club.id)    
-    @preference_group1 = FactoryGirl.create(:preference_group_with_preferences, :club_id => @club.id)    
+    @landing_user = FactoryBot.create(:confirmed_landing_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)    
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
+    @preference_group = FactoryBot.create(:preference_group_with_preferences, :club_id => @club.id)    
+    @preference_group1 = FactoryBot.create(:preference_group_with_preferences, :club_id => @club.id)    
     @campaign.preference_groups <<  @preference_group  
     @campaign.preference_groups <<  @preference_group1 
-    @product = FactoryGirl.create(:random_product, :club_id => @club_id)
-    @product1 = FactoryGirl.create(:random_product, :club_id => @club_id)
+    @product = FactoryBot.create(:random_product, :club_id => @club_id)
+    @product1 = FactoryBot.create(:random_product, :club_id => @club_id)
     @campaign.products << @product 
     @campaign.products << @product1
-    @campaign1 = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
+    @campaign1 = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
     @campaign1.preference_groups <<  @preference_group  
     @campaign1.preference_groups <<  @preference_group1
 

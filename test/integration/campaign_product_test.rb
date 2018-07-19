@@ -3,11 +3,11 @@ require 'test_helper'
 class CampaignProductTest < ActionDispatch::IntegrationTest
  
   setup do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)    
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)    
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )                 
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)    
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)    
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )                 
     sign_in_as(@admin_agent)
   end
 
@@ -32,7 +32,7 @@ class CampaignProductTest < ActionDispatch::IntegrationTest
   end
 
   test "should rename products label" do    
-    @product = FactoryGirl.create(:random_product, :club_id => @club.id)
+    @product = FactoryBot.create(:random_product, :club_id => @club.id)
     @campaign.products << @product       
     visit campaign_products_edit_path(@partner.prefix, @club.name, @campaign.id)
     within("#assigned_products_table") do
@@ -46,7 +46,7 @@ class CampaignProductTest < ActionDispatch::IntegrationTest
   end
 
   test "Should reset product label" do
-    @product = FactoryGirl.create(:random_product, :club_id => @club.id)
+    @product = FactoryBot.create(:random_product, :club_id => @club.id)
     @campaign.products << @product         
     visit campaign_products_edit_path(@partner.prefix, @club.name, @campaign.id)
     within("#assigned_products_table") do

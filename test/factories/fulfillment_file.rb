@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :fulfillment_file do
     initial_date DateTime.now

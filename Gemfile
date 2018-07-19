@@ -106,8 +106,8 @@ gem 'progress_bar'
 gem 'data-confirm-modal', github: 'ifad/data-confirm-modal', branch: 'bootstrap2'
 gem 'mailcheck', github: 'dmferrari/mailcheck-ruby'
 
-group :test do
-  gem 'factory_girl_rails'
+group :test do 
+  gem 'factory_bot_rails'
   gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'

@@ -2,30 +2,30 @@ require 'test_helper'
 
 class FulfillmentsControllerTest < ActionController::TestCase
   setup do
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:club, :partner_id => @partner.id)
     @product = @club.products.last
   end
 
   def update_status_on_fulfillment_where_i_do_not_manage(profile)
       # setup user from other club
-    @other_club = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership_with_gateway_other_club = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @other_club.id)
+    @other_club = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership_with_gateway_other_club = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @other_club.id)
     @other_club_saved_user = create_active_user(@terms_of_membership_with_gateway_other_club, :active_user, nil, {}, { :created_by => @admin_user })
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @other_club_saved_user.id, :product_sku => Settings.others_product, :club_id => @other_club.id)}
+    3.times{FactoryBot.create(:fulfillment, :user_id => @other_club_saved_user.id, :product_sku => Settings.others_product, :club_id => @other_club.id)}
 
     # setup my user and login as club role fulfillment manager
-    @my_club = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership_with_gateway_my_club = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @my_club.id)
+    @my_club = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership_with_gateway_my_club = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @my_club.id)
 
-    @agent_club_role = FactoryGirl.create(:agent)
+    @agent_club_role = FactoryBot.create(:agent)
     club_role = ClubRole.new :club_id => @my_club.id
     club_role.role = profile
     club_role.agent_id = @agent_club_role.id
     club_role.save    
 
     @my_club_saved_user = create_active_user(@terms_of_membership_with_gateway_my_club, :active_user, nil, {}, { :created_by => @agent_club_role })
-    3.times{FactoryGirl.create(:fulfillment, :user_id => @my_club_saved_user.id, :product_sku => Settings.others_product, :club_id => @my_club.id)}
+    3.times{FactoryBot.create(:fulfillment, :user_id => @my_club_saved_user.id, :product_sku => Settings.others_product, :club_id => @my_club.id)}
 
     sign_in @agent_club_role
 
@@ -56,17 +56,17 @@ class FulfillmentsControllerTest < ActionController::TestCase
   end
 
   def create_xls_file_with_club_role(role)
-    @agent = FactoryGirl.create(:agent)
+    @agent = FactoryBot.create(:agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.role = role
     club_role.agent_id = @agent.id
     club_role.save
     sign_in(@agent)
 
-    second_club = FactoryGirl.create(:simple_club_with_gateway)
-    second_product = FactoryGirl.create(:product, :club_id => second_club.id)
-    first_user = FactoryGirl.create(:user, :club_id => @club.id)
-    second_user = FactoryGirl.create(:user, :club_id => second_club.id)
+    second_club = FactoryBot.create(:simple_club_with_gateway)
+    second_product = FactoryBot.create(:product, :club_id => second_club.id)
+    first_user = FactoryBot.create(:user, :club_id => @club.id)
+    second_user = FactoryBot.create(:user, :club_id => second_club.id)
 
     first_fulfillment = Fulfillment.new
     first_fulfillment.product_sku = @product.sku
@@ -117,7 +117,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
   ##################################################### 
 
   test "Admin_by_role should not see fulfillment files from another club where it has not permissions" do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -125,8 +125,8 @@ class FulfillmentsControllerTest < ActionController::TestCase
     @club_admin.roles = nil
     @club_admin.save
     sign_in(@club_admin)
-    @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @ff_file = FactoryGirl.create(:fulfillment_file)
+    @other_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @ff_file = FactoryBot.create(:fulfillment_file)
     @ff_file.club_id = @other_club.id
     @ff_file.save
     get :list_for_file, fulfillment_file_id: @ff_file, partner_prefix: @partner.prefix, club_prefix: @other_club.name
@@ -134,7 +134,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
   end
 
   test "Admin_by_role should not Export to XLS fulfillments from another club where it has not permissions" do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -142,8 +142,8 @@ class FulfillmentsControllerTest < ActionController::TestCase
     @club_admin.roles = nil
     @club_admin.save
     sign_in(@club_admin)
-    @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @ff_file = FactoryGirl.create(:fulfillment_file)
+    @other_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @ff_file = FactoryBot.create(:fulfillment_file)
     @ff_file.club_id = @other_club.id
     @ff_file.save
     get :generate_xls, id: @ff_file, partner_prefix: @partner.prefix, club_prefix: @other_club.name
@@ -159,7 +159,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
   end
 
   test "Admin, fulfillment_managment and agency by role should not be able to create fulfillment files with fulfillments from other clubs" do
-    @agent = FactoryGirl.create(:agent)
+    @agent = FactoryBot.create(:agent)
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.role = 'admin'
@@ -168,10 +168,10 @@ class FulfillmentsControllerTest < ActionController::TestCase
     
     ['admin','fulfillment_managment','agency'].each do |role|
       @agent.club_roles.first.update_attribute :role, role
-      second_club = FactoryGirl.create(:simple_club_with_gateway)
-      second_product = FactoryGirl.create(:product, :club_id => second_club.id, sku: 'OTHERS')
-      first_user = FactoryGirl.create(:user, :club_id => @club.id)
-      second_user = FactoryGirl.create(:user, :club_id => second_club.id)
+      second_club = FactoryBot.create(:simple_club_with_gateway)
+      second_product = FactoryBot.create(:product, :club_id => second_club.id, sku: 'OTHERS')
+      first_user = FactoryBot.create(:user, :club_id => @club.id)
+      second_user = FactoryBot.create(:user, :club_id => second_club.id)
 
       first_fulfillment = Fulfillment.new
       first_fulfillment.product_sku = @product.sku
@@ -196,7 +196,7 @@ class FulfillmentsControllerTest < ActionController::TestCase
   end
 
   test "Supervisor by role should not be able to create fulfillment files with fulfillments from other clubs" do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "supervisor"

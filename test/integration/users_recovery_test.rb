@@ -10,16 +10,16 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
   end
 
   def setup_user(cancel = true, create_user = true)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
     @partner = @club.partner
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => "another_tom")
-    @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)    
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @new_terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => "another_tom")
+    @member_cancel_reason =  FactoryBot.create(:member_cancel_reason)    
 
     if create_user
-      unsaved_user = FactoryGirl.build(:user_with_api)
+      unsaved_user = FactoryBot.build(:user_with_api)
       create_user_by_sloop(@admin_agent, unsaved_user, nil, nil, @terms_of_membership_with_gateway)
       
       @saved_user = User.find_by(email: unsaved_user.email)
@@ -108,7 +108,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
   test "Recover an user using CS which was enrolled with a product sku that does not have stock" do
     setup_user(true, true)
-    product = FactoryGirl.create(:product_without_stock_and_not_backorder, club_id: @club.id)
+    product = FactoryBot.create(:product_without_stock_and_not_backorder, club_id: @club.id)
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
     click_on 'Recover'
@@ -118,7 +118,7 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
 
   test "Recover an user using CS with a new product" do
     setup_user(true, true)
-    product = FactoryGirl.create(:product_without_recurrent, club_id: @club.id)
+    product = FactoryBot.create(:product_without_recurrent, club_id: @club.id)
     recover_user(@saved_user,@terms_of_membership_with_gateway, product)
     @saved_user.reload
     assert_not_nil @saved_user.fulfillments.where(product_sku: product.sku)
@@ -178,8 +178,8 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     @saved_user.active_credit_card.update_attribute(:blacklisted, true )
     assert_equal @saved_user.active_credit_card.blacklisted, true
 
-    credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    credit_card = FactoryBot.build(:credit_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, @saved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway, false)
     @saved_user.reload
 
@@ -193,8 +193,8 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
   test "Same CC when recovering user (Sloop)" do
     setup_user
    
-    credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    credit_card = FactoryBot.build(:credit_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     assert_difference("CreditCard.count",0) do
       create_user_by_sloop(@admin_agent, @saved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway, false)
     end
@@ -224,8 +224,8 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     assert_equal @saved_user.first_name, "New name"
     assert_equal @saved_user.status, "lapsed"
 
-    credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    credit_card = FactoryBot.build(:credit_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     assert_difference("CreditCard.count",0) do
       create_user_by_sloop(@admin_agent, @saved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway, false)
     end
@@ -290,8 +290,8 @@ class UsersRecoveryTest < ActionDispatch::IntegrationTest
     @terms_of_membership_with_gateway.provisional_days = 0
     @terms_of_membership_with_gateway.installment_amount = 0.0
     @terms_of_membership_with_gateway.save
-    enrollment_info = FactoryGirl.build :membership_with_enrollment_info_without_enrollment_amount
-    unsaved_user = FactoryGirl.build(:user_with_api)
+    enrollment_info = FactoryBot.build :membership_with_enrollment_info_without_enrollment_amount
+    unsaved_user = FactoryBot.build(:user_with_api)
     
     assert_difference('User.count') do
       create_user_by_sloop(@admin_agent, unsaved_user, nil, enrollment_info, @terms_of_membership_with_gateway, true, true)

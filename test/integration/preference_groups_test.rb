@@ -3,10 +3,10 @@ require 'test_helper'
 class PreferenceGroupTest < ActionDispatch::IntegrationTest
  
   setup do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)    
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @preference_group = FactoryGirl.create(:preference_group, :club_id => @club.id)  
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)    
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @preference_group = FactoryBot.create(:preference_group, :club_id => @club.id)  
     sign_in_as(@admin_agent)  
   end
 
@@ -17,7 +17,7 @@ class PreferenceGroupTest < ActionDispatch::IntegrationTest
   end
 
   test 'create preference group' do
-    unsaved_preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)
+    unsaved_preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)
     visit preference_groups_path(@partner.prefix, @club.name)
     click_link_or_button 'New Preference Group'
     fill_in_form(unsaved_preference_group.name, unsaved_preference_group.code)
@@ -35,7 +35,7 @@ class PreferenceGroupTest < ActionDispatch::IntegrationTest
   end
 
   test 'update preference group' do
-    unsaved_preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)    
+    unsaved_preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)    
     visit preference_groups_path(@partner.prefix, @club.name)
     within("#preference_groups_table") do
       click_link_or_button 'Edit'

@@ -3,9 +3,9 @@ require 'test_helper'
 class PreferenceGroupsControllerTest < ActionController::TestCase
 
   def setup
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @preference_group = FactoryGirl.create(:preference_group, :club_id => @club.id)   
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @preference_group = FactoryBot.create(:preference_group, :club_id => @club.id)   
   end
 
   test 'agents that should get index' do
@@ -71,7 +71,7 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
   test "agents that should create preference groups" do
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
-      preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)      
+      preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)      
 
       assert_difference('PreferenceGroup.count',1) do
         post :create, partner_prefix: @partner.prefix, :club_prefix => @club.name, preference_group: { name: preference_group.name, code: preference_group.code, add_by_default: preference_group.add_by_default} 
@@ -86,7 +86,7 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
-        preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)      
+        preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)      
         post :create, partner_prefix: @partner.prefix, :club_prefix => @club.name, preference_group: { name: preference_group.name, code: preference_group.code, add_by_default: preference_group.add_by_default} 
         assert_response :unauthorized, "Agent #{agent} can access to this page." 
       end
@@ -116,7 +116,7 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
   test "agents that should update preference groups" do
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
-      preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)
+      preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)
       put :update, id: @preference_group.id, partner_prefix: @partner.prefix, :club_prefix => @club.name, preference_group: { name: preference_group.name, add_by_default: true }
       assert_redirected_to preference_group_path  
     end
@@ -128,7 +128,7 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
-        preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)
+        preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)
         put :update, id: @preference_group.id, partner_prefix: @partner.prefix, :club_prefix => @club.name, preference_group: { name: preference_group.name, add_by_default: true }
         assert_response :unauthorized, "Agent #{agent} can update this page."
       end
@@ -189,7 +189,7 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
 
   test "agents that should create preference groups with club roles" do
     sign_agent_with_club_role(:agent, 'admin')
-    preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)     
+    preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)     
     assert_difference('PreferenceGroup.count',1) do
       post :create, partner_prefix: @partner.prefix, :club_prefix => @club.name, preference_group: { name: preference_group.name, code: preference_group.code, add_by_default: preference_group.add_by_default} 
     end
@@ -200,7 +200,7 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do 
-        preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)      
+        preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)      
         post :create, partner_prefix: @partner.prefix, :club_prefix => @club.name, preference_group: { name: preference_group.name, code: preference_group.code, add_by_default: preference_group.add_by_default} 
         assert_response :unauthorized, "Agent #{role} can access to this page." 
       end
@@ -225,7 +225,7 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
 
   test "agents that should update preference groups with club roles" do
     sign_agent_with_club_role(:agent, 'admin')
-    preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)
+    preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)
     put :update, id: @preference_group.id, partner_prefix: @partner.prefix, :club_prefix => @club.name, preference_group: { name: preference_group.name, add_by_default: true }
     assert_redirected_to preference_group_path      
   end
@@ -234,7 +234,7 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do 
-        preference_group = FactoryGirl.build(:preference_group, :club_id => @club.id)
+        preference_group = FactoryBot.build(:preference_group, :club_id => @club.id)
         put :update, id: @preference_group.id, partner_prefix: @partner.prefix, :club_prefix => @club.name, preference_group: { name: preference_group.name, add_by_default: true }
         assert_response :unauthorized, "Agent #{role} can update this page."
       end
@@ -242,8 +242,8 @@ class PreferenceGroupsControllerTest < ActionController::TestCase
   end
 
   test "agent with club Admin role that should NOT get index, show, edit when it allows to another club" do    
-    another_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
+    another_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    agent = FactoryBot.create(:confirmed_admin_agent, roles: '') 
     ClubRole.create(club_id: another_club.id, agent_id: agent.id, role: 'admin')
     sign_in agent
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name

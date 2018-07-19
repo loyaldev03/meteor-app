@@ -3,8 +3,8 @@ require 'test_helper'
 class ClubTest < ActionDispatch::IntegrationTest
  
   setup do
-    @partner = FactoryGirl.create(:partner)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
     sign_in_as(@admin_agent)
   end
 
@@ -69,7 +69,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "create club" do
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    unsaved_club = FactoryBot.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     fill_in_club(unsaved_club)
@@ -80,7 +80,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "Search option in My Clubs should not affect front end perfomance" do
-    saved_club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
+    saved_club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
     visit my_clubs_path
     within("#my_clubs_table_filter") do
       find(:css, "input").set(saved_club.name)
@@ -98,7 +98,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "should read club" do
-    saved_club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
+    saved_club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
     visit clubs_path(@partner.prefix)
     within("#clubs_table") do
       assert page.has_content?(saved_club.id.to_s)
@@ -115,8 +115,8 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "should update club" do
-    saved_club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway, partner_id: @partner.id)
+    saved_club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
+    unsaved_club = FactoryBot.build(:simple_club_with_gateway, partner_id: @partner.id)
     visit clubs_path(@partner.prefix)
     within("#clubs_table") do
       click_link_or_button 'Edit'
@@ -129,7 +129,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "should delete club" do
-    saved_club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
+    saved_club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
     visit clubs_path(@partner.prefix)
     within("#clubs_table") do
       click_link_or_button 'Destroy'
@@ -140,7 +140,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "should see all clubs as admin on my clubs section" do
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id) }
+    5.times{ FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id) }
     within(".navbar"){ click_link_or_button("My Clubs") }
     within("#my_clubs_table")do
       Club.all.each do |club|
@@ -161,18 +161,18 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "Add a contact number by club" do
-    @club = FactoryGirl.create(:simple_club_with_gateway, name: "new_club", partner_id: @partner.id)
+    @club = FactoryBot.create(:simple_club_with_gateway, name: "new_club", partner_id: @partner.id)
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id)
     
-    unsaved_blacklisted_user =  FactoryGirl.build(:active_user, club_id: @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_blacklisted_user =  FactoryBot.build(:active_user, club_id: @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_blacklisted_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @blacklisted_user = User.find_by(email: unsaved_blacklisted_user.email)
     @blacklisted_user.blacklist(@admin_agent,"Testing")
     
-    unsaved_user =  FactoryGirl.build(:active_user, club_id: @club.id)
+    unsaved_user =  FactoryBot.build(:active_user, club_id: @club.id)
     fill_in_user(unsaved_user, credit_card)
 
     assert page.has_content?("There was an error with your credit card information. Please call member services at: #{@club.cs_phone_number}.")
@@ -180,11 +180,11 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "Display a club without PGC" do
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @club = FactoryBot.create(:simple_club_with_gateway)
     @partner = @club.partner
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id)
-    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id)
+    @terms_of_membership_with_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id)
     @club.payment_gateway_configurations.first.update_attribute(:club_id,nil)
     visit my_clubs_path
     within("#my_clubs_table") do
@@ -194,7 +194,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "Configure and Update ET marketing gateway - Login by General Admin" do
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    unsaved_club = FactoryBot.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     fill_in_club(unsaved_club)
@@ -230,7 +230,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "Configure and Update Mailchimp/Mandrill marketing gateway - Login by General Admin" do
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    unsaved_club = FactoryBot.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     fill_in_club(unsaved_club)
@@ -254,7 +254,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "Configure and Update ET marketing gateway - Login by Admin by Club" do
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    unsaved_club = FactoryBot.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     fill_in_club(unsaved_club)
@@ -296,7 +296,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "Configure and Update Mailchimp/Mandrill marketing gateway - Login by Admin by Club" do
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    unsaved_club = FactoryBot.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     fill_in_club(unsaved_club)   
@@ -325,7 +325,7 @@ class ClubTest < ActionDispatch::IntegrationTest
   end
 
   test "Configure and Update Checkout Pages" do
-    unsaved_club = FactoryGirl.build(:simple_club_with_gateway)
+    unsaved_club = FactoryBot.build(:simple_club_with_gateway)
     visit clubs_path(@partner.prefix)
     click_link_or_button 'New Club'
     fill_in_club(unsaved_club) 

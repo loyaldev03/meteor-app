@@ -3,10 +3,10 @@ require 'test_helper'
 class TransportSettingsControllerTest < ActionController::TestCase
 
   def setup
-    @partner = FactoryGirl.create(:partner)
+    @partner = FactoryBot.create(:partner)
     @partner_prefix = @partner.prefix
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)     
-    @tsmailchimp = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club.id)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)     
+    @tsmailchimp = FactoryBot.create(:transport_settings_mailchimp, :club_id => @club.id)
   end
 
   test "agents that should get index" do 
@@ -91,7 +91,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
 
   test "agents that should create transport settings" do
     [:confirmed_admin_agent].each do |agent|            
-      transportSetting = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)    
+      transportSetting = FactoryBot.build(:transport_settings_facebook, :club_id => @club.id)    
       sign_agent_with_global_role(agent)
       assert_difference('TransportSetting.count',1) do        
         post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, transport_setting: {
@@ -110,7 +110,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
-        transportSetting = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)    
+        transportSetting = FactoryBot.build(:transport_settings_facebook, :club_id => @club.id)    
         post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, transport_setting: {
           transport: transportSetting.transport, client_id: transportSetting.client_id, 
           client_secret: transportSetting.client_secret, access_token: transportSetting.access_token
@@ -123,8 +123,8 @@ class TransportSettingsControllerTest < ActionController::TestCase
   test "agents that should update transport settings" do
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
-      @club1 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-      transportSetting = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club1.id)       
+      @club1 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+      transportSetting = FactoryBot.create(:transport_settings_mailchimp, :club_id => @club1.id)       
       put :update, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, transport_setting: { api_key: transportSetting.api_key }
       assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, :club_prefix => @club.name, :id => @tsmailchimp.id )
     end
@@ -136,8 +136,8 @@ class TransportSettingsControllerTest < ActionController::TestCase
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        @club1 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) 
-        transportSetting = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club1.id)       
+        @club1 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id) 
+        transportSetting = FactoryBot.create(:transport_settings_mailchimp, :club_id => @club1.id)       
         put :update, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, transport_setting: { api_key: transportSetting.api_key }
         assert_response :unauthorized, "Agent #{agent} can update this page."
       end
@@ -155,8 +155,8 @@ class TransportSettingsControllerTest < ActionController::TestCase
   end
 
   test "agent with club Admin role that should NOT get index, show, new, edit when it allows to another club" do    
-    another_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
+    another_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    agent = FactoryBot.create(:confirmed_admin_agent, roles: '') 
     ClubRole.create(club_id: another_club.id, agent_id: agent.id, role: 'admin')
     sign_in agent
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
@@ -214,7 +214,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
 
   test "agents that should create transport settings with club roles" do
     sign_agent_with_club_role(:agent, 'admin')
-    transportSetting = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)        
+    transportSetting = FactoryBot.build(:transport_settings_facebook, :club_id => @club.id)        
     assert_difference('TransportSetting.count',1) do        
       post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, transport_setting: {
         transport: transportSetting.transport, client_id: transportSetting.client_id, 
@@ -229,7 +229,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
-        transportSetting = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)    
+        transportSetting = FactoryBot.build(:transport_settings_facebook, :club_id => @club.id)    
         post :create, partner_prefix: @partner_prefix, :club_prefix => @club.name, transport_setting: {
           transport: transportSetting.transport, client_id: transportSetting.client_id, 
           client_secret: transportSetting.client_secret, access_token: transportSetting.access_token
@@ -257,8 +257,8 @@ class TransportSettingsControllerTest < ActionController::TestCase
 
   test "agents that should update transport settings with club role" do
     sign_agent_with_club_role(:agent, 'admin')
-    @club1 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    transportSetting = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club1.id)       
+    @club1 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    transportSetting = FactoryBot.create(:transport_settings_mailchimp, :club_id => @club1.id)       
     put :update, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, transport_setting: { api_key: transportSetting.api_key }
     assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, :club_prefix => @club.name, :id => @tsmailchimp.id )
   end
@@ -267,8 +267,8 @@ class TransportSettingsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
-        @club1 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) 
-        transportSetting = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club1.id)       
+        @club1 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id) 
+        transportSetting = FactoryBot.create(:transport_settings_mailchimp, :club_id => @club1.id)       
         put :update, id: @tsmailchimp.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, transport_setting: { api_key: transportSetting.api_key }
         assert_response :unauthorized, "Agent #{role} can update this page."
       end

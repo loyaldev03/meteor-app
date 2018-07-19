@@ -3,21 +3,21 @@ require 'test_helper'
 class Campaigns::ProductsControllerTest < ActionController::TestCase
 
   def setup
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )       
-    @product = FactoryGirl.create(:random_product, :club_id => @club.id)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )       
+    @product = FactoryBot.create(:random_product, :club_id => @club.id)
     @campaign.products << @product  
   end
 
   def sign_agent_with_global_role(type)
-     @agent = FactoryGirl.create type
+     @agent = FactoryBot.create type
      sign_in @agent     
   end
 
   def sign_agent_with_club_role(type, role)
-    @agent = FactoryGirl.create(type, roles: '') 
+    @agent = FactoryBot.create(type, roles: '') 
     ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
     sign_in @agent
   end

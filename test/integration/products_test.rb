@@ -4,15 +4,15 @@ class ProductsTest < ActionDispatch::IntegrationTest
 
   setup do
     SacStore.enable_integration!
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
-    @transport_settings = FactoryGirl.create(:transport_settings_store, club_id: @club.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
+    @transport_settings = FactoryBot.create(:transport_settings_store, club_id: @club.id)
     sign_in_as(@admin_agent)
   end
 
   test "product list" do
-    saved_product = FactoryGirl.create(:random_product, club_id: @club.id) 
+    saved_product = FactoryBot.create(:random_product, club_id: @club.id) 
     visit products_path(@partner.prefix, @club.name)
 
     within("#products_table") do
@@ -24,7 +24,7 @@ class ProductsTest < ActionDispatch::IntegrationTest
   end
 
   test "all links in product show must work" do
-    saved_product = FactoryGirl.create(:random_product, club_id: @club.id)
+    saved_product = FactoryBot.create(:random_product, club_id: @club.id)
     visit products_path(@partner.prefix, @club.name)     
     assert page.has_content?('Search')
     visit product_path(@partner.prefix, @club.name, saved_product.id)

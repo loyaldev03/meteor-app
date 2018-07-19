@@ -8,17 +8,17 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
   ############################################################
 
   setup do
-    @communication_type = FactoryGirl.create(:communication_type)
+    @communication_type = FactoryBot.create(:communication_type)
   end
 
   def setup_user(create_new_user = true, create_user_by_sloop = false)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
 
     @partner = @club.partner
     Time.zone = @club.time_zone
-    @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
+    @disposition_type = FactoryBot.create(:disposition_type, :club_id => @club.id)
 
     if create_new_user
       @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
@@ -26,9 +26,9 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
 
     if create_user_by_sloop
       active_merchant_stubs
-      unsaved_user =  FactoryGirl.build(:provisional_user_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
-      credit_card = FactoryGirl.build(:credit_card)
-      enrollment_info = FactoryGirl.build(:membership_with_enrollment_info_without_enrollment_amount)
+      unsaved_user =  FactoryBot.build(:provisional_user_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
+      credit_card = FactoryBot.build(:credit_card)
+      enrollment_info = FactoryBot.build(:membership_with_enrollment_info_without_enrollment_amount)
 
       @terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
@@ -55,8 +55,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
   test "Do not display token field (club with auth.net) - Admin" do
     setup_user(false)
     @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_user.active_credit_card
     visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -75,8 +75,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     setup_user(false)
     @admin_agent.update_attribute(:roles,"supervisor")
     @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_user.active_credit_card
     visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -95,8 +95,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     setup_user(false)
     @admin_agent.update_attribute(:roles,"representative")
     @club.payment_gateway_configurations.first.update_attribute(:gateway, 'authorize_net')
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
     saved_credit_card = @saved_user.active_credit_card
     visit users_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
@@ -191,7 +191,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     actual_user = User.find(@saved_user.id)
     old_active_credit_card = actual_user.active_credit_card
     
-    new_cc = FactoryGirl.build(:credit_card, :number => "378282246310005", :expire_month => Time.new.month, :expire_year => Time.new.year+10)
+    new_cc = FactoryBot.build(:credit_card, :number => "378282246310005", :expire_month => Time.new.month, :expire_year => Time.new.year+10)
 
     last_digits = new_cc.last_digits
     add_credit_card(actual_user, new_cc)
@@ -230,8 +230,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
   test "add new CC and new Subscription Plan" do
     setup_user
     
-    new_cc = FactoryGirl.build(:credit_card, :number => "378282246310005", :expire_month => Time.new.month, :expire_year => Time.new.year+10)
-    new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    new_cc = FactoryBot.build(:credit_card, :number => "378282246310005", :expire_month => Time.new.month, :expire_year => Time.new.year+10)
+    new_terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
 
     last_digits = new_cc.last_digits
     add_credit_card(@saved_user, new_cc, new_terms_of_membership_with_gateway.name)
@@ -452,8 +452,8 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
   
   test "Update external id" do
     setup_user(false)
-    @club_external_id = FactoryGirl.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
-    @terms_of_membership_with_external_id = FactoryGirl.create(:terms_of_membership_with_gateway_and_external_id, :club_id => @club_external_id.id)
+    @club_external_id = FactoryBot.create(:simple_club_with_require_external_id, :partner_id => @partner.id)
+    @terms_of_membership_with_external_id = FactoryBot.create(:terms_of_membership_with_gateway_and_external_id, :club_id => @club_external_id.id)
     @user_with_external_id = create_active_user(@terms_of_membership_with_external_id, :active_user_with_external_id, nil, {}, { :created_by => @admin_agent })
     
     visit edit_user_path(:partner_prefix => @user_with_external_id.club.partner.prefix, :club_prefix => @user_with_external_id.club.name, :user_prefix => @user_with_external_id.id)
@@ -535,7 +535,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
   # Credit card 7913 added and activated.
   test "Delete credit card only when user is lapsed and is not blacklisted (and credit card is not the last one)" do
     setup_user
-    second_credit_card = FactoryGirl.create(:credit_card_american_express , :user_id => @saved_user.id, :active => false)
+    second_credit_card = FactoryBot.create(:credit_card_american_express , :user_id => @saved_user.id, :active => false)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -623,7 +623,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
   test "Sorting transaction table" do
     setup_user
     12.times do |index| 
-      FactoryGirl.create(:transaction, user_id: @saved_user.id, transaction_type: "sale", response_result: index, response_transaction_id: index, gateway: "mes")
+      FactoryBot.create(:transaction, user_id: @saved_user.id, transaction_type: "sale", response_result: index, response_transaction_id: index, gateway: "mes")
       sleep 0.25
     end
     first_transaction = Transaction.find_by response_result: 0
@@ -656,9 +656,9 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     setup_user false, true
     @saved_user.active_credit_card.update_attribute :blacklisted, true 
 
-    unsaved_user =  FactoryGirl.build(:provisional_user_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
-    credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info_without_enrollment_amount)
+    unsaved_user =  FactoryBot.build(:provisional_user_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
+    credit_card = FactoryBot.build(:credit_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info_without_enrollment_amount)
     @terms_of_membership_with_gateway.update_attribute(:provisional_days, 0)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     new_user = User.find_by(email: unsaved_user.email)

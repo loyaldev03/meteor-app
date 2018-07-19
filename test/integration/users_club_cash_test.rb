@@ -7,11 +7,11 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
   ############################################################
 
   def setup_user(create_user = true)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     
     if create_user
       @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
@@ -20,11 +20,11 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
   end
 
   def create_user_throught_sloop(enrollment_info, terms_of_membership)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
     Time.zone = @club.time_zone
 
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :active_user
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :active_user
     create_user_by_sloop(@admin_agent, @user, @credit_card, enrollment_info, terms_of_membership)
     sign_in_as(@admin_agent)
   end
@@ -102,7 +102,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
 
   test "create user with terms_of_membership without club cash" do
     setup_user false
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_without_club_cash, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway_without_club_cash, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
     @saved_user.bill_membership
     sleep(1) #To wait until billing is finished.
@@ -160,9 +160,9 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
 
   test "set club cash expire date on user created by sloop once it is billed" do
     setup_user false
-    @enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
+    @enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
 
     create_user_by_sloop(@admin_agent, @user, @credit_card, @enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by_email(@user.email)
@@ -181,11 +181,11 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
   end
 
   test "add club cash amount using the amount on user TOM enrollment amount = 0" do
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
 
     create_user_throught_sloop(enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.last
@@ -239,7 +239,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
 
   test "add club cash from club cash amount configured in the TOM - Yearly user" do
     setup_user false
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within("#table_membership_information")do
@@ -265,7 +265,7 @@ class UsersClubCashTest < ActionDispatch::IntegrationTest
 
   test "Add club cash from club cash amount configured in the TOM - Yearly and Chapter user" do
     setup_user false
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
     @saved_user.update_attribute(:country, "US")
     @saved_user.update_attribute(:state, "AL")

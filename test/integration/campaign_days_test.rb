@@ -3,21 +3,21 @@ require 'test_helper'
 class CampaignDaysTest < ActionDispatch::IntegrationTest
  
   setup do
-    @partner = FactoryGirl.create(:partner)
+    @partner = FactoryBot.create(:partner)
     @partner_prefix = @partner.prefix
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)     
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign_twitter, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
-    @missing_campaign_days = FactoryGirl.create(:missing_campaign_day, :campaign_id => @campaign.id)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)     
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign_twitter, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
+    @missing_campaign_days = FactoryBot.create(:missing_campaign_day, :campaign_id => @campaign.id)
   end
 
   def login_general_admin(type)
-    @admin_agent = FactoryGirl.create(type)
+    @admin_agent = FactoryBot.create(type)
     sign_in_as(@admin_agent)
   end
 
   def sign_agent_with_club_role(type, role)
-    @agent = FactoryGirl.create(type, roles: '') 
+    @agent = FactoryBot.create(type, roles: '') 
     ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
     sign_in_as(@agent) 
   end

@@ -6,13 +6,13 @@ class LoginTest < ActionDispatch::IntegrationTest
   end
 
   test "admin_agent_login" do
-  	admin_user = FactoryGirl.create(:confirmed_admin_agent)
+  	admin_user = FactoryBot.create(:confirmed_admin_agent)
     sign_in_as(admin_user)
     assert page.has_content?('Signed in successfully')
   end
 
   test "admin_agent_logout" do
-  	admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+  	admin_agent = FactoryBot.create(:confirmed_admin_agent)
     sign_in_as(admin_agent)
     page.execute_script("window.jQuery('.dropdown').addClass('open')")
 #     
@@ -26,7 +26,7 @@ class LoginTest < ActionDispatch::IntegrationTest
 
   test "no_login" do
     visit root_path
-    user = FactoryGirl.build(:agent)
+    user = FactoryBot.build(:agent)
     sign_in_as(user)
     assert page.has_content?('Invalid email or password')
   end

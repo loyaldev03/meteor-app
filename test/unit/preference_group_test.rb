@@ -3,7 +3,7 @@ require 'test_helper'
 class PreferenceGroupTest < ActiveSupport::TestCase
 
   setup do    
-    @preference_group = FactoryGirl.build(:preference_group)
+    @preference_group = FactoryBot.build(:preference_group)
   end
 
   test 'Should save preference group when saving all data' do

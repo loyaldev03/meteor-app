@@ -3,10 +3,10 @@ require 'test_helper'
 class Api::OperationControllerTest < ActionController::TestCase
 
   setup do
-    @admin_user = FactoryGirl.create(:confirmed_admin_agent)
-    @api_user = FactoryGirl.create(:confirmed_api_agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @admin_user = FactoryBot.create(:confirmed_admin_agent)
+    @api_user = FactoryBot.create(:confirmed_api_agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id
 
     @user = create_active_user(@terms_of_membership, :user_with_api)
   end

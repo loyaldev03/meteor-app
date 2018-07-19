@@ -3,7 +3,7 @@ require 'test_helper'
 class ClubTest < ActiveSupport::TestCase
 
   setup do
-    @club = FactoryGirl.build(:club)
+    @club = FactoryBot.build(:club)
   end
 
   test "Should not save without name" do
@@ -51,7 +51,7 @@ class ClubTest < ActiveSupport::TestCase
   end
 
   test "Do not allow to configurate two clubs with the same Mailchimp list" do
-    @mailchimp_club = FactoryGirl.create(:club, marketing_tool_client: 'mailchimp_mandrill', marketing_tool_attributes: {'mailchimp_list_id'=>"12345"})
+    @mailchimp_club = FactoryBot.create(:club, marketing_tool_client: 'mailchimp_mandrill', marketing_tool_attributes: {'mailchimp_list_id'=>"12345"})
     @club.marketing_tool_client = 'mailchimp_mandrill'
     @club.marketing_tool_attributes = {'mailchimp_list_id'=>"12345"}
     assert !@club.save

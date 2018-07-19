@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :terms_of_membership do
     sequence(:name) {|n| "test_#{n}" }

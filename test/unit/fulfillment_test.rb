@@ -3,15 +3,15 @@ require 'test_helper'
 class FulfillmentTest < ActiveSupport::TestCase
   
   setup do 
-    @club = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership_with_gateway_yearly = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @club = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_gateway_yearly = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
   end
 
   def setup_products 
-    @product_with_stock = FactoryGirl.create(:product, club_id: @terms_of_membership_with_gateway.club.id, sku: 'PRODUCT' )
-    @product_without_stock = FactoryGirl.create(:product_without_stock_and_not_recurrent, club_id: @terms_of_membership_with_gateway.club.id, sku: 'NOSTOCK')
-    @product_recurrent = FactoryGirl.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id, sku: 'NORECURRENT')
+    @product_with_stock = FactoryBot.create(:product, club_id: @terms_of_membership_with_gateway.club.id, sku: 'PRODUCT' )
+    @product_without_stock = FactoryBot.create(:product_without_stock_and_not_recurrent, club_id: @terms_of_membership_with_gateway.club.id, sku: 'NOSTOCK')
+    @product_recurrent = FactoryBot.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id, sku: 'NORECURRENT')
   end
 
   def enroll_user(user,tom, amount=23, cc_blank=false, cc_card = nil)
@@ -38,8 +38,8 @@ class FulfillmentTest < ActiveSupport::TestCase
   #cancel user and check if not_processed fulfillments were updated to canceled
   test "cancel user after more than two days of enrollment. It should not cancel the fulfillment." do
     setup_products
-    user = FactoryGirl.build(:user)
-    @credit_card = FactoryGirl.build(:credit_card)
+    user = FactoryBot.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)
     user = enroll_user(user, @terms_of_membership_with_gateway)
     fulfillment = user.fulfillments.first
     assert_equal fulfillment.status, "not_processed"
@@ -56,8 +56,8 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "cancel user before two days of enrollment. It should cancel the fulfillment." do
     setup_products
-    user = FactoryGirl.build(:user)
-    @credit_card = FactoryGirl.build(:credit_card)
+    user = FactoryBot.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)
     user = enroll_user(user, @terms_of_membership_with_gateway)
     fulfillment = user.fulfillments.first
     assert_equal fulfillment.status, "not_processed"
@@ -75,8 +75,8 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Canceling fulfillment should replenish stock" do
     setup_products
-    user = FactoryGirl.build(:user)
-    @credit_card = FactoryGirl.build(:credit_card)
+    user = FactoryBot.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)
     user = enroll_user(user, @terms_of_membership_with_gateway)
     fulfillment = user.fulfillments.first
     assert_equal fulfillment.status, "not_processed"
@@ -97,9 +97,9 @@ class FulfillmentTest < ActiveSupport::TestCase
   # Fulfillment should set as manual_review_required with match age correctly calcultaed.
   test "Fulfillment should set as manual_review_required when - when there are full_name_match" do 
     setup_products
-    @credit_card = FactoryGirl.build(:credit_card)
-    user = FactoryGirl.build(:user)
-    dup_user = FactoryGirl.build(:user, first_name: user.first_name, last_name: user.last_name, state: user.state)
+    @credit_card = FactoryBot.build(:credit_card)
+    user = FactoryBot.build(:user)
+    dup_user = FactoryBot.build(:user, first_name: user.first_name, last_name: user.last_name, state: user.state)
     user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
 
     wait_for_first_fulfillment = 4
@@ -121,7 +121,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     end
 
     Timecop.travel(Time.zone.now + wait_for_second_fulfillment.days) do
-      another_dup_user = FactoryGirl.build(:user, first_name: user.first_name, last_name: user.last_name, state: user.state)
+      another_dup_user = FactoryBot.build(:user, first_name: user.first_name, last_name: user.last_name, state: user.state)
       another_dup_user = enroll_user(another_dup_user, @terms_of_membership_with_gateway, nil, true)
       assert_not_nil Operation.find_by(user_id: another_dup_user.id, operation_type: Settings.operation_types.fulfillment_created_as_manual_review_required)
 
@@ -137,9 +137,9 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Fulfillment should set as manual_review_required - when there are full_phone_number_match" do 
     setup_products
-    @credit_card = FactoryGirl.build(:credit_card)
-    user = FactoryGirl.build(:user)
-    dup_user = FactoryGirl.build(:user, phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code, phone_local_number: user.phone_local_number)
+    @credit_card = FactoryBot.build(:credit_card)
+    user = FactoryBot.build(:user)
+    dup_user = FactoryBot.build(:user, phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code, phone_local_number: user.phone_local_number)
     user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
     user_dup = enroll_user(dup_user, @terms_of_membership_with_gateway, nil, true)
 
@@ -151,7 +151,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_equal fulfillment_dup.suspected_fulfillment_evidences.last.full_phone_number_match, true 
     assert_equal fulfillment_dup.full_phone_number_matches_count, 1 
 
-    another_dup_user = FactoryGirl.build(:user, phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code, phone_local_number: user.phone_local_number)
+    another_dup_user = FactoryBot.build(:user, phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code, phone_local_number: user.phone_local_number)
     another_dup_user = enroll_user(another_dup_user, @terms_of_membership_with_gateway, nil, true)
     fulfillment_dup = another_dup_user.fulfillments.last
     assert_equal fulfillment_dup.status, 'manual_review_required'
@@ -161,9 +161,9 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Fulfillment should set as manual_review_required - when there are full_address_match" do 
     setup_products
-    @credit_card = FactoryGirl.build(:credit_card)
-    user = FactoryGirl.build(:user)
-    dup_user = FactoryGirl.build(:user, address: user.address, city: user.city, zip: user.zip)
+    @credit_card = FactoryBot.build(:credit_card)
+    user = FactoryBot.build(:user)
+    dup_user = FactoryBot.build(:user, address: user.address, city: user.city, zip: user.zip)
     user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
     user_dup = enroll_user(dup_user, @terms_of_membership_with_gateway, nil, true)
 
@@ -175,7 +175,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_equal fulfillment_dup.suspected_fulfillment_evidences.last.full_address_match, true 
     assert_equal fulfillment_dup.full_address_matches_count, 1 
   
-    another_dup_user = FactoryGirl.build(:user, address: user.address, city: user.city, zip: user.zip)
+    another_dup_user = FactoryBot.build(:user, address: user.address, city: user.city, zip: user.zip)
     another_dup_user = enroll_user(another_dup_user, @terms_of_membership_with_gateway, nil, true)
 
     fulfillment_dup = another_dup_user.fulfillments.last
@@ -186,9 +186,9 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Fulfillment should set as manual_review_required - when multiple matches" do 
     setup_products
-    @credit_card = FactoryGirl.build(:credit_card)
-    user = FactoryGirl.build(:user)
-    dup_user = FactoryGirl.build(:user, address: user.address, city: user.city, zip: user.zip, phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code, phone_local_number: user.phone_local_number)
+    @credit_card = FactoryBot.build(:credit_card)
+    user = FactoryBot.build(:user)
+    dup_user = FactoryBot.build(:user, address: user.address, city: user.city, zip: user.zip, phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code, phone_local_number: user.phone_local_number)
     user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
     user_dup = enroll_user(dup_user, @terms_of_membership_with_gateway, nil, true)
 
@@ -201,7 +201,7 @@ class FulfillmentTest < ActiveSupport::TestCase
     assert_equal fulfillment_dup.full_phone_number_matches_count, 1
     assert_equal fulfillment_dup.full_address_matches_count, 1
 
-    another_dup_user = FactoryGirl.build(:user, first_name: user.first_name, last_name: user.last_name, state: user.state, phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code, phone_local_number: user.phone_local_number)
+    another_dup_user = FactoryBot.build(:user, first_name: user.first_name, last_name: user.last_name, state: user.state, phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code, phone_local_number: user.phone_local_number)
     another_dup_user = enroll_user(another_dup_user, @terms_of_membership_with_gateway, nil, true)
     fulfillment_dup = another_dup_user.fulfillments.last
     assert_equal fulfillment_dup.status, 'manual_review_required'
@@ -212,8 +212,8 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Fulfillment should set as manual_review_required - when the users recovers" do 
     setup_products
-    @credit_card = FactoryGirl.build(:credit_card)
-    user = FactoryGirl.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)
+    user = FactoryBot.build(:user)
     user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
 
     user.set_as_canceled
@@ -228,21 +228,21 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Fulfillment should set as canceled when user is testing account" do
     setup_products
-    @credit_card = FactoryGirl.build(:credit_card)
+    @credit_card = FactoryBot.build(:credit_card)
     ['admin@xagax.com', 'admin@stoneacreinc.com'].each do |email|
-      user = FactoryGirl.build(:user, email: email)
+      user = FactoryBot.build(:user, email: email)
       user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
       fulfillment = user.fulfillments.last
       assert user.testing_account?
       assert_equal fulfillment.status, 'canceled'
     end
-    user = FactoryGirl.build(:user, first_name: 'test')
+    user = FactoryBot.build(:user, first_name: 'test')
     user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
     fulfillment = user.fulfillments.last
     assert user.testing_account?
     assert_equal fulfillment.status, 'canceled'
 
-    user = FactoryGirl.build(:user, last_name: 'test')
+    user = FactoryBot.build(:user, last_name: 'test')
     user = enroll_user(user, @terms_of_membership_with_gateway, nil, true)
     fulfillment = user.fulfillments.last
     assert user.testing_account?
@@ -253,9 +253,9 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   def setup_store_integration
     SacStore.enable_integration! 
-    @club1 = FactoryGirl.create(:simple_club_with_gateway)      
-    @transport_settings = FactoryGirl.create(:transport_settings_store, club_id:@club1.id)    
-    @terms_of_membership_with_gateway1 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club1.id)            
+    @club1 = FactoryBot.create(:simple_club_with_gateway)      
+    @transport_settings = FactoryBot.create(:transport_settings_store, club_id:@club1.id)    
+    @terms_of_membership_with_gateway1 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club1.id)            
   end
 
   def stub_store_stock_movement_creation
@@ -270,8 +270,8 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Decrease stock after create a fulfillment at not_processed status" do  
     setup_store_integration
-    user = FactoryGirl.build(:user)
-    @credit_card = FactoryGirl.build(:credit_card)   
+    user = FactoryBot.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)   
     stub_store_stock_movement_creation
     user = enroll_user(user, @terms_of_membership_with_gateway1)
     fulfillment = user.fulfillments.first
@@ -285,8 +285,8 @@ class FulfillmentTest < ActiveSupport::TestCase
 
   test "Increase stock after canceled a fulfillment" do    
     setup_store_integration
-    user = FactoryGirl.build(:user)
-    @credit_card = FactoryGirl.build(:credit_card)   
+    user = FactoryBot.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)   
     stub_store_stock_movement_creation
     user = enroll_user(user, @terms_of_membership_with_gateway1)
     fulfillment = user.fulfillments.first

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
     # HACK only if using schema as rb instead of sql: 
     # visible_id should be created automatically by mysql.
     # but test database is not created by migrations, so our custom executes

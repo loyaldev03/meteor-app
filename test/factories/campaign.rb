@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :campaign do
     sequence(:name) {|n| "Campaign_#{Faker::Commerce.product_name}" }
     sequence(:title) {|n| "Title_#{Faker::Commerce.product_name}" }

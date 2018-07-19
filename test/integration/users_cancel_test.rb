@@ -10,20 +10,20 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
   end
 
   def setup_user(create_new_user = true)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
     @partner = @club.partner
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :initial_club_cash_amount => 0)
-    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :initial_club_cash_amount => 0)
+    @terms_of_membership_with_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @member_cancel_reason =  FactoryBot.create(:member_cancel_reason)
  
-    @hd_decline = FactoryGirl.create(:hard_decline_strategy_for_billing)
-    @sd_decline = FactoryGirl.create(:soft_decline_strategy)
+    @hd_decline = FactoryBot.create(:hard_decline_strategy_for_billing)
+    @sd_decline = FactoryBot.create(:soft_decline_strategy)
     if create_new_user
-      unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-      credit_card = FactoryGirl.build(:credit_card_master_card)
-      enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+      unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+      credit_card = FactoryBot.build(:credit_card_master_card)
+      enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
       @saved_user = User.find_by_email unsaved_user.email
     end
@@ -37,9 +37,9 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
 
   test "Downgrade an user when credit card is blank - Same club" do
     setup_user(false)
-    credit_card = FactoryGirl.build(:blank_credit_card)
-    @unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    credit_card = FactoryBot.build(:blank_credit_card)
+    @unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    @terms_of_membership_with_gateway_to_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership_with_gateway.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => @terms_of_membership_with_gateway_to_downgrade.id)
     @saved_user = create_user(@unsaved_user, credit_card, @terms_of_membership_with_gateway.name, true)
     
@@ -62,22 +62,22 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
   end
 
   test "See Additional User Data" do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
     @partner = @club.partner
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
   end
 
   ##TO FIX
   ## test "Downgrade a member - Different club" do
   ##   setup_member(false)
-  ##   credit_card = FactoryGirl.build(:credit_card_master_card)
-  ##   @club_2 = FactoryGirl.create(:simple_club_with_gateway)
-  ##   @unsaved_member = FactoryGirl.build(:active_member, :club_id => @club.id)
+  ##   credit_card = FactoryBot.build(:credit_card_master_card)
+  ##   @club_2 = FactoryBot.create(:simple_club_with_gateway)
+  ##   @unsaved_member = FactoryBot.build(:active_member, :club_id => @club.id)
   ##   @saved_member = create_member(@unsaved_member, credit_card, @terms_of_membership_with_gateway.name, false)
-  ##   @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club_2.id)
+  ##   @terms_of_membership_with_gateway_to_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club_2.id)
   ##   @terms_of_membership_with_gateway.update_attribute(:downgrade_tom_id, @terms_of_membership_with_gateway_to_downgrade.id)  
   ##   active_merchant_stubs_process(@hd_decline.response_code, @hd_decline.notes)
   ##   @saved_member.update_attribute(:next_retry_bill_date, Time.zone.now)
@@ -92,11 +92,11 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
 
   test "Downgrade an user when soft recycled is limit - Same club" do
     setup_user false
-    @terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    @terms_of_membership_with_gateway_to_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership_with_gateway.update_attributes(if_cannot_bill: "downgrade_tom", downgrade_tom_id: @terms_of_membership_with_gateway_to_downgrade.id, installment_amount: 0.54)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     @saved_user = User.find_by_email unsaved_user.email
     @saved_user.update_attribute(:recycled_times, 4)
@@ -177,8 +177,8 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
 
   test "Rejecting an user should set cancel_date" do
     setup_user(false)
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
     
     @saved_user = create_user(unsaved_user, credit_card, @terms_of_membership_with_approval.name)
     

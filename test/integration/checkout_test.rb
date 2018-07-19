@@ -3,21 +3,21 @@ require 'test_helper'
 class CheckoutTest < ActionDispatch::IntegrationTest
  
   setup do
-    @landing_agent = FactoryGirl.create(:confirmed_landing_agent)   
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @landing_agent = FactoryBot.create(:confirmed_landing_agent)   
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Settings['club_params'][@club.id] = Settings['club_params'][1234]
     host = Capybara.current_session.server.host
     port = Capybara.current_session.server.port
     @club.checkout_url = "http://#{host}:#{port}"
     @club.save(validate: false)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)       
-    @prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :campaign_id => @campaign.id, :terms_of_membership_id => @terms_of_membership.id)
-    @credit_card = FactoryGirl.create :credit_card_american_express  
-    @product = FactoryGirl.create(:random_product, :club_id => @club.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)       
+    @prospect = FactoryBot.create(:prospect, :club_id => @club.id, :campaign_id => @campaign.id, :terms_of_membership_id => @terms_of_membership.id)
+    @credit_card = FactoryBot.create :credit_card_american_express  
+    @product = FactoryBot.create(:random_product, :club_id => @club.id)
     @campaign.products << @product 
-    @campaign1 = FactoryGirl.create(:campaign_with_checkout_settings, club_id: @club.id, terms_of_membership_id: @terms_of_membership.id)
+    @campaign1 = FactoryBot.create(:campaign_with_checkout_settings, club_id: @club.id, terms_of_membership_id: @terms_of_membership.id)
     sign_in_as(@landing_agent)
   end
 
@@ -47,8 +47,8 @@ class CheckoutTest < ActionDispatch::IntegrationTest
   end
 
   test "show Duplicated web page" do
-    user = FactoryGirl.create(:user, :club_id => @club.id)
-    prospect = FactoryGirl.create(:prospect, :email => user.email, :club_id => @club.id, :campaign_id => @campaign.id, :terms_of_membership_id => @terms_of_membership.id)    
+    user = FactoryBot.create(:user, :club_id => @club.id)
+    prospect = FactoryBot.create(:prospect, :email => user.email, :club_id => @club.id, :campaign_id => @campaign.id, :terms_of_membership_id => @terms_of_membership.id)    
     show_new_checkout(prospect) 
     assert_difference('User.count',0) do
       fill_in_credit_card(@credit_card.number, @credit_card.expire_month, @credit_card.expire_year)
@@ -58,7 +58,7 @@ class CheckoutTest < ActionDispatch::IntegrationTest
   end
 
   test "show Error web page" do    
-    prospect = FactoryGirl.create(:prospect, :first_name => 'first_name', :club_id => @club.id, :campaign_id => @campaign.id, :terms_of_membership_id => @terms_of_membership.id)    
+    prospect = FactoryBot.create(:prospect, :first_name => 'first_name', :club_id => @club.id, :campaign_id => @campaign.id, :terms_of_membership_id => @terms_of_membership.id)    
     show_new_checkout(prospect) 
     assert_difference('User.count',0) do
       fill_in_credit_card(@credit_card.number, @credit_card.expire_month, @credit_card.expire_year)

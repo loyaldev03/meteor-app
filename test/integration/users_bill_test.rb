@@ -13,23 +13,23 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   def setup_user(provisional_days = nil, create_user = true, club_with_gateway = :simple_club_with_gateway)
     active_merchant_stubs
 
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(club_with_gateway)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @club = FactoryBot.create(club_with_gateway)
     @partner = @club.partner
 
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership_with_gateway.provisional_days = provisional_days unless provisional_days.nil?
-    @communication_type = FactoryGirl.create(:communication_type)
-    @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
+    @communication_type = FactoryBot.create(:communication_type)
+    @disposition_type = FactoryBot.create(:disposition_type, :club_id => @club.id)
     
     sign_in_as(@admin_agent)
 
     if create_user
-      unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
+      unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
       # @saved_user = create_user(unsaved_user)
-      enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, enrollment_amount: 0.0)
-      credit_card_to_load = FactoryGirl.build(:credit_card)
+      enrollment_info = FactoryBot.build(:membership_with_enrollment_info, enrollment_amount: 0.0)
+      credit_card_to_load = FactoryBot.build(:credit_card)
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card_to_load, enrollment_info, @terms_of_membership_with_gateway)
       @saved_user = User.find_by email: unsaved_user.email
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
@@ -129,8 +129,8 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   test "See HD for 'Soft recycle limit'" do
     setup_user
     @saved_user.current_membership.update_attribute(:enrollment_amount, 0.0)
-    @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
-    @hd_strategy = FactoryGirl.create(:hard_decline_strategy) 
+    @sd_strategy = FactoryBot.create(:soft_decline_strategy)
+    @hd_strategy = FactoryBot.create(:hard_decline_strategy) 
     active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
 
     within('#table_membership_information') do
@@ -374,10 +374,10 @@ class UsersBillTest < ActionDispatch::IntegrationTest
 
   test "Hard decline for user without CC information when the billing date arrives" do
     setup_user(nil,false)
-    @hd_strategy = FactoryGirl.create(:hard_decline_strategy_for_billing)
+    @hd_strategy = FactoryBot.create(:hard_decline_strategy_for_billing)
     active_merchant_stubs("9997", "This transaction has not been approved with stub", false)
     
-    unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
     @saved_user = create_user(unsaved_user, nil, @terms_of_membership_with_gateway.name, true)
 
     within("#table_active_credit_card")do
@@ -467,7 +467,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
 
   test "Try billing an user with blank credit card." do
     setup_user(nil,false)
-    unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)      
+    unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)      
     @saved_user = create_user(unsaved_user,nil,nil, true)
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     fill_in('amount', :with => '100')
@@ -481,13 +481,13 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   # test "Litle payment gateway (Enrollment amount)" do
   # active_merchant_stubs_litle
   #  setup_user(false)
-  #  @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
+  #  @club = FactoryBot.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
   #  Time.zone = @club.time_zone
-  #  @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :provisional_days => 0)
+  #  @terms_of_membership_with_gateway_for_litle = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :provisional_days => 0)
     
-  #  unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-  #  credit_card = FactoryGirl.build(:credit_card_master_card)
-  #  enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+  #  unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+  #  credit_card = FactoryBot.build(:credit_card_master_card)
+  #  enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
   #  create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
   #  @saved_user= User.find_by_email(unsaved_user.email)
   #  visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
@@ -499,11 +499,11 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   # test "Litle payment gateway (Installment amount)" do
   #   active_merchant_stubs_litle
   #   setup_user(false)
-  #   @club = FactoryGirl.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
-  #   @terms_of_membership_with_gateway_for_litle = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-  #   unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-  #   credit_card = FactoryGirl.build(:credit_card_master_card)
-  #  enrollment_info = FactoryGirl.build(:membership_with_enrollment_info, :enrollment_amount => false)
+  #   @club = FactoryBot.create(:simple_club_with_litle_gateway, :name => "new_club", :partner_id => @partner.id)
+  #   @terms_of_membership_with_gateway_for_litle = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+  #   unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+  #   credit_card = FactoryBot.build(:credit_card_master_card)
+  #  enrollment_info = FactoryBot.build(:membership_with_enrollment_info, :enrollment_amount => false)
   #  create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_for_litle)
   #  @saved_user= User.find_by_email(unsaved_user.email)
   #  visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)

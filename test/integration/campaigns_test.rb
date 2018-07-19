@@ -3,12 +3,12 @@ require 'test_helper'
 class CampaignTest < ActionDispatch::IntegrationTest
  
   setup do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)    
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )      
-    @preference_group = FactoryGirl.create(:preference_group, :club_id => @club.id)    
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)    
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )      
+    @preference_group = FactoryBot.create(:preference_group, :club_id => @club.id)    
     sign_in_as(@admin_agent)
   end
 
@@ -44,7 +44,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
   end
 
   test "create campaign" do    
-    unsaved_campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
+    unsaved_campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
     campaign_type = unsaved_campaign.campaign_type
     transport = unsaved_campaign.transport
     visit campaigns_path(@partner.prefix, @club.name)
@@ -71,7 +71,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
   end
 
   test "should not update campaigns in the past when it has campaign_days created" do    
-    campaign_days = FactoryGirl.create(:campaign_day, :campaign_id => @campaign.id)    
+    campaign_days = FactoryBot.create(:campaign_day, :campaign_id => @campaign.id)    
     visit campaigns_path(@partner.prefix, @club.name)
     within("#campaigns_table") do
       click_link_or_button 'Edit'
@@ -97,7 +97,7 @@ class CampaignTest < ActionDispatch::IntegrationTest
     assert page.has_css?("#campaign_audience[disabled]")
     assert page.has_css?("#campaign_campaign_code[disabled]")   
 
-    unsaved_campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
+    unsaved_campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
     fill_in 'campaign[name]', with: unsaved_campaign.name
     fill_in 'campaign[title]', with: unsaved_campaign.title
     select_from_datepicker("campaign_initial_date", unsaved_campaign.initial_date + 3.days)
@@ -131,8 +131,8 @@ class CampaignTest < ActionDispatch::IntegrationTest
   end
 
   test "configure and update checkout settings" do
-    unsaved_campaign = FactoryGirl.build(:campaign_with_checkout_settings)
-    @campaign1 = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
+    unsaved_campaign = FactoryBot.build(:campaign_with_checkout_settings)
+    @campaign1 = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )  
     visit campaign_path(@partner.prefix, @club.name, @campaign1.id)    
     click_link_or_button 'Checkout Settings'
     click_link_or_button 'Edit Settings'

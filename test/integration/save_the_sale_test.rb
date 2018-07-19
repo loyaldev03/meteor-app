@@ -10,22 +10,22 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
   end
 
   def setup_user(approval = false, active = false)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id)
-    @terms_of_membership_with_gateway2 = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'second_tom_without_aproval')
-    @terms_of_membership_with_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id)
-    @terms_of_membership_with_approval2 = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id, name: 'second_tom_aproval')
-    @new_terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_hold_card, club_id: @club.id)
-    @lifetime_terms_of_membership = FactoryGirl.create(:life_time_terms_of_membership, club_id: @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id)
+    @terms_of_membership_with_gateway2 = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'second_tom_without_aproval')
+    @terms_of_membership_with_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id)
+    @terms_of_membership_with_approval2 = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, club_id: @club.id, name: 'second_tom_aproval')
+    @new_terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_hold_card, club_id: @club.id)
+    @lifetime_terms_of_membership = FactoryBot.create(:life_time_terms_of_membership, club_id: @club.id)
     
-    @member_cancel_reason =  FactoryGirl.create(:member_cancel_reason)
+    @member_cancel_reason =  FactoryBot.create(:member_cancel_reason)
     
-    unsaved_user = FactoryGirl.build(:user_with_api)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user = FactoryBot.build(:user_with_api)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
 
     if approval
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_approval)
@@ -202,7 +202,7 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
   test "Change the user from a lifetime TOM to a another" do
     setup_user(false)
 
-    unsaved_user = FactoryGirl.build(:user_with_cc, club_id: @club.id)
+    unsaved_user = FactoryBot.build(:user_with_cc, club_id: @club.id)
     @saved_user = create_user(unsaved_user, nil, @lifetime_terms_of_membership.name, true)
 
     assert_difference('Membership.count') do 

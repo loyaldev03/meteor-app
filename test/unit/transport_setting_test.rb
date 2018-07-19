@@ -3,11 +3,11 @@ require 'test_helper'
 class TransportSettingTest < ActiveSupport::TestCase
 
   setup do
-    @transportsetting = FactoryGirl.build(:transport_settings_facebook)
-    @tsmailchimp = FactoryGirl.build(:transport_settings_mailchimp)
-    @ts_google_analytics = FactoryGirl.build(:transport_settings_google_analytics)
-    @ts_google_tag_manager = FactoryGirl.build(:transport_settings_google_tag_manager)
-    @ts_store = FactoryGirl.build(:transport_settings_store)
+    @transportsetting = FactoryBot.build(:transport_settings_facebook)
+    @tsmailchimp = FactoryBot.build(:transport_settings_mailchimp)
+    @ts_google_analytics = FactoryBot.build(:transport_settings_google_analytics)
+    @ts_google_tag_manager = FactoryBot.build(:transport_settings_google_tag_manager)
+    @ts_store = FactoryBot.build(:transport_settings_store)
   end
 
   test 'Should save facebook transport settings when filling all data' do
@@ -68,9 +68,9 @@ class TransportSettingTest < ActiveSupport::TestCase
   end
 
   test 'Should not create more than 1 transport for the same club' do
-    @club = FactoryGirl.create(:simple_club_with_gateway)
-    @transportsetting1 = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)
-    @transportsetting2 = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)
+    @club = FactoryBot.create(:simple_club_with_gateway)
+    @transportsetting1 = FactoryBot.create(:transport_settings_facebook, :club_id => @club.id)
+    @transportsetting2 = FactoryBot.build(:transport_settings_facebook, :club_id => @club.id)
     assert !@transportsetting2.save        
     assert @transportsetting2.errors.messages[:transport].include? "has already been taken"   
   end

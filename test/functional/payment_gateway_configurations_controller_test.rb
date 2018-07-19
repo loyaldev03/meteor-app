@@ -2,11 +2,11 @@ require "test_helper"
 
 class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
   setup do
-    @agent = FactoryGirl.create(:agent)
-    @admin_user = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
-    @simple_club_with_gateway = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @agent = FactoryBot.create(:agent)
+    @admin_user = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:club, :partner_id => @partner.id)
+    @simple_club_with_gateway = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
   end
 
   test "Admin should be able to show pgc information" do
@@ -44,7 +44,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
 
   test "Agents different from admin cannot get show" do
     sign_in @agent
-    @agent = FactoryGirl.create(:confirmed_admin_agent)
+    @agent = FactoryBot.create(:confirmed_admin_agent)
     ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       get :show, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id
@@ -54,7 +54,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
 
   test "Agents different from admin cannot get new" do
     sign_in @agent
-    @agent = FactoryGirl.create(:confirmed_admin_agent)
+    @agent = FactoryBot.create(:confirmed_admin_agent)
     ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       get :new, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name
@@ -64,7 +64,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
 
   test "Agents different from admin cannot get create" do
     sign_in @agent
-    @agent = FactoryGirl.create(:confirmed_admin_agent)
+    @agent = FactoryBot.create(:confirmed_admin_agent)
     ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, payment_gateway_configuration: { report_group: "NewReportGroup", merchant_key: "NewMerchantKey", :login => "Login", :password => "asdasdds", :gateway => "mes" }
@@ -74,7 +74,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
 
   test "Agents different from admin cannot get edit" do
     sign_in @agent
-    @agent = FactoryGirl.create(:confirmed_admin_agent)
+    @agent = FactoryBot.create(:confirmed_admin_agent)
     ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       get :edit, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id
@@ -84,7 +84,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
 
   test "Agents different from admin cannot get update" do
     sign_in @agent
-    @agent = FactoryGirl.create(:confirmed_admin_agent)
+    @agent = FactoryBot.create(:confirmed_admin_agent)
     ['supervisor', 'representative', 'fulfillment_managment', 'agency', 'api', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       put :update, partner_prefix: @partner.prefix, club_prefix: @simple_club_with_gateway.name, id: @simple_club_with_gateway.payment_gateway_configuration.id,
@@ -109,7 +109,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
 
   test "agent with admin club role should get new" do
     sign_in(@agent)
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
+    @club = FactoryBot.create(:club, :partner_id => @partner.id)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
     club_role.role = 'admin'
@@ -120,7 +120,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
 
   test "agent with admin club role should create pgc" do
     sign_in(@agent)
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
+    @club = FactoryBot.create(:club, :partner_id => @partner.id)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
     club_role.role = 'admin'
@@ -166,7 +166,7 @@ class PaymentGatewayConfigurationsControllerTest < ActionController::TestCase
 
   test "agent with club role different from admin should not get new" do
     sign_in(@agent)
-    @club = FactoryGirl.create(:club, :partner_id => @partner.id)
+    @club = FactoryBot.create(:club, :partner_id => @partner.id)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|

@@ -2,10 +2,10 @@ require 'test_helper'
 
 class ClubsControllerTest < ActionController::TestCase
   def setup    
-    @agent = FactoryGirl.create(:agent)
-    @partner = FactoryGirl.create(:partner)
+    @agent = FactoryBot.create(:agent)
+    @partner = FactoryBot.create(:partner)
     @partner_prefix = @partner.prefix
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
   end
 
   test "Admin should get index" do
@@ -51,7 +51,7 @@ class ClubsControllerTest < ActionController::TestCase
   test "Admin should create club" do
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
-      @club = FactoryGirl.build(:club, :partner_id => @partner.id)
+      @club = FactoryBot.build(:club, :partner_id => @partner.id)
       assert_difference('Club.count') do
         post :create, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name, cs_phone_number: @club.cs_phone_number, cs_email: @club.cs_email }
       end
@@ -65,7 +65,7 @@ class ClubsControllerTest < ActionController::TestCase
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        @club = FactoryGirl.build(:club, :partner_id => @partner.id)
+        @club = FactoryBot.build(:club, :partner_id => @partner.id)
         post :create, partner_prefix: @partner_prefix, club: { description: @club.description, name: @club.name }
         assert_response :unauthorized
       end
@@ -160,7 +160,7 @@ class ClubsControllerTest < ActionController::TestCase
 
   test "agent with club roles should not should not get index" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
@@ -173,7 +173,7 @@ class ClubsControllerTest < ActionController::TestCase
 
   test "agent with club roles should not get new" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
@@ -186,10 +186,10 @@ class ClubsControllerTest < ActionController::TestCase
 
   test "agent with club roles should not create club" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
-    club_second = FactoryGirl.build(:club, :partner_id => @partner.id)
+    club_second = FactoryBot.build(:club, :partner_id => @partner.id)
     ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
@@ -200,7 +200,7 @@ class ClubsControllerTest < ActionController::TestCase
 
   test "agent with club roles should not get show club" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
@@ -213,7 +213,7 @@ class ClubsControllerTest < ActionController::TestCase
 
   test "agent with club role admin should get edit club" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     club_role.role = "admin"
@@ -224,7 +224,7 @@ class ClubsControllerTest < ActionController::TestCase
 
   test "agent with club roles should not update club" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|      
@@ -237,7 +237,7 @@ class ClubsControllerTest < ActionController::TestCase
 
   test "agent with club role admin should update club" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     club_role.role = "admin"
@@ -248,7 +248,7 @@ class ClubsControllerTest < ActionController::TestCase
 
   test "agent with club roles should not destroy club" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     ['admin', 'supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|

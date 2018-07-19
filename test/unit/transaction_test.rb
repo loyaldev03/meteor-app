@@ -2,22 +2,22 @@
 
 class TransactionTest < ActiveSupport::TestCase
   setup do
-    @current_agent = FactoryGirl.create(:agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership_with_gateway_yearly = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
-    @user = FactoryGirl.build(:user)
-    @credit_card = FactoryGirl.build(:credit_card)
-    @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
-    @sd_mes_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "054")
-    @sd_litle_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "305", :gateway => "litle")
-    @sd_auth_net_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "316", :gateway => "authorize_net")
-    @sd_first_data_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "605", :gateway => "first_data")
-    @sd_stripe_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "card_declined", :gateway => "stripe")
-    @sd_payeezy_expired_strategy = FactoryGirl.create(:soft_decline_strategy, :response_code => "302", :gateway => "payeezy")
-    @hd_strategy = FactoryGirl.create(:hard_decline_strategy)
-    FactoryGirl.create(:without_grace_period_decline_strategy_monthly)
-    FactoryGirl.create(:without_grace_period_decline_strategy_yearly)
+    @current_agent = FactoryBot.create(:agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership_with_gateway_yearly = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @user = FactoryBot.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)
+    @sd_strategy = FactoryBot.create(:soft_decline_strategy)
+    @sd_mes_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "054")
+    @sd_litle_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "305", :gateway => "litle")
+    @sd_auth_net_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "316", :gateway => "authorize_net")
+    @sd_first_data_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "605", :gateway => "first_data")
+    @sd_stripe_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "card_declined", :gateway => "stripe")
+    @sd_payeezy_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "302", :gateway => "payeezy")
+    @hd_strategy = FactoryBot.create(:hard_decline_strategy)
+    FactoryBot.create(:without_grace_period_decline_strategy_monthly)
+    FactoryBot.create(:without_grace_period_decline_strategy_yearly)
   end
 
   def enroll_user(tom, amount=23, cc_blank=false, cc_card = nil)
@@ -49,7 +49,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Enrollment with approval" do
-    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @tom_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     active_merchant_stubs
     assert_difference('Operation.count',2) do
       assert_no_difference('Fulfillment.count') do
@@ -262,7 +262,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "Monthly user SD until gets HD will downgrade the user" do 
     active_merchant_stubs_store
     active_merchant_stubs
-    @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    @terms_of_membership_for_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
     @terms_of_membership.if_cannot_bill = "downgrade_tom"
     @terms_of_membership.save
@@ -310,7 +310,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "Downgrade due to soft decline should update NRBD and BD according to new Terms of membership provisional days." do 
     active_merchant_stubs_store
     active_merchant_stubs
-    @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id, provisional_days: 30)
+    @terms_of_membership_for_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id, provisional_days: 30)
     @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
     @terms_of_membership.if_cannot_bill = "downgrade_tom"
     @terms_of_membership.save
@@ -368,7 +368,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Billing with grace period disable on tom and missing CC" do
     active_user = create_active_user( @terms_of_membership, :active_user_without_cc )
-    blank_cc = FactoryGirl.create( :blank_credit_card, :user_id => active_user.id )
+    blank_cc = FactoryBot.create( :blank_credit_card, :user_id => active_user.id )
 
     nbd = active_user.bill_date
     assert_difference('Operation.count', 5) do
@@ -384,9 +384,9 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Should not bill user which is not being spected to be billed (is_payment_expected = false)" do
-    @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
+    @terms_of_membership_not_expected_to_be_billed = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
     active_user = create_active_user( @terms_of_membership_not_expected_to_be_billed )
-    blank_cc = FactoryGirl.create( :blank_credit_card, :user_id => active_user.id )
+    blank_cc = FactoryBot.create( :blank_credit_card, :user_id => active_user.id )
 
     Timecop.travel(active_user.next_retry_bill_date+1.day) do
       assert_difference('Operation.count', 0) do
@@ -454,7 +454,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with SD reaches the recycle limit, and HD downgrade the user." do 
-    @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    @terms_of_membership_for_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
     @terms_of_membership.if_cannot_bill = "downgrade_tom"
     @terms_of_membership.save
@@ -479,7 +479,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with HD downgrade the user when configured to do so" do 
-    @terms_of_membership_for_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    @terms_of_membership_for_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
     @terms_of_membership.if_cannot_bill = "downgrade_tom"
     @terms_of_membership.save
@@ -528,7 +528,7 @@ class TransactionTest < ActiveSupport::TestCase
   # TODO: how do we stub faraday?
   test "Chargeback processing should create transaction, blacklist and cancel the user" do
     active_user = create_active_user(@terms_of_membership)
-    transaction = FactoryGirl.create(:transaction, user: active_user, terms_of_membership: @terms_of_membership)
+    transaction = FactoryBot.create(:transaction, user: active_user, terms_of_membership: @terms_of_membership)
     answer = { :body => '"Merchant Id","DBA Name","Control Number","Incoming Date","Card Number","Reference Number",' + 
       '"Tran Date","Tran Amount","Trident Tran ID","Purchase ID","Client Ref Num","Auth Code","Adj Date",' +
       '"Adj Ref Num","Reason","First Time","Reason Code","CB Ref Num","Terminal ID"\n' +
@@ -546,7 +546,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "enroll with monthly tom with no amount and cc blank" do
-    @tom = FactoryGirl.create(:terms_of_membership_monthly_without_provisional_day_and_amount, :club_id => @club.id)
+    @tom = FactoryBot.create(:terms_of_membership_monthly_without_provisional_day_and_amount, :club_id => @club.id)
     @credit_card.number = "0000000000"
     active_merchant_stubs
  
@@ -561,7 +561,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "enroll with yearly tom with no amount and cc blank" do
-    @tom = FactoryGirl.create(:terms_of_membership_yearly_without_provisional_day_and_amount, :club_id => @club.id)
+    @tom = FactoryBot.create(:terms_of_membership_yearly_without_provisional_day_and_amount, :club_id => @club.id)
     @credit_card.number = "0000000000"
     active_merchant_stubs
     user = enroll_user(@tom, 0, true)
@@ -576,9 +576,9 @@ class TransactionTest < ActiveSupport::TestCase
 
   # # Tets Litle transactions
   # def club_with_litle
-  #   @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
-  #   @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-  #   @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)
+  #   @litle_club = FactoryBot.create(:simple_club_with_litle_gateway)
+  #   @litle_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+  #   @credit_card_litle = FactoryBot.build(:credit_card_american_express_litle)
   #   active_merchant_stubs_litle
   # end
 
@@ -655,9 +655,9 @@ class TransactionTest < ActiveSupport::TestCase
 
   # # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Litle
   # test "Try billing an user's membership when he was previously SD for credit_card_expired for Litle" do 
-  #   @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
-  #   @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-  #   @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)    
+  #   @litle_club = FactoryBot.create(:simple_club_with_litle_gateway)
+  #   @litle_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+  #   @credit_card_litle = FactoryBot.build(:credit_card_american_express_litle)    
 
   #   active_user = create_active_user(@litle_terms_of_membership)
   #   active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
@@ -692,10 +692,10 @@ class TransactionTest < ActiveSupport::TestCase
   # end
 
   # test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for Litle" do 
-  #   @litle_club = FactoryGirl.create(:simple_club_with_litle_gateway)
-  #   @litle_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-  #   @litle_terms_of_membership_the_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id, :name =>"second_one")
-  #   @credit_card_litle = FactoryGirl.build(:credit_card_american_express_litle)
+  #   @litle_club = FactoryBot.create(:simple_club_with_litle_gateway)
+  #   @litle_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
+  #   @litle_terms_of_membership_the_second = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id, :name =>"second_one")
+  #   @credit_card_litle = FactoryBot.build(:credit_card_american_express_litle)
 
   #   active_user = create_active_user(@litle_terms_of_membership)
   #   active_user.active_credit_card.update_attribute :token, @credit_card_litle.token
@@ -722,8 +722,8 @@ class TransactionTest < ActiveSupport::TestCase
   # end
 
   test "should not update NBD after save the sale from monthly-tom to monthly-tom" do
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     user = enroll_user(@terms_of_membership, 0)
     nbd_initial = user.next_retry_bill_date
 
@@ -746,8 +746,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "should not update NBD after save the sale from monthly-tom to yearly-tom" do
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     user = enroll_user(@terms_of_membership, 0)
     nbd_initial = user.next_retry_bill_date
 
@@ -770,8 +770,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "should not update NBD after save the sale from yearly-tom to monthly-tom" do
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
-    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     user = enroll_user(@terms_of_membership, 0)
     nbd_initial = Time.zone.now + user.terms_of_membership.provisional_days.days
 
@@ -792,8 +792,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "should not update NBD after save the sale from yearly-tom to yearly-tom" do
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
-    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    @terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     user = enroll_user(@terms_of_membership, 0)
     nbd_initial = Time.zone.now + @terms_of_membership.provisional_days.days
 
@@ -854,7 +854,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Make no recurrent billing with user not expecting billing" do
-    @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
+    @terms_of_membership_not_expected_to_be_billed = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
     user = enroll_user(@terms_of_membership_not_expected_to_be_billed, 0, false)
     amount = 200
     assert_difference("Transaction.count",1) do
@@ -865,7 +865,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Make check/cash payment with user not expecting billing" do
-    @terms_of_membership_not_expected_to_be_billed = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
+    @terms_of_membership_not_expected_to_be_billed = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false)
     user = enroll_user(@terms_of_membership_not_expected_to_be_billed, 0, false)
     amount = 200
     assert_difference("Transaction.count",0) do
@@ -972,13 +972,13 @@ class TransactionTest < ActiveSupport::TestCase
   test "Create and bill an user with installment period = X days or months at TOM" do 
     active_merchant_stubs
 
-    @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @club = FactoryBot.create(:simple_club_with_gateway_with_family)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
 
     [6, 15, 365].each do |days|
-      @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
-      @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_period => days)
-      @user = FactoryGirl.build(:user)
+      @club = FactoryBot.create(:simple_club_with_gateway_with_family)
+      @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_period => days)
+      @user = FactoryBot.build(:user)
       user = enroll_user(@terms_of_membership)
       Timecop.travel(user.next_retry_bill_date) do
         TasksHelpers.bill_all_members_up_today
@@ -992,9 +992,9 @@ class TransactionTest < ActiveSupport::TestCase
     end
 
     [1, 6, 24].each do |months|
-      @club = FactoryGirl.create(:simple_club_with_gateway_with_family)
-      @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_period => (months*30.4166667).to_i )
-      @user = FactoryGirl.build(:user)
+      @club = FactoryBot.create(:simple_club_with_gateway_with_family)
+      @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_period => (months*30.4166667).to_i )
+      @user = FactoryBot.build(:user)
       user = enroll_user(@terms_of_membership)
 
       Timecop.travel(user.next_retry_bill_date) do
@@ -1298,7 +1298,7 @@ class TransactionTest < ActiveSupport::TestCase
     answer = active_user.bill_membership
 
     @club.payment_gateway_configurations.first.delete
-    old_pgc = FactoryGirl.create(:litle_payment_gateway_configuration, :club_id => @club.id)
+    old_pgc = FactoryBot.create(:litle_payment_gateway_configuration, :club_id => @club.id)
     active_user.reload
     assert_equal active_user.status, 'active'
 
@@ -1320,9 +1320,9 @@ class TransactionTest < ActiveSupport::TestCase
   # Tets Authorize net transactions
   def club_with_authorize_net
     active_merchant_stubs_auth_net
-    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
-    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
-    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
+    @authorize_net_club = FactoryBot.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @credit_card_authorize_net = FactoryBot.build(:credit_card_american_express_authorize_net)
   end
 
   test "Bill membership with Authorize net" do
@@ -1378,9 +1378,9 @@ class TransactionTest < ActiveSupport::TestCase
   # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Auth.net
   test "Try billing an user's membership when he was previously SD for credit_card_expired for Auth.net" do 
     active_merchant_stubs_auth_net
-    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
-    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
-    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net, :token => "tzNduuh2DRQT7FXUILDl3Q==")
+    @authorize_net_club = FactoryBot.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @credit_card_authorize_net = FactoryBot.build(:credit_card_american_express_authorize_net, :token => "tzNduuh2DRQT7FXUILDl3Q==")
 
     active_user = create_active_user(@authorize_net_terms_of_membership)
     active_merchant_stubs_auth_net(@sd_auth_net_expired_strategy.response_code, "decline stubbed", false)
@@ -1413,10 +1413,10 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for Auth.net" do 
     active_merchant_stubs_auth_net
-    @authorize_net_club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
-    @authorize_net_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
-    @authorize_net_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id, :name =>"second_one")
-    @credit_card_authorize_net = FactoryGirl.build(:credit_card_american_express_authorize_net)
+    @authorize_net_club = FactoryBot.create(:simple_club_with_authorize_net_gateway)
+    @authorize_net_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id)
+    @authorize_net_terms_of_membership_second = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @authorize_net_club.id, :name =>"second_one")
+    @credit_card_authorize_net = FactoryBot.build(:credit_card_american_express_authorize_net)
     
     active_user = enroll_user(@authorize_net_terms_of_membership, 0, false, @credit_card_authorize_net)
     active_user.next_retry_bill_date = Time.zone.now
@@ -1448,9 +1448,9 @@ class TransactionTest < ActiveSupport::TestCase
 
   # Tets FirstData transactions
   def club_with_first_data
-    @first_data_club = FactoryGirl.create(:simple_club_with_first_data_gateway)
-    @first_data_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @first_data_club.id)
-    @credit_card_first_data = FactoryGirl.build(:credit_card_visa_first_data)
+    @first_data_club = FactoryBot.create(:simple_club_with_first_data_gateway)
+    @first_data_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @first_data_club.id)
+    @credit_card_first_data = FactoryBot.build(:credit_card_visa_first_data)
   end
   
   test "Enroll with FirstData" do
@@ -1538,7 +1538,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for FirstData" do 
     club_with_first_data
-    @first_data_terms_of_membership_second = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @first_data_club.id, :name =>"second_one")
+    @first_data_terms_of_membership_second = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @first_data_club.id, :name =>"second_one")
     active_user = enroll_user(@first_data_terms_of_membership, 100, false, @credit_card_first_data)
     active_card = active_user.active_credit_card
 
@@ -1590,9 +1590,9 @@ class TransactionTest < ActiveSupport::TestCase
 
   # Tets Stripe transactions
   def club_with_stripe
-    @stripe_club = FactoryGirl.create(:simple_club_with_stripe_gateway)
-    @stripe_terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @stripe_club.id)
-    @credit_card_stripe = FactoryGirl.build(:credit_card_visa_stripe)
+    @stripe_club = FactoryBot.create(:simple_club_with_stripe_gateway)
+    @stripe_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @stripe_club.id)
+    @credit_card_stripe = FactoryBot.build(:credit_card_visa_stripe)
     active_merchant_stubs_stripe
   end
 
@@ -1649,9 +1649,9 @@ class TransactionTest < ActiveSupport::TestCase
 
   # Tets Stripe transactions
   def club_with_payeezy
-    @payeezy_club                 = FactoryGirl.create(:simple_club_with_payeezy_gateway)
-    @payeezy_terms_of_membership  = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @payeezy_club.id)
-    @credit_card_payeezy          = FactoryGirl.build(:credit_card_visa_payeezy)
+    @payeezy_club                 = FactoryBot.create(:simple_club_with_payeezy_gateway)
+    @payeezy_terms_of_membership  = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @payeezy_club.id)
+    @credit_card_payeezy          = FactoryBot.build(:credit_card_visa_payeezy)
     active_merchant_stubs_payeezy
   end
 

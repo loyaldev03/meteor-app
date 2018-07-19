@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :soft_decline_strategy, class: DeclineStrategy do
     days 2

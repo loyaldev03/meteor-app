@@ -3,10 +3,10 @@ require 'test_helper'
 class CampaignsControllerTest < ActionController::TestCase
 
   def setup
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )   
     @partner_prefix = @partner.prefix
   end
 
@@ -84,7 +84,7 @@ class CampaignsControllerTest < ActionController::TestCase
   test "agents that should create campaign" do
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
-      campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+      campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
 
       assert_difference('Campaign.count',1) do
         post_create_campaign(campaign)
@@ -100,7 +100,7 @@ class CampaignsControllerTest < ActionController::TestCase
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
-        campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+        campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         post_create_campaign(campaign)
         assert_response :unauthorized, "Agent #{agent} can access to this page."       
       end
@@ -130,7 +130,7 @@ class CampaignsControllerTest < ActionController::TestCase
   test "agents that should update campaign" do
     [:confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
-      campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+      campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
       put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
       assert_redirected_to campaigns_path     
     end
@@ -142,7 +142,7 @@ class CampaignsControllerTest < ActionController::TestCase
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)     
       perform_call_as(@agent) do  
-        campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+        campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
         assert_response :unauthorized, "Agent #{agent} can update this page."
       end
@@ -176,8 +176,8 @@ class CampaignsControllerTest < ActionController::TestCase
   end
 
   test "agent with club Admin role that should NOT get index, show,  when it allows to another club" do    
-    another_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    agent = FactoryGirl.create(:confirmed_admin_agent, roles: '') 
+    another_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    agent = FactoryBot.create(:confirmed_admin_agent, roles: '') 
     ClubRole.create(club_id: another_club.id, agent_id: agent.id, role: 'admin')
     sign_in agent
     get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name
@@ -235,7 +235,7 @@ class CampaignsControllerTest < ActionController::TestCase
 
   test "agents that should create campaign with club roles" do
     sign_agent_with_club_role(:agent, 'admin')
-    campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+    campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
     assert_difference('Campaign.count',1) do
       post_create_campaign(campaign)
     end
@@ -247,7 +247,7 @@ class CampaignsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do 
-        campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+        campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         post_create_campaign(campaign)
         assert_response :unauthorized, "Agent #{role} can access to this page."      
       end
@@ -272,7 +272,7 @@ class CampaignsControllerTest < ActionController::TestCase
 
   test "agents that should update campaign with club role" do
     sign_agent_with_club_role(:agent, 'admin')
-    campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+    campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
     put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
     assert_redirected_to campaigns_path  
   end
@@ -281,7 +281,7 @@ class CampaignsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do 
-        campaign = FactoryGirl.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
+        campaign = FactoryBot.build(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )
         put :update, id: @campaign.id, partner_prefix: @partner_prefix, :club_prefix => @club.name, campaign: { name: campaign.name, initial_date: campaign.initial_date, finish_date: campaign.finish_date }
         assert_response :unauthorized, "Agent #{role} can access to this page."
       end

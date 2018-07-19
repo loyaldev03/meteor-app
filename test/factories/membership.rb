@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :user_membership, class: Membership do
     join_date { DateTime.now }

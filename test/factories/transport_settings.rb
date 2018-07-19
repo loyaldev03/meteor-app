@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :transport_settings_facebook, class: TransportSetting do
     transport { TransportSetting.transports['facebook'] } 

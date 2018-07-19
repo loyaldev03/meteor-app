@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :preference_group do
     name {Faker::Lorem.characters(20)}
     code { Faker::Lorem.characters(10) }
@@ -6,10 +6,10 @@ FactoryGirl.define do
   
     factory :preference_group_with_preferences do
       after(:create) do |preference_group| 
-        FactoryGirl.create(:preference, preference_group_id: preference_group.id)
+        FactoryBot.create(:preference, preference_group_id: preference_group.id)
       end
       after(:create) do |preference_group| 
-        FactoryGirl.create(:preference, preference_group_id: preference_group.id)
+        FactoryBot.create(:preference, preference_group_id: preference_group.id)
       end
     end
   end

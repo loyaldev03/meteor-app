@@ -3,27 +3,27 @@ require 'test_helper'
 class Api::MembersControllerTest < ActionController::TestCase
   
   setup do
-    @admin_user = FactoryGirl.create(:confirmed_admin_agent)
-    @representative_user = FactoryGirl.create(:confirmed_representative_agent)
-    @fulfillment_manager_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
-    @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
-    @api_user = FactoryGirl.create(:confirmed_api_agent)
-    @agency_agent = FactoryGirl.create(:confirmed_agency_agent)
-    @fulfillment_managment_user = FactoryGirl.create(:confirmed_fulfillment_manager_agent) 
+    @admin_user = FactoryBot.create(:confirmed_admin_agent)
+    @representative_user = FactoryBot.create(:confirmed_representative_agent)
+    @fulfillment_manager_user = FactoryBot.create(:confirmed_fulfillment_manager_agent)
+    @supervisor_user = FactoryBot.create(:confirmed_supervisor_agent)
+    @api_user = FactoryBot.create(:confirmed_api_agent)
+    @agency_agent = FactoryBot.create(:confirmed_agency_agent)
+    @fulfillment_managment_user = FactoryBot.create(:confirmed_fulfillment_manager_agent) 
     
-    @club = FactoryGirl.create(:simple_club_with_gateway, :family_memberships_allowed => false)
-    @club_with_family = FactoryGirl.create(:simple_club_with_gateway_with_family)
-    @club_with_api = FactoryGirl.create(:club_with_api)
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
-    @terms_of_membership_with_family = FactoryGirl.create :terms_of_membership_with_gateway_with_family, :club_id => @club_with_family.id
-    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
+    @club = FactoryBot.create(:simple_club_with_gateway, :family_memberships_allowed => false)
+    @club_with_family = FactoryBot.create(:simple_club_with_gateway_with_family)
+    @club_with_api = FactoryBot.create(:club_with_api)
+    @terms_of_membership = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @terms_of_membership_with_family = FactoryBot.create :terms_of_membership_with_gateway_with_family, :club_id => @club_with_family.id
+    @wordpress_terms_of_membership = FactoryBot.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
 
     @preferences = {'color' => 'green','car'=> 'dodge'}
     # request.env["devise.mapping"] = Devise.mappings[:agent]
  
-    @unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    @credit_card = FactoryGirl.build(:credit_card_master_card)
-    @enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    @unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    @credit_card = FactoryBot.build(:credit_card_master_card)
+    @enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
   end
 
 
@@ -123,21 +123,21 @@ class Api::MembersControllerTest < ActionController::TestCase
 
   def prepare_upgrade_downgrade_toms(yearly = true, blank_credit_card = false)
     sign_in @admin_user
-    @tom_yearly = FactoryGirl.create :terms_of_membership_with_gateway_yearly, :club_id => @club.id, 
+    @tom_yearly = FactoryBot.create :terms_of_membership_with_gateway_yearly, :club_id => @club.id, 
                                      :name => "YearlyTom", installment_amount: 100, provisional_days: 90,
                                      club_cash_installment_amount: 300
-    @tom_monthly = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, 
+    @tom_monthly = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, 
                                      :name => "MonthlyTom", installment_amount: 10
-    @credit_card = FactoryGirl.build :credit_card
-    @second_credit_card = FactoryGirl.build :credit_card_master_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @second_credit_card = FactoryBot.build :credit_card_master_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     @terms_of_membership = yearly ? @tom_yearly : @tom_monthly
     if blank_credit_card
-      @enrollment_info = FactoryGirl.build :membership_with_enrollment_info, :enrollment_amount => 0.0
-      @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
+      @enrollment_info = FactoryBot.build :membership_with_enrollment_info, :enrollment_amount => 0.0
+      @credit_card = FactoryBot.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
       generate_post_message({}, {setter: { cc_blank: true }})
     else
       generate_post_message
@@ -168,7 +168,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   def validate_credit_card_updated_only_year(active_credit_card, token, number, amount_years)
-    @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
+    @credit_card = FactoryBot.build :credit_card_american_express, :number => number
     @credit_card.expire_month = active_credit_card.expire_month
     @credit_card.expire_year = (Date.today + amount_years.year).year
     assert_difference('Operation.count',2) do
@@ -182,7 +182,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   def validate_credit_card_updated_only_month(active_credit_card, token, number, amount_months)
-    @credit_card = FactoryGirl.build :credit_card_american_express, :number => number
+    @credit_card = FactoryBot.build :credit_card_american_express, :number => number
     @credit_card.expire_month = (Time.zone.now + amount_months.months).month # January is the first month.
     @credit_card.expire_year = active_credit_card.expire_year
     assert_difference('Operation.count',2) do
@@ -200,9 +200,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Billing membership by Provisional amount
   test "Admin should enroll/create user with preferences" do
     sign_in @admin_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -236,9 +236,9 @@ class Api::MembersControllerTest < ActionController::TestCase
  test "Admin should enroll/create user with preferences when needs approval" do
     sign_in @admin_user
     @terms_of_membership.update_attribute :needs_enrollment_approval, true
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -264,10 +264,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     @club = @club_with_api
     Drupal.enable_integration!
     Drupal.test_mode!
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @terms_of_membership = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -290,9 +290,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "User should not be enrolled if the email is already is used." do
     sign_in @admin_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -310,7 +310,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     email_used = @user.email
-    @user = FactoryGirl.build :user_with_api, :email => email_used
+    @user = FactoryBot.build :user_with_api, :email => email_used
     assert_difference('Membership.count',0) do
       assert_difference('Transaction.count',0) do
         assert_difference('User.count',0) do
@@ -337,9 +337,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   # test "Member should not be enrolled if the email is already is used, even when mes throws error." do
   #   sign_in @admin_user
-  #   @credit_card = FactoryGirl.build :credit_card
-  #   @member = FactoryGirl.build :member_with_api
-  #   @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+  #   @credit_card = FactoryBot.build :credit_card
+  #   @member = FactoryBot.build :member_with_api
+  #   @enrollment_info = FactoryBot.build :membership_with_enrollment_info
   #   @current_club = @terms_of_membership.club
   #   @current_agent = @admin_user
   #   active_merchant_stubs
@@ -354,7 +354,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   #     end
   #   end
   #   email_used = @member.email
-  #   @member = FactoryGirl.build :member_with_api, :email => email_used
+  #   @member = FactoryBot.build :member_with_api, :email => email_used
   #   active_merchant_stubs_store(@credit_card, "900", "This transaction has been approved with stub", false)
   #   assert_difference('Membership.count',0) do
   #     assert_difference('Transaction.count',0) do
@@ -370,9 +370,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Reject new enrollments if billing is disable
   test "If billing is disabled user cant be enrolled." do
     sign_in @admin_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_club.update_attribute :billing_enable, false
     @current_agent = @admin_user
@@ -392,9 +392,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Representative should enroll/create user" do
     sign_in @representative_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -407,9 +407,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Fulfillment mamager should enroll/create user" do
     sign_in @fulfillment_manager_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -422,9 +422,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Supervisor should enroll/create user" do
     sign_in @supervisor_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -436,18 +436,18 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Api user should enroll/create user" do
     sign_in @api_user
-    @credit_card = FactoryGirl.build :credit_card    
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card    
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     generate_post_message
     assert_response :success
   end
   
   test "Agency should not enroll/create user" do
     sign_in @agency_agent
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -460,9 +460,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   #Profile fulfillment_managment
   test "fulfillment_managment should enroll/create user" do
     sign_in @fulfillment_managment_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -489,9 +489,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "admin user should update user" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
   
-    @credit_card = FactoryGirl.create :credit_card_master_card, :active => false
+    @credit_card = FactoryBot.create :credit_card_master_card, :active => false
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
   
     active_merchant_stubs_store(@credit_card.number)
@@ -507,9 +507,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "api_id should be updated if batch_update enabled" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
   
-    @credit_card = FactoryGirl.create :credit_card_master_card, :active => false
+    @credit_card = FactoryBot.create :credit_card_master_card, :active => false
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
   
     new_api_id = @user.api_id.to_i + 10
@@ -533,45 +533,45 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "representative user should update user" do
     sign_in @representative_user
-    @credit_card = FactoryGirl.build :credit_card    
+    @credit_card = FactoryBot.build :credit_card    
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     @credit_card = active_credit_card
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     generate_put_message
     assert_response :success
   end
   
   test "supervisor user should update user" do
     sign_in @supervisor_user
-    @credit_card = FactoryGirl.build :credit_card    
+    @credit_card = FactoryBot.build :credit_card    
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     @credit_card = active_credit_card
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     generate_put_message
     assert_response :success
   end
   
   test "api user should update user" do
     sign_in @api_user
-    @credit_card = FactoryGirl.build :credit_card    
+    @credit_card = FactoryBot.build :credit_card    
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     @credit_card = active_credit_card
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     generate_put_message
     assert_response :success
   end
   
   test "agency user should not update user" do
     sign_in @agency_agent
-    @credit_card = FactoryGirl.build :credit_card    
+    @credit_card = FactoryBot.build :credit_card    
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     generate_put_message
     assert_response :unauthorized
   end
@@ -579,12 +579,12 @@ class Api::MembersControllerTest < ActionController::TestCase
   #Profile fulfillment_managment
   test "fulfillment_managment user should update user" do
     sign_in @fulfillment_managment_user
-    @credit_card = FactoryGirl.build :credit_card    
+    @credit_card = FactoryBot.build :credit_card    
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     @credit_card = active_credit_card
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     generate_put_message
     assert_response :success
   end 
@@ -593,9 +593,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should update credit card" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
   
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     active_merchant_stubs_store(@credit_card.number)
   
     assert_difference('Operation.count',3) do
@@ -612,7 +612,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should update credit card only year" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     token = active_credit_card.token
   
     active_merchant_stubs_store("5589548939080095")
@@ -628,7 +628,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should update credit card only month" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     token = active_credit_card.token
   
     active_merchant_stubs_store("5589548939080095")
@@ -645,7 +645,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
   
-    @credit_card = FactoryGirl.build :credit_card_master_card
+    @credit_card = FactoryBot.build :credit_card_master_card
     assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count') do
         generate_put_message
@@ -673,10 +673,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not update credit card when dates are not changed and same number. (With 'X')" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_token = active_credit_card.token
   
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
     @credit_card.expire_year = active_credit_card.expire_year
     @credit_card.expire_month = active_credit_card.expire_month
@@ -694,10 +694,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not add new credit card with same data as the one active" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
   
     ["5589548939080095", "5589 5489 3908 0095", "5589-5489-3908-0095", "5589/5489/3908/0095"].each do |number|
-      @credit_card = FactoryGirl.build :credit_card_american_express
+      @credit_card = FactoryBot.build :credit_card_american_express
       @credit_card.number = number
       @credit_card.expire_year = @user.active_credit_card.expire_year
       @credit_card.expire_month = @user.active_credit_card.expire_month
@@ -722,11 +722,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
   
-    active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id, :expire_month => (Time.zone.now+1.month).month
+    active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id, :expire_month => (Time.zone.now+1.month).month
     active_credit_card.update_attribute(:expire_year, (Time.zone.now+1.year).year)
     cc_token = active_credit_card.token
   
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     @credit_card.number = "123456789"
     @credit_card.expire_year = @user.active_credit_card.expire_year
     @credit_card.expire_month = @user.active_credit_card.expire_month
@@ -750,9 +750,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
   
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_token = @active_credit_card.token
-    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:user_id => @user.id
+    @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id
   
     active_merchant_stubs_store(@credit_card.number)
   
@@ -771,9 +771,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     number = "340-5043-2363-2976" 
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_token = @active_credit_card.token
-    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
+    @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
   
     active_merchant_stubs_store(@credit_card.number)
   
@@ -792,9 +792,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     number = "340 5043 2363 2976"   
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_token = @active_credit_card.token
-    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
+    @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
   
     active_merchant_stubs_store(@credit_card.number)
   
@@ -813,9 +813,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     number = "340/5043/2363/2976"
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_token = @active_credit_card.token
-    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
+    @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
   
     active_merchant_stubs_store(@credit_card.number)
   
@@ -834,9 +834,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
   
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_number = @active_credit_card.number
-    @credit_card = FactoryGirl.create :credit_card_american_express, :active => false ,:user_id => @user.id
+    @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id
     @credit_card.expire_month = (Time.zone.now-1.month).month
     @credit_card.expire_year = (Time.zone.now-1.year).year
   
@@ -855,10 +855,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not update active credit card with expired month" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_expire_month = @active_credit_card.expire_month
   
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     @credit_card.number = @active_credit_card.number
     expired_month = Time.zone.now-1.month
     @credit_card.expire_month = expired_month.month
@@ -880,10 +880,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not update active credit card with expired year" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_expire_year = @active_credit_card.expire_year
   
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     @credit_card.number = @active_credit_card.number
     @credit_card.expire_year = (Time.zone.now-1.year).year
   
@@ -904,10 +904,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @user2 = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :user_id => @user.id
-    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :user_id => @user2.id, :blacklisted => true
+    @active_credit_card = FactoryBot.create :credit_card_american_express, :active => true, :user_id => @user.id
+    @blacklisted_credit_card = FactoryBot.create :credit_card_master_card, :active => false, :user_id => @user2.id, :blacklisted => true
   
-    @credit_card = FactoryGirl.build :credit_card_master_card
+    @credit_card = FactoryBot.build :credit_card_master_card
     active_merchant_stubs_store(@credit_card.number)
   
     assert_difference('Operation.count',0) do
@@ -926,12 +926,12 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership = @terms_of_membership_with_family
   
     @former_user = create_active_user(@terms_of_membership_with_family, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @former_user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @former_user.id
     @former_user_credit_card = @active_credit_card.token
   
-    @user = FactoryGirl.build(:user_with_api)
-    @credit_card = FactoryGirl.build :credit_card_master_card
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @user = FactoryBot.build(:user_with_api)
+    @credit_card = FactoryBot.build :credit_card_master_card
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
   
     active_merchant_stubs_store(@credit_card.number)
     assert_difference('Operation.count',4) do
@@ -948,12 +948,12 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, true)
   
     @former_user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @former_user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @former_user.id
     @former_user_credit_card_token = @active_credit_card.token
   
-    @user = FactoryGirl.build(:user_with_api, :email => @former_user.email)
-    @credit_card = FactoryGirl.build :credit_card_american_express
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @user = FactoryBot.build(:user_with_api, :email => @former_user.email)
+    @credit_card = FactoryBot.build :credit_card_american_express
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
   
     active_merchant_stubs_store(@credit_card.number)
   
@@ -971,11 +971,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     @user = create_active_user(@terms_of_membership_with_family, :user_with_api)
     @user2 = create_active_user(@terms_of_membership_with_family, :user_with_api)
   
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     old_token = @active_credit_card.token
-    @active_credit_card2 = FactoryGirl.create :credit_card_american_express, :active => true, :user_id => @user2.id
+    @active_credit_card2 = FactoryBot.create :credit_card_american_express, :active => true, :user_id => @user2.id
   
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     token = @credit_card.token
     active_merchant_stubs_store(@credit_card.number)
   
@@ -1001,11 +1001,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     @terms_of_membership.club = @former_user.club
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
   
-    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @former_user.id
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @former_active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @former_user.id
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
   
-    @user = FactoryGirl.build(:user_with_api, :email => "new_email@email.com")
-    @credit_card = FactoryGirl.build :credit_card_master_card
+    @user = FactoryBot.build(:user_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryBot.build :credit_card_master_card
     active_merchant_stubs_store(@credit_card.number)
   
     assert_equal @terms_of_membership.club.family_memberships_allowed, false
@@ -1021,17 +1021,17 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Error User when CC is already used (Sloop) and Family memberships = false with little gateway" do
     sign_in @admin_user
     active_merchant_stubs
-    @club = FactoryGirl.create(:simple_club_with_litle_gateway)
+    @club = FactoryBot.create(:simple_club_with_litle_gateway)
     @current_agent = @admin_user
     @former_user = create_active_user(@terms_of_membership, :user_with_api)
     @terms_of_membership.club = @former_user.club
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
   
-    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @former_user.id
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @former_active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @former_user.id
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
   
-    @user = FactoryGirl.build(:user_with_api, :email => "new_email@email.com")
-    @credit_card = FactoryGirl.build :credit_card_master_card
+    @user = FactoryBot.build(:user_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryBot.build :credit_card_master_card
     active_merchant_stubs_store(@credit_card.number)
   
     assert_equal @terms_of_membership.club.family_memberships_allowed, false
@@ -1047,17 +1047,17 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Error User when CC is already used (Sloop) and Family memberships = false with authorize_net gateway" do
     sign_in @admin_user
     active_merchant_stubs
-    @club = FactoryGirl.create(:simple_club_with_authorize_net_gateway)
+    @club = FactoryBot.create(:simple_club_with_authorize_net_gateway)
     @current_agent = @admin_user
     @former_user = create_active_user(@terms_of_membership, :user_with_api)
     @terms_of_membership.club = @former_user.club
     @terms_of_membership.club.update_attribute(:family_memberships_allowed, false)
   
-    @former_active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @former_user.id
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @former_active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @former_user.id
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
   
-    @user = FactoryGirl.build(:user_with_api, :email => "new_email@email.com")
-    @credit_card = FactoryGirl.build :credit_card_master_card
+    @user = FactoryBot.build(:user_with_api, :email => "new_email@email.com")
+    @credit_card = FactoryBot.build :credit_card_master_card
     active_merchant_stubs_store(@credit_card.number)
   
     assert_equal @terms_of_membership.club.family_memberships_allowed, false
@@ -1074,11 +1074,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @user2 = create_active_user(@terms_of_membership, :user_with_api)
   
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     token = @active_credit_card.token
-    @active_credit_card2 = FactoryGirl.create :credit_card_american_express, :active => true, :user_id => @user2.id
+    @active_credit_card2 = FactoryBot.create :credit_card_american_express, :active => true, :user_id => @user2.id
   
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     active_merchant_stubs_store(@credit_card.number)
   
     assert_difference('Operation.count',0) do
@@ -1097,10 +1097,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update a profile with CC with dashes" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
-    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @blacklisted_credit_card = FactoryBot.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     @credit_card.number = "340-5043-2363-2976"
     @credit_card.expire_year = @blacklisted_credit_card.expire_year
     @credit_card.expire_month = @blacklisted_credit_card.expire_month
@@ -1122,10 +1122,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update a profile with CC with slashes" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
-    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @blacklisted_credit_card = FactoryBot.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     @credit_card.number = "340/5043/2363/2976"
     @credit_card.expire_year = @blacklisted_credit_card.expire_year
     @credit_card.expire_month = @blacklisted_credit_card.expire_month
@@ -1148,10 +1148,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update a profile with CC with white spaces" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_master_card, :active => true, :user_id => @user.id
-    @blacklisted_credit_card = FactoryGirl.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
+    @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
+    @blacklisted_credit_card = FactoryBot.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     @credit_card.number = "340 5043 2363 2976"
     @credit_card.expire_year = @blacklisted_credit_card.expire_year
     @credit_card.expire_month = @blacklisted_credit_card.expire_month
@@ -1172,9 +1172,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not create user's record when there is an error on transaction." do
     active_merchant_stubs_store
     sign_in @admin_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs_purchase(@credit_card.number, "34234", "decline stubbed", false) 
@@ -1195,9 +1195,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Should not create user's record when there is an error on MeS get token." do
     active_merchant_stubs_store
     sign_in @admin_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed", false)
@@ -1252,9 +1252,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update Credit Card with expire this current month" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    @active_credit_card = FactoryGirl.create :credit_card_american_express, :active => true, :user_id => @user.id
+    @active_credit_card = FactoryBot.create :credit_card_american_express, :active => true, :user_id => @user.id
   
-    @credit_card = FactoryGirl.build :credit_card_american_express
+    @credit_card = FactoryBot.build :credit_card_american_express
     @credit_card.expire_year = (Time.zone.now.in_time_zone(@user.get_club_timezone)).year
     @credit_card.expire_month = (Time.zone.now.in_time_zone(@user.get_club_timezone)).month 
   
@@ -1274,7 +1274,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update user's next_bill_date provisional status" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     @user.set_as_provisional
     @user.update_attribute :recycled_times, 1
@@ -1292,7 +1292,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update user's next_bill_date active status" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     @user.set_as_provisional
     @user.set_as_active
@@ -1311,7 +1311,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update user's next_bill_date applied status" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     @set_as_canceled
     @user.set_as_applied   
@@ -1324,7 +1324,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update user's next_bill_date lapsed status" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     @user.set_as_provisional
     @user.set_as_canceled!
@@ -1336,9 +1336,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Update user's next_bill_date when payment is not expected" do
     sign_in @admin_user
-    @terms_of_membership_no_payment_expected = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false
+    @terms_of_membership_no_payment_expected = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :is_payment_expected => false
     @user = create_active_user(@terms_of_membership_no_payment_expected, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     @user.set_as_provisional
     @user.set_as_canceled!
@@ -1351,7 +1351,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update user's next_bill_date with wrong date format" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     @user.set_as_provisional
     assert_difference('Operation.count',0) do
@@ -1363,7 +1363,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update user's next_bill_date with date prior to actual date" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     @user.set_as_provisional
     assert_difference('Operation.count',0) do
@@ -1376,7 +1376,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Update user's next_bill_date with blank date" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     @user.set_as_provisional
     assert_difference('Operation.count',0) do
@@ -1389,7 +1389,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Supervisor should not updates user's next_bill_date" do
     sign_in @supervisor_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     @user.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
@@ -1400,7 +1400,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Representative should not updates user's next_bill_date" do
     sign_in @representative_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     @user.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
@@ -1411,7 +1411,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Agency should not updates user's next_bill_date" do
     sign_in @agency_agent
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     @user.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
@@ -1422,7 +1422,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Fulfillment manager should not updates user's next_bill_date" do
     sign_in @fulfillment_managment_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     @user.set_as_provisional
     assert_difference('Operation.count',0) do
       generate_put_next_bill_date( I18n.l(Time.zone.now + 3.days, :format => :only_date) )
@@ -1435,7 +1435,7 @@ class Api::MembersControllerTest < ActionController::TestCase
      next_bill_date = I18n.l(Time.zone.now+3.day, :format => :dashed)
   
      @user = create_active_user(@terms_of_membership, :user_with_api)
-     FactoryGirl.create :credit_card, :user_id => @user.id
+     FactoryBot.create :credit_card, :user_id => @user.id
   
      @user.set_as_provisional
      assert_difference('Operation.count') do
@@ -1599,10 +1599,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   # Cancel date using a Curl call
   test "Admin should cancel user" do
     sign_in @admin_user
-    @membership = FactoryGirl.create(:user_with_api_membership)
+    @membership = FactoryBot.create(:user_with_api_membership)
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @user.update_attribute :current_membership_id, @membership.id
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)
   
     assert_difference("Operation.count") do
@@ -1619,10 +1619,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Should not cancel user when reason is blank" do
     sign_in @admin_user
-    @membership = FactoryGirl.create(:user_with_api_membership)
+    @membership = FactoryBot.create(:user_with_api_membership)
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @user.update_attribute :current_membership_id, @membership.id
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
   
     assert_difference("Operation.count",0) do
@@ -1634,10 +1634,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Should cancel user even if the cancel date is the same as today" do
     sign_in @admin_user
-    @membership = FactoryGirl.create(:user_with_api_membership)
+    @membership = FactoryBot.create(:user_with_api_membership)
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @user.update_attribute :current_membership_id, @membership.id
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
   
     Timecop.freeze(Time.zone.now + 1.month) do
       cancel_date = I18n.l(Time.new.getlocal(@user.get_offset_related), :format => :only_date)    
@@ -1655,10 +1655,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Should not cancel user when cancel date is in wrong format" do
     sign_in @admin_user
-    @membership = FactoryGirl.create(:user_with_api_membership)
+    @membership = FactoryBot.create(:user_with_api_membership)
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @user.update_attribute :current_membership_id, @membership.id
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
   
     assert_difference("Operation.count",0) do
@@ -1671,7 +1671,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Supervisor should not cancel memeber" do
     sign_in @supervisor_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
   
     assert_difference("Operation.count",0) do
@@ -1683,7 +1683,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Representative should not cancel memeber" do
     sign_in @representative_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
   
     assert_difference("Operation.count",0) do
@@ -1695,7 +1695,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Agency should not cancel memeber" do
     sign_in @agency_agent
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
   
     assert_difference("Operation.count",0) do
@@ -1706,10 +1706,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "api should cancel memeber" do
     sign_in @api_user
-    @membership = FactoryGirl.create(:user_with_api_membership)
+    @membership = FactoryBot.create(:user_with_api_membership)
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @user.update_attribute :current_membership_id, @membership.id
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     cancel_date = I18n.l(Time.zone.now+2.days, :format => :only_date)    
   
     assert_difference("Operation.count") do
@@ -1726,10 +1726,10 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Admin should enroll/create user with blank_cc as true even if not cc information provided." do
     sign_in @admin_user
     @club = @club_with_api
-    @terms_of_membership = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id
-    @credit_card = FactoryGirl.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info, :enrollment_amount => 0.0
+    @terms_of_membership = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id
+    @credit_card = FactoryBot.build(:credit_card, :number => "", :expire_month => "", :expire_year => "")
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info, :enrollment_amount => 0.0
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -1749,7 +1749,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Change TOM throught API - different TOM - active user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :active_user, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_user.reload
@@ -1759,7 +1759,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Do not allow change TOM throught API to same TOM - active user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :active_user, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_user.id, :terms_of_membership_id => @terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
@@ -1767,7 +1767,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Change TOM throught API - different TOM - provisional user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :provisional_user, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     @saved_user.reload
@@ -1777,7 +1777,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Do not allow change TOM throught API to same TOM - provisional user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :provisional_user, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_user.id, :terms_of_membership_id => @saved_user.terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
@@ -1785,7 +1785,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Do not allow change TOM throught API - applied user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :applied_user, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the subscription plan."
@@ -1793,7 +1793,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Do not allow change TOM throught API - lapsed user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :applied_user, nil, {}, { :created_by => @admin_user })
     post(:change_terms_of_membership, { :id => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the subscription plan."
@@ -1801,9 +1801,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "User should not be updated if it is already active and the cc send it is wrong" do
     sign_in @admin_user
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs
@@ -1823,7 +1823,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     email_used = @user.email
     @user.first_name = "new_Name"
     @credit_card.expire_month = (Time.zone.now - 1.day).year
-    @user = FactoryGirl.build :user_with_api, :email => email_used
+    @user = FactoryBot.build :user_with_api, :email => email_used
     assert_difference('Membership.count',0) do
       assert_difference('Transaction.count',0) do
         assert_difference('User.count',0) do
@@ -1840,7 +1840,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Update TOM throught API - sending Email" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user_2 = create_active_user(@terms_of_membership_with_family, :active_user, nil, {}, { :created_by => @admin_user })
     @saved_user = create_active_user(@terms_of_membership, :active_user, nil, {}, { :created_by => @admin_user })
     @saved_user_2.update_attribute :email, @saved_user.email
@@ -1852,7 +1852,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Update TOM throught API - different TOM - active user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :active_user, nil, {}, { :created_by => @admin_user })
     post(:update_terms_of_membership, { :id_or_email => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :prorated => 0 ,:format => :json} )
     @saved_user.reload
@@ -1862,7 +1862,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Do not allow update TOM throught API to same TOM - active user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :active_user, nil, {}, { :created_by => @admin_user })
     post(:update_terms_of_membership, { :id_or_email => @saved_user.id, :terms_of_membership_id => @terms_of_membership.id, :prorated => 0, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
@@ -1870,7 +1870,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Update TOM throught API - different TOM - provisional user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :provisional_user, nil, {}, { :created_by => @admin_user })
     post(:update_terms_of_membership, { :id_or_email => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :prorated => 0, :format => :json} )
     @saved_user.reload
@@ -1880,7 +1880,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Do not allow update TOM throught API to same TOM - provisional user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :provisional_user, nil, {}, { :created_by => @admin_user })
     post(:update_terms_of_membership, { :id_or_email => @saved_user.id, :terms_of_membership_id => @saved_user.terms_of_membership.id, :format => :json} )
     assert @response.body.include? "Nothing to change. Member is already enrolled on that TOM."
@@ -1888,7 +1888,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Do not allow update TOM throught API - applied member" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :applied_user, nil, {}, { :created_by => @admin_user })
     post(:update_terms_of_membership, { :id_or_email => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the subscription plan."
@@ -1896,7 +1896,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Do not allow update TOM throught API - lapsed user" do
     sign_in @admin_user
-    @terms_of_membership_second = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
+    @terms_of_membership_second = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id, :name => "secondTom"
     @saved_user = create_active_user(@terms_of_membership, :applied_user, nil, {}, { :created_by => @admin_user })
     post(:update_terms_of_membership, { :id_or_email => @saved_user.id, :terms_of_membership_id => @terms_of_membership_second.id, :format => :json} )
     assert @response.body.include? "Member status does not allows us to change the subscription plan."
@@ -2151,7 +2151,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Upgrade/Downgrade User with Basic membership level by prorate logic (OldProvisionalDays > NewProvisionalDays)- Softdecline User (Provisional status)" do
     prepare_upgrade_downgrade_toms
     previous_membership = @saved_user.current_membership
-    sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    sd_strategy = FactoryBot.create(:soft_decline_strategy)
     active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
   
     first_nbd = @saved_user.next_retry_bill_date
@@ -2172,7 +2172,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Upgrade/Downgrade User with Basic membership level by prorate logic - Softdecline User (Active status)" do
     prepare_upgrade_downgrade_toms false
     previous_membership = @saved_user.current_membership
-    sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    sd_strategy = FactoryBot.create(:soft_decline_strategy)
   
     first_nbd = @saved_user.next_retry_bill_date
     Timecop.travel(first_nbd) do
@@ -2202,7 +2202,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     ['admin', 'api'].each do |role|
       @admin_user.update_attribute :roles, role
       @user = create_active_user(@terms_of_membership, :user_with_api)
-      FactoryGirl.create :credit_card, :user_id => @user.id
+      FactoryBot.create :credit_card, :user_id => @user.id
       @user.set_as_provisional
   
       Timecop.travel(@user.next_retry_bill_date) do
@@ -2222,7 +2222,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     ['admin', 'api'].each do |role|
       @admin_user.update_attribute :roles, role
       @user = create_active_user(@terms_of_membership, :user_with_api)
-      FactoryGirl.create :credit_card, :user_id => @user.id
+      FactoryBot.create :credit_card, :user_id => @user.id
       @user.set_as_provisional
   
       Timecop.travel(@user.next_retry_bill_date) do
@@ -2240,7 +2240,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "One-time or Donation billing throught API without amount, description or type" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
-    FactoryGirl.create :credit_card, :user_id => @user.id
+    FactoryBot.create :credit_card, :user_id => @user.id
     @user.set_as_provisional
   
     Timecop.travel(@user.next_retry_bill_date) do
@@ -2258,7 +2258,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     ['representative', 'supervisor', 'agency', 'fulfillment_managment'].each do |role|
       @admin_user.update_attribute :roles, role
       @user = create_active_user(@terms_of_membership, :user_with_api)
-      FactoryGirl.create :credit_card, :user_id => @user.id
+      FactoryBot.create :credit_card, :user_id => @user.id
       @user.set_as_provisional
       generate_post_sale(@user.terms_of_membership.installment_amount, "testing", "one-time")
       assert_response :unauthorized
@@ -2338,7 +2338,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Upgrade/Downgrade User with Basic membership level by prorate logic (NewProvisionalDays > OldProvisionalDays)- Softdecline User (Provisional status)" do
     prepare_upgrade_downgrade_toms false
     previous_membership = @saved_user.current_membership
-    sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    sd_strategy = FactoryBot.create(:soft_decline_strategy)
     active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
   
     first_nbd = @saved_user.next_retry_bill_date
@@ -2365,9 +2365,9 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Admin should get user's information" do
     sign_in @admin_user
   
-    @credit_card = FactoryGirl.build :credit_card
-    @user = FactoryGirl.build :user_with_api
-    @enrollment_info = FactoryGirl.build :membership_with_enrollment_info
+    @credit_card = FactoryBot.build :credit_card
+    @user = FactoryBot.build :user_with_api
+    @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
     active_merchant_stubs

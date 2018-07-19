@@ -4,13 +4,13 @@ require 'test_helper'
 class EmailTemplatesControllerTest < ActionController::TestCase
 
   setup do
-  	@admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @agent = FactoryGirl.create(:agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @user = FactoryGirl.build(:user)
-    @credit_card = FactoryGirl.build(:credit_card)
-    @tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
+  	@admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @agent = FactoryBot.create(:agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @user = FactoryBot.build(:user)
+    @credit_card = FactoryBot.build(:credit_card)
+    @tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
   end
 
   test 'Admin should get index' do
@@ -23,7 +23,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do 
         get :index, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
         assert_response :unauthorized
@@ -41,7 +41,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do 
       	get :new, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
         assert_response :unauthorized
@@ -50,9 +50,9 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'Admin should get create' do
-  	@admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+  	@admin_agent = FactoryBot.create(:confirmed_admin_agent)
     sign_in @admin_agent
-    comm = FactoryGirl.build(:email_template, :terms_of_membership_id => @tom.id)
+    comm = FactoryBot.build(:email_template, :terms_of_membership_id => @tom.id)
     post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: { 
       name: comm.name, client: comm.client, external_attributes: comm.external_attributes }
     assert_response :success
@@ -62,7 +62,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do 
         post :create, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id
         assert_response :unauthorized
@@ -80,7 +80,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do 
         get :edit, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
         assert_response :unauthorized
@@ -97,7 +97,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   test 'Admin agents should send testing communications' do
     sign_in @admin_agent
     @saved_user = create_active_user(@tom, :active_user, nil, {}, { :created_by => @admin_user })
-    @communication = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
+    @communication = FactoryBot.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
     assert_difference("Communication.count",0) do
       assert_difference("Operation.count",0) do
         post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id, :user_id => @saved_user.id
@@ -111,7 +111,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do 
         get :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
         assert_response :unauthorized
@@ -120,11 +120,11 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'Non Admin agents should not send testing communications' do
-    @communication = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
+    @communication = FactoryBot.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do 
         post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id
         assert_response :unauthorized
@@ -135,9 +135,9 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   test 'Admin agents should not send testing communications to users from other club' do
     sign_in @admin_agent
     @saved_user = create_active_user(@tom, :active_user, nil, {}, { :created_by => @admin_user })
-    @communication = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
-    @club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test2')
+    @communication = FactoryBot.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
+    @club2 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @tom2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test2')
     @saved_user2 = create_active_user(@tom2, :active_user, nil, {}, { :created_by => @admin_user })
     
     post :test_communications, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id, :email_template_id => @communication.id, :user_id => @saved_user2.id
@@ -153,7 +153,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do 
         put :update, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => @tom.email_templates.first.id
         assert_response :unauthorized
@@ -177,9 +177,9 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   ##################################################### 
 
   test 'Do not allow to see users communications from another TOM where I do not have permissions' do
-    @club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test2')
-    @club_admin = FactoryGirl.create(:agent)
+    @club2 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @tom2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test2')
+    @club_admin = FactoryBot.create(:agent)
     club_role = ClubRole.new :club_id => @club2.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -187,8 +187,8 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     @club_admin.roles = nil
     @club_admin.save
     sign_in(@club_admin)
-    et = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'pillar', days: 1, external_attributes: nil)
-    et2 = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom2.id, :template_type => 'pillar', days: 1, external_attributes: nil)
+    et = FactoryBot.create(:email_template, :terms_of_membership_id => @tom.id, :template_type => 'pillar', days: 1, external_attributes: nil)
+    et2 = FactoryBot.create(:email_template, :terms_of_membership_id => @tom2.id, :template_type => 'pillar', days: 1, external_attributes: nil)
     get :show, :partner_prefix => @partner.prefix, :club_prefix => @club.name, :terms_of_membership_id => @tom.id, :id => et.id
     assert_response :unauthorized
     get :show, :partner_prefix => @partner.prefix, :club_prefix => @club2.name, :terms_of_membership_id => @tom2.id, :id => et2.id
@@ -197,14 +197,14 @@ class EmailTemplatesControllerTest < ActionController::TestCase
 
   test 'Do not allow enter user communication duplicate - Logged by Admin_by_club' do
     comm = EmailTemplate.where(:terms_of_membership_id => @tom.id, :template_type => 'birthday').first
-    @agent = FactoryGirl.create(:agent)
+    @agent = FactoryBot.create(:agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
     club_role.role = "admin"
     club_role.save
     sign_in(@agent)
 
-    comm = FactoryGirl.create(:email_template, :terms_of_membership_id => @tom.id)
+    comm = FactoryBot.create(:email_template, :terms_of_membership_id => @tom.id)
     assert_difference("EmailTemplate.count",0) do
       post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: { 
         name: comm.name, client: comm.client, external_attributes: comm.external_attributes, template_type: 'birthday' }
@@ -213,8 +213,8 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'agent with admin club role should get index' do
-    @club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test')
+    @club2 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @tom2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club2.id, :name => 'TOM for Email Templates Test')
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
@@ -239,7 +239,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'agent with admin club role should get new' do
-    @club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @club2 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
@@ -267,7 +267,7 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     club_role.agent_id = @agent.id
     club_role.role = 'admin'
     club_role.save
-    comm = FactoryGirl.build(:email_template, :terms_of_membership_id => @tom.id)
+    comm = FactoryBot.build(:email_template, :terms_of_membership_id => @tom.id)
     post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: { 
       name: comm.name, client: comm.client, external_attributes: comm.external_attributes }
     assert_response :success

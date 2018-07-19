@@ -4,14 +4,14 @@ class AgentsTest < ActionDispatch::IntegrationTest
  
 
   def setup_environment
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    club = FactoryBot.create(:simple_club_with_gateway)
     sign_in_as(@admin_agent)
   end
 
 
   def create_agent_try_to_recover_it(global_role = true)
-    confirmed_agent = FactoryGirl.create(:confirmed_agent)
+    confirmed_agent = FactoryBot.create(:confirmed_agent)
     assert_equal 1, Agent.where(email: confirmed_agent.email).count
 
     visit new_admin_agent_path
@@ -38,7 +38,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
 
   def create_agent_destroy_it_and_recover_it(destination_global_role, source_global_role)
     if source_global_role
-      confirmed_agent = FactoryGirl.create(:confirmed_admin_agent)
+      confirmed_agent = FactoryBot.create(:confirmed_admin_agent)
     else
       prepare_agents_with_club_roles
       confirmed_agent = @agent_club_role_admin
@@ -91,7 +91,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "create agent and do not allow duplicates" do
     setup_environment
     visit new_admin_agent_path
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
@@ -130,7 +130,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
 
   test "update agent" do
     setup_environment
-    confirmed_agent = FactoryGirl.create(:confirmed_agent)
+    confirmed_agent = FactoryBot.create(:confirmed_agent)
     visit admin_agents_path
 
     within("#agents_table") do 
@@ -152,7 +152,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
 
   test "destroy agent" do
     setup_environment
-    confirmed_agent = FactoryGirl.create(:confirmed_agent)
+    confirmed_agent = FactoryBot.create(:confirmed_agent)
     visit admin_agents_path
 
     within("#agents_table") do 
@@ -169,8 +169,8 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "search agent" do
     setup_environment
 
-    confirmed_agent = FactoryGirl.create(:confirmed_agent)
-    10.times{ FactoryGirl.create(:confirmed_agent) }
+    confirmed_agent = FactoryBot.create(:confirmed_agent)
+    10.times{ FactoryBot.create(:confirmed_agent) }
 
     visit admin_agents_path
     do_data_table_search("#agents_table_filter", confirmed_agent.email)
@@ -187,7 +187,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "create admin agent" do
     setup_environment
     visit new_admin_agent_path
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
@@ -223,7 +223,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
 
   test "should display agents in order" do
     setup_environment
-    10.times{ FactoryGirl.create(:confirmed_agent) }
+    10.times{ FactoryBot.create(:confirmed_agent) }
     visit admin_agents_path
   
     within("#agents_table")do
@@ -237,7 +237,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "create agent with supervisor role" do
     setup_environment
     visit new_admin_agent_path
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
@@ -258,7 +258,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "create agent with representative role" do
     setup_environment
     visit new_admin_agent_path
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
@@ -279,7 +279,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "create agent with api role" do
     setup_environment
     visit new_admin_agent_path
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
@@ -300,7 +300,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "create agent like Administrator, Supervisor and representative" do
     setup_environment
     visit new_admin_agent_path
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
@@ -314,7 +314,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   end
 
   test "Reset Password at CS" do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
    
     visit '/'
     click_link_or_button("Forgot your password?")
@@ -337,7 +337,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "create agent with global role and them remove that role." do
     setup_environment
     visit new_admin_agent_path
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
 
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
@@ -365,7 +365,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "create agent with landing role" do
     setup_environment
     visit new_admin_agent_path
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
@@ -389,22 +389,22 @@ class AgentsTest < ActionDispatch::IntegrationTest
   # # # ##################################################### 
 
   def prepare_agents_with_club_roles
-    club = FactoryGirl.create(:simple_club_with_gateway)
-    club2 = FactoryGirl.create(:simple_club_with_gateway)
-    club3 = FactoryGirl.create(:simple_club_with_gateway)
-    @agent_club_role_admin = FactoryGirl.create(:agent)
+    club = FactoryBot.create(:simple_club_with_gateway)
+    club2 = FactoryBot.create(:simple_club_with_gateway)
+    club3 = FactoryBot.create(:simple_club_with_gateway)
+    @agent_club_role_admin = FactoryBot.create(:agent)
     [club, club3].each do |club|
       club_role = ClubRole.new :club_id => club.id
       club_role.role = "admin"
       club_role.agent_id = @agent_club_role_admin.id
       club_role.save
     end
-    @agent_club_role_representative = FactoryGirl.create(:agent)
+    @agent_club_role_representative = FactoryBot.create(:agent)
     club_role = ClubRole.new :club_id => club.id
     club_role.role = "representative"
     club_role.agent_id = @agent_club_role_representative.id
     club_role.save
-    @agent_club_role_admin2 = FactoryGirl.create(:agent)
+    @agent_club_role_admin2 = FactoryBot.create(:agent)
     club_role = ClubRole.new :club_id => club2.id
     club_role.role = "admin"
     club_role.agent_id = @agent_club_role_admin2.id
@@ -459,7 +459,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
     sign_in_as(@agent_club_role_admin)
     visit new_admin_agent_path
 
-    unsaved_agent = FactoryGirl.build(:agent)
+    unsaved_agent = FactoryBot.build(:agent)
     fill_in 'agent[email]', :with => unsaved_agent.email
     fill_in 'agent[username]', :with => unsaved_agent.username
     fill_in 'agent[password]', :with => unsaved_agent.password
@@ -479,7 +479,7 @@ class AgentsTest < ActionDispatch::IntegrationTest
   test "Club role admin can delete club roles, unless it is the last one." do
     prepare_agents_with_club_roles
     sign_in_as(@agent_club_role_admin)
-    aditional_club = FactoryGirl.create(:simple_club_with_gateway)
+    aditional_club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => aditional_club.id
     club_role.role = "admin"
     club_role.agent_id = @agent_club_role_admin.id

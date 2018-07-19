@@ -10,12 +10,12 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
   end
 
   def setup_user(create_new_user = true)
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @club = FactoryBot.create(:simple_club_with_gateway)
     @partner = @club.partner
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @member_blacklist_reason =  FactoryGirl.create(:member_blacklist_reason)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @member_blacklist_reason =  FactoryBot.create(:member_blacklist_reason)
 
     if create_new_user
       @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, nil, {}, { :created_by => @admin_agent })
@@ -74,15 +74,15 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
 
     blacklisted_credit_card_number = "4012301230123010"
 
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
+    credit_card = FactoryBot.build(:credit_card_master_card)
     active_merchant_stubs_store(credit_card.number)    
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
     @saved_user.reload
     @saved_user.set_as_canceled!
 
-    credit_card = FactoryGirl.build(:credit_card_master_card)
+    credit_card = FactoryBot.build(:credit_card_master_card)
     credit_card.number = blacklisted_credit_card_number
     active_merchant_stubs_store(credit_card.number)    
 
@@ -101,7 +101,7 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
 
   test "blacklist user with more CC" do
     setup_user
-    FactoryGirl.create(:credit_card_master_card, :user_id => @saved_user.id)
+    FactoryBot.create(:credit_card_master_card, :user_id => @saved_user.id)
     @saved_user.reload
 
     blacklist_user(@saved_user,@member_blacklist_reason.name)
@@ -110,15 +110,15 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
 
   test "create user with blacklist CC" do
     setup_user(false)
-    credit_card = FactoryGirl.create(:credit_card_master_card)
-    unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
+    credit_card = FactoryBot.create(:credit_card_master_card)
+    unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
     
-    bl_credit_card = FactoryGirl.build(:credit_card)
+    bl_credit_card = FactoryBot.build(:credit_card)
     @saved_user = create_user(unsaved_user, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     blacklist_user(@saved_user,@member_blacklist_reason.name)
     validate_blacklisted_user(@saved_user)
 
-    unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
     @saved_user2 = fill_in_user(unsaved_user, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     assert page.has_content?(I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => @club.cs_phone_number))
     assert User.count == 1
@@ -126,15 +126,15 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
 
   test "create user with blacklist email" do
     setup_user(false)
-    credit_card = FactoryGirl.create(:credit_card_master_card)
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.create(:credit_card_master_card)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
     
-    bl_credit_card = FactoryGirl.build(:credit_card)
+    bl_credit_card = FactoryBot.build(:credit_card)
     @saved_user = create_user(unsaved_user, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     blacklist_user(@saved_user,@member_blacklist_reason.name)
     validate_blacklisted_user(@saved_user)
 
-    unsaved_user2 = FactoryGirl.build(:active_user, :club_id => @club.id, :email => unsaved_user.email)
+    unsaved_user2 = FactoryBot.build(:active_user, :club_id => @club.id, :email => unsaved_user.email)
     @saved_user2 = fill_in_user(unsaved_user2, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     assert page.has_content?(I18n.t('error_messages.user_email_blacklisted', :cs_phone_number => @club.cs_phone_number))
     assert User.count == 1
@@ -143,18 +143,18 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
   #TO REVIEW
   test "create user from another club with blacklist CC" do
     setup_user(false)
-    @club2 = FactoryGirl.create(:simple_club_with_litle_gateway)
+    @club2 = FactoryBot.create(:simple_club_with_litle_gateway)
     @partner2 = @club2.partner
-    @terms_of_membership_with_gateway2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club2.id)
-    credit_card = FactoryGirl.create(:credit_card_master_card)
-    unsaved_user = FactoryGirl.build(:user_with_cc, :club_id => @club.id)
+    @terms_of_membership_with_gateway2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club2.id)
+    credit_card = FactoryBot.create(:credit_card_master_card)
+    unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
     
-    bl_credit_card = FactoryGirl.build(:credit_card)
+    bl_credit_card = FactoryBot.build(:credit_card)
     @saved_user = create_user(unsaved_user, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     blacklist_user(@saved_user,@member_blacklist_reason.name)
     validate_blacklisted_user(@saved_user)
 
-    unsaved_user2 = FactoryGirl.build(:user_with_cc, :club_id => @club2.id)
+    unsaved_user2 = FactoryBot.build(:user_with_cc, :club_id => @club2.id)
     @saved_user2 = fill_in_user(unsaved_user2, bl_credit_card, @terms_of_membership_with_gateway2.name, false)
   end
 

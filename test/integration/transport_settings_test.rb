@@ -3,15 +3,15 @@ require 'test_helper'
 class TransportSettingsTest < ActionDispatch::IntegrationTest
  
   setup do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
     @partner_prefix = @partner.prefix
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @tsfacebook = FactoryGirl.build(:transport_settings_facebook, :club_id => @club.id)
-    @tsmailchimp = FactoryGirl.build(:transport_settings_mailchimp, :club_id => @club.id)
-    @tsgoogletagmanager = FactoryGirl.build(:transport_settings_google_tag_manager, :club_id => @club.id)
-    @tsgoogleanalytics = FactoryGirl.build(:transport_settings_google_analytics, :club_id => @club.id)
-    @tsstore = FactoryGirl.build(:transport_settings_store, :club_id => @club.id)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @tsfacebook = FactoryBot.build(:transport_settings_facebook, :club_id => @club.id)
+    @tsmailchimp = FactoryBot.build(:transport_settings_mailchimp, :club_id => @club.id)
+    @tsgoogletagmanager = FactoryBot.build(:transport_settings_google_tag_manager, :club_id => @club.id)
+    @tsgoogleanalytics = FactoryBot.build(:transport_settings_google_analytics, :club_id => @club.id)
+    @tsstore = FactoryBot.build(:transport_settings_store, :club_id => @club.id)
     sign_in_as(@admin_agent)
   end
 
@@ -23,7 +23,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should see Facebook Transport Settings" do
-    transport_settings_facebook = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)    
+    transport_settings_facebook = FactoryBot.create(:transport_settings_facebook, :club_id => @club.id)    
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -73,7 +73,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should edit Facebook Transport Settings" do
-    transport_settings_facebook = FactoryGirl.create(:transport_settings_facebook, :club_id => @club.id)    
+    transport_settings_facebook = FactoryBot.create(:transport_settings_facebook, :club_id => @club.id)    
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'
@@ -87,7 +87,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should see Mailchimp Transport Settings" do
-    transport_settings_mailchimp = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club.id)
+    transport_settings_mailchimp = FactoryBot.create(:transport_settings_mailchimp, :club_id => @club.id)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -97,7 +97,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should edit Mailchimp Transport Settings" do
-    transport_settings_mailchimp = FactoryGirl.create(:transport_settings_mailchimp, :club_id => @club.id)
+    transport_settings_mailchimp = FactoryBot.create(:transport_settings_mailchimp, :club_id => @club.id)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'
@@ -109,7 +109,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should see Google tag manager Transport Settings" do
-    transport_settings_google_tag_manager = FactoryGirl.create(:transport_settings_google_tag_manager, :club_id => @club.id)
+    transport_settings_google_tag_manager = FactoryBot.create(:transport_settings_google_tag_manager, :club_id => @club.id)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -119,7 +119,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should edit Google tag manager Transport Settings" do
-    transport_settings_google_tag_manager = FactoryGirl.create(:transport_settings_google_tag_manager, :club_id => @club.id)
+    transport_settings_google_tag_manager = FactoryBot.create(:transport_settings_google_tag_manager, :club_id => @club.id)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'
@@ -131,7 +131,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should see Google analytics Transport Settings" do
-    transport_settings_google_analytics = FactoryGirl.create(:transport_settings_google_analytics, :club_id => @club.id)
+    transport_settings_google_analytics = FactoryBot.create(:transport_settings_google_analytics, :club_id => @club.id)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -141,7 +141,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end
 
   test "should edit Google analytics Transport Settings" do
-    transport_settings_google_analytics = FactoryGirl.create(:transport_settings_google_analytics, :club_id => @club.id)
+    transport_settings_google_analytics = FactoryBot.create(:transport_settings_google_analytics, :club_id => @club.id)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'
@@ -153,7 +153,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end 
 
   test "should see Store Transport Settings" do
-    transport_settings_mailchimp = FactoryGirl.create(:transport_settings_store, :club_id => @club.id)
+    transport_settings_mailchimp = FactoryBot.create(:transport_settings_store, :club_id => @club.id)
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Show'
@@ -163,7 +163,7 @@ class TransportSettingsTest < ActionDispatch::IntegrationTest
   end 
 
   test "should edit Store Transport Settings" do
-    transport_settings_store = FactoryGirl.create(:transport_settings_store, :club_id => @club.id)    
+    transport_settings_store = FactoryBot.create(:transport_settings_store, :club_id => @club.id)    
     visit transport_settings_path(@partner_prefix, @club.name)
     within("#transport_settings_table") do
       click_link_or_button 'Edit'

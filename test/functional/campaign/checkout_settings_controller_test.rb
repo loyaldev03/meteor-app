@@ -2,22 +2,22 @@ require 'test_helper'
 
 class Campaigns::CheckoutSettingsControllerTest < ActionController::TestCase
   def setup
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
-    @tom = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id)
-    @campaign = FactoryGirl.create(
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
+    @tom = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id)
+    @campaign = FactoryBot.create(
       :campaign_with_checkout_settings,
       club_id: @club.id,
       terms_of_membership_id: @tom.id
     )
-    @campaign_without_checkout_settings = FactoryGirl.create(
+    @campaign_without_checkout_settings = FactoryBot.create(
       :campaign,
       club_id: @club.id,
       terms_of_membership_id: @tom.id
     )
-    @another_club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id)
-    @another_tom = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @another_club.id)
-    @another_campaign = FactoryGirl.create(
+    @another_club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
+    @another_tom = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @another_club.id)
+    @another_campaign = FactoryBot.create(
       :campaign_with_checkout_settings,
       club_id: @another_club.id,
       terms_of_membership_id: @another_tom.id
@@ -25,12 +25,12 @@ class Campaigns::CheckoutSettingsControllerTest < ActionController::TestCase
   end
 
   def sign_agent_with_global_role(type)
-    @agent = FactoryGirl.create type
+    @agent = FactoryBot.create type
     sign_in @agent
   end
 
   def sign_agent_with_club_role(type, role)
-    @agent = FactoryGirl.create(type, roles: '')
+    @agent = FactoryBot.create(type, roles: '')
     ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
     sign_in @agent
   end

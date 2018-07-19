@@ -4,17 +4,17 @@ require 'test_helper'
 class UserTest < ActiveSupport::TestCase
 
   setup do
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @club = FactoryBot.create(:simple_club_with_gateway)
     @partner = @club.partner
     Time.zone = @club.time_zone
 
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
-    @sd_strategy = FactoryGirl.create(:soft_decline_strategy)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @wordpress_terms_of_membership = FactoryBot.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
+    @sd_strategy = FactoryBot.create(:soft_decline_strategy)
   end
 
   test "Should create an user" do
-    user = FactoryGirl.build(:user)
+    user = FactoryBot.build(:user)
     assert !user.save, user.errors.inspect
     user.club = @terms_of_membership_with_gateway.club
     Delayed::Worker.delay_jobs = true
@@ -25,22 +25,22 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Should not create an user without first name" do
-    user = FactoryGirl.build(:user, :first_name => nil)
+    user = FactoryBot.build(:user, :first_name => nil)
     assert !user.save
   end
 
   test "Should not create an user without last name" do
-    user = FactoryGirl.build(:user, :last_name => nil)
+    user = FactoryBot.build(:user, :last_name => nil)
     assert !user.save
   end
 
   test "Should create an user without gender" do
-    user = FactoryGirl.build(:user, :gender => nil)
+    user = FactoryBot.build(:user, :gender => nil)
     assert !user.save
   end
 
   test "Should create an user without type_of_phone_number" do
-    user = FactoryGirl.build(:user, :type_of_phone_number => nil)
+    user = FactoryBot.build(:user, :type_of_phone_number => nil)
     assert !user.save
   end
 
@@ -76,16 +76,16 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Should not save with an invalid email" do
-    user = FactoryGirl.build(:user, :email => 'testing.com.ar')
+    user = FactoryBot.build(:user, :email => 'testing.com.ar')
     user.valid?
     assert_not_nil user.errors, user.errors.full_messages.inspect
   end
 
   test "Should not be two users with the same email within the same club" do
-    user = FactoryGirl.build(:user)
+    user = FactoryBot.build(:user)
     user.club =  @terms_of_membership_with_gateway.club
     user.save
-    user_two = FactoryGirl.build(:user)
+    user_two = FactoryBot.build(:user)
     user_two.club =  @terms_of_membership_with_gateway.club
     user_two.email = user.email
     user_two.valid?
@@ -93,18 +93,18 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Should let save two users with the same email in differents clubs" do
-    @second_club = FactoryGirl.create(:simple_club_with_gateway)
+    @second_club = FactoryBot.create(:simple_club_with_gateway)
 
-    user = FactoryGirl.build(:user, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
+    user = FactoryBot.build(:user, email: 'testing@xagax.com', club: @terms_of_membership_with_gateway.club)
     user.club_id = 1
     user.save
-    user_two = FactoryGirl.build(:user, email: 'testing@xagax.com', club: @second_club)
+    user_two = FactoryBot.build(:user, email: 'testing@xagax.com', club: @second_club)
     assert user_two.save, "user cant be save #{user_two.errors.inspect}"
   end
 
   test "active user cant be recovered" do
     user = create_active_user(@terms_of_membership_with_gateway)
-    tom_dup = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    tom_dup = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     
     answer = user.recover(tom_dup)
     assert answer[:code] == Settings.error_codes.user_already_active, answer[:message]
@@ -123,7 +123,7 @@ class UserTest < ActiveSupport::TestCase
 
   # When enrolling/recovering an user should send approval email as DJ
   test "Lapsed user can be recovered unless it needs approval" do
-    @tom_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @tom_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     user = create_active_user(@tom_approval, :lapsed_user)
     answer = {}
     Delayed::Worker.delay_jobs = true
@@ -139,11 +139,11 @@ class UserTest < ActiveSupport::TestCase
 
   test "Should not let create an user with a wrong format zip" do
     ['12345-1234', '12345'].each {|zip| zip
-      user = FactoryGirl.build(:user, zip: zip, club: @terms_of_membership_with_gateway.club)
+      user = FactoryBot.build(:user, zip: zip, club: @terms_of_membership_with_gateway.club)
       assert user.save, "User cant be save #{user.errors.inspect}"
     }    
     ['1234-1234', '12345-123', '1234'].each {|zip| zip
-      user = FactoryGirl.build(:user, zip: zip, club: @terms_of_membership_with_gateway.club)
+      user = FactoryBot.build(:user, zip: zip, club: @terms_of_membership_with_gateway.club)
       assert !user.save, "User cant be save #{user.errors.inspect}"
     }        
   end
@@ -166,7 +166,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "User should be saved with first_name and last_name with numbers or acents." do
-    user = FactoryGirl.build(:user)
+    user = FactoryBot.build(:user)
     assert !user.save, user.errors.inspect
     user.club =  @terms_of_membership_with_gateway.club
     user.first_name = 'Billy 3ro'
@@ -345,16 +345,16 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Add club cash - more than maximum value on an user related to drupal" do
-    agent = FactoryGirl.create(:confirmed_admin_agent)
-    club = FactoryGirl.create(:club_with_api)
-    user = FactoryGirl.create(:user_with_api, :club_id => @club.id)
+    agent = FactoryBot.create(:confirmed_admin_agent)
+    club = FactoryBot.create(:club_with_api)
+    user = FactoryBot.create(:user_with_api, :club_id => @club.id)
 
     answer = user.add_club_cash(agent, 12385243.2)
   end
 
   test "save the sale should update membership" do
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
 
     old_membership_id = @saved_user.current_membership_id
@@ -369,8 +369,8 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "save the sale should not update membership if it failed" do
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
     answer = {:code => 500, message => "Error on sts"}
     User.any_instance.stubs(:enroll).returns(answer)
@@ -383,9 +383,9 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Scheduled save the sale (do not remove club cash)" do
-    agent = FactoryGirl.create(:confirmed_admin_agent)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    agent = FactoryBot.create(:confirmed_admin_agent)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
     @saved_user.update_attribute :club_cash_amount, 100
     scheduled_date = (Time.current.to_date + 2.days).to_date
@@ -409,9 +409,9 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Scheduled save the sale (remove club cash)" do
-    agent = FactoryGirl.create(:confirmed_admin_agent)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    agent = FactoryBot.create(:confirmed_admin_agent)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
     @saved_user.update_attribute :club_cash_amount, 100
     scheduled_date = (Time.current.to_date + 2.days).to_date
@@ -437,8 +437,8 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Downgrade user should fill parent_membership_id" do
-    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    terms_of_membership_with_gateway_to_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     terms_of_membership.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => terms_of_membership_with_gateway_to_downgrade.id)
     saved_user = create_active_user(terms_of_membership, :provisional_user_with_cc)
     old_membership_id = saved_user.current_membership_id
@@ -451,8 +451,8 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Downgrade user should be done even when the user has invalid information" do
-    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    terms_of_membership_with_gateway_to_downgrade = FactoryGirl.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
+    terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    terms_of_membership_with_gateway_to_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     terms_of_membership.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => terms_of_membership_with_gateway_to_downgrade.id)
     saved_user = create_active_user(terms_of_membership, :provisional_user_with_cc)
     old_membership_id = saved_user.current_membership_id
@@ -465,8 +465,8 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Upgrade user should fill parent_membership_id" do
-    terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    terms_of_membership2 = FactoryGirl.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
+    terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    terms_of_membership2 = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     terms_of_membership.upgrade_tom_id = terms_of_membership2.id
     terms_of_membership.upgrade_tom_period = 0
     terms_of_membership.save(validate: false)
@@ -481,7 +481,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "manual payment user should be canceled when its billing date is overdue" do
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @saved_user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
     @saved_user.manual_payment =true
     @saved_user.bill_date = Time.zone.now-1.day
@@ -556,7 +556,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Do not Send Prebill email (7 days before NBD) when user's installment_amount is 0" do
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_amount => 0)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :installment_amount => 0)
     user = create_active_user(@terms_of_membership, :provisional_user_with_cc)
 
     excecute_like_server(@club.time_zone) do 
@@ -587,8 +587,8 @@ class UserTest < ActiveSupport::TestCase
 
   test "Send communication with marketing client selected" do
     user = create_active_user(@terms_of_membership_with_gateway, :provisional_user_with_cc)    
-    email_template_for_exact_target = FactoryGirl.create(:email_template_for_exact_target , :terms_of_membership_id => @terms_of_membership_with_gateway.id)
-    email_template_for_mailchimp_mandrill = FactoryGirl.create(:email_template_for_mailchimp_mandrill, :terms_of_membership_id => @terms_of_membership_with_gateway.id)
+    email_template_for_exact_target = FactoryBot.create(:email_template_for_exact_target , :terms_of_membership_id => @terms_of_membership_with_gateway.id)
+    email_template_for_mailchimp_mandrill = FactoryBot.create(:email_template_for_mailchimp_mandrill, :terms_of_membership_id => @terms_of_membership_with_gateway.id)
     #configure exact target
     user.club.update_attributes :marketing_tool_client => "exact_target", :marketing_tool_attributes => { "et_business_unit" => "12345", "et_prospect_list" => "1235", "et_members_list" => "12345", "et_username" => "12345", "et_password" => "12345" }
     excecute_like_server(@club.time_zone) do 
@@ -619,8 +619,8 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should delete user testing account" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
-    user = FactoryGirl.create(:user, :club_id => club.id,:testing_account => true)
+    club = FactoryBot.create(:simple_club_with_gateway)
+    user = FactoryBot.create(:user, :club_id => club.id,:testing_account => true)
     assert_difference("User.count",-1) do
       TasksHelpers.delete_testing_accounts
     end

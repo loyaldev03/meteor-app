@@ -2,8 +2,8 @@ require 'test_helper'
 
 class ProductsControllerTest < ActionController::TestCase
   setup do
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
   end
 
   test "Agents should get index" do
@@ -33,7 +33,7 @@ class ProductsControllerTest < ActionController::TestCase
       :confirmed_agency_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do 
-        @product = FactoryGirl.create(:random_product)
+        @product = FactoryBot.create(:random_product)
         get :show, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
         assert_response :success
       end
@@ -45,7 +45,7 @@ class ProductsControllerTest < ActionController::TestCase
      :confirmed_api_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        @product = FactoryGirl.create(:random_product)
+        @product = FactoryBot.create(:random_product)
         get :show, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name
         assert_response :unauthorized
       end
@@ -53,7 +53,7 @@ class ProductsControllerTest < ActionController::TestCase
   end
     
   test "Admin_by_role can not see product from another club where it has not permissions" do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -61,8 +61,8 @@ class ProductsControllerTest < ActionController::TestCase
     @club_admin.roles = nil
     @club_admin.save
     sign_in(@club_admin)
-    @other_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @product = FactoryGirl.create(:product)
+    @other_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @product = FactoryBot.create(:product)
     @product.club_id = @other_club.id
     @product.save
     get :show, id: @product, partner_prefix: @partner.prefix, club_prefix: @club.name

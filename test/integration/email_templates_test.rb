@@ -3,11 +3,11 @@ require 'test_helper'
 
 class EmailTemplatesTest < ActionDispatch::IntegrationTest
   setup do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, partner_id: @partner.id, :marketing_tool_client => "action_mailer")
-    @tom = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'TOM for Email Templates Test')
-    @communication = FactoryGirl.create(:email_template_for_action_mailer, terms_of_membership_id: @tom.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id, :marketing_tool_client => "action_mailer")
+    @tom = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'TOM for Email Templates Test')
+    @communication = FactoryBot.create(:email_template_for_action_mailer, terms_of_membership_id: @tom.id)
   end
 
   def fill_in_form(options_for_texts = {}, options_for_selects = {}, options_for_checkboxs = [])
@@ -52,8 +52,8 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   test 'Show all user communications - Logged by General Admin' do
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
-    @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'TOM for Email Templates Test2')
-    communication = FactoryGirl.create(:email_template, terms_of_membership_id: @tom2.id, name: "EmailTemplateTest")
+    @tom2 = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'TOM for Email Templates Test2')
+    communication = FactoryBot.create(:email_template, terms_of_membership_id: @tom2.id, name: "EmailTemplateTest")
     within('#terms_of_memberships_table') do
       within("tr", text: @tom.name) do
         click_link_or_button "Communications"
@@ -122,7 +122,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test 'Allow to create more than one user communication with Pillar type - Logged by General Admin' do
-    old_comm = FactoryGirl.create(:email_template, terms_of_membership_id: @tom.id, template_type: 'pillar')
+    old_comm = FactoryBot.create(:email_template, terms_of_membership_id: @tom.id, template_type: 'pillar')
     old_comm.save
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -160,7 +160,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
 
   test 'CS send an user communication - Logged by General Admin' do
     sign_in_as(@admin_agent)
-    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, club_id: @club.id
+    @club_tom = FactoryBot.create :terms_of_membership_with_gateway, club_id: @club.id
     @club_tom.save
     #action_mailer
     create_email_template_and_send_communication({email_template_name: 'Comm Name New'}, {"email_template[template_type]" => "Cancellation"}, [])
@@ -218,7 +218,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test 'Edit user communications - Logged by Admin_by_club' do
-    @agent = FactoryGirl.create(:agent)
+    @agent = FactoryBot.create(:agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @agent.id
     club_role.role = "admin"
@@ -242,7 +242,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test 'Destroy user communications - Logged by Admin_by_club' do
-    @agent = FactoryGirl.create(:agent)
+    @agent = FactoryBot.create(:agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @agent.id
     club_role.role = "admin"
@@ -287,7 +287,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test "Show all user communications - Logged by Admin_by_club" do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -295,8 +295,8 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
     @club_admin.roles = nil
     @club_admin.save
     sign_in_as(@club_admin)
-    @tom2 = FactoryGirl.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'Another Tom')
-    communication = FactoryGirl.create(:email_template, terms_of_membership_id: @tom2.id, name: "EmailTemplateTest")
+    @tom2 = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'Another Tom')
+    communication = FactoryBot.create(:email_template, terms_of_membership_id: @tom2.id, name: "EmailTemplateTest")
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       within("tr", text: @tom.name) do
@@ -311,7 +311,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test 'Do not allow enter days = 0 - Logged by Admin_by_club' do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -337,7 +337,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test 'Add user communications - Logged by Admin_by_club' do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -345,7 +345,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
     @club_admin.roles = nil
     @club_admin.save
     sign_in_as(@club_admin)
-    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, club_id: @club.id    
+    @club_tom = FactoryBot.create :terms_of_membership_with_gateway, club_id: @club.id    
     @club_tom.save
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
@@ -362,7 +362,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test 'Show one user communication - Logged by Admin_by_club' do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -370,7 +370,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
     @club_admin.roles = nil
     @club_admin.save
     sign_in_as(@club_admin)
-    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, club_id: @club.id    
+    @club_tom = FactoryBot.create :terms_of_membership_with_gateway, club_id: @club.id    
     @club_tom.save
     visit terms_of_memberships_path(@partner.prefix, @club.name)  
     communication_name = 'Comm Name'
@@ -390,7 +390,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test 'Do not allow enter user communication duplicate - Logged by Admin_by_club' do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -398,7 +398,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
     @club_admin.roles = nil
     @club_admin.save
     sign_in_as(@club_admin)
-    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, club_id: @club.id    
+    @club_tom = FactoryBot.create :terms_of_membership_with_gateway, club_id: @club.id    
     @club_tom.save
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
@@ -415,7 +415,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   end
 
   test 'CS send an user communication - Logged by Admin_by_club' do
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"
@@ -423,7 +423,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
     @club_admin.roles = nil
     @club_admin.save
     sign_in_as(@club_admin)
-    @club_tom = FactoryGirl.create :terms_of_membership_with_gateway, :club_id => @club.id    
+    @club_tom = FactoryBot.create :terms_of_membership_with_gateway, :club_id => @club.id    
     @club_tom.save
     #action_mailer
     create_email_template_and_send_communication({email_template_name: 'Comm Name New'}, {"email_template[template_type]" => "Cancellation"}, [])
@@ -437,7 +437,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
 
   test "Show and create users comms only for marketing client configured - Login by Admin_by_club" do
     @club.update_attributes :marketing_tool_client => 'exact_target'
-    @club_admin = FactoryGirl.create(:confirmed_admin_agent)
+    @club_admin = FactoryBot.create(:confirmed_admin_agent)
     club_role = ClubRole.new club_id: @club.id
     club_role.agent_id = @club_admin.id
     club_role.role = "admin"

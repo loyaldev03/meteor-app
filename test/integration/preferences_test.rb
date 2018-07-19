@@ -3,11 +3,11 @@ require 'test_helper'
 class PreferenceTest < ActionDispatch::IntegrationTest
  
   setup do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)    
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @preference_group = FactoryGirl.create(:preference_group, :club_id => @club.id)  
-    @preference = FactoryGirl.create(:preference, :preference_group_id => @preference_group.id)      
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)    
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @preference_group = FactoryBot.create(:preference_group, :club_id => @club.id)  
+    @preference = FactoryBot.create(:preference, :preference_group_id => @preference_group.id)      
     sign_in_as(@admin_agent)
   end
 
@@ -20,7 +20,7 @@ class PreferenceTest < ActionDispatch::IntegrationTest
   end
 
   test 'create preference' do    
-    unsaved_preference = FactoryGirl.build(:preference, :preference_group_id => @preference_group.id)    
+    unsaved_preference = FactoryBot.build(:preference, :preference_group_id => @preference_group.id)    
     visit preference_group_preferences_path(@partner.prefix, @club.name, @preference_group.id)
     click_link_or_button 'New Preference'  
     fill_in 'preference[name]', with: unsaved_preference.name
@@ -29,7 +29,7 @@ class PreferenceTest < ActionDispatch::IntegrationTest
   end
 
   test 'update preferences' do    
-    unsaved_preference = FactoryGirl.build(:preference, :preference_group_id => @preference_group.id)    
+    unsaved_preference = FactoryBot.build(:preference, :preference_group_id => @preference_group.id)    
     visit preference_group_preferences_path(@partner.prefix, @club.name, @preference_group.id)
     within("#preferencesTable") do
       click_link_or_button 'Edit'

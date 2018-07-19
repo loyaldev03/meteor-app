@@ -3,16 +3,16 @@ require 'test_helper'
 class DomainsControllerTest < ActionController::TestCase
   
   def setup
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @domain = FactoryGirl.create(:domain, :partner_id => @partner.id, :club_id => @club.id)
-    @agent = FactoryGirl.create(:agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @domain = FactoryBot.create(:domain, :partner_id => @partner.id, :club_id => @club.id)
+    @agent = FactoryBot.create(:agent)
     @partner_prefix = @partner.prefix
   end
 
   test "agents that should get index" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       sign_in @agent
       get :index, partner_prefix: @partner_prefix
       assert_response :success
@@ -23,7 +23,7 @@ class DomainsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent     
+      @agent = FactoryBot.create agent     
       perform_call_as(@agent) do
         get :index, partner_prefix: @partner_prefix
         assert_response :unauthorized
@@ -33,7 +33,7 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "agents that should get new" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       sign_in @agent
       get :new, partner_prefix: @partner_prefix
       assert_response :success
@@ -44,7 +44,7 @@ class DomainsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do
         get :new, partner_prefix: @partner_prefix
         assert_response :unauthorized
@@ -54,9 +54,9 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "agents that should create domain" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       sign_in @agent
-      domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
+      domain = FactoryBot.build(:domain, :partner_id => @partner.id )
       assert_difference('Domain.count',1) do
         post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
           description: domain.description, hosted: domain.hosted, url: domain.url }
@@ -69,9 +69,9 @@ class DomainsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do
-        domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
+        domain = FactoryBot.build(:domain, :partner_id => @partner.id )
         post :create, partner_prefix: @partner_prefix, domain: { data_rights: domain.data_rights, 
             description: domain.description, hosted: domain.hosted, url: domain.url } 
         assert_response :unauthorized
@@ -81,7 +81,7 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "agents that should show domain" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       sign_in @agent
       get :show, id: @domain.id, partner_prefix: @partner_prefix
       assert_response :success
@@ -92,7 +92,7 @@ class DomainsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do
         get :show, id: @domain.id, partner_prefix: @partner_prefix
         assert_response :unauthorized
@@ -103,7 +103,7 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "agents that should get edit" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       sign_in @agent
       get :edit, id: @domain, partner_prefix: @partner_prefix
       assert_response :success
@@ -114,7 +114,7 @@ class DomainsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do
         get :edit, id: @domain, partner_prefix: @partner_prefix
         assert_response :unauthorized
@@ -124,7 +124,7 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "agents that should update domain" do
     [:confirmed_admin_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       sign_in @agent
       put :update, id: @domain, partner_prefix: @partner_prefix, domain: { data_rights: @domain.data_rights, description: @domain.description, hosted: @domain.hosted, url: @domain.url }
       assert_redirected_to domain_path(assigns(:domain), partner_prefix: @partner_prefix)
@@ -135,7 +135,7 @@ class DomainsControllerTest < ActionController::TestCase
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent,
      :confirmed_agency_agent, :confirmed_landing_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do
         put :update, id: @domain, partner_prefix: @partner_prefix, domain: { data_rights: @domain.data_rights, description: @domain.description, hosted: @domain.hosted, url: @domain.url }
         assert_response :unauthorized
@@ -204,7 +204,7 @@ class DomainsControllerTest < ActionController::TestCase
     sign_in(@agent)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
-    domain = FactoryGirl.build(:domain, :partner_id => @partner.id )
+    domain = FactoryBot.build(:domain, :partner_id => @partner.id )
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       club_role.role = role
       club_role.save
@@ -216,9 +216,9 @@ class DomainsControllerTest < ActionController::TestCase
 
   test "agent with club role admin should create domain only for it's club" do
     sign_in(@agent)
-    club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    club2 = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    domain = FactoryGirl.build(:domain)
+    club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    club2 = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    domain = FactoryBot.build(:domain)
     club_role = ClubRole.new :club_id => @club.id
     club_role.agent_id = @agent.id
     club_role.role = "admin"

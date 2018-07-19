@@ -3,12 +3,12 @@ require 'test_helper'
 class Campaigns::CheckoutsControllerTest < ActionController::TestCase
 
   def setup
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)        
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
-    @prospect = FactoryGirl.create(:prospect, :club_id => @club.id)
-    @credit_card = FactoryGirl.create :credit_card_american_express
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)        
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
+    @prospect = FactoryBot.create(:prospect, :club_id => @club.id)
+    @credit_card = FactoryBot.create :credit_card_american_express
     @email_local = 'test@'
     @email_domains =
       { good: 'aim.com', wrong: ['aim.con'] },      
@@ -166,12 +166,12 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   end
 
   def sign_agent_with_global_role(type)
-    @agent = FactoryGirl.create type
+    @agent = FactoryBot.create type
     sign_in @agent
   end
 
   def sign_agent_with_club_role(type, role)
-    @agent = FactoryGirl.create(type, roles: '')
+    @agent = FactoryBot.create(type, roles: '')
     ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
     sign_in @agent
   end
@@ -188,7 +188,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
       sign_agent_with_global_role(agent)
   
       assert_difference('Prospect.count',1) do
-        prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id)
+        prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id)
         generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       end
       prospect = Prospect.last
@@ -203,7 +203,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
         assert_difference('Prospect.count',0) do
-          prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id)
+          prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id)
           generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
         end
       end
@@ -212,12 +212,12 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   end
   
   test "should not create prospect if the domain does not belong to the club" do
-    @club1 = FactoryGirl.create(:simple_club_with_gateway, :checkout_url => "http://test2.host", :partner_id => @partner.id)
-    @campaign1 = FactoryGirl.create(:campaign, :club_id => @club1.id, :terms_of_membership_id => @terms_of_membership.id)
+    @club1 = FactoryBot.create(:simple_club_with_gateway, :checkout_url => "http://test2.host", :partner_id => @partner.id)
+    @campaign1 = FactoryBot.create(:campaign, :club_id => @club1.id, :terms_of_membership_id => @terms_of_membership.id)
     [:confirmed_admin_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       assert_difference('Prospect.count',0) do
-        prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club1.id)
+        prospect_to_create = FactoryBot.build(:prospect, :club_id => @club1.id)
         generate_submit_post(@campaign1.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       end
       assert_redirected_to error_checkout_path(campaign_id: @campaign1.to_param)
@@ -228,7 +228,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
     [:confirmed_admin_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       assert_difference('Prospect.count',0) do
-        prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id)
+        prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id)
         generate_submit_post(4565121, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       end
       assert_redirected_to critical_error_checkout_path
@@ -239,49 +239,49 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
     [:confirmed_admin_agent, :confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :first_name => 'M')
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :first_name => 'M')
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"first_name"=>["is too short (minimum is 2 characters)"]})
       assert_response :redirect
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :last_name => 'B')
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :last_name => 'B')
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"last_name"=>["is too short (minimum is 2 characters)"]})
       assert_response :redirect
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :first_name => 'Maarttiisswaarttiisswaarttiisswaarttiisswaarttiissweee')
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :first_name => 'Maarttiisswaarttiisswaarttiisswaarttiisswaarttiissweee')
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"first_name"=>["is too long (maximum is 50 characters)"]})
       assert_response :redirect
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :last_name => 'Baarttiisswaarttiisswaarttiisswaarttiisswaarttiissweee')
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :last_name => 'Baarttiisswaarttiisswaarttiisswaarttiisswaarttiissweee')
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"last_name"=>["is too long (maximum is 50 characters)"]})
       assert_response :redirect
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :zip => 123)
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :zip => 123)
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"zip"=>["Unfortunately we are unable to ship outside of the United States at this time."]})
       assert_response :redirect
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :zip => 123451)
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :zip => 123451)
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"zip"=>["Unfortunately we are unable to ship outside of the United States at this time."]})
       assert_response :redirect
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :phone_country_code => 1, :phone_area_code => 56, :phone_local_number => 456)
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :phone_country_code => 1, :phone_area_code => 56, :phone_local_number => 456)
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"phone"=>["Wrong phone number"]})
       assert_response :redirect
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :email => "alicebrennan.com")
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :email => "alicebrennan.com")
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"email"=>["Wrong email address"]})
@@ -296,7 +296,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
       @email_domains.each do |domain|
         assert_difference('Prospect.count', 1) do
           email = @email_local + domain[:good]
-          prospect_to_create = FactoryGirl.build(:prospect, club_id: @club.id, email: email)
+          prospect_to_create = FactoryBot.build(:prospect, club_id: @club.id, email: email)
           generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
         end
         prospect = Prospect.last
@@ -314,7 +314,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
           assert_difference('Prospect.count', 1) do
             good_email = @email_local + domain[:good]
             wrong_email = @email_local + wrong_domain
-            prospect_to_create = FactoryGirl.build(:prospect, club_id: @club.id, email: wrong_email)
+            prospect_to_create = FactoryBot.build(:prospect, club_id: @club.id, email: wrong_email)
             generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
           end
           prospect = Prospect.last
@@ -336,7 +336,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   test "admin and landing should create checkout" do
     [:confirmed_admin_agent, :confirmed_landing_agent ].each do |agent|
       sign_agent_with_global_role(agent)
-      prospect = FactoryGirl.create(:prospect, :club_id => @club.id)
+      prospect = FactoryBot.create(:prospect, :club_id => @club.id)
       assert_difference('User.count',1) do
        assert_difference('Membership.count', 1) do
          post :create, credit_card: { campaign_id:@campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
@@ -352,7 +352,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
      :confirmed_agency_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        prospect = FactoryGirl.create(:prospect, :club_id => @club.id)
+        prospect = FactoryBot.create(:prospect, :club_id => @club.id)
         assert_difference('User.count',0) do
           assert_difference('Membership.count', 0) do
             post :create, credit_card: { campaign_id: @campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
@@ -366,8 +366,8 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   test "admin and landing should display duplicated_checkout" do
     [:confirmed_admin_agent, :confirmed_landing_agent ].each do |agent|
       sign_agent_with_global_role(agent)
-      user = FactoryGirl.create(:active_user, :club_id => @club.id)
-      prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :email => user.email)
+      user = FactoryBot.create(:active_user, :club_id => @club.id)
+      prospect = FactoryBot.create(:prospect, :club_id => @club.id, :email => user.email)
       assert_difference('User.count',0) do
         assert_difference('Membership.count', 0) do
           post :create, credit_card: { campaign_id: @campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
@@ -383,8 +383,8 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
      :confirmed_agency_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        user = FactoryGirl.create(:active_user, :club_id => @club.id)
-        prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :email => user.email)
+        user = FactoryBot.create(:active_user, :club_id => @club.id)
+        prospect = FactoryBot.create(:prospect, :club_id => @club.id, :email => user.email)
         assert_difference('User.count',0) do
           assert_difference('Membership.count', 0) do
             post :create, campaign_id:@campaign.to_param, prospect_id:prospect.id, credit_card: { prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
@@ -398,8 +398,8 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   test "admin and landing should recover a user by checkout" do
     [:confirmed_admin_agent, :confirmed_landing_agent ].each do |agent|
       sign_agent_with_global_role(agent)
-      lapsed_user = FactoryGirl.create(:lapsed_user, :club_id => @club.id)
-      prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :email => lapsed_user.email)
+      lapsed_user = FactoryBot.create(:lapsed_user, :club_id => @club.id)
+      prospect = FactoryBot.create(:prospect, :club_id => @club.id, :email => lapsed_user.email)
       assert_difference('Membership.count', 1) do
         post :create, credit_card: { campaign_id: @campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
       end
@@ -408,13 +408,13 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   end
   
   test "admin and landing should be able to create prospect and user without credit_card nor geographic inforamtion (LAM)" do
-    campaign_without_cc_and_geographic = FactoryGirl.create(:campaign_without_cc_and_geographic, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
+    campaign_without_cc_and_geographic = FactoryBot.create(:campaign_without_cc_and_geographic, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
     [:confirmed_admin_agent, :confirmed_landing_agent ].each do |agent|
       sign_agent_with_global_role(agent)
 
       assert_difference('User.count',1) do
         assert_difference('Prospect.count',1) do
-          prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id)
+          prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id)
           generate_submit_post(campaign_without_cc_and_geographic.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
         end
       end
@@ -431,7 +431,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
     ['admin', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       assert_difference('Prospect.count',1) do
-        prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id)
+        prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id)
         generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       end
       prospect = Prospect.last
@@ -444,7 +444,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
         assert_difference('Prospect.count',0) do
-          prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id)
+          prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id)
           generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
         end
       end
@@ -453,12 +453,12 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   end
   
   test "Agents roles by club should not create prospect if the domain does not belong to the club" do
-    @club1 = FactoryGirl.create(:simple_club_with_gateway, :checkout_url => "http://test2.host", :partner_id => @partner.id)
-    @campaign1 = FactoryGirl.create(:campaign, :club_id => @club1.id, :terms_of_membership_id => @terms_of_membership.id)
+    @club1 = FactoryBot.create(:simple_club_with_gateway, :checkout_url => "http://test2.host", :partner_id => @partner.id)
+    @campaign1 = FactoryBot.create(:campaign, :club_id => @club1.id, :terms_of_membership_id => @terms_of_membership.id)
     ['admin', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       assert_difference('Prospect.count',0) do
-        prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club1.id)
+        prospect_to_create = FactoryBot.build(:prospect, :club_id => @club1.id)
         generate_submit_post(@campaign1.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       end
       assert_redirected_to error_checkout_path(campaign_id: @campaign1.to_param)
@@ -469,7 +469,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
     ['admin', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
       assert_difference('Prospect.count',0) do
-        prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id)
+        prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id)
         generate_submit_post(568941, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       end
       assert_redirected_to critical_error_checkout_path
@@ -480,49 +480,49 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
     ['admin', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
 
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :first_name => 'M')
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :first_name => 'M')
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"first_name"=>["is too short (minimum is 2 characters)"]})
       assert_response :redirect
 
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :last_name => 'B')
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :last_name => 'B')
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"last_name"=>["is too short (minimum is 2 characters)"]})
       assert_response :redirect
 
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :first_name => 'Maarttiisswaarttiisswaarttiisswaarttiisswaarttiissweee')
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :first_name => 'Maarttiisswaarttiisswaarttiisswaarttiisswaarttiissweee')
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"first_name"=>["is too long (maximum is 50 characters)"]})
       assert_response :redirect
 
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :last_name => 'Baarttiisswaarttiisswaarttiisswaarttiisswaarttiissweee')
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :last_name => 'Baarttiisswaarttiisswaarttiisswaarttiisswaarttiissweee')
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"last_name"=>["is too long (maximum is 50 characters)"]})
       assert_response :redirect
 
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :zip => 123)
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :zip => 123)
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"zip"=>["Unfortunately we are unable to ship outside of the United States at this time."]})
       assert_response :redirect
 
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :zip => 123451)
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :zip => 123451)
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"zip"=>["Unfortunately we are unable to ship outside of the United States at this time."]})
       assert_response :redirect
 
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :phone_country_code => 1, :phone_area_code => 56, :phone_local_number => 456)
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :phone_country_code => 1, :phone_area_code => 56, :phone_local_number => 456)
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"phone"=>["Wrong phone number"]})
       assert_response :redirect
   
-      prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id, :email => "alicebrennan.com")
+      prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id, :email => "alicebrennan.com")
       generate_submit_post(@campaign.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
       error_message = Prospect.last.error_messages
       assert_equal( error_message, {"email"=>["Wrong email address"]})
@@ -542,7 +542,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   test "admin and landing roles by club should create checkout" do
     ['admin', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
-      prospect = FactoryGirl.create(:prospect, :club_id => @club.id)
+      prospect = FactoryBot.create(:prospect, :club_id => @club.id)
       assert_difference('User.count',1) do
         assert_difference('Membership.count', 1) do
           post :create, credit_card: { campaign_id: @campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
@@ -556,7 +556,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       sign_agent_with_club_role(:agent, role)
         perform_call_as(@agent) do
-        prospect = FactoryGirl.create(:prospect, :club_id => @club.id)
+        prospect = FactoryBot.create(:prospect, :club_id => @club.id)
         assert_difference('User.count',0) do
           assert_difference('Membership.count', 0) do
             post :create, credit_card: { campaign_id:@campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
@@ -570,8 +570,8 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   test "admin and landing roles by club should display duplicated_checkout" do
     ['admin', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
-      user = FactoryGirl.create(:active_user, :club_id => @club.id)
-      prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :email => user.email)
+      user = FactoryBot.create(:active_user, :club_id => @club.id)
+      prospect = FactoryBot.create(:prospect, :club_id => @club.id, :email => user.email)
       assert_difference('User.count',0) do
         assert_difference('Membership.count', 0) do
           post :create, credit_card: { campaign_id:@campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
@@ -585,8 +585,8 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
     ['supervisor', 'representative', 'api', 'agency', 'fulfillment_managment'].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
-        user = FactoryGirl.create(:active_user, :club_id => @club.id)
-        prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :email => user.email)
+        user = FactoryBot.create(:active_user, :club_id => @club.id)
+        prospect = FactoryBot.create(:prospect, :club_id => @club.id, :email => user.email)
         assert_difference('User.count',0) do
           assert_difference('Membership.count', 0) do
             post :create, credit_card: { campaign_id:@campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
@@ -600,8 +600,8 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   test "admin and landing roles by club should recover a user by checkout" do
     ['admin', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
-      lapsed_user = FactoryGirl.create(:lapsed_user, :club_id => @club.id)
-      prospect = FactoryGirl.create(:prospect, :club_id => @club.id, :email => lapsed_user.email)
+      lapsed_user = FactoryBot.create(:lapsed_user, :club_id => @club.id)
+      prospect = FactoryBot.create(:prospect, :club_id => @club.id, :email => lapsed_user.email)
       assert_difference('Membership.count', 1) do
         post :create, credit_card: { campaign_id:@campaign.to_param, prospect_token: prospect.token, :number => @credit_card.number, :expire_month => @credit_card.expire_month, :expire_year => @credit_card.expire_year }
       end
@@ -610,13 +610,13 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   end
 
   test "admin and landing roles by club should be able to create prospect and user without credit_card nor geographic inforamtion (LAM)" do
-    campaign_without_cc_and_geographic = FactoryGirl.create(:campaign_without_cc_and_geographic, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
+    campaign_without_cc_and_geographic = FactoryBot.create(:campaign_without_cc_and_geographic, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)
     ['admin', 'landing'].each do |role|
       sign_agent_with_club_role(:agent, role)
 
       assert_difference('User.count',1) do
         assert_difference('Prospect.count',1) do
-          prospect_to_create = FactoryGirl.build(:prospect, :club_id => @club.id)
+          prospect_to_create = FactoryBot.build(:prospect, :club_id => @club.id)
           generate_submit_post(campaign_without_cc_and_geographic.to_param, prospect_to_create, @terms_of_membership.id, @agent.authentication_token)
         end
       end

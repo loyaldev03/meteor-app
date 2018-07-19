@@ -2,10 +2,10 @@ require 'test_helper'
 
 class UsersControllerTest < ActionController::TestCase
   setup do
-    @agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @saved_user = FactoryGirl.create(:user_with_api, :club_id => @club.id, :next_retry_bill_date => Time.zone.now+5.day)
+    @agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @saved_user = FactoryBot.create(:user_with_api, :club_id => @club.id, :next_retry_bill_date => Time.zone.now+5.day)
   	@saved_user = User.last
     sign_in @agent
   end
@@ -39,7 +39,7 @@ class UsersControllerTest < ActionController::TestCase
 	end
 
   test "should get to bill event section" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
       @agent.update_attribute :roles, role
       get :no_recurrent_billing, partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id
@@ -48,7 +48,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should not get to bill event section" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     ['representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
@@ -59,7 +59,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "One time billing" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
       @agent.update_attribute :roles, role
       generate_post_bill_event(200, "testing billing event", "one-time")
@@ -68,7 +68,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "Donation billing" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     ['admin', 'supervisor'].each do |role|
       @agent.update_attribute :roles, role
       generate_post_bill_event(200, "testing billing event", "donation")
@@ -77,7 +77,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should not bill an event" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     ['representative', 'api', 'agency', 'fulfillment_managment', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       generate_post_bill_event(200, "testing billing event", "one-time")
@@ -86,14 +86,14 @@ class UsersControllerTest < ActionController::TestCase
   end
   
   test "billing event with negative amount" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     generate_post_bill_event(-100, "testing billing event", "one-time")
     assert_response :success
     assert @response.body.include?("Amount must be greater than 0.")
   end
 
   test "should manual bill" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     ['admin', 'supervisor', 'representative'].each do |role|
       @agent.update_attribute :roles, role
       generate_post_manual_bill(200, "cash")
@@ -102,7 +102,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should not manual bill" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     ['api', 'agency', 'fulfillment_managment'].each do |role|
       @agent.update_attribute :roles, role
       generate_post_manual_bill(200, "cash")
@@ -111,7 +111,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should toggle testing account value" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     ['admin', 'supervisor', 'fulfillment_managment', 'representative', 'landing'].each do |role|
       @agent.update_attribute :roles, role
       generate_put_toggle_testing_account
@@ -120,7 +120,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should not toggle testing account value" do
-    club = FactoryGirl.create(:simple_club_with_gateway)
+    club = FactoryBot.create(:simple_club_with_gateway)
     ['api', 'agency'].each do |role|
       @agent.update_attribute :roles, role
       generate_put_toggle_testing_account
@@ -130,8 +130,8 @@ class UsersControllerTest < ActionController::TestCase
 
   test 'should resend communication' do
     sign_in @agent
-    @tom            = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
-    @email_template = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
+    @tom            = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
+    @email_template = FactoryBot.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
     @communication  = 
     Communication.create(user: @saved_user, template_name: @email_template.name, client: @email_template.client)
     post :resend_communication, :partner_prefix => @partner.prefix, :club_prefix => @club.name, user_prefix: @saved_user.id, :communication_id => @communication.id
@@ -139,12 +139,12 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'should not resend communication' do
-    @tom            = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
-    @email_template = FactoryGirl.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
+    @tom            = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'TOM for Email Templates Test')
+    @email_template = FactoryBot.create(:email_template_for_action_mailer, :terms_of_membership_id => @tom.id)
     @communication  = Communication.create(user: @saved_user, template_name: @email_template.name, client: @email_template.client)
     [:confirmed_supervisor_agent, :confirmed_representative_agent, 
      :confirmed_api_agent, :confirmed_fulfillment_manager_agent].each do |agent|
-      @agent = FactoryGirl.create agent
+      @agent = FactoryBot.create agent
       perform_call_as(@agent) do
         post :resend_communication, :partner_prefix => @partner.prefix, :club_prefix => @club.name, user_prefix: @saved_user.id, :communication_id => @communication.id
         assert_response :unauthorized

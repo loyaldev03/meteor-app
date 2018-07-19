@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :fulfillment do
     product_sku Settings.others_product

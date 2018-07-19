@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :agent do
     sequence(:username) {|n| "User_#{Faker::Lorem.characters(4)}" }

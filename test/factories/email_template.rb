@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :email_template, class: EmailTemplate do
     sequence(:name) {|n| "test_communication_#{n}"}

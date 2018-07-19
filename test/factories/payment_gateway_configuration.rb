@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :payment_gateway_configuration do
     login "94100010879200000001"

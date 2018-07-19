@@ -2,18 +2,18 @@ require 'test_helper'
 
 class Api::ClubCashTransactionControllerTest < ActionController::TestCase
   setup do
-    @admin_user = FactoryGirl.create(:confirmed_admin_agent)
-    @api_user = FactoryGirl.create(:confirmed_api_agent)
-    @representative_user = FactoryGirl.create(:confirmed_representative_agent)
-    @supervisor_user = FactoryGirl.create(:confirmed_supervisor_agent)
-    @agency_user = FactoryGirl.create(:confirmed_agency_agent)
-    @landing_user = FactoryGirl.create(:confirmed_landing_agent)
+    @admin_user = FactoryBot.create(:confirmed_admin_agent)
+    @api_user = FactoryBot.create(:confirmed_api_agent)
+    @representative_user = FactoryBot.create(:confirmed_representative_agent)
+    @supervisor_user = FactoryBot.create(:confirmed_supervisor_agent)
+    @agency_user = FactoryBot.create(:confirmed_agency_agent)
+    @landing_user = FactoryBot.create(:confirmed_landing_agent)
     # request.env["devise.mapping"] = Devise.mappings[:agent]
-    @club = FactoryGirl.create(:club_with_api)
+    @club = FactoryBot.create(:club_with_api)
     @partner = @club.partner
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @wordpress_terms_of_membership = FactoryGirl.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @wordpress_terms_of_membership = FactoryBot.create :wordpress_terms_of_membership_with_gateway, :club_id => @club.id
     Drupal.enable_integration!
     Drupal.test_mode!
     Drupal::UserPoints.any_instance.stubs(:create!).returns('true')

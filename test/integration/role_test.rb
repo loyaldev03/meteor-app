@@ -6,47 +6,47 @@ class RolesTest < ActionDispatch::IntegrationTest
   end
   
   def setup_admin
-    @agent = FactoryGirl.create(:confirmed_admin_agent)
+    @agent = FactoryBot.create(:confirmed_admin_agent)
     sign_in_as(@agent)
   end
 
   def setup_agent_no_rol
-    @agent = FactoryGirl.create(:confirmed_agent)
+    @agent = FactoryBot.create(:confirmed_agent)
     @agent.update_attribute(:roles, "")
     sign_in_as(@agent)   
   end
 
   def setup_supervisor
-    @agent = FactoryGirl.create(:confirmed_supervisor_agent)
+    @agent = FactoryBot.create(:confirmed_supervisor_agent)
     sign_in_as(@agent)
   end
 
   def setup_representative
-    @agent = FactoryGirl.create(:confirmed_representative_agent)
+    @agent = FactoryBot.create(:confirmed_representative_agent)
     @agent.update_attribute(:roles, 'representative')
     sign_in_as(@agent)
   end
 
   def setup_agency
-    @agent = FactoryGirl.create(:confirmed_agency_agent)
+    @agent = FactoryBot.create(:confirmed_agency_agent)
     @agent.update_attribute(:roles, 'agency')
     sign_in_as(@agent)
   end
 
   def setup_api
-    @agent = FactoryGirl.create(:confirmed_api_agent)
+    @agent = FactoryBot.create(:confirmed_api_agent)
     @agent.update_attribute(:roles, 'api')
     sign_in_as(@agent)
   end
 
   def setup_fulfillment_managment
-    @agent = FactoryGirl.create(:confirmed_fulfillment_manager_agent)
+    @agent = FactoryBot.create(:confirmed_fulfillment_manager_agent)
     @agent.update_attribute(:roles, 'fulfillment_managment')
     sign_in_as(@agent)
   end
 
   def setup_agent_with_club_role(club, role)
-    @agent = FactoryGirl.create(:agent)
+    @agent = FactoryBot.create(:agent)
     club_role = ClubRole.new :club_id => club.id
     club_role.agent_id = @agent.id
     club_role.role = role
@@ -55,20 +55,20 @@ class RolesTest < ActionDispatch::IntegrationTest
   end
 
   def setup_user(create_new_user = true)
-    @club = FactoryGirl.create(:simple_club_with_gateway)
+    @club = FactoryBot.create(:simple_club_with_gateway)
     @partner = @club.partner
     Time.zone = @club.time_zone
 
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @communication_type = FactoryGirl.create(:communication_type)
-    @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @communication_type = FactoryBot.create(:communication_type)
+    @disposition_type = FactoryBot.create(:disposition_type, :club_id => @club.id)
     
     if create_new_user
-      @agent_admin = FactoryGirl.create(:confirmed_admin_agent)
-      unsaved_user =  FactoryGirl.build(:active_user, :club_id => @club.id)
+      @agent_admin = FactoryBot.create(:confirmed_admin_agent)
+      unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
       excecute_like_server(@club.time_zone) do 
-        credit_card = FactoryGirl.build(:credit_card_master_card)
-        enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+        credit_card = FactoryBot.build(:credit_card_master_card)
+        enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
         create_user_by_sloop(@agent_admin, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
       end
       @saved_user = User.find_by(email: unsaved_user.email)
@@ -82,8 +82,8 @@ class RolesTest < ActionDispatch::IntegrationTest
 
   test "select all clubs for admin agent."do
     setup_admin
-    partner = FactoryGirl.create(:partner)
-    10.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    partner = FactoryBot.create(:partner)
+    10.times{ FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) }
     find("#my_clubs").click
 
     within("#change_partner")do
@@ -96,8 +96,8 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "Agent admin can assign role_clubs, when there are no global roles" do
     setup_admin
     setup_user false
-    @agent_no_role = FactoryGirl.create :confirmed_agent
-    7.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+    @agent_no_role = FactoryBot.create :confirmed_agent
+    7.times{ FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id) }
     club1 = Club.first
     club2 = Club.second
     club3 = Club.third
@@ -146,7 +146,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     setup_admin
     setup_user
     @saved_user.set_as_canceled!
-    credit_card = FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
+    credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -176,8 +176,8 @@ class RolesTest < ActionDispatch::IntegrationTest
   # Select only clubs related to supervisor agent.
   test "select every club when user has global role 'supervisor'" do
     setup_supervisor
-    partner = FactoryGirl.create(:partner)
-    7.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    partner = FactoryBot.create(:partner)
+    7.times{ club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) }
     find("#my_clubs").click
 
     within("#change_partner")do
@@ -208,7 +208,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "Profile Supervisor - Add a Credit Card" do
     setup_supervisor
     setup_user
-    credit_card = FactoryGirl.build(:credit_card_american_express)
+    credit_card = FactoryBot.build(:credit_card_american_express)
 
     add_credit_card(@saved_user,credit_card)
 
@@ -220,7 +220,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     setup_supervisor
     setup_user
     @saved_user.set_as_canceled!
-    credit_card = FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
+    credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -234,7 +234,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "Mark an user as 'wrong address' - Supervisor Role" do
     setup_supervisor
     setup_user(@agent)
-    5.times{FactoryGirl.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product)}
+    5.times{FactoryBot.create(:fulfillment, :user_id => @saved_user.id, :product_sku => Settings.others_product)}
 
     set_as_undeliverable_user(@saved_user,'reason')
 
@@ -274,8 +274,8 @@ class RolesTest < ActionDispatch::IntegrationTest
   # Select only clubs related to representative agent.
   test "select every club when user has global role 'representative'" do
     setup_representative
-    partner = FactoryGirl.create(:partner)
-    10.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    partner = FactoryBot.create(:partner)
+    10.times{ club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) }
     find("#my_clubs").click
 
     within("#change_partner")do
@@ -304,7 +304,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     setup_representative
     setup_user
     @saved_user.set_as_canceled!
-    credit_card = FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
+    credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -321,7 +321,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "Representative should only see credit card last digits" do
     setup_representative
     setup_user
-    credit_card = FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
+    credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -346,7 +346,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "Profile Representative - Add a Credit Card" do
     setup_representative
     setup_user
-    credit_card = FactoryGirl.build(:credit_card_american_express)
+    credit_card = FactoryBot.build(:credit_card_american_express)
 
     add_credit_card(@saved_user,credit_card)
 
@@ -374,8 +374,8 @@ class RolesTest < ActionDispatch::IntegrationTest
   #should show every club when api global role.
   test "Should show agent's related club_roles, when agent has api global role."do
     setup_api
-    partner = FactoryGirl.create(:partner)
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    partner = FactoryBot.create(:partner)
+    5.times{ FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) }
 
     find("#my_clubs").click
     within("#my_clubs_table")do
@@ -397,8 +397,8 @@ class RolesTest < ActionDispatch::IntegrationTest
   #Select only clubs related to agency agent.
   test "select every club when user has global role 'agency'" do
     setup_agency
-    partner = FactoryGirl.create(:partner)
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    partner = FactoryBot.create(:partner)
+    5.times{ FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) }
 
     find("#my_clubs").click
     within("#my_clubs_table")do
@@ -429,7 +429,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "Agency should not be able to destroy a credit card" do
     setup_agency
     setup_user
-    credit_card = FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
+    credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false )
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -458,7 +458,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "Profile fulfillment_managment" do
     setup_fulfillment_managment
     setup_user false
-    unsaved_user = FactoryGirl.build(:user_with_api, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:user_with_api, :club_id => @club.id)
     create_user(unsaved_user)
     saved_user = User.find_by(email: unsaved_user.email)
 
@@ -483,7 +483,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     setup_fulfillment_managment
     setup_user
     @agent.update_attribute(:roles, 'fulfillment_managment')
-    credit_card = FactoryGirl.build(:credit_card_american_express)
+    credit_card = FactoryBot.build(:credit_card_american_express)
 
     add_credit_card(@saved_user,credit_card)
 
@@ -505,7 +505,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "fulfillment_managment role - Recover an user" do
     setup_fulfillment_managment
     setup_user
-    @new_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'new_tome')
+    @new_tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'new_tome')
     @saved_user.set_as_canceled!
     recover_user(@saved_user,@new_tom)
   end
@@ -535,8 +535,8 @@ class RolesTest < ActionDispatch::IntegrationTest
 
   test "Should show agent's related club_roles, even when agent does not have global role."do
     setup_agent_no_rol
-    partner = FactoryGirl.create(:partner)
-    2.times{ club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) }
+    partner = FactoryBot.create(:partner)
+    2.times{ club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) }
     first_club = Club.first
     second_club = Club.last    
     @agent.add_role_with_club('representative', first_club)
@@ -552,12 +552,12 @@ class RolesTest < ActionDispatch::IntegrationTest
 
   test "Agents that can admin users. (without global role)" do
     setup_agent_no_rol
-    partner = FactoryGirl.create(:partner)
-    first_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    second_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    third_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    fourth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    fifth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    partner = FactoryBot.create(:partner)
+    first_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    second_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    third_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fourth_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fifth_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
 
     @agent.add_role_with_club('supervisor', first_club)
     @agent.add_role_with_club('representative', second_club)
@@ -594,12 +594,12 @@ class RolesTest < ActionDispatch::IntegrationTest
 
   test "Agents that can admin products. (without global role)" do
     setup_agent_no_rol
-    partner = FactoryGirl.create(:partner)
-    first_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    second_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    third_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    fourth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    fifth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    partner = FactoryBot.create(:partner)
+    first_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    second_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    third_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fourth_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fifth_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
 
 
     @agent.add_role_with_club('supervisor', first_club)
@@ -645,12 +645,12 @@ class RolesTest < ActionDispatch::IntegrationTest
 
   test "Agents that can admin fulfillments. (without global role)" do
     setup_agent_no_rol
-    partner = FactoryGirl.create(:partner)
-    first_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    second_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    third_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    fourth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
-    fifth_club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    partner = FactoryBot.create(:partner)
+    first_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    second_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    third_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fourth_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
+    fifth_club = FactoryBot.create(:simple_club_with_gateway, :partner_id => partner.id) 
 
     @agent.add_role_with_club('supervisor', first_club)
     @agent.add_role_with_club('representative', second_club)
@@ -688,10 +688,10 @@ class RolesTest < ActionDispatch::IntegrationTest
     setup_admin
     setup_user
     @saved_user.set_as_canceled!
-    credit_card = FactoryGirl.create(:credit_card_american_express, 
+    credit_card = FactoryBot.create(:credit_card_american_express, 
                                      :user_id => @saved_user.id, 
                                      :active => false )
-    FactoryGirl.create(:operation, :user_id => @saved_user.id, 
+    FactoryBot.create(:operation, :user_id => @saved_user.id, 
                                    :operation_type => Settings.operation_types.chargeback, 
                                    :created_by_id => @agent.id )
 
@@ -748,7 +748,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "club role admin available actions" do
     setup_user false
     setup_agent_with_club_role(@club, 'admin')
-    unsaved_user = FactoryGirl.build(:user_with_api, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:user_with_api, :club_id => @club.id)
 
     within('#my_clubs_table'){
       assert page.has_selector?("#users")
@@ -758,7 +758,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     }
 
     @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
-    FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+    FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
     validate_view_user_base(@saved_user)
 
     assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
@@ -799,7 +799,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     test "club role representative available actions" do
       setup_user false
       setup_agent_with_club_role(@club, 'representative')
-      unsaved_user = FactoryGirl.build(:user_with_api, :club_id => @club.id)
+      unsaved_user = FactoryBot.build(:user_with_api, :club_id => @club.id)
 
       within('#my_clubs_table'){
         assert page.has_selector?("#users")
@@ -809,7 +809,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       }
 
       @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
-      FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+      FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
       assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
@@ -842,7 +842,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     test "club role supervisor available actions" do
       setup_user false
       setup_agent_with_club_role(@club, 'supervisor')
-      unsaved_user = FactoryGirl.build(:user_with_api, :club_id => @club.id)
+      unsaved_user = FactoryBot.build(:user_with_api, :club_id => @club.id)
 
       within('#my_clubs_table'){
         assert page.has_selector?("#users")
@@ -852,7 +852,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       }
 
       @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
-      FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+      FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
       assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
@@ -885,7 +885,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     test "club role agency available actions" do
       setup_user
       setup_agent_with_club_role(@club, 'agency')
-      FactoryGirl.create(:credit_card_american_express, :active => false ,:user_id => @saved_user.id)
+      FactoryBot.create(:credit_card_american_express, :active => false ,:user_id => @saved_user.id)
 
       within('#my_clubs_table'){
         assert page.has_selector?("#users")
@@ -938,7 +938,7 @@ class RolesTest < ActionDispatch::IntegrationTest
   test "club role fulfillment_managment available actions" do
     setup_user false
     setup_agent_with_club_role(@club, 'fulfillment_managment')
-    unsaved_user = FactoryGirl.build(:user_with_api, :club_id => @club.id)
+    unsaved_user = FactoryBot.build(:user_with_api, :club_id => @club.id)
 
     within('#my_clubs_table'){
       assert page.has_selector?("#users")
@@ -948,7 +948,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     }
 
     @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
-    FactoryGirl.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+    FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
     validate_view_user_base(@saved_user)
 
     assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
@@ -997,7 +997,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     setup_user false
     
     @agent.update_attribute(:roles,'agency')
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+    5.times{ FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     find("#my_clubs").click
     within("#my_clubs_table")do
@@ -1016,7 +1016,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     setup_user false
 
     @agent.update_attribute(:roles,'representative')
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+    5.times{ FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     find("#my_clubs").click
     within("#my_clubs_table")do
@@ -1034,7 +1034,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     setup_supervisor
     setup_user false
     @agent.update_attribute(:roles,'supervisor')
-    5.times{ FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id) }
+    5.times{ FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id) }
 
     find("#my_clubs").click
     within("#my_clubs_table")do

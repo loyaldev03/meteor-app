@@ -21,13 +21,13 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
     unstubs_elasticsearch_index
 
     @default_state = "Alabama" # when we select options we do it by option text not by value ?
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
     Time.zone = @club.time_zone
-    @terms_of_membership_with_gateway = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @communication_type = FactoryGirl.create(:communication_type)
-    @disposition_type = FactoryGirl.create(:disposition_type, :club_id => @club.id)
+    @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @communication_type = FactoryBot.create(:communication_type)
+    @disposition_type = FactoryBot.create(:disposition_type, :club_id => @club.id)
     
     if create_new_user
       @saved_user = create_active_user(@terms_of_membership_with_gateway, :active_user, :membership_with_enrollment_info, {}, { :created_by => @admin_agent })
@@ -73,8 +73,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   test "search user by date billing information" do
     setup_user(false)
     Delayed::Worker.delay_jobs = true    
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
     saved_credit_card = @saved_user.active_credit_card
     Delayed::Job.all.each{ |x| x.invoke_job }
@@ -94,8 +94,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   test "search user by amount billing information" do
     setup_user(false)
     Delayed::Worker.delay_jobs = true    
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
     saved_credit_card = @saved_user.active_credit_card
     Delayed::Job.all.each{ |x| x.invoke_job }
@@ -227,8 +227,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   test "View token in user record - Admin and Supervisor role" do
     setup_user(false)
     stubs_elasticsearch_index
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
     saved_credit_card = @saved_user.active_credit_card
     ['admin', 'supervisor'].each do |role|
@@ -248,8 +248,8 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   test "View token in user record - Representative rol" do
     setup_user(false)
     stubs_elasticsearch_index
-    unsaved_user = FactoryGirl.build(:active_user, :club_id => @club.id)
-    credit_card = FactoryGirl.build(:credit_card_master_card,:expire_year => Date.today.year+1)
+    unsaved_user = FactoryBot.build(:active_user, :club_id => @club.id)
+    credit_card = FactoryBot.build(:credit_card_master_card,:expire_year => Date.today.year+1)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, nil, @terms_of_membership_with_gateway, false)
     saved_credit_card = @saved_user.active_credit_card
     @admin_agent.update_attribute(:roles, "representative")
@@ -360,15 +360,15 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   end
   
   test "should accept applied user" do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway_needs_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
         
-    unsaved_user = FactoryGirl.build(:user_with_api)
-    credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user = FactoryBot.build(:user_with_api)
+    credit_card = FactoryBot.build(:credit_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
     
     sign_in_as(@admin_agent)
@@ -384,15 +384,15 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   end
   
   test "should reject applied user" do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @terms_of_membership_with_gateway_needs_approval = FactoryGirl.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @terms_of_membership_with_gateway_needs_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
     Time.zone = @club.time_zone 
     
-    unsaved_user = FactoryGirl.build(:user_with_api)
-    credit_card = FactoryGirl.build(:credit_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user = FactoryBot.build(:user_with_api)
+    credit_card = FactoryBot.build(:credit_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway_needs_approval, false)
   
     sign_in_as(@admin_agent)
@@ -411,7 +411,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   
   test "canceled date will be abble to be cancelled once set." do
     setup_user
-    cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
+    cancel_reason = FactoryBot.create(:member_cancel_reason, :club_id => 1)
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
   
@@ -454,7 +454,7 @@ class UsersSearchTest < ActionDispatch::IntegrationTest
   # See an user is blacklisted in the search results
   test "should show status with 'Blisted' on search results, when user is blacklisted." do
     setup_user
-    cancel_reason = FactoryGirl.create(:member_cancel_reason, :club_id => 1)
+    cancel_reason = FactoryBot.create(:member_cancel_reason, :club_id => 1)
     @saved_user.set_as_canceled!
     @saved_user.update_attribute(:blacklisted,true)
   

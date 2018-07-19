@@ -2,9 +2,9 @@ require 'test_helper'
 
 class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   setup do
-    @admin_agent = FactoryGirl.create(:confirmed_admin_agent)
-    @partner = FactoryGirl.create(:partner)
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @admin_agent = FactoryBot.create(:confirmed_admin_agent)
+    @partner = FactoryBot.create(:partner)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
   end
 
   def fill_in_form(options = {}, options_for_select = {}, options_for_check = [])
@@ -197,9 +197,9 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 
     @terms_of_membership = TermsOfMembership.find_by_name tom_name
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => saved_user.id)
@@ -228,9 +228,9 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 
     @terms_of_membership = TermsOfMembership.find_by_name tom_name
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => saved_user.id)
@@ -259,9 +259,9 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 
     @terms_of_membership = TermsOfMembership.find_by_name tom_name
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => saved_user.id)
@@ -290,9 +290,9 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 
     @terms_of_membership = TermsOfMembership.find_by_name tom_name
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
 
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => saved_user.id)
@@ -401,7 +401,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   test "Create subcription plan with Downgrade to option" do
     sign_in_as(@admin_agent)
-    tom_to_downgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    tom_to_downgrade = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     tom_name = 'TOM with Downgrade To'
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     click_link_or_button 'Add New Plan'
@@ -439,9 +439,9 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     assert page.find('#terms_of_memberships_table').has_content?(tom_name) # TOM is in the table
 
     @terms_of_membership = TermsOfMembership.find_by_name tom_name
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
     visit show_user_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :user_prefix => @saved_user.id)
     within("#td_mi_club_cash_amount") { assert page.has_content?(initial_amount_of_club_cash) }
@@ -450,10 +450,10 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Create an user with TOM upgrate to = 1" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name with upgrade'
-    tom_to_upgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Upgraded TOM')
+    tom_to_upgrade = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Upgraded TOM')
 
     assert_difference("TermsOfMembership.count",1) do
-      @terms_of_membership = FactoryGirl.create(:terms_of_membership, initial_fee:1, 
+      @terms_of_membership = FactoryBot.create(:terms_of_membership, initial_fee:1, 
                                  name: tom_name, description: "", club_id: tom_to_upgrade.club_id,
                                  provisional_days:0, subscription_limits: 0, initial_club_cash_amount: 0,
                                  installment_amount:0, installment_period:1, upgrade_tom_period:1,
@@ -462,9 +462,9 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
                                  skip_first_club_cash: false )
     end
     
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => @terms_of_membership.club_id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => @terms_of_membership.club_id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership)
     visit show_user_path(:partner_prefix => @terms_of_membership.club.partner.prefix, :club_prefix => @terms_of_membership.club.name, :user_prefix => @saved_user.id)
   end
@@ -474,7 +474,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Edit subcription plan with Initial Fee distinct of 0 - No membership  associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -498,7 +498,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Edit subcription plan with Initial Fee at 0 - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -522,7 +522,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Update subcription plan with Free Trial Period by days - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -546,7 +546,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Update subcription plan with Free Trial Period by months - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -571,7 +571,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Update subcription plan with Paid Trial Period by days - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -595,7 +595,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Update subcription plan with Paid Trial Period by month - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -619,7 +619,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Update subcription plan with Recurring Amount by month - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -643,7 +643,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Update subcription plan with Recurring Amount by year - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -667,7 +667,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Update subcription plan with No payment is expected - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do      
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -688,7 +688,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   # test "Update subcription plan with Stop billing after at Subscription Terms - month  - No membership associated" do
   #   tom_name = 'TOM Name'
-  #   tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+  #   tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
   #   visit terms_of_memberships_path(@partner.prefix, @club.name)
   #   within('#terms_of_memberships_table') do
   #     find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -711,7 +711,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   # test "Update subcription plan with Stop billing after at Subscription Terms - day - No membership associated" do
   #   tom_name = 'TOM Name'
-  #   tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+  #   tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
   #   visit terms_of_memberships_path(@partner.prefix, @club.name)
   #   within('#terms_of_memberships_table') do
   #     find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -735,7 +735,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   # test "Create an user at TOM updated by Subscription Plan  - No membership associated" do
   #   # First, create the TOM and update it
   #   tom_name = 'TOM Name'
-  #   tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+  #   tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
   #   visit terms_of_memberships_path(@partner.prefix, @club.name)
   #   within('#terms_of_memberships_table') do
   #     find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -766,7 +766,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   # test "Update subcription plan with Suspend for by days - No membership associated" do
   #   tom_name = 'TOM Name'
-  #   tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+  #   tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
   #   visit terms_of_memberships_path(@partner.prefix, @club.name)
   #   within('#terms_of_memberships_table') do
   #     find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -794,7 +794,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   # test "Update subcription plan with Suspend for by month - No membership associated" do
   #   tom_name = 'TOM Name'
-  #   tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+  #   tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
   #   visit terms_of_memberships_path(@partner.prefix, @club.name)
   #   within('#terms_of_memberships_table') do
   #     find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -823,8 +823,8 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   # test "Create subcription plan with Downgrade to option - No membership associated" do
   #   sign_in_as(@admin_agent)
   #   tom_name = 'TOM Name'
-  #   tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
-  #   tom_to_downgrade = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Downgradable TOM')
+  #   tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+  #   tom_to_downgrade = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => 'Downgradable TOM')
   #   visit terms_of_memberships_path(@partner.prefix, @club.name)
   #   within('#terms_of_memberships_table') do
   #     find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -852,7 +852,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Update subcription plan with external code and description - No membership associated" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -878,7 +878,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   test "Do not edit TOM with active (active, applied and provisional) membership" do
     sign_in_as(@admin_agent)
-    27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
+    27.times { |n| the_tom = FactoryBot.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
     the_tom = TermsOfMembership.last
     the_user = create_active_user(the_tom, :active_user, nil, {}, { :created_by => @admin_agent })
       visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -894,7 +894,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   test "Do not edit TOM with inactive (lapsed) membership" do
     sign_in_as(@admin_agent)
-    27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
+    27.times { |n| the_tom = FactoryBot.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
     the_tom = TermsOfMembership.last
     the_lapsed_user = create_active_user(the_tom, :lapsed_user, nil, {}, { :created_by => @admin_agent })
     visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -911,7 +911,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Edit TOM without users and add club cash" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -935,7 +935,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Delete club cash at TOM - TOM without users" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM Name'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -964,7 +964,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
     tom_name = 'TOM Name'
     initial_club_cash_amount = 50
     club_cash_installment_amount = 150
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -992,7 +992,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   test "Delete unused TOM" do
     sign_in_as(@admin_agent)
-    27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
+    27.times { |n| the_tom = FactoryBot.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
     the_tom = TermsOfMembership.last
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
@@ -1007,7 +1007,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   test "Do not delete a TOM with inactive memberships" do
     sign_in_as(@admin_agent)
-    27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
+    27.times { |n| the_tom = FactoryBot.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
     the_tom = TermsOfMembership.last
     the_lapsed_user = create_active_user(the_tom, :lapsed_user, nil, {}, { :created_by => @admin_agent })
     visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -1023,7 +1023,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   test "Do not delete a TOM with active memberships" do
     sign_in_as(@admin_agent)
-    27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
+    27.times { |n| the_tom = FactoryBot.create(:terms_of_membership_with_gateway, :name => "test#{n}" ,:club_id => @club.id) }
     the_tom = TermsOfMembership.last
     the_active_user = create_active_user(the_tom, :active_user, nil, {}, { :created_by => @admin_agent })
     visit terms_of_memberships_path(@partner.prefix, @club.name)
@@ -1061,7 +1061,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Edit a TOM that doesn't Require Approval" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM that doesnt Require Approval'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -1088,7 +1088,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
   test "Edit a TOM that Requires Approval" do
     sign_in_as(@admin_agent)
     tom_name = 'TOM that Requires Approval'
-    tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => tom_name)
+    tom = FactoryBot.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => tom_name)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
       find('.sorting_asc', :text => 'ID').click # Sorting desc to show the last tom we had created as the first row of the table
@@ -1113,7 +1113,7 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   test "Delete a TOM that Requires Approval" do
     sign_in_as(@admin_agent)
-    27.times { |n| the_tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :name => "test#{n}" ,:club_id => @club.id) }
+    27.times { |n| the_tom = FactoryBot.create(:terms_of_membership_with_gateway_and_approval_required, :name => "test#{n}" ,:club_id => @club.id) }
     the_tom = TermsOfMembership.last
     visit terms_of_memberships_path(@partner.prefix, @club.name)
     within('#terms_of_memberships_table') do
@@ -1128,10 +1128,10 @@ class TermsOfMembershipTests < ActionDispatch::IntegrationTest
 
   test "Create an user a TOM that Requires Approval" do
     sign_in_as(@admin_agent)
-    the_tom = FactoryGirl.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => 'TOM that Requires Approval')
-    unsaved_user =  FactoryGirl.build(:active_user, :club_id => the_tom.club_id)
-    credit_card = FactoryGirl.build(:credit_card_master_card)
-    enrollment_info = FactoryGirl.build(:membership_with_enrollment_info)
+    the_tom = FactoryBot.create(:terms_of_membership_with_gateway_and_approval_required, :club_id => @club.id, :name => 'TOM that Requires Approval')
+    unsaved_user =  FactoryBot.build(:active_user, :club_id => the_tom.club_id)
+    credit_card = FactoryBot.build(:credit_card_master_card)
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     @saved_user = create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, the_tom)
     visit show_user_path(:partner_prefix => the_tom.club.partner.prefix, :club_prefix => the_tom.club.name, :user_prefix => @saved_user.id)
   end

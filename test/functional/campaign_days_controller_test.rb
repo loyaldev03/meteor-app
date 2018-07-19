@@ -3,12 +3,12 @@ require 'test_helper'
 class CampaignDaysControllerTest < ActionController::TestCase
 
   def setup
-    @partner = FactoryGirl.create(:partner)
+    @partner = FactoryBot.create(:partner)
     @partner_prefix = @partner.prefix
-    @club = FactoryGirl.create(:simple_club_with_gateway, :partner_id => @partner.id)
-    @terms_of_membership = FactoryGirl.create(:terms_of_membership_with_gateway, :club_id => @club.id)
-    @campaign = FactoryGirl.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )       
-    @missing_campaign_days = FactoryGirl.create(:missing_campaign_day, :campaign_id => @campaign.id)
+    @club = FactoryBot.create(:simple_club_with_gateway, :partner_id => @partner.id)
+    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
+    @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id )       
+    @missing_campaign_days = FactoryBot.create(:missing_campaign_day, :campaign_id => @campaign.id)
   end
 
   test "agents that should get missing campaign_days" do

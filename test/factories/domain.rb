@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   
   factory :simple_domain, class: Domain do
     url { "http://#{Faker::Internet.domain_name}" }

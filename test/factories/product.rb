@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :product do
     name Settings.others_product.capitalize
     sku Settings.others_product

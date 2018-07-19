@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :partner do
     prefix { Faker::Internet.domain_word.upcase+Faker::Internet.domain_word.upcase }
