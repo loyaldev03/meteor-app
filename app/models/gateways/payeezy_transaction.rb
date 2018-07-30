@@ -24,8 +24,8 @@ class PayeezyTransaction < Transaction
       answer = gateway.store(am_credit_card, login_data)
     end
     logger.info "AM::Store::Answer (#{pgc.gateway} took #{time_elapsed}ms) => " + answer.inspect
-    raise answer.params['results']['Error']['messages'].first['code'] if answer.params['results'] and answer.params['results']['status'] != 'success'
-    answer.params['results']['token']['value']
+    raise answer.params['Error']['messages'].first['code'] if answer.params and answer.params['status'] != 'success'
+    answer.params['token']['value']
   end
 
   def fill_transaction_type_for_credit(sale_transaction)

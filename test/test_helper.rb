@@ -126,9 +126,9 @@ class ActiveSupport::TestCase
   
   
   def active_merchant_stubs_payeezy(code = "100", message = "Transaction Normal - Approved with Stub", success = true)
-    response = {'results' => {"correlation_id"=>"228.1085182325738", "status"=>"success", "type"=>"FDToken", 
+    response = {"correlation_id"=>"228.1085182325738", "status"=>"success", "type"=>"FDToken", 
                 "token"=>{"type"=>"Mastercard", "cardholder_name"=>"test test", "exp_date"=>"0320", 
-                "value"=>"9782465740991323"}}}
+                "value"=>"9782465740991323"}}
     answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'Mastercard|test test|0320|9782465740991323')
     ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:store).returns(answer)
     response = {"correlation_id"=>"228.5060252765196", "transaction_status"=> (success ? 'approved' : 'declined'), 
