@@ -18,7 +18,8 @@ private
         #I couldnt make it work in another way. TODO: fix operation#show url.
         operation.description.to_s.truncate(150) + note_icon(operation),
         operation.created_by.username,
-        link_to("<i class='icon-zoom-in'>".html_safe, ((!@current_agent.can? :edit, Operation, @current_club.id) ? '#' : @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_user.id,:id => operation.id)), :class => "btn btn-small", :disabled=>(!@current_agent.can? :edit, Operation, @current_club.id)),
+        link_to("<i class='icon-zoom-in'></i>".html_safe, ((!@current_agent.can? :edit, Operation, @current_club.id) ? '#' : @url_helpers.operation_path(@current_partner.prefix,@current_club.name,@current_user.id,:id => operation.id)), :class => "btn btn-small", :disabled=>(!@current_agent.can? :edit, Operation, @current_club.id)) + 
+        reject_save_the_sale_button(operation),
       ]
     end
   end
@@ -55,6 +56,23 @@ private
   
   def note_icon(operation)
     (operation.notes.to_s.length > 0 ? " <i class ='icon-comment help' rel= 'popover' data-toggle='modal' href='#myModal" + operation.id.to_s + "' style='cursor: pointer'></i>" + modal(operation) : '')
+  end
+
+  def reject_save_the_sale_button(operation)
+    return '' unless operation.can_be_rejected?
+    return '' unless @current_agent.can? :cancel_save_the_sale, Operation, @current_club.id
+    link_to "<i class=\"icon-ban-circle\"></i>&nbsp;#{I18n.t('reject')}".html_safe,
+            @url_helpers.user_reject_save_the_sale_path(
+              @current_partner.prefix,
+              @current_club.name,
+              @current_user.id,
+              operation.id
+            ),
+            method: :put,
+            class: 'btn btn-small btn-danger',
+            title: I18n.t('reject_save_the_sale'),
+            controller: :users, action: :reject_save_the_sale,
+            data: { confirm: I18n.t('are_you_sure') }
   end
   
   def modal(operation)

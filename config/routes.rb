@@ -84,6 +84,7 @@ SacPlatform::Application.routes.draw do
         match '/chargeback/:transaction_id' => 'users#chargeback', as: 'user_chargeback', via: [:get, :post]
         match '/full_save' => 'users#full_save', as: 'user_full_save', :via => [:get]
         match '/save_the_sale' => 'users#save_the_sale', as: 'user_save_the_sale', :via => [:get, :post]
+        put '/reject_save_the_sale/:operation_id' => 'users#reject_save_the_sale', as: 'user_reject_save_the_sale'
         match '/cancel' => 'users#cancel', as: 'user_cancel', :via => [:get, :post]
         match '/blacklist' => 'users#blacklist', as: 'user_blacklist', :via => [:get, :post]
         match '/change_next_bill_date' => 'users#change_next_bill_date', as: 'user_change_next_bill_date', :via => [:get, :post]

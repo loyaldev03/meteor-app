@@ -130,6 +130,24 @@ class UsersController < ApplicationController
       end
     end
   end
+  
+  def reject_save_the_sale
+    operation = Operation.find_by(id: params[:operation_id], club_id: @current_club.id)
+    if operation && operation.can_be_rejected?
+      operation.update_attribute(:operation_type, Settings.operation_types.rejected_save_the_sale)
+      Auditory.audit(
+        @current_agent,
+        operation,
+        I18n.t('activerecord.attributes.operation.save_the_sale_rejected', operation_id: operation.id),
+        nil,
+        Settings.operation_types.save_the_sale_rejected_by_agent
+      )
+      flash[:notice] = I18n.t('activerecord.attributes.operation.save_the_sale_rejected', operation_id: operation.id)
+    else
+      flash[:error] = I18n.t("error_messages.operation_not_found")
+    end
+    redirect_to show_user_path
+  end
 
   def unschedule_future_tom_update
     if current_user.can_change_tom? and @current_user.update_attributes change_tom_date: nil, change_tom_attributes: nil

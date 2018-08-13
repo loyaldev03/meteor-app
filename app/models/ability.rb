@@ -58,6 +58,7 @@ class Ability
     cannot :manual_review, Fulfillment
     cannot :bulk_process, Product
     cannot :send, Communication
+    cannot :cancel_save_the_sale, Operation
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
 
@@ -110,6 +111,7 @@ class Ability
       can :list, Communication
       can :send, Communication
       can :manage, EmailTemplate
+      can :cancel_save_the_sale, Operation
     when 'representative' then
       can :manage, User
       cannot :api_profile, User
@@ -141,6 +143,7 @@ class Ability
       can :list, Communication
       can :list, Fulfillment
       can :list_my_clubs, Club
+      cannot :cancel_save_the_sale, Operation
     when 'supervisor' then
       can :manage, User
       cannot :api_profile, User
@@ -167,6 +170,7 @@ class Ability
       can :list, Fulfillment
       can :manual_review, Fulfillment
       can :list_my_clubs, Club
+      cannot :cancel_save_the_sale, Operation
     when 'api' then
       can :api_enroll, User
       can :api_update, User
@@ -186,12 +190,14 @@ class Ability
       can :api_change, TermsOfMembership
       can :api_sale, User
       can :api_get_banner_by_email, User
+      cannot :cancel_save_the_sale, Operation
     when 'landing' then
       can :show_prospects_api, Prospect
       can :checkout_submit, Campaign
       can :checkout_new, Campaign
       can :checkout_create, Campaign
       can :api_campaign_get_data, Campaign
+      cannot :cancel_save_the_sale, Operation
     # Agency role: Team de acquisicion
     when 'agency' then
       can :manage, Product
@@ -211,6 +217,7 @@ class Ability
       can :list, UserNote
       can :list, Communication
       can :list_my_clubs, Club
+      cannot :cancel_save_the_sale, Operation
     # Fulfillment Managment role: Team de Fulfillment
     when 'fulfillment_managment' then
       can :manage, User
@@ -242,6 +249,7 @@ class Ability
       can :list, Communication
       can :list, Membership
       can :list_my_clubs, Club
+      can :cancel_save_the_sale, Operation
     end
 
     # Define abilities for the passed in user here. For example:

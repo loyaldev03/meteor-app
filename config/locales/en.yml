@@ -59,6 +59,8 @@ en:
   link_to_store_variant: 'Go to Store Variant'
   change_membership_upon_new_cc: 'Change Membership'
   change_membership_upon_new_cc_help: "If a Subscription Plan is selected and if the credit card information is valid, the user will have it's membership changed as well (following the same logic as a save the sale)"
+  reject: 'Reject'
+  reject_save_the_sale: 'Reject Save the Sale'
   enums:
     campaign:
       transport:
@@ -210,6 +212,7 @@ en:
     transport_setting_wrong_credentials: 'The Transport Setting does not have the correct credentials configured, make sure to configure them correctly.'
     preferences_not_set_for_club: "Preferences for this Club aren't set in application.yml."
     api_role_not_found: 'External Code not found.'
+    operation_not_found: 'Operation not found'
     club_cash:
       negative_amount: "Check amount value, please. Amount cannot be less than 0 (zero)."
       null_amount: "Check amount value, please. Amount cannot be blank or null."
@@ -520,6 +523,7 @@ en:
         operation_date: 'Operation date'
         description: 'Description'
         created_by: 'Created by'
+        save_the_sale_rejected: "Save the Sale from Operation [%{operation_id}] Rejected"
       terms_of_membership:
         name: 'Name'
         mode: 'Mode'

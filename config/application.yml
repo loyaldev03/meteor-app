@@ -134,6 +134,8 @@ defaults: &defaults
     resend_communication_error: 256
     aus_update_credit_card: 257
     membership_and_credit_card_update: 258
+    rejected_save_the_sale: 259
+    save_the_sale_rejected_by_agent: 260 
     #communication
     active_email: 300
     prebill_email: 301
