@@ -21,6 +21,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   def enroll_user(tom, amount=23, cc_blank=false, cc_card = nil)
+    active_merchant_stubs
     credit_card = cc_card.nil? ? @credit_card : cc_card
     answer = User.enroll(tom, @current_agent, amount, 
       { first_name: @user.first_name,
@@ -826,7 +827,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     assert_equal(operation.description, "Member billed successfully $#{amount} Transaction id: #{transaction.id}. Reason: testing event")
     assert_equal(operation.operation_type, Settings.operation_types.no_recurrent_billing)
-    assert_equal(transaction.full_label, "Sale : This transaction has been approved. Reason: testing event")
+    assert_equal(transaction.full_label, "Sale : This transaction has been approved with stub. Reason: testing event")
     assert transaction.success?
 
     answer = Transaction.refund(amount, transaction.id)
