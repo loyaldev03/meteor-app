@@ -38,6 +38,7 @@ class TrustCommerceTransaction < Transaction
       self.membership_id = sale_transaction.membership_id
       self.created_at = args[:adjudication_date]
       self.save!
+      update_gateway_cost
       Auditory.audit(nil, self, operation_description, sale_transaction.user, Settings.operation_types.chargeback)
     end
   end

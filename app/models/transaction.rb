@@ -14,7 +14,7 @@ class Transaction < ActiveRecord::Base
 
   before_save :validate_adjudication_date, :if => lambda {|record| [Settings.operation_types.chargeback, Settings.operation_types.chargeback_rebutted].include? record.operation_type}
   after_save :elasticsearch_index_asyn_call
-
+  
   scope :refunds, lambda { where('transaction_type IN (?, ?)', 'credit', 'refund') }
 
   ONE_TIME_BILLINGS = ["one-time", "donation"]
@@ -388,11 +388,8 @@ class Transaction < ActiveRecord::Base
     end
 
     def save_response(answer)
-      if answer.params and answer.params[:duplicate]=="true"
-        # we keep this if, just because it was on Litle version (compatibility).
-        # MeS seems to not send this param
-        { message: I18n.t('error_messages.duplicate_transaction', response: response.params[:response]), code: Settings.error_codes.duplicate_transaction }
-      elsif answer.success?
+      update_gateway_cost
+      if answer.success?
         unless self.credit_card.nil?
           self.credit_card.accepted_on_billing
         end
@@ -416,5 +413,14 @@ class Transaction < ActiveRecord::Base
 
     def elasticsearch_index_asyn_call
       self.user.async_elasticsearch_index if self.user_id and not (self.changed & ['user_id', 'amount', 'created_at']).empty?
+    end
+    
+    def update_gateway_cost
+      merchant_fees = MerchantFee.where(gateway: self.gateway).select{|merchant_fee| merchant_fee.transaction_types.include? self.transaction_type}
+      merchant_fees = merchant_fees.select{|merchant_fee| merchant_fee.apply_on_decline == true} unless self.success
+      if merchant_fees.any?
+        self.gateway_cost = (self.amount * (merchant_fees.sum(&:rate)/100)).abs + merchant_fees.sum(&:unit_cost)
+        self.save
+      end
     end
 end

@@ -1644,9 +1644,9 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
   
-  ######################################################
-  #######  Payeezy #####################################
-  ######################################################
+#   ######################################################
+#   #######  Payeezy #####################################
+#   ######################################################
 
   # Tets Stripe transactions
   def club_with_payeezy
@@ -1663,6 +1663,16 @@ class TransactionTest < ActiveSupport::TestCase
     end
   end
 
+  test "Calculate gateway_cost on enroll with Payeezy" do
+    merchant_fee = FactoryBot.create(:merchant_fee_payeezy)
+    gateway_cost = (23*(merchant_fee.rate/100)) + merchant_fee.unit_cost
+    club_with_payeezy
+    assert_difference('Transaction.count',1) do
+      enroll_user(@payeezy_terms_of_membership, 23, false, @credit_card_payeezy)
+    end
+    assert_equal Transaction.last.gateway_cost, gateway_cost
+  end
+
   test "Bill membership with Payeezy" do
     club_with_payeezy
     active_user = enroll_user(@payeezy_terms_of_membership, 100, false, @credit_card_payeezy)
@@ -1674,6 +1684,22 @@ class TransactionTest < ActiveSupport::TestCase
         assert_equal active_user.status, 'active'
       end
     end
+  end
+
+  test "Calculate gateway_cost on billing membership with Payeezy" do   
+    club_with_payeezy
+    active_user = enroll_user(@payeezy_terms_of_membership, 100, false, @credit_card_payeezy)
+    amount = @payeezy_terms_of_membership.installment_amount
+    merchant_fee = FactoryBot.create(:merchant_fee_payeezy)
+    gateway_cost = (amount*(merchant_fee.rate/100)) + merchant_fee.unit_cost
+    assert_difference('Transaction.count',1) do
+      Timecop.travel(active_user.next_retry_bill_date) do
+        answer = active_user.bill_membership
+        active_user.reload
+        assert_equal active_user.status, 'active'
+      end
+    end
+    assert_equal Transaction.last.gateway_cost, gateway_cost   
   end
   
   test "Full refund with Payeezy" do
@@ -1690,6 +1716,24 @@ class TransactionTest < ActiveSupport::TestCase
     end
     assert_equal Transaction.find_by_transaction_type('refund').operation_type, Settings.operation_types.credit
   end
+
+  test "Calculate gateway_cost in Full refund with Payeezy" do
+    club_with_payeezy
+    active_user = enroll_user(@payeezy_terms_of_membership, 100, false, @credit_card_payeezy)
+    amount = @payeezy_terms_of_membership.installment_amount
+    merchant_fee = FactoryBot.create(:merchant_fee_payeezy)   
+    Timecop.travel(active_user.next_retry_bill_date) do
+      answer = active_user.bill_membership
+      active_user.reload
+      assert_equal active_user.status, 'active'
+      trans = active_user.transactions.last
+      answer = Transaction.refund(amount, trans.id)
+      assert_equal answer[:code], "000", answer[:message]
+    end
+    assert_equal Transaction.find_by_transaction_type('refund').operation_type, Settings.operation_types.credit
+    gateway_cost = (amount *(merchant_fee.rate/100)) + merchant_fee.unit_cost
+    assert_equal Transaction.last.gateway_cost, gateway_cost   
+  end
   
   test "Partial refund with Payeezy" do
     club_with_payeezy
@@ -1704,6 +1748,25 @@ class TransactionTest < ActiveSupport::TestCase
       answer = Transaction.refund(refunded_amount, trans.id)
       assert_equal answer[:code], "000", answer[:message] # refunds cant be processed on Auth.net test env
       assert_equal Transaction.where("user_id = ? and operation_type = ? and transaction_type = 'refund'", active_user.id, Settings.operation_types.credit).count, 1
+    end
+  end
+
+  test "Calculate gateway_cost in Partial refund with Payeezy" do
+    club_with_payeezy
+    active_user = enroll_user(@payeezy_terms_of_membership, 100, false, @credit_card_payeezy)
+    amount = @payeezy_terms_of_membership.installment_amount
+    merchant_fee = FactoryBot.create(:merchant_fee_payeezy)
+    Timecop.travel(active_user.next_retry_bill_date) do
+      answer = active_user.bill_membership
+      active_user.reload
+      assert_equal active_user.status, 'active'
+      trans = active_user.transactions.find_by(transaction_type: 'sale')
+      refunded_amount = amount-0.34
+      answer = Transaction.refund(refunded_amount, trans.id)
+      assert_equal answer[:code], "000", answer[:message] # refunds cant be processed on Auth.net test env
+      assert_equal Transaction.where("user_id = ? and operation_type = ? and transaction_type = 'refund'", active_user.id, Settings.operation_types.credit).count, 1
+      gateway_cost = (refunded_amount *(merchant_fee.rate/100)) + merchant_fee.unit_cost
+      assert_equal (Transaction.last.gateway_cost).to_d.truncate(4).to_f, gateway_cost.to_d.truncate(4).to_f
     end
   end
 end

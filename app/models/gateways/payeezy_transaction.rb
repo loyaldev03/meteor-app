@@ -40,17 +40,19 @@ class PayeezyTransaction < Transaction
         chargeback_amount     = -args['Chargeback Amount'].to_f
         operation_type        = Settings.operation_types.chargeback
         operation_description = "Chargeback processed $#{chargeback_amount}"
+        chargeback_type       = 'chargeback'
       elsif args['Chargeback Status'] == 'REVERSED'
         chargeback_amount     = args['Chargeback Amount'].to_f
         operation_type        = Settings.operation_types.chargeback_rebutted
         operation_description = "Rebutted Chargeback processed $#{chargeback_amount}"
+        chargeback_type       = 'rebutted_chargeback'
       elsif args['Chargeback Status'] == 'CLOSED' && args['Chargeback Category'] == 'DEBITED'
         raise NonReportableException.new
       elsif args['Chargeback Status'] != 'CLOSED'
         raise "Wrong status received: Status: #{args['Chargeback Status']}}"
       end
       
-      self.transaction_type   = "chargeback"
+      self.transaction_type   = chargeback_type
       self.response           = args.to_hash.to_json
       self.prepare(sale_transaction.user, sale_transaction.credit_card, chargeback_amount, 
                     sale_transaction.payment_gateway_configuration, sale_transaction.terms_of_membership_id, nil, operation_type)
@@ -61,6 +63,7 @@ class PayeezyTransaction < Transaction
       self.membership_id      = sale_transaction.membership_id
       self.created_at         = args['Received Date'].to_time
       self.save!
+      update_gateway_cost
       Auditory.audit(nil, self, operation_description, sale_transaction.user, operation_type)
     end
   end
