@@ -9,6 +9,6 @@ class CreateMerchantFees < ActiveRecord::Migration
       t.boolean :apply_on_decline,  default: true
     end
     
-    add_column :transactions, :gateway_cost, :decimal, precision: 11, scale: 4, default: 0.0
+    add_column :transactions, :gateway_cost, :decimal, precision: 11, scale: 4
   end
 end

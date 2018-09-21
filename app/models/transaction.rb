@@ -418,9 +418,8 @@ class Transaction < ActiveRecord::Base
     def update_gateway_cost
       merchant_fees = MerchantFee.where(gateway: self.gateway).select{|merchant_fee| merchant_fee.transaction_types.include? self.transaction_type}
       merchant_fees = merchant_fees.select{|merchant_fee| merchant_fee.apply_on_decline == true} unless self.success
-      if merchant_fees.any?
-        self.gateway_cost = (self.amount * (merchant_fees.sum(&:rate)/100)).abs + merchant_fees.sum(&:unit_cost)
-        self.save
-      end
+      gateway_cost  = merchant_fees.any? ? (self.amount * (merchant_fees.sum(&:rate)/100)).abs + merchant_fees.sum(&:unit_cost) : 0
+      self.gateway_cost = gateway_cost
+      self.save
     end
 end
