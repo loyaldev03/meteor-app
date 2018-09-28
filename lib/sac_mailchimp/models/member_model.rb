@@ -30,6 +30,15 @@ module SacMailchimp
     	end
     end
 
+    def delete!
+      return if has_fake_email?
+      if (client.lists(mailchimp_list_id).members(email).retrieve rescue nil)
+        client.lists(mailchimp_list_id).members(email).delete
+      end
+    rescue Gibbon::MailChimpError => e
+      SacMailchimp::report_error("Member:testing_account_delete", e, self.user)
+    end
+
     def update_email!(former_email)
       unless has_fake_email?(former_email)
         former_subscriber = client.lists(mailchimp_list_id).members(email(former_email)).retrieve rescue nil
