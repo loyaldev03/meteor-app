@@ -1324,6 +1324,15 @@ class User < ActiveRecord::Base
       Mailchimp::UserSynchronizationJob.perform_later(self.id) if defined?(SacMailchimp::MemberModel)
     end
   end
+  
+  def marketing_tool_remove_from_list
+    case(club.marketing_tool_client)
+    when 'exact_target'
+      exact_target_unsubscribe if defined?(SacExactTarget::MemberModel)
+    when 'mailchimp_mandrill'
+      self.mailchimp_member.delete! if self.mailchimp_member
+    end
+  end
 
   def get_offset_related(date = Time.now)
     date = date.to_date
