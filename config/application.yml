@@ -444,7 +444,7 @@ test:
 production:
   <<: *defaults
   campaign_manager_recipients: 'mbrossard@meteoraffinity.com,ndavid@meteoraffinity.com,lerrick@meteoraffinity.com'
-  email_to_send_product_list: 'tbrady@meteoraffinity.com,ckincheloe@meteoraffinity.com'
+  email_to_send_product_list: 'tbrady@meteoraffinity.com,ndavid@meteoraffinity.com'
   logger_level_for_tasks: 'INFO'
   mes_report_service:
     user: Stoneacrereports
