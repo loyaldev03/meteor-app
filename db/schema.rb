@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180926190120) do
+ActiveRecord::Schema.define(version: 20180926190913) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -54,9 +54,9 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.decimal  "spent",                 precision: 10, scale: 2
     t.integer  "reached",     limit: 4
     t.integer  "converted",   limit: 4
+    t.integer  "meta",        limit: 4,                          default: 0
     t.datetime "created_at",                                                 null: false
     t.datetime "updated_at",                                                 null: false
-    t.integer  "meta",        limit: 4,                          default: 0
   end
 
   add_index "campaign_days", ["campaign_id", "date"], name: "index_campaign_days_on_campaign_id_and_date", unique: true, using: :btree
@@ -92,20 +92,16 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.integer  "products_count",                       limit: 4,                              default: 0
     t.string   "delivery_date",                        limit: 255,                            default: "3 - 5 weeks from date ordered"
     t.string   "slug",                                 limit: 100
-    t.boolean  "create_remote_user_in_background",                                            default: false
     t.boolean  "credit_card_and_geographic_required",                                         default: true
-    t.string   "favicon_url_file_name",                limit: 255
-    t.string   "favicon_url_content_type",             limit: 255
-    t.integer  "favicon_url_file_size",                limit: 4
-    t.datetime "favicon_url_updated_at"
-    t.string   "header_image_url_file_name",           limit: 255
-    t.string   "header_image_url_content_type",        limit: 255
-    t.integer  "header_image_url_file_size",           limit: 4
-    t.datetime "header_image_url_updated_at"
-    t.string   "result_pages_image_url_file_name",     limit: 255
-    t.string   "result_pages_image_url_content_type",  limit: 255
-    t.integer  "result_pages_image_url_file_size",     limit: 4
-    t.datetime "result_pages_image_url_updated_at"
+    t.boolean  "create_remote_user_in_background",                                            default: false
+    t.string   "header_image_file_name",               limit: 255
+    t.string   "header_image_content_type",            limit: 255
+    t.integer  "header_image_file_size",               limit: 4
+    t.datetime "header_image_updated_at"
+    t.string   "result_pages_image_file_name",         limit: 255
+    t.string   "result_pages_image_content_type",      limit: 255
+    t.integer  "result_pages_image_file_size",         limit: 4
+    t.datetime "result_pages_image_updated_at"
     t.text     "checkout_page_bonus_gift_box_content", limit: 65535
     t.text     "checkout_page_footer",                 limit: 65535
     t.text     "css_style",                            limit: 65535
@@ -183,22 +179,21 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.string   "payment_gateway_errors_email",               limit: 255
     t.string   "twitter_url",                                limit: 255
     t.string   "facebook_url",                               limit: 255
-    t.boolean  "maintenance_mode",                                         default: false
     t.string   "checkout_url",                               limit: 255
     t.string   "cs_email",                                   limit: 255
     t.text     "privacy_policy_url",                         limit: 65535
-    t.string   "favicon_url_file_name",                      limit: 255
-    t.string   "favicon_url_content_type",                   limit: 255
-    t.integer  "favicon_url_file_size",                      limit: 4
-    t.datetime "favicon_url_updated_at"
+    t.string   "favicon_file_name",                          limit: 255
+    t.string   "favicon_content_type",                       limit: 255
+    t.integer  "favicon_file_size",                          limit: 4
+    t.datetime "favicon_updated_at"
     t.string   "header_image_file_name",                     limit: 255
     t.string   "header_image_content_type",                  limit: 255
     t.integer  "header_image_file_size",                     limit: 4
     t.datetime "header_image_updated_at"
-    t.string   "result_pages_image_url_file_name",           limit: 255
-    t.string   "result_pages_image_url_content_type",        limit: 255
-    t.integer  "result_pages_image_url_file_size",           limit: 4
-    t.datetime "result_pages_image_url_updated_at"
+    t.string   "result_pages_image_file_name",               limit: 255
+    t.string   "result_pages_image_content_type",            limit: 255
+    t.integer  "result_pages_image_file_size",               limit: 4
+    t.datetime "result_pages_image_updated_at"
     t.text     "checkout_page_bonus_gift_box_content",       limit: 65535
     t.text     "thank_you_page_content",                     limit: 65535
     t.text     "duplicated_page_content",                    limit: 65535
@@ -206,17 +201,13 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.text     "checkout_page_footer",                       limit: 65535
     t.text     "result_page_footer",                         limit: 65535
     t.text     "css_style",                                  limit: 65535
-    t.string   "no_products_url",                            limit: 255
-    t.string   "not_available_url",                          limit: 255
     t.text     "unavailable_campaign_url",                   limit: 65535
     t.string   "fulfillment_tracking_prefix",                limit: 1
-    t.string   "store_url",                                  limit: 255
     t.text     "thank_you_page_content_when_no_cc_required", limit: 65535
-    t.integer  "default_landing_agent_id",                   limit: 4
-    t.string   "appletouch_icon_url_file_name",              limit: 255
+    t.string   "appletouch_icon_file_name",                  limit: 255
     t.string   "appletouch_icon_content_type",               limit: 255
-    t.integer  "appletouch_icon_url_file_size",              limit: 4
-    t.datetime "appletouch_icon_url_updated_at"
+    t.integer  "appletouch_icon_file_size",                  limit: 4
+    t.datetime "appletouch_icon_updated_at"
   end
 
   add_index "clubs", ["drupal_domain_id"], name: "index_drupal_domain_id", using: :btree
@@ -237,7 +228,7 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.integer  "user_id",             limit: 8
   end
 
-  add_index "communications", ["user_id"], name: "index_communications_on_member_id", using: :btree
+  add_index "communications", ["user_id"], name: "index_communications_on_user_id", using: :btree
 
   create_table "credit_cards", force: :cascade do |t|
     t.boolean  "active",                                default: true
@@ -351,6 +342,7 @@ ActiveRecord::Schema.define(version: 20180926190120) do
 
   add_index "enrollment_infos", ["created_at"], name: "index_created_at", using: :btree
   add_index "enrollment_infos", ["membership_id"], name: "index_membership_id", using: :btree
+  add_index "enrollment_infos", ["product_id"], name: "index_enrollment_infos_on_product_id", using: :btree
   add_index "enrollment_infos", ["terms_of_membership_id"], name: "index_terms_of_membership_id", using: :btree
   add_index "enrollment_infos", ["user_id"], name: "index_enrollment_info_on_member_id", using: :btree
 
@@ -367,53 +359,6 @@ ActiveRecord::Schema.define(version: 20180926190120) do
 
   add_index "enumerations", ["club_id"], name: "index_enumerations_on_club_id", using: :btree
   add_index "enumerations", ["visible", "type"], name: "index_enumerations_on_visible_and_type", using: :btree
-
-  create_table "extended_fulfillments", force: :cascade do |t|
-    t.integer  "fulfillment_id",         limit: 8
-    t.datetime "fulfillment_created_at"
-    t.string   "product_sku",            limit: 255
-    t.string   "fulfillment_status",     limit: 255
-    t.string   "club_id",                limit: 255
-    t.integer  "user_id",                limit: 8
-    t.string   "user_status",            limit: 255
-    t.string   "first_name",             limit: 255
-    t.string   "last_name",              limit: 255
-    t.string   "email",                  limit: 255
-    t.string   "address",                limit: 255
-    t.string   "city",                   limit: 255
-    t.string   "state",                  limit: 255
-    t.integer  "zip",                    limit: 4
-    t.integer  "phone_country_code",     limit: 4
-    t.integer  "phone_area_code",        limit: 4
-    t.integer  "phone_local_number",     limit: 4
-    t.string   "blacklisted",            limit: 255
-    t.string   "full_address",           limit: 255
-    t.string   "full_name",              limit: 255
-    t.integer  "phone_number",           limit: 8
-    t.boolean  "has_matches"
-    t.string   "visitor_id",             limit: 255
-    t.string   "user_agent",             limit: 255
-    t.string   "ip_address",             limit: 255
-    t.string   "lifetime_revenue",       limit: 255
-  end
-
-  add_index "extended_fulfillments", ["address"], name: "index_extended_fulfillments_on_address", using: :btree
-  add_index "extended_fulfillments", ["city"], name: "index_extended_fulfillments_on_city", using: :btree
-  add_index "extended_fulfillments", ["email"], name: "index_extended_fulfillments_on_email", using: :btree
-  add_index "extended_fulfillments", ["first_name"], name: "index_extended_fulfillments_on_first_name", using: :btree
-  add_index "extended_fulfillments", ["fulfillment_created_at"], name: "index_extended_fulfillments_on_fulfillment_created_at", using: :btree
-  add_index "extended_fulfillments", ["fulfillment_id"], name: "index_extended_fulfillments_on_fulfillment_id", using: :btree
-  add_index "extended_fulfillments", ["full_address"], name: "index_extended_fulfillments_on_full_address", using: :btree
-  add_index "extended_fulfillments", ["full_name"], name: "index_extended_fulfillments_on_full_name", using: :btree
-  add_index "extended_fulfillments", ["ip_address"], name: "index_extended_fulfillments_on_ip_address", using: :btree
-  add_index "extended_fulfillments", ["last_name"], name: "index_extended_fulfillments_on_last_name", using: :btree
-  add_index "extended_fulfillments", ["phone_area_code"], name: "index_extended_fulfillments_on_phone_area_code", using: :btree
-  add_index "extended_fulfillments", ["phone_country_code"], name: "index_extended_fulfillments_on_phone_country_code", using: :btree
-  add_index "extended_fulfillments", ["phone_local_number"], name: "index_extended_fulfillments_on_phone_local_number", using: :btree
-  add_index "extended_fulfillments", ["phone_number"], name: "index_extended_fulfillments_on_phone_number", using: :btree
-  add_index "extended_fulfillments", ["state"], name: "index_extended_fulfillments_on_state", using: :btree
-  add_index "extended_fulfillments", ["visitor_id"], name: "index_extended_fulfillments_on_visitor_id", using: :btree
-  add_index "extended_fulfillments", ["zip"], name: "index_extended_fulfillments_on_zip", using: :btree
 
   create_table "friendly_id_slugs", force: :cascade do |t|
     t.string   "slug",           limit: 255, null: false
@@ -452,38 +397,6 @@ ActiveRecord::Schema.define(version: 20180926190120) do
   add_index "fulfillment_files_fulfillments", ["fulfillment_file_id"], name: "index_fulfillment_file_id", using: :btree
   add_index "fulfillment_files_fulfillments", ["fulfillment_id"], name: "index_fulfillment_files_fulfillments_on_fulfillment_id", using: :btree
 
-  create_table "fulfillment_matches", force: :cascade do |t|
-    t.integer "fulfillment_id",     limit: 8
-    t.integer "match_id",           limit: 8
-    t.boolean "email_match"
-    t.boolean "full_name_match"
-    t.boolean "full_address_match"
-    t.boolean "phone_number_match"
-    t.boolean "user_blacklisted"
-    t.integer "match_age",          limit: 4
-  end
-
-  add_index "fulfillment_matches", ["fulfillment_id"], name: "index_fulfillment_matches_on_fulfillment_id", using: :btree
-  add_index "fulfillment_matches", ["match_id"], name: "index_fulfillment_matches_on_match_id", using: :btree
-
-  create_table "fulfillment_trials", force: :cascade do |t|
-    t.datetime "created_at",                                                                              null: false
-    t.datetime "updated_at",                                                                              null: false
-    t.integer  "fulfillment_id",                 limit: 8
-    t.integer  "full_name_matches",              limit: 4
-    t.integer  "full_address_matches",           limit: 4
-    t.integer  "email_matches",                  limit: 4
-    t.integer  "phone_number_matches",           limit: 4
-    t.integer  "blacklisted_users_fulfillments", limit: 4
-    t.decimal  "average_match_age",                          precision: 11, scale: 2
-    t.integer  "matching_fulfillments",          limit: 4
-    t.string   "status",                         limit: 255,                          default: "pending"
-    t.integer  "result",                         limit: 4
-    t.decimal  "score",                                      precision: 5,  scale: 5
-  end
-
-  add_index "fulfillment_trials", ["fulfillment_id"], name: "index_fulfillment_trials_on_fulfillment_id", using: :btree
-
   create_table "fulfillments", force: :cascade do |t|
     t.string   "product_sku",                     limit: 255
     t.datetime "assigned_at"
@@ -507,7 +420,6 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.decimal  "average_match_age",                           precision: 6, scale: 2
     t.integer  "matching_fulfillments_count",     limit: 4
     t.integer  "product_id",                      limit: 4
-    t.string   "product_package",                 limit: 255
     t.integer  "store_id",                        limit: 4
     t.string   "sync_result",                     limit: 255
   end
@@ -518,6 +430,7 @@ ActiveRecord::Schema.define(version: 20180926190120) do
   add_index "fulfillments", ["full_address"], name: "index_fulfillments_on_full_address", using: :btree
   add_index "fulfillments", ["full_name"], name: "index_fulfillments_on_full_name", using: :btree
   add_index "fulfillments", ["full_phone_number"], name: "index_fulfillments_on_full_phone_number", using: :btree
+  add_index "fulfillments", ["product_id"], name: "index_fulfillments_on_product_id", using: :btree
   add_index "fulfillments", ["status"], name: "index_fulfillments_on_status", using: :btree
   add_index "fulfillments", ["store_id"], name: "index_fulfillments_on_store_id", using: :btree
   add_index "fulfillments", ["user_id"], name: "index2", using: :btree
@@ -646,30 +559,26 @@ ActiveRecord::Schema.define(version: 20180926190120) do
   end
 
   create_table "products", force: :cascade do |t|
-    t.string   "name",               limit: 255
-    t.string   "sku",                limit: 255
-    t.boolean  "recurrent",                      default: false
-    t.integer  "stock",              limit: 4
-    t.integer  "weight",             limit: 4
-    t.integer  "club_id",            limit: 8
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.boolean  "allow_backorder",                default: false
-    t.boolean  "is_visible",                     default: true
+    t.string   "name",            limit: 255
+    t.string   "sku",             limit: 255
+    t.boolean  "recurrent",                   default: false
+    t.integer  "stock",           limit: 4
+    t.integer  "weight",          limit: 4
+    t.integer  "club_id",         limit: 8
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.boolean  "allow_backorder",             default: false
+    t.boolean  "is_visible",                  default: true
     t.datetime "deleted_at"
-    t.string   "image_url",          limit: 255
-    t.string   "cost_center",        limit: 255
-    t.string   "package",            limit: 255
-    t.integer  "store_id",           limit: 4
-    t.integer  "alert_on_low_stock", limit: 1
-    t.string   "store_slug",         limit: 255
+    t.string   "image_url",       limit: 255
+    t.integer  "store_id",        limit: 4
+    t.string   "store_slug",      limit: 255
   end
 
   add_index "products", ["club_id"], name: "index_products_on_club_id", using: :btree
   add_index "products", ["sku"], name: "index_products_on_sku", using: :btree
 
   create_table "prospects", force: :cascade do |t|
-    t.string   "uuid",                          limit: 36
     t.string   "first_name",                    limit: 255
     t.string   "last_name",                     limit: 255
     t.string   "address",                       limit: 255
@@ -706,6 +615,7 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.string   "utm_medium",                    limit: 255
     t.string   "campaign_description",          limit: 255
     t.string   "utm_content",                   limit: 255
+    t.string   "uuid",                          limit: 36
     t.integer  "club_id",                       limit: 4
     t.string   "marketing_client_sync_result",  limit: 255
     t.integer  "email_quality",                 limit: 4,     default: 0
@@ -749,8 +659,8 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.integer  "downgrade_tom_id",             limit: 8
     t.string   "api_role",                     limit: 255
     t.integer  "agent_id",                     limit: 4
-    t.decimal  "initial_fee",                                precision: 11, scale: 2
-    t.decimal  "trial_period_amount",                        precision: 11, scale: 2
+    t.decimal  "initial_fee",                                precision: 5,  scale: 2
+    t.decimal  "trial_period_amount",                        precision: 5,  scale: 2
     t.boolean  "is_payment_expected",                                                 default: true
     t.integer  "installment_period",           limit: 4,                              default: 1
     t.integer  "subscription_limits",          limit: 4
@@ -801,14 +711,14 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.decimal  "refunded_amount",                                precision: 11, scale: 2, default: 0.0
     t.string   "country",                          limit: 255
     t.integer  "membership_id",                    limit: 8
-    t.string   "cc_type",                          limit: 255
     t.string   "token",                            limit: 255
+    t.string   "cc_type",                          limit: 255
     t.string   "last_digits",                      limit: 255
     t.integer  "user_id",                          limit: 8
     t.boolean  "success",                                                                 default: false
     t.integer  "operation_type",                   limit: 4
     t.integer  "club_id",                          limit: 4
-    t.decimal  "gateway_cost",                                   precision: 11, scale: 4, default: 0.0
+    t.decimal  "gateway_cost",                                   precision: 11, scale: 4
   end
 
   add_index "transactions", ["club_id"], name: "index_transactions_on_club_id", using: :btree
@@ -816,7 +726,7 @@ ActiveRecord::Schema.define(version: 20180926190120) do
   add_index "transactions", ["membership_id"], name: "index_transactions_on_membership_id", using: :btree
   add_index "transactions", ["operation_type"], name: "index_transactions_on_operation_type", using: :btree
   add_index "transactions", ["response_transaction_id"], name: "index_response_transaction_id", using: :btree
-  add_index "transactions", ["user_id"], name: "index_transactions_on_member_id", using: :btree
+  add_index "transactions", ["user_id"], name: "index_transactions_on_user_id", using: :btree
 
   create_table "transport_settings", force: :cascade do |t|
     t.integer  "club_id",    limit: 4
@@ -827,16 +737,14 @@ ActiveRecord::Schema.define(version: 20180926190120) do
   end
 
   add_index "transport_settings", ["club_id", "transport"], name: "index_transport_settings_on_club_id_and_transport", unique: true, using: :btree
-  add_index "transport_settings", ["club_id"], name: "index_transport_settings_on_club_id", using: :btree
-  add_index "transport_settings", ["transport"], name: "index_transport_settings_on_transport", using: :btree
 
   create_table "user_additional_data", force: :cascade do |t|
     t.integer  "club_id",    limit: 8
     t.string   "param",      limit: 255
     t.string   "value",      limit: 255
     t.integer  "user_id",    limit: 8
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "user_notes", force: :cascade do |t|
@@ -892,12 +800,12 @@ ActiveRecord::Schema.define(version: 20180926190120) do
     t.datetime "club_cash_expire_date"
     t.date     "birth_date"
     t.text     "preferences",                         limit: 65535
+    t.datetime "last_sync_error_at"
     t.string   "gender",                              limit: 1
     t.string   "type_of_phone_number",                limit: 255
     t.string   "phone_country_code",                  limit: 5
-    t.string   "phone_area_code",                     limit: 5
+    t.string   "phone_area_code",                     limit: 10
     t.string   "phone_local_number",                  limit: 10
-    t.datetime "last_sync_error_at"
     t.text     "autologin_url",                       limit: 65535
     t.integer  "current_membership_id",               limit: 8
     t.string   "sync_status",                         limit: 255,                            default: "not_synced"
@@ -919,11 +827,10 @@ ActiveRecord::Schema.define(version: 20180926190120) do
   end
 
   add_index "users", ["club_id", "api_id"], name: "api_id_UNIQUE", unique: true, using: :btree
-  add_index "users", ["club_id", "api_id"], name: "index4", unique: true, using: :btree
   add_index "users", ["club_id", "email"], name: "email_UNIQUE", unique: true, using: :btree
   add_index "users", ["created_at"], name: "index_created_at", using: :btree
   add_index "users", ["current_membership_id"], name: "index_current_membership_id", using: :btree
-  add_index "users", ["email"], name: "index_members_on_email", using: :btree
+  add_index "users", ["email"], name: "index_users_on_email", using: :btree
   add_index "users", ["need_sync_to_marketing_client", "club_id"], name: "index_users_on_need_sync_to_marketing_client_and_club_id", using: :btree
   add_index "users", ["slug"], name: "index_users_on_slug", using: :btree
 
