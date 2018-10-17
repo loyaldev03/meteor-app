@@ -1,7 +1,7 @@
 <div class='content'>
   <div class="row">
     <div class="col-sm-12 col-md-4">
-      <%= image_tag(@checkout_settings[:result_pages_image_url].url, id: 'result_image', class: 'img-responsive') if @checkout_settings and @checkout_settings[:result_pages_image_url].present? %>
+      <%= image_tag(@checkout_settings[:result_pages_image].url, id: 'result_image', class: 'img-responsive') if @checkout_settings and @checkout_settings[:result_pages_image].present? %>
     </div>
     <div class="col-sm-12 col-md-8">
       <h3>There was an error processing your request</h3>

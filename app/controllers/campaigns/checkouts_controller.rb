@@ -7,6 +7,7 @@ class Campaigns::CheckoutsController < ApplicationController
   before_filter :load_club_based_on_host, only: %i[submit new create thank_you duplicated error critical_error]
   before_filter :load_campaign, only: %i[submit new thank_you duplicated error]
   before_filter :set_page_title, only: %i[new thank_you duplicated error critical_error]
+  before_filter :set_appletouch_icon, only: %i[new thank_you duplicated error critical_error]
   before_filter :campaign_active, only: %i[submit new thank_you duplicated]
   before_filter :load_prospect, only: %i[new duplicated error create]
   before_filter :load_user, only: :thank_you
@@ -218,10 +219,18 @@ class Campaigns::CheckoutsController < ApplicationController
                                  result_page_footer
                                  thank_you_page_content],
                                methods:
-                               %i[favicon_url
-                                  result_pages_image_url
-                                  header_image_url]
+                               %i[favicon
+                                  result_pages_image
+                                  header_image]
                              ).with_indifferent_access
                            end
+  end
+
+  def set_appletouch_icon
+      @appletouch_icon = if @club.appletouch_icon_file_name.present?
+                               @club.appletouch_icon.url
+                             else
+                               '/apple-touch-icon-precomposed.png'
+                             end
   end
 end

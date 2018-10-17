@@ -125,7 +125,7 @@ class Campaigns::CheckoutSettingsControllerTest < ActionController::TestCase
     %i[confirmed_admin_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        %w[header_image_url result_pages_image_url].each do |image_name|
+        %w[header_image result_pages_image].each do |image_name|
           delete :remove_image, partner_prefix: @club.partner.prefix,
                                 club_prefix: @club.name,
                                 campaign_id: @campaign.id,
@@ -145,7 +145,7 @@ class Campaigns::CheckoutSettingsControllerTest < ActionController::TestCase
        confirmed_landing_agent].each do |agent|
       sign_agent_with_global_role(agent)
       perform_call_as(@agent) do
-        %w[header_image_url result_pages_image_url].each do |image_name|
+        %w[header_image result_pages_image].each do |image_name|
           delete :remove_image, partner_prefix: @club.partner.prefix,
                                 club_prefix: @club.name,
                                 campaign_id: @campaign.id,
@@ -211,8 +211,8 @@ class Campaigns::CheckoutSettingsControllerTest < ActionController::TestCase
         error_page_content: 'error_page_content',
         result_page_footer: 'result_page_footer',
         thank_you_page_content: 'thank_you_page_content',
-        header_image_url: Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png')),
-        result_pages_image_url: Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png'))
+        header_image: Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png')),
+        result_pages_image: Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png'))
       }
       submit_form(@campaign_without_checkout_settings, values)
       campaign = Campaign.find(@campaign_without_checkout_settings.id)
@@ -288,7 +288,7 @@ class Campaigns::CheckoutSettingsControllerTest < ActionController::TestCase
     role = :admin
     sign_agent_with_club_role(:agent, role)
     perform_call_as(@agent) do
-      %w[header_image_url result_pages_image_url].each do |image_name|
+      %w[header_image result_pages_image].each do |image_name|
         delete :remove_image, partner_prefix: @club.partner.prefix,
                               club_prefix: @club.name,
                               campaign_id: @campaign.id,
@@ -302,7 +302,7 @@ class Campaigns::CheckoutSettingsControllerTest < ActionController::TestCase
     %i[supervisor representative api agency fulfillment_managment landing].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
-        %w[header_image_url result_pages_image_url].each do |image_name|
+        %w[header_image result_pages_image].each do |image_name|
           delete :remove_image, partner_prefix: @club.partner.prefix,
                                 club_prefix: @club.name,
                                 campaign_id: @campaign.id,
@@ -317,7 +317,7 @@ class Campaigns::CheckoutSettingsControllerTest < ActionController::TestCase
     %i[supervisor representative api agency fulfillment_managment landing].each do |role|
       sign_agent_with_club_role(:agent, role)
       perform_call_as(@agent) do
-        %w[header_image_url result_pages_image_url].each do |image_name|
+        %w[header_image result_pages_image].each do |image_name|
           delete :remove_image, partner_prefix: @club.partner.prefix,
                                 club_prefix: @another_club.name,
                                 campaign_id: @another_campaign.id,

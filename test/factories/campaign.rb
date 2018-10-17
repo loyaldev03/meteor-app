@@ -47,8 +47,8 @@ FactoryBot.define do
       error_page_content 'Campaign Specific Error page content'
       result_page_footer 'Campaign Specific Result page footer'
       thank_you_page_content 'Campaign Specific Thank you page content'
-      header_image_url Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png'))
-      result_pages_image_url Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png'))
+      header_image Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png'))
+      result_pages_image Rack::Test::UploadedFile.new(Rails.root.join('test', 'fixtures', 'images', 'image.png'))
     end
   end
 end

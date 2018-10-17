@@ -38,7 +38,7 @@ FactoryBot.define do
     family_memberships_allowed true
     association :partner
     marketing_tool_client :action_mailer     
-    header_image_url_file_name { Faker::Avatar.image("my-own-slug", "50x50", "jpg") }
+    header_image_file_name { Faker::Avatar.image("my-own-slug", "50x50", "jpg") }
     checkout_page_bonus_gift_box_content "<p>Included with your Merchandise is a Risk Free 30 of the Club.</p>"
     checkout_page_footer "OFFER AND BILLING DETAILS: Your Bonus Gift"
     checkout_url "http://test.host"

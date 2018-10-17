@@ -22,9 +22,9 @@
   <%= javascript_include_tag 'checkout/checkout' %>
   <%= stylesheet_link_tag 'checkout/checkout', :media => "all" %>
   
-  <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon"/>
-  <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed"/>
-  <%= favicon_link_tag @club.favicon_url.url if @club.favicon_url.present? %>
+  <link href="<%= @appletouch_icon %>" rel="apple-touch-icon"/>
+  <link href="<%= @appletouch_icon %>" rel="apple-touch-icon-precomposed"/>
+  <%= favicon_link_tag @club.favicon.url if @club.favicon.present? %>
 
   <%= render :partial => 'campaigns/checkouts/shared/ga' %>
 

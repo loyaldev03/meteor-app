@@ -16,6 +16,6 @@
 
 <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon"/>
 <link href="/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed"/>
-<%= favicon_link_tag @current_club.favicon_url.url if @current_club and @current_club.favicon_url.present? %>
+<%= favicon_link_tag @current_club.favicon.url if @current_club and @current_club.favicon.present? %>
 
 <%= javascript_include_tag "application" %>

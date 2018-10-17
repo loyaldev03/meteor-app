@@ -33,7 +33,9 @@ class Api::CampaignsController < ApplicationController
       if products.first.present? || !@campaign.with_products_assigned?
         render json: {
           code: Settings.error_codes.success,
-          campaign: get_campaign,
+          title: @campaign.title,
+          favicon: @campaign.club.favicon.url,
+          appletouch_icon: @campaign.club.appletouch_icon.url,
           without_products_assigned: !@campaign.with_products_assigned?,
           get_products: products,
           get_preferences: get_preferences
@@ -60,11 +62,7 @@ class Api::CampaignsController < ApplicationController
   end
 
   private
-
-  def get_campaign
-    [{ title: @campaign.title, favicon_url: @campaign.club.favicon_url.url }]
-  end
-
+  
   def get_products
     @campaign.products.where('stock > ? OR allow_backorder = ?', 0, true).order(:weight).pluck(:id, 'campaign_products.label as label', :image_url, :sku).map { |id, label, image_url, sku| { id: id, name: label, sku: sku, image_url: image_url } }
   end

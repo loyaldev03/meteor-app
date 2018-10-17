@@ -32,11 +32,11 @@ class Campaign < ActiveRecord::Base
   validates_date :initial_date, after: lambda { Time.zone.now }, if: -> { (initial_date_changed? || finish_date_changed?) && !can_set_dates_in_the_past? }
   validates :transport_campaign_id, presence: true, if: -> { has_campaign_day_associated? }
 
-  has_attached_file :header_image_url, styles: { thumb: '300x' }
-  has_attached_file :result_pages_image_url, styles: { thumb: '50x' }
+  has_attached_file :header_image, styles: { thumb: '300x' }
+  has_attached_file :result_pages_image, styles: { thumb: '50x' }
 
   # This validation MUST be placed after the has_attachment declaration. Otherwise, it will fail https://github.com/thoughtbot/paperclip/issues/1340
-  validates_attachment_content_type :header_image_url, :result_pages_image_url,
+  validates_attachment_content_type :header_image, :result_pages_image,
                                     content_type: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif']
 
   enum campaign_type: {
@@ -150,10 +150,10 @@ class Campaign < ActiveRecord::Base
       css_style: css_style.present? ? css_style : club.css_style,
       duplicated_page_content: duplicated_page_content.present? ? duplicated_page_content : club.duplicated_page_content,
       error_page_content: error_page_content.present? ? error_page_content : club.error_page_content,
-      favicon_url: club.favicon_url,
-      header_image_url: header_image_url.present? ? header_image_url : club.header_image_url,
+      favicon: club.favicon,
+      header_image: header_image.present? ? header_image : club.header_image,
       result_page_footer: result_page_footer.present? ? result_page_footer : club.result_page_footer,
-      result_pages_image_url: result_pages_image_url.present? ? result_pages_image_url : club.result_pages_image_url,
+      result_pages_image: result_pages_image.present? ? result_pages_image : club.result_pages_image,
       thank_you_page_content: thank_you_page_content.present? ? thank_you_page_content : club.thank_you_page_content
     }
   end

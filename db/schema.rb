@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180502125023) do
+ActiveRecord::Schema.define(version: 20180926190120) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -94,6 +94,10 @@ ActiveRecord::Schema.define(version: 20180502125023) do
     t.string   "slug",                                 limit: 100
     t.boolean  "create_remote_user_in_background",                                            default: false
     t.boolean  "credit_card_and_geographic_required",                                         default: true
+    t.string   "favicon_url_file_name",                limit: 255
+    t.string   "favicon_url_content_type",             limit: 255
+    t.integer  "favicon_url_file_size",                limit: 4
+    t.datetime "favicon_url_updated_at"
     t.string   "header_image_url_file_name",           limit: 255
     t.string   "header_image_url_content_type",        limit: 255
     t.integer  "header_image_url_file_size",           limit: 4
@@ -187,10 +191,10 @@ ActiveRecord::Schema.define(version: 20180502125023) do
     t.string   "favicon_url_content_type",                   limit: 255
     t.integer  "favicon_url_file_size",                      limit: 4
     t.datetime "favicon_url_updated_at"
-    t.string   "header_image_url_file_name",                 limit: 255
-    t.string   "header_image_url_content_type",              limit: 255
-    t.integer  "header_image_url_file_size",                 limit: 4
-    t.datetime "header_image_url_updated_at"
+    t.string   "header_image_file_name",                     limit: 255
+    t.string   "header_image_content_type",                  limit: 255
+    t.integer  "header_image_file_size",                     limit: 4
+    t.datetime "header_image_updated_at"
     t.string   "result_pages_image_url_file_name",           limit: 255
     t.string   "result_pages_image_url_content_type",        limit: 255
     t.integer  "result_pages_image_url_file_size",           limit: 4
@@ -209,6 +213,10 @@ ActiveRecord::Schema.define(version: 20180502125023) do
     t.string   "store_url",                                  limit: 255
     t.text     "thank_you_page_content_when_no_cc_required", limit: 65535
     t.integer  "default_landing_agent_id",                   limit: 4
+    t.string   "appletouch_icon_url_file_name",              limit: 255
+    t.string   "appletouch_icon_content_type",               limit: 255
+    t.integer  "appletouch_icon_url_file_size",              limit: 4
+    t.datetime "appletouch_icon_url_updated_at"
   end
 
   add_index "clubs", ["drupal_domain_id"], name: "index_drupal_domain_id", using: :btree
@@ -558,6 +566,15 @@ ActiveRecord::Schema.define(version: 20180502125023) do
   add_index "memberships", ["terms_of_membership_id"], name: "index_terms_of_membership_id", using: :btree
   add_index "memberships", ["user_id"], name: "index2", using: :btree
 
+  create_table "merchant_fees", force: :cascade do |t|
+    t.string  "name",              limit: 255
+    t.string  "gateway",           limit: 255
+    t.string  "transaction_types", limit: 255
+    t.decimal "rate",                          precision: 4,  scale: 4, default: 0.0
+    t.decimal "unit_cost",                     precision: 12, scale: 4, default: 0.0
+    t.boolean "apply_on_decline",                                       default: true
+  end
+
   create_table "operations", force: :cascade do |t|
     t.text     "description",    limit: 65535
     t.datetime "operation_date"
@@ -791,6 +808,7 @@ ActiveRecord::Schema.define(version: 20180502125023) do
     t.boolean  "success",                                                                 default: false
     t.integer  "operation_type",                   limit: 4
     t.integer  "club_id",                          limit: 4
+    t.decimal  "gateway_cost",                                   precision: 11, scale: 4, default: 0.0
   end
 
   add_index "transactions", ["club_id"], name: "index_transactions_on_club_id", using: :btree

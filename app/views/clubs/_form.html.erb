@@ -150,23 +150,33 @@
 
   <div class="tab-pane" id="checkout">
     <div class="control-group">
-      <%= f.label :header_image_url, :class => 'control-label' %>
+      <%= f.label :header_image, :class => 'control-label' %>
       <div class="controls">
-        <% if @club.header_image_url.present? %>
-        <%= image_tag @club.header_image_url.url(:thumb) %>
+        <% if @club.header_image.present? %>
+        <%= image_tag @club.header_image.url(:thumb) %>
         <br/>
         <% end %>
-        <%= f.file_field :header_image_url, :class => 'text_field' %>
+        <%= f.file_field :header_image, :class => 'text_field' %>
       </div>
     </div>
     <div class="control-group">
-      <%= f.label :favicon_url, :class => 'control-label' %>
+      <%= f.label :favicon, :class => 'control-label' %>
       <div class="controls">
-        <% if @club.favicon_url.present? %>
-        <%= image_tag @club.favicon_url.url %>
+        <% if @club.favicon.present? %>
+        <%= image_tag @club.favicon.url %>
         <br/>
         <% end %>
-        <%= f.file_field :favicon_url, :class => 'text_field' %>
+        <%= f.file_field :favicon, :class => 'text_field' %>
+      </div>
+    </div>
+    <div class="control-group">
+      <%= f.label :appletouch_icon, :class => 'control-label' %>
+      <div class="controls">
+        <% if @club.appletouch_icon.present? %>
+          <%= image_tag @club.appletouch_icon.url(:thumb) %>
+          <br/>
+        <% end %>
+        <%= f.file_field :appletouch_icon, :class => 'text_field' %>
       </div>
     </div>
     <div class="control-group">
@@ -238,13 +248,13 @@
       </div>
     </div>
     <div class="control-group">
-      <%= f.label :result_pages_image_url, :class => 'control-label' %>
+      <%= f.label :result_pages_image, :class => 'control-label' %>
       <div class="controls">
-        <% if @club.result_pages_image_url.present? %>
-        <%= image_tag @club.result_pages_image_url.url(:thumb) %>
+        <% if @club.result_pages_image.present? %>
+        <%= image_tag @club.result_pages_image.url(:thumb) %>
         <br/>
         <% end %>
-        <%= f.file_field :result_pages_image_url, :class => 'text_field' %>
+        <%= f.file_field :result_pages_image, :class => 'text_field' %>
       </div>
     </div>
   </div>

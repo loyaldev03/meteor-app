@@ -45,12 +45,16 @@ class Club < ActiveRecord::Base
   has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename",
                            url: "/system/:attachment/:id/:style/:filename",
                            styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
-  has_attached_file :header_image_url, styles: { thumb: '300x' }
-  has_attached_file :favicon_url
-  has_attached_file :result_pages_image_url, styles: { thumb: '50x' }
+  has_attached_file :header_image, styles: { thumb: '300x' }
+  has_attached_file :favicon
+  has_attached_file :appletouch_icon, styles: { thumb: '50x' }
+  has_attached_file :result_pages_image, styles: { thumb: '50x' }
   # This validation MUST be placed after the has_attachment declaration. Otherwise, it will fail https://github.com/thoughtbot/paperclip/issues/1340
-  validates_attachment_content_type :header_image_url, :favicon_url, :result_pages_image_url,
-                                    content_type: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif', 'image/x-icon', 'image/vnd.microsoft.icon']
+  validates_attachment_content_type :header_image,:result_pages_image,
+                                    content_type: ['image/jpg', 'image/jpeg', 'image/png']
+  validates_attachment_content_type :favicon,
+                                    content_type: ['image/x-icon', 'image/vnd.microsoft.icon']
+  validates_attachment_content_type :appletouch_icon, content_type: 'image/png'
 
   # marketing_tool_attributes possible keys:
   # Pardot : pardot_email, pardot_user_key, pardot_password

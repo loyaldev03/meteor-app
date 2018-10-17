@@ -13,15 +13,15 @@
   <table class="table table-striped table-bordered checkout-settings">
     <tr>
       <td>
-        <p class="text-right"><%= model_class.human_attribute_name(:header_image_url) %></p>
+        <p class="text-right"><%= model_class.human_attribute_name(:header_image) %></p>
       </td>
       <td>
-        <% if @campaign.header_image_url.present? %>
-          <%= image_tag @campaign.header_image_url.url(:thumb) %>
+        <% if @campaign.header_image.present? %>
+          <%= image_tag @campaign.header_image.url(:thumb) %>
           <% if @current_agent.can? :manage, Campaign, @campaign.club.id %>
             <br />
             <%= link_to I18n.t(:clear), 
-              campaign_checkout_settings_remove_image_path(@current_partner.prefix, @current_club.name, @campaign.id, image_name: 'header_image_url'), 
+              campaign_checkout_settings_remove_image_path(@current_partner.prefix, @current_club.name, @campaign.id, image_name: 'header_image'), 
               method: :delete, 
               id: 'btn-remove-header-image',
               class: 'btn btn-mini btn-danger',
@@ -126,15 +126,15 @@
     </tr>
     <tr>
       <td>
-        <p class="text-right"><%= model_class.human_attribute_name(:result_pages_image_url) %></p>
+        <p class="text-right"><%= model_class.human_attribute_name(:result_pages_image) %></p>
       </td>
       <td>
-        <% if @campaign.result_pages_image_url.present? %>
-          <%= image_tag @campaign.result_pages_image_url.url(:thumb) %>
+        <% if @campaign.result_pages_image.present? %>
+          <%= image_tag @campaign.result_pages_image.url(:thumb) %>
           <% if @current_agent.can? :manage, Campaign, @campaign.club.id %>
             <br />
             <%= link_to I18n.t(:clear), 
-              campaign_checkout_settings_remove_image_path(@current_partner.prefix, @current_club.name, @campaign.id, image_name: 'result_pages_image_url'), 
+              campaign_checkout_settings_remove_image_path(@current_partner.prefix, @current_club.name, @campaign.id, image_name: 'result_pages_image'), 
               method: :delete, 
               id: 'btn-remove-result-pages-image',
               class: 'btn btn-mini btn-danger',

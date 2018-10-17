@@ -119,21 +119,29 @@
   </div>
   <div class="tab-pane" id="checkout">
     <p>
-      <strong><%= model_class.human_attribute_name(:header_image_url) %>:</strong><br>
-      <% if @club.header_image_url.present? %>
-      <%= image_tag @club.header_image_url.url(:thumb) %>
+      <strong><%= model_class.human_attribute_name(:header_image) %>:</strong><br>
+      <% if @club.header_image.present? %>
+      <%= image_tag @club.header_image.url(:thumb) %>
     <% else %>
       Not set.
       <% end %>
     </p>
     <p>
-      <strong><%= model_class.human_attribute_name(:favicon_url) %>:</strong><br>
-      <% if @club.favicon_url.present? %>
-      <%= image_tag @club.favicon_url.url %>
+      <strong><%= model_class.human_attribute_name(:favicon) %>:</strong><br>
+      <% if @club.favicon.present? %>
+      <%= image_tag @club.favicon.url %>
     <% else %>
       Not set.
       <% end %>
     </p>
+    <p>
+      <strong><%= model_class.human_attribute_name(:appletouch_icon) %>:</strong><br>
+      <% if @club.appletouch_icon.present? %>
+        <%= image_tag @club.appletouch_icon.url(:thumb) %>
+      <% else %>
+        Not set.
+        <% end %>
+      </p>
     <p>
       <strong><%= model_class.human_attribute_name(:privacy_policy_url) %>:</strong><br>
       <%= @club.privacy_policy_url.present? ? @club.privacy_policy_url : 'Not set.' %>
@@ -199,9 +207,9 @@
       <% end %>
     </p>
     <p>
-      <strong><%= model_class.human_attribute_name(:result_pages_image_url) %>:</strong><br>
-      <% if @club.result_pages_image_url.present? %>
-      <%= image_tag @club.result_pages_image_url.url(:thumb) %>
+      <strong><%= model_class.human_attribute_name(:result_pages_image) %>:</strong><br>
+      <% if @club.result_pages_image.present? %>
+      <%= image_tag @club.result_pages_image.url(:thumb) %>
     <% else %>
       Not set.
       <% end %>

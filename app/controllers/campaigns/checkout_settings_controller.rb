@@ -11,8 +11,8 @@ class Campaigns::CheckoutSettingsController < ApplicationController
     error_page_content
     result_page_footer
     thank_you_page_content
-    header_image_url
-    result_pages_image_url
+    header_image
+    result_pages_image
   ].freeze
 
   layout '2-cols'
@@ -52,10 +52,10 @@ class Campaigns::CheckoutSettingsController < ApplicationController
   def remove_image
     return unless params[:image_name].present?
     case params[:image_name]
-    when 'header_image_url'
-      @campaign.header_image_url = nil
-    when 'result_pages_image_url'
-      @campaign.result_pages_image_url = nil
+    when 'header_image'
+      @campaign.header_image = nil
+    when 'result_pages_image'
+      @campaign.result_pages_image = nil
     end
     if @campaign.save
       flash[:notice] = t('activerecord.attributes.checkout_settings.image_remove_success', image_name: params[:image_name])
