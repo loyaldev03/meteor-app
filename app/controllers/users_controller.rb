@@ -278,6 +278,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def unblacklist
+    my_authorize! :unblacklist, current_user, current_club.id
+    return if request.get?
+
+    response = current_user.unblacklist(current_agent, params[:reason], params[:unblacklist_type])
+    if response[:code] == Settings.error_codes.success
+      flash[:notice] = response[:message]
+    else
+      flash[:error] = response[:message]
+    end
+    redirect_to show_user_path
+  end
+
   def change_next_bill_date
     if request.post?
       answer = @current_user.change_next_bill_date(params[:next_bill_date], @current_agent)

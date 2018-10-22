@@ -106,6 +106,9 @@ if [ "$1" == "production" ]; then
   ssh -p 30003 deploy@reporting2.affinitystop.com rm /home/deploy/production-logs/*$(date -d "-1 month" +"%Y%m")*.gz
 fi
 
+# blacklist temporary unblacklisted users
+echo "`date` rake users:blacklist_users_unblacklisted_temporary"
+cd /var/www/$2/current && bundle exec rake users:blacklist_users_unblacklisted_temporary >> $LOGFILE 2>&1
 
 
 WAIT_PIDS=`jobs -l | awk '{print $2}'`

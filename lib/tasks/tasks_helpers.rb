@@ -259,6 +259,28 @@ module TasksHelpers
     end
   end
 
+  def self.blacklist_users_unblacklisted_temporary
+    base = User.where(blacklisted: false).joins(:operations).where('operations.operation_type = ?', Settings.operation_types.unblacklisted_temporary).distinct
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, format: :dashed)}] Starting users:blacklist_users_unblacklisted_temporary rake task, processing #{base.count} users"
+    base.find_each(batch_size: 100).with_index do |user, index|
+      tz = Time.zone.now
+      begin
+        Rails.logger.info "  *[#{index + 1}] processing user ##{user.id}"
+        # Do not blacklist again if there is a newer permanent unblacklist operation
+        last_unblacklist = user.operations.where(operation_type: Settings.operation_types.unblacklisted).last
+        if last_unblacklist && last_unblacklist.created_at > user.operations.where(operation_type: Settings.operation_types.unblacklisted_temporary).last.created_at
+          Rails.logger.info "    [!] User ##{user.id} was permanently Unblacklisted #{last_unblacklist.created_at}. Won't be blacklisted."
+          next
+        end
+        user.blacklist(nil, 'Automated Blacklist')
+      rescue Exception => e
+        Auditory.report_issue('Users::blacklist_users_unblacklisted_temporary', e, user: user.id)
+        Rails.logger.info "    [!] failed: #{$ERROR_INFO.inspect}\n\t#{$ERROR_POSITION[0..9] * "\n\t"}"
+      end
+      Rails.logger.info "    ... took #{Time.zone.now - tz}seconds user ##{user.id}"
+    end
+  end
+
   def self.delete_testing_accounts
     today = Time.zone.now.to_date
     base = User.where(testing_account: true)

@@ -411,6 +411,10 @@ class User < ActiveRecord::Base
     !self.blacklisted?
   end
 
+  def can_be_unblacklisted?
+    blacklisted?
+  end
+
   def can_add_club_cash?
     if is_not_drupal?
       return true
@@ -1046,22 +1050,31 @@ class User < ActiveRecord::Base
     answer
   end
 
-  # Bug #27501 this method was added just to be used from console.
-  def unblacklist(agent = nil)
+  def unblacklist(agent = nil, reason = '', unblacklist_type = 'permanent')
+    answer = { message: "Member already blacklisted", success: false }
     if self.blacklisted?
       User.transaction do
         begin
+          operation = Settings.operation_types.unblacklisted
+          message = "Unblacklisted member and all its credit cards. Reason: #{reason}"
+          if unblacklist_type == 'temporary'
+            operation = Settings.operation_types.unblacklisted_temporary
+            message = "Temporary unblacklisted member and all its credit cards. Reason: #{reason}"
+          end
           self.blacklisted = false
           self.save(validate: false)
-          Auditory.audit(agent, self, "Un-blacklisted member and all its credit cards.", self, Settings.operation_types.unblacklisted)
+          Auditory.audit(agent, self, message, self, operation  )
           self.credit_cards.each { |cc| cc.unblacklist }
+          answer = { message: message, code: Settings.error_codes.success }
         rescue Exception => e
           Auditory.report_issue("User::unblacklist", e, { user: self.id })
+          answer = { message: I18n.t('error_messages.airbrake_error_message') + e.to_s, code: Settings.error_codes.user_could_not_be_unblacklisted }
           raise ActiveRecord::Rollback
         end
       end
       marketing_tool_sync_subscription unless self.blacklisted?
     end
+    answer
   end
 
   def blacklist(agent, reason)

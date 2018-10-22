@@ -43,6 +43,7 @@ en:
   all_times: 'All times'
   text_cancel_are_you_sure: 'This user will be canceled. Are you really sure?'
   text_blacklist_are_you_sure: 'This user will be blacklisted. Are you really sure?'
+  text_unblacklist_are_you_sure: 'This user will be unblacklisted. Are you really sure?'
   loading: 'Loading'
   test_api_connection: 'Test API Connection'
   index: '#'
@@ -59,6 +60,8 @@ en:
   link_to_store_variant: 'Go to Store Variant'
   change_membership_upon_new_cc: 'Change Membership'
   change_membership_upon_new_cc_help: "If a Subscription Plan is selected and if the credit card information is valid, the user will have it's membership changed as well (following the same logic as a save the sale)"
+  temporary: 'Temporary'
+  permanent: 'Permanent'
   reject: 'Reject'
   reject_save_the_sale: 'Reject Save the Sale'
   enums:
@@ -95,6 +98,7 @@ en:
     return_to_user_show: 'Return to user show'
     add_club_cash_transaction: 'Save club cash transaction'
     blacklist_user: 'Blacklist user'
+    unblacklist_user: 'Unblacklist user'
     cancel_user: 'Cancel user'
     change_bill_date: 'Change next bill date'
     refund_user: 'Refund'
@@ -111,6 +115,7 @@ en:
     generate_xls: 'Generate xls'
     password_reset: 'Password reset'
     blacklist: 'Blacklist'
+    unblacklist: 'Unblacklist'
     cancel: 'Cancel'
     login_remotely_as_user: 'Login remotely as user'
     resend_welcome_email: 'Resend welcome email'
@@ -430,6 +435,8 @@ en:
         billed_date_to: 'To:'
         manual_payment: 'Set to cash/check payments only'
         manual_payment_help: 'Setting this flag will require Check/Cash payments transactions to remain active. Check/Cash payments should be made before the NBD or the user will be cancelled'
+        unblacklist_temporary: 'Temporary Unblacklist'
+        unblacklist_temporary_help: 'This user will be blacklisted again tonight by the system'
         sync_status_priorities:
           synced: success
           unsynced: warning

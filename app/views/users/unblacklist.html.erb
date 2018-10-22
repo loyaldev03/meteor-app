@@ -1,0 +1,39 @@
+<%= render :partial => "shared/user_information" %>
+
+<%= form_tag(user_unblacklist_path, id: "unblacklist_form") do %>
+  <table class="table table-bordered">
+    <tr>
+      <td> 
+        <%= label_tag :reason, t('reason'), :class => 'help-inline required_asterisk' %>
+        <br />
+        <%= text_area_tag :reason, '', required: true, rows: 5 %>
+        <br />
+        <p class="text-info">Type of Unblacklist</p>
+        <label class="radio">
+          <input type="radio" name="unblacklist_type" id="unblacklist_type_temporary" value="temporary" checked>
+          <%= t('temporary') %>
+          <%= render  partial: 'shared/help', 
+                      locals: { 
+                        title: t('activerecord.attributes.user.unblacklist_temporary'), 
+                        content: t('activerecord.attributes.user.unblacklist_temporary_help') 
+                      },
+                      style: 'display: inline;' %>
+        </label>
+        <label class="radio">
+          <input type="radio" name="unblacklist_type" id="unblacklist_type_permanent" value="permanent">
+          <%= t('permanent') %>
+        </label>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= submit_tag t('buttons.unblacklist_user'), :class => 'btn btn-primary', data: { confirm: t('text_unblacklist_are_you_sure') } %>
+        <%= link_to t('buttons.cancel'), show_user_path, :class => 'btn' %>
+      </td>
+    </tr>
+  </table>
+<% end %>
+
+<% content_for :javascript do %>
+  unblacklistFormFunctions();
+<% end %>

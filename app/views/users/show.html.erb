@@ -49,7 +49,17 @@
         <%= link_to('Save the sale', ((can?(:save_the_sale, User) and @current_user.can_change_tom?) ? user_save_the_sale_path : '#'),:class => "btn btn-large-w btn-info #{'disabled' unless @current_user.can_change_tom?}",:id => 'save_the_sale') %>
       </div>
       <div class="span4">
-        <%= link_to 'Blacklist', (@current_user.can_be_blacklisted? ? user_blacklist_path : '#'), :class => "btn btn-large-w btn-danger #{'disabled' unless @current_user.can_be_blacklisted?}", :id => "blacklist_btn" %>
+        <% if !current_user.blacklisted? %>
+          <%= link_to t('buttons.blacklist'),
+                      (current_user.can_be_blacklisted? ? user_blacklist_path : '#'),
+                      :class => "btn btn-large-w btn-danger #{ 'disabled' unless current_user.can_be_blacklisted? }",
+                      :id => "blacklist_btn" %>
+        <% else %>
+          <%= link_to t('buttons.unblacklist'),
+                      ((current_agent.can? :unblacklist, current_user, current_club.id) ? user_unblacklist_path : '#'),
+                      :class => "btn btn-large-w btn-danger #{ 'disabled' unless current_agent.can? :unblacklist, current_user, current_club.id }",
+                      :id => "unblacklist_btn" %>
+        <% end %>
       </div>
     </div>
 

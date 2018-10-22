@@ -1957,3 +1957,10 @@ function preference_functions(){
     $('#preferenceEditModal, #newPreferenceModal').modal('hide');
   });
 }
+
+function unblacklistFormFunctions()  {
+  disable_form_buttons_upon_submition('unblacklist_form');
+  $("textarea#reason").blur(function() {
+    $(this).val($.trim($(this).val()));
+  });
+}

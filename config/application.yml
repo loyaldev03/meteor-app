@@ -135,7 +135,8 @@ defaults: &defaults
     aus_update_credit_card: 257
     membership_and_credit_card_update: 258
     rejected_save_the_sale: 259
-    save_the_sale_rejected_by_agent: 260 
+    save_the_sale_rejected_by_agent: 260
+    unblacklisted_temporary: 261
     #communication
     active_email: 300
     prebill_email: 301
@@ -303,6 +304,7 @@ defaults: &defaults
     billing_date_not_reached: '9999'
     user_email_blacklisted: '9996'
     user_could_no_be_blacklisted: '9998'
+    user_could_not_be_unblacklisted: '19998'
     tom_wihtout_gateway_configured: '9789'
     tom_to_downgrade_belongs_to_different_club: '9790'
     club_cash_transaction_not_successful: '9791'

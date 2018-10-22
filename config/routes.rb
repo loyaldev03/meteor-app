@@ -87,6 +87,7 @@ SacPlatform::Application.routes.draw do
         put '/reject_save_the_sale/:operation_id' => 'users#reject_save_the_sale', as: 'user_reject_save_the_sale'
         match '/cancel' => 'users#cancel', as: 'user_cancel', :via => [:get, :post]
         match '/blacklist' => 'users#blacklist', as: 'user_blacklist', :via => [:get, :post]
+        match '/unblacklist' => 'users#unblacklist', as: 'user_unblacklist', via: [:get, :post]
         match '/change_next_bill_date' => 'users#change_next_bill_date', as: 'user_change_next_bill_date', :via => [:get, :post]
         match '/set_undeliverable' => 'users#set_undeliverable', as: 'user_set_undeliverable', :via => [:get, :post]
         match '/set_unreachable' => 'users#set_unreachable', as: 'user_set_unreachable', :via => [:get, :post]

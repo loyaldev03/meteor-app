@@ -58,6 +58,7 @@ class Ability
     cannot :manual_review, Fulfillment
     cannot :bulk_process, Product
     cannot :send, Communication
+    cannot :unblacklist, User
     cannot :cancel_save_the_sale, Operation
 
     role = agent.roles.blank? ? agent.which_is_the_role_for_this_club?(club_id).role : agent.roles rescue nil
@@ -111,9 +112,11 @@ class Ability
       can :list, Communication
       can :send, Communication
       can :manage, EmailTemplate
+      can :unblacklist, User
       can :cancel_save_the_sale, Operation
     when 'representative' then
       can :manage, User
+      cannot :unblacklist, User
       cannot :api_profile, User
       cannot :set_undeliverable, User
       cannot :see_sync_status, User
@@ -146,6 +149,7 @@ class Ability
       cannot :cancel_save_the_sale, Operation
     when 'supervisor' then
       can :manage, User
+      cannot :unblacklist, User
       cannot :api_profile, User
       cannot :see_sync_status, User
       cannot :api_update_club_cash, User
@@ -249,6 +253,7 @@ class Ability
       can :list, Communication
       can :list, Membership
       can :list_my_clubs, Club
+      can :unblacklist, User
       can :cancel_save_the_sale, Operation
     end
 
