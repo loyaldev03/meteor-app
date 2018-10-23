@@ -137,6 +137,7 @@ SacPlatform::Application.routes.draw do
         get '/download_xls/:fulfillment_file_id' => 'fulfillments#download_xls', as: 'download_xls_fulfillments'
         get '/list_for_file/:fulfillment_file_id' => 'fulfillments#list_for_file', as: 'fulfillment_list_for_file'
         get '/mark_file_as_sent/:fulfillment_file_id' => 'fulfillments#mark_file_as_sent', as: 'fulfillment_file_mark_as_sent'
+        get '/mark_file_as_packed/:fulfillment_file_id' => 'fulfillments#mark_file_as_packed', as: 'fulfillment_file_mark_as_packed'
       end
 
       scope '/fulfillment/:id' do

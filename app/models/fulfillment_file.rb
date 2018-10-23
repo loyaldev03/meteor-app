@@ -6,13 +6,24 @@ class FulfillmentFile < ActiveRecord::Base
 
   state_machine :status, initial: :in_process do
     after_transition in_process: :sent, do: :mark_fulfillments_as_sent
-
+    after_transition packed: :sent, do: :mark_fulfillments_as_sent
+    
     event :processed do
       transition in_process: :sent
+    end
+
+    event :processed_and_packed do
+      transition packed: :sent
+    end
+
+    event :pack do
+      transition in_process: :packed
     end
     
     #First status. fulfillment file was created
     state :in_process
+    # Manually set through CS: https://www.pivotaltracker.com/story/show/160935111/comments/195021037
+    state :packed
     #Manually set through CS. Every fulfillment inside was processed.
     state :sent 
   end

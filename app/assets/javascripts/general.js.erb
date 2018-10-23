@@ -894,7 +894,7 @@ function fulfillment_files_functions() {
   });
   $(".dataTables_paginate").css({ float: "left" });
 
-  $("#fulfillment_files_table").on('confirm:complete', '#mark_as_sent', function(event){
+  $("#fulfillment_files_table").on('confirm:complete', '.mark_as_sent, .mark_as_packed', function(event){
     startAjaxLoader(true);
     window.location.href = $(this).attr('href');
   });

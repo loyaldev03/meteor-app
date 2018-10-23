@@ -131,15 +131,37 @@ class FulfillmentsController < ApplicationController
   def mark_file_as_sent
     my_authorize! :report, Fulfillment, @current_club.id
     file = FulfillmentFile.find(params[:fulfillment_file_id])
-    unless file.sent?
+    if file.sent?
+      flash[:notice] = 'Fulfillment file was already marked as sent.'
+    elsif file.in_process?
       file.processed!
-      flash[:notice] = "Fulfillment file marked as sent successfully."
-    else
-      flash[:notice] = "Fulfillment file was already marked as sent."
+      flash[:notice] = 'Fulfillment file marked as sent successfully.'
+    elsif file.packed?
+      file.processed_and_packed!
+      flash[:notice] = 'Fulfillment file processed and marked as packed successfully.'
     end
   rescue Exception => e
     flash[:error] = t('error_messages.airbrake_error_message')
-    Auditory.report_issue("FulfillmentFile:mark_file_as_sent", e)
+    Auditory.report_issue('FulfillmentFile:mark_file_as_sent', e)
+  ensure
+    redirect_to list_fulfillment_files_path
+  end
+
+  def mark_file_as_packed
+    my_authorize! :report, Fulfillment, @current_club.id
+    file = FulfillmentFile.find(params[:fulfillment_file_id])
+    # byebug
+    if file.packed?
+      flash[:notice] = 'Fulfillment file was already marked as packed.'
+    elsif file.in_process?
+      file.pack!
+      flash[:notice] = 'Fulfillment file marked as packed successfully.'
+    else
+      flash[:error] = 'Couldn\'t mark file as Packed'
+    end
+  rescue Exception => e
+    flash[:error] = t('error_messages.airbrake_error_message')
+    Auditory.report_issue('FulfillmentFile:mark_file_as_packed', e)
   ensure
     redirect_to list_fulfillment_files_path
   end

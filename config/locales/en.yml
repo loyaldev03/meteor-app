@@ -64,6 +64,7 @@ en:
   permanent: 'Permanent'
   reject: 'Reject'
   reject_save_the_sale: 'Reject Save the Sale'
+  not_set: 'Not set'
   enums:
     campaign:
       transport:
@@ -147,6 +148,8 @@ en:
     unmark_as_testing_account: "Unmark as testing account"
     set_not_processed: "Set as not processed"
     details: 'Details'
+    mark_as_sent: 'Mark as Sent'
+    mark_as_packed: 'Mark as Packed'
   admin:
     agents:
       index:
@@ -678,12 +681,15 @@ en:
       fulfillment_files:
         id: 'ID'
         created_at: 'Created at'
+        created_by: 'Created by'
         working_file: 'Working file'
         view: 'View'
         status: 'Status'
         product: 'Product'
         date: 'Date'
         processed: 'Processed'
+        mark_as_packed_are_you_sure: 'Are you sure you want to mark the fulfillment file as packed?'
+        mark_as_sent_are_you_sure: 'Are you sure you want to mark all the fulfillments that are in progress as sent?'
       communication:
         response: 'Response'
         template_name: 'Template name'

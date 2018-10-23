@@ -54,8 +54,9 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
         assert page.has_content?(fulfillment_file.status)
         assert page.has_content?(fulfillment_file.product)
         assert page.has_content?(fulfillment_file.dates)
-        assert page.has_content?(fulfillment_file.fulfillments_processed)
-        assert page.has_selector?("#mark_as_sent") if fulfillment_file.status == 'in_process'
+        assert page.has_content?(fulfillment_file.fulfillments_processed)        
+        assert page.has_selector?("#mark_as_packed_#{fulfillment_file.id}") if fulfillment_file.status == 'in_process'
+        assert page.has_selector?("#mark_as_sent_#{fulfillment_file.id}") if fulfillment_file.status == 'in_process'
         assert page.has_selector?("#download_xls_#{fulfillment_file.id}")
         click_link_or_button 'View'
       end
@@ -2412,7 +2413,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     
     visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
     within("#fulfillment_files_table")do
-      click_link_or_button 'Mark as sent'
+      click_link_or_button 'Mark as Sent'
       confirm_ok_js
     end
     assert page.has_content?("Fulfillment file marked as sent successfully")
@@ -2424,6 +2425,35 @@ test "Update the status of all the fulfillments - In process using individual ch
 
     file = FulfillmentFile.last
     assert_equal file.status, "sent"
+  end
+
+    # Mark as packed - fulfillment file
+  test "Check fulfillment file at packed status" do
+    setup_user(false)
+    active_merchant_stubs
+    enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
+    create_user_throught_sloop(enrollment_info)
+
+    5.times{FactoryBot.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
+    generate_fulfillment_files(false, @saved_user.fulfillments, nil, nil, 'not_processed', false)
+    
+    visit list_fulfillment_files_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name)
+    within("#fulfillment_files_table")do
+      click_link_or_button 'Mark as Packed'
+      confirm_ok_js
+    end
+    assert page.has_content?("Fulfillment file marked as packed successfully")
+
+    fulfillment_file = FulfillmentFile.last
+
+    within("#fulfillment_files_table")do
+      assert page.has_content?("packed")
+      assert page.has_no_selector?("#mark_as_packed_#{fulfillment_file.id}")
+      assert page.has_selector?("#mark_as_sent_#{fulfillment_file.id}")
+    end
+
+    file = FulfillmentFile.last
+    assert_equal file.status, "packed"
   end
 
   test "Agents can not change fulfillment status from User Profile" do
@@ -2530,8 +2560,8 @@ test "Update the status of all the fulfillments - In process using individual ch
       assert page.has_content?( I18n.l(fulfillment_file.last.created_at.to_date) )
       assert page.has_no_content?( I18n.l(fulfillment_file2.first.created_at.to_date) )     
       assert page.has_no_content?( I18n.l(fulfillment_file2.last.created_at.to_date) )
-    
-      first(:link, 'Mark as sent').click
+
+      first(:link, 'Mark as Sent').click
       confirm_ok_js
     end
     assert page.has_content?("Fulfillment file marked as sent successfully")
