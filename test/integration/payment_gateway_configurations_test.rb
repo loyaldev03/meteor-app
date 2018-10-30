@@ -79,11 +79,15 @@ class PaymentGatewayConfigurationTest < ActionDispatch::IntegrationTest
     @club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
     visit club_path(@partner.prefix, @club.id)
     click_link_or_button "Payment Gateway Configuration"
-    new_pgc = FactoryBot.build(:payment_gateway_configuration)
+    new_pgc = FactoryBot.build(:payeezy_payment_gateway_configuration)
     click_link_or_button "Replace Payment Gateway"
+        assert page.has_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="mes"]'
     assert page.has_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="authorize_net"]'
     assert page.has_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="litle"]'
-    assert page.has_no_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="mes"]'
+    assert page.has_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="first_data"]'
+    assert page.has_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="trust_commerce"]'
+    assert page.has_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="stripe"]'
+    assert page.has_no_xpath? '//select[@id="payment_gateway_configuration_gateway"]/option[@value="payeezy"]'
   end
 
   test "Do not allow to edit a PGC if it has users - Login by General Admin" do

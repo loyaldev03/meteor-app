@@ -166,13 +166,13 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
   end
 
   def sign_agent_with_global_role(type)
-    active_merchant_stubs
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
     @agent = FactoryBot.create type
     sign_in @agent
   end
 
   def sign_agent_with_club_role(type, role)
-    active_merchant_stubs
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
     @agent = FactoryBot.create(type, roles: '')
     ClubRole.create(club_id: @club.id, agent_id: @agent.id, role: role)
     sign_in @agent

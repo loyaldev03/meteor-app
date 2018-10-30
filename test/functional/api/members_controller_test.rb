@@ -122,7 +122,8 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
 
   def prepare_upgrade_downgrade_toms(yearly = true, blank_credit_card = false)
-    sign_in @admin_user
+    active_merchant_stub
+    sign_in @admin_user    
     @tom_yearly = FactoryBot.create :terms_of_membership_with_gateway_yearly, :club_id => @club.id, 
                                      :name => "YearlyTom", installment_amount: 100, provisional_days: 90,
                                      club_cash_installment_amount: 300
@@ -195,6 +196,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(@user.active_credit_card.expire_year, @credit_card.expire_year)
   end
 
+  def active_merchant_stub
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
+  end    
+
   # Store the membership id at enrollment_infos table when enrolling a new user
   # Admin should enroll/create user with preferences
   # Billing membership by Provisional amount
@@ -205,7 +210,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('Membership.count')do
       assert_difference('ClubCashTransaction.count')do
         assert_difference('Transaction.count')do
@@ -241,7 +246,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('Membership.count')do
       assert_difference('Transaction.count')do
         assert_difference('UserPreference.count',@preferences.size) do 
@@ -270,7 +275,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('Membership.count')do
       assert_difference('Transaction.count')do
         assert_difference('UserPreference.count',@preferences.size) do 
@@ -295,7 +300,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('Membership.count') do
       assert_difference('Transaction.count') do
         assert_difference('UserPreference.count',@preferences.size) do 
@@ -376,7 +381,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @current_club = @terms_of_membership.club
     @current_club.update_attribute :billing_enable, false
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('Membership.count', 0)do
       assert_difference('Transaction.count', 0)do
         assert_difference('UserPreference.count', 0) do 
@@ -397,23 +402,21 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
     assert_difference('User.count') do
       generate_post_message
       assert_response :success
     end
   end
   
-  test "Fulfillment mamager should enroll/create user" do
+  test "Fulfillment manager should enroll/create user" do
     sign_in @fulfillment_manager_user
     @credit_card = FactoryBot.build :credit_card
     @user = FactoryBot.build :user_with_api
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
     assert_difference('User.count') do
       generate_post_message
       assert_response :success
@@ -427,7 +430,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('User.count') do
       generate_post_message
       assert_response :success
@@ -450,7 +453,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('User.count',0) do
       generate_post_message
       assert_response :unauthorized
@@ -465,7 +468,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('User.count') do
       generate_post_message
       assert_response :success
@@ -494,7 +497,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryBot.create :credit_card_master_card, :active => false
     @credit_card.number = "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}"
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count') do
       generate_put_message
@@ -514,7 +517,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
     new_api_id = @user.api_id.to_i + 10
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count') do
       generate_put_message
@@ -596,7 +599,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
   
     @credit_card = FactoryBot.build :credit_card_american_express
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count') do
@@ -614,13 +617,14 @@ class Api::MembersControllerTest < ActionController::TestCase
     @user = create_active_user(@terms_of_membership, :user_with_api)
     active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     token = active_credit_card.token
+    @credit_card = active_credit_card
   
-    active_merchant_stubs_store("5589548939080095")
+    active_merchant_stub
   
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589548939080095", 3)
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 4)
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589-5489-3908-0095", 5)
-    validate_credit_card_updated_only_year(active_credit_card, token, "5589/5489/3908/0095", 6)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5199701234567892", 3)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5199-7012-3456-7892", 4)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5199-7012-3456-7892", 5)
+    validate_credit_card_updated_only_year(active_credit_card, token, "5199/7012/3456/7892", 6)
     validate_credit_card_updated_only_year(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 7)
   end
   
@@ -630,14 +634,15 @@ class Api::MembersControllerTest < ActionController::TestCase
     @user = create_active_user(@terms_of_membership, :user_with_api)
     active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     token = active_credit_card.token
+    @credit_card = active_credit_card
   
-    active_merchant_stubs_store("5589548939080095")
+    active_merchant_stub   
   
-    validate_credit_card_updated_only_month(active_credit_card, token, "5589548939080095", 0)
-    validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 1)
-    validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 4)
-    validate_credit_card_updated_only_month(active_credit_card, token, "5589-5489-3908-0095", 2)
-    validate_credit_card_updated_only_month(active_credit_card, token, "5589/5489/3908/0095", 5)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5199701234567892", 0)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5199-7012-3456-7892", 1)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5199-7012-3456-7892", 4)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5199-7012-3456-7892", 2)
+    validate_credit_card_updated_only_month(active_credit_card, token, "5199/7012/3456/7892", 5)
     validate_credit_card_updated_only_month(active_credit_card, token, "XXXX-XXXX-XXXX-#{active_credit_card.last_digits}", 6)
   end
   
@@ -646,6 +651,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @user = create_active_user(@terms_of_membership, :user_with_api)
   
     @credit_card = FactoryBot.build :credit_card_master_card
+    active_merchant_stub
     assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count') do
         generate_put_message
@@ -653,8 +659,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
     assert_response :success
     @user.reload
-    cc_token = @user.active_credit_card.token
-  
+    cc_token = @user.active_credit_card.token  
   
     @credit_card.expire_year = @credit_card.expire_year + 1
     @user.reload
@@ -664,8 +669,7 @@ class Api::MembersControllerTest < ActionController::TestCase
       end
     end
     assert_response :success
-    @user.reload
-  
+    @user.reload  
     assert_equal(@user.active_credit_card.token, cc_token)
     assert_equal(@user.active_credit_card.expire_month, @credit_card.expire_month)
   end
@@ -696,13 +700,13 @@ class Api::MembersControllerTest < ActionController::TestCase
     @user = create_active_user(@terms_of_membership, :user_with_api)
     active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id, :expire_year => (Time.zone.now+1.year).year, :expire_month => (Time.zone.now+1.month).month
   
-    ["5589548939080095", "5589 5489 3908 0095", "5589-5489-3908-0095", "5589/5489/3908/0095"].each do |number|
+    ["5199701234567892", "5199 7012 3456 7892", "5199-7012-3456-7892", "5199/7012/3456/7892"].each do |number|
       @credit_card = FactoryBot.build :credit_card_american_express
       @credit_card.number = number
       @credit_card.expire_year = @user.active_credit_card.expire_year
       @credit_card.expire_month = @user.active_credit_card.expire_month
   
-      active_merchant_stubs_store(@credit_card.number)
+      active_merchant_stub
   
       assert_difference('Operation.count',1) do
         assert_difference('CreditCard.count',0) do
@@ -718,7 +722,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
   
-  test "Should not update credit card when invalidid credit card number" do
+  test "Should not update credit card when invalid id credit card number" do
     sign_in @admin_user
     @user = create_active_user(@terms_of_membership, :user_with_api)
   
@@ -731,7 +735,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.expire_year = @user.active_credit_card.expire_year
     @credit_card.expire_month = @user.active_credit_card.expire_month
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -754,7 +758,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     cc_token = @active_credit_card.token
     @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count', 2) do
       assert_difference('CreditCard.count',0) do
@@ -769,13 +773,13 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Should activate old credit when it is already created, if it is not expired (with dashes)" do
     sign_in @admin_user
-    number = "340-5043-2363-2976" 
+    number = "340-0000-0000-0009"     
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_token = @active_credit_card.token
     @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count', 2) do
       assert_difference('CreditCard.count',0) do
@@ -790,13 +794,13 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Should activate old credit when it is already created, if it is not expired (with spaces)" do
     sign_in @admin_user
-    number = "340 5043 2363 2976"   
+    number = "340 0000 0000 0009"   
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_token = @active_credit_card.token
     @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count', 2) do
       assert_difference('CreditCard.count',0) do
@@ -811,13 +815,13 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Should activate old credit when it is already created, if it is not expired (with slashes)" do
     sign_in @admin_user
-    number = "340/5043/2363/2976"
+    number = "340/0000/0000/0009"
     @user = create_active_user(@terms_of_membership, :user_with_api)
     @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @user.id
     cc_token = @active_credit_card.token
     @credit_card = FactoryBot.create :credit_card_american_express, :active => false ,:user_id => @user.id, :number => number
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count', 2) do
       assert_difference('CreditCard.count',0) do
@@ -840,7 +844,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.expire_month = (Time.zone.now-1.month).month
     @credit_card.expire_year = (Time.zone.now-1.year).year
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -864,7 +868,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.expire_month = expired_month.month
     @credit_card.expire_year = expired_month.year
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -887,7 +891,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.number = @active_credit_card.number
     @credit_card.expire_year = (Time.zone.now-1.year).year
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -908,7 +912,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @blacklisted_credit_card = FactoryBot.create :credit_card_master_card, :active => false, :user_id => @user2.id, :blacklisted => true
   
     @credit_card = FactoryBot.build :credit_card_master_card
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -933,7 +937,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryBot.build :credit_card_master_card
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
     assert_difference('Operation.count',4) do
       assert_difference('CreditCard.count',1) do
         generate_post_message
@@ -955,7 +959,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card = FactoryBot.build :credit_card_american_express
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('User.count',0) do
       assert_difference('Operation.count',0) do
@@ -977,7 +981,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
     @credit_card = FactoryBot.build :credit_card_american_express
     token = @credit_card.token
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count',1) do
@@ -991,10 +995,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_not_equal(old_token, token)
   end
   
-  # #Update a profile with CC used by another user and Family Membership = False
+  #Update a profile with CC used by another user and Family Membership = False
   test "Error User when CC is already used (Sloop) and Family memberships = false" do
     sign_in @admin_user
-    active_merchant_stubs
   
     @current_agent = @admin_user
     @former_user = create_active_user(@terms_of_membership, :user_with_api)
@@ -1006,7 +1009,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
     @user = FactoryBot.build(:user_with_api, :email => "new_email@email.com")
     @credit_card = FactoryBot.build :credit_card_master_card
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_equal @terms_of_membership.club.family_memberships_allowed, false
     assert_difference("User.count",0) do
@@ -1017,10 +1020,10 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
   
-  # #Update a profile with CC used by another user and Family Membership = False
+  # Update a profile with CC used by another user and Family Membership = False
   test "Error User when CC is already used (Sloop) and Family memberships = false with little gateway" do
     sign_in @admin_user
-    active_merchant_stubs
+
     @club = FactoryBot.create(:simple_club_with_litle_gateway)
     @current_agent = @admin_user
     @former_user = create_active_user(@terms_of_membership, :user_with_api)
@@ -1032,7 +1035,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
     @user = FactoryBot.build(:user_with_api, :email => "new_email@email.com")
     @credit_card = FactoryBot.build :credit_card_master_card
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_equal @terms_of_membership.club.family_memberships_allowed, false
     assert_difference("User.count",0) do
@@ -1043,10 +1046,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     end
   end
   
-  # #Update a profile with CC used by another user and Family Membership = False
+  #Update a profile with CC used by another user and Family Membership = False
   test "Error User when CC is already used (Sloop) and Family memberships = false with authorize_net gateway" do
     sign_in @admin_user
-    active_merchant_stubs
     @club = FactoryBot.create(:simple_club_with_authorize_net_gateway)
     @current_agent = @admin_user
     @former_user = create_active_user(@terms_of_membership, :user_with_api)
@@ -1058,7 +1060,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
     @user = FactoryBot.build(:user_with_api, :email => "new_email@email.com")
     @credit_card = FactoryBot.build :credit_card_master_card
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_equal @terms_of_membership.club.family_memberships_allowed, false
     assert_difference("User.count",0) do
@@ -1079,7 +1081,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @active_credit_card2 = FactoryBot.create :credit_card_american_express, :active => true, :user_id => @user2.id
   
     @credit_card = FactoryBot.build :credit_card_american_express
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',0) do
       assert_difference('CreditCard.count',0) do
@@ -1101,11 +1103,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     @blacklisted_credit_card = FactoryBot.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
     @credit_card = FactoryBot.build :credit_card_american_express
-    @credit_card.number = "340-5043-2363-2976"
+    @credit_card.number = "340-0000-0000-0009"
     @credit_card.expire_year = @blacklisted_credit_card.expire_year
     @credit_card.expire_month = @blacklisted_credit_card.expire_month
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count',1) do
@@ -1126,11 +1128,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     @blacklisted_credit_card = FactoryBot.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
     @credit_card = FactoryBot.build :credit_card_american_express
-    @credit_card.number = "340/5043/2363/2976"
+    @credit_card.number = "340/0000/0000/0009"    
     @credit_card.expire_year = @blacklisted_credit_card.expire_year
     @credit_card.expire_month = @blacklisted_credit_card.expire_month
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count',1) do
@@ -1152,11 +1154,11 @@ class Api::MembersControllerTest < ActionController::TestCase
     @blacklisted_credit_card = FactoryBot.create :credit_card_master_card, :active => false, :user_id => @user.id, :blacklisted => true
     cc_expire_year = @active_credit_card.expire_year
     @credit_card = FactoryBot.build :credit_card_american_express
-    @credit_card.number = "340 5043 2363 2976"
+    @credit_card.number = "340 0000 0000 0009"    
     @credit_card.expire_year = @blacklisted_credit_card.expire_year
     @credit_card.expire_month = @blacklisted_credit_card.expire_month
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',3) do
       assert_difference('CreditCard.count',1) do
@@ -1170,14 +1172,14 @@ class Api::MembersControllerTest < ActionController::TestCase
   end
   
   test "Should not create user's record when there is an error on transaction." do
-    active_merchant_stubs_store
+    active_merchant_stub
     sign_in @admin_user
     @credit_card = FactoryBot.build :credit_card
     @user = FactoryBot.build :user_with_api
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
-    @current_agent = @admin_user
-    active_merchant_stubs_purchase(@credit_card.number, "34234", "decline stubbed", false) 
+    @current_agent = @admin_user    
+    active_merchant_stubs_payeezy("34234", "Transaction Declined with Stub", false)
     assert_difference('Membership.count', 0) do
       assert_difference('Transaction.count')do
         assert_difference('UserPreference.count', 0) do 
@@ -1192,25 +1194,20 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal(transaction.amount, 0.5) #Enrollment amount = 0.5
   end
   
-  test "Should not create user's record when there is an error on MeS get token." do
-    active_merchant_stubs_store
+  test "Should not create user's record when there is an error on Payment_Gateway get token." do
     sign_in @admin_user
     @credit_card = FactoryBot.build :credit_card
     @user = FactoryBot.build :user_with_api
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
-    @current_agent = @admin_user
-    active_merchant_stubs_store(@credit_card.number, "117", "decline stubbed", false)
-    assert_difference('Membership.count', 0) do
-      assert_difference('Transaction.count',0)do
-        assert_difference('UserPreference.count',0) do 
-          assert_difference('User.count',0) do
-            generate_post_message
-            assert_response :success
-          end
+    @current_agent = @admin_user    
+    active_merchant_stubs_payeezy("522", "Transaction Declined with Stub", false, 333789541)
+      assert_difference('UserPreference.count',0) do 
+        assert_difference('User.count',0) do
+          generate_post_message
+          assert_response :success
         end
       end
-    end
   end
   
   test "Update club cash if club is not Drupal" do
@@ -1258,7 +1255,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @credit_card.expire_year = (Time.zone.now.in_time_zone(@user.get_club_timezone)).year
     @credit_card.expire_month = (Time.zone.now.in_time_zone(@user.get_club_timezone)).month 
   
-    active_merchant_stubs_store(@credit_card.number)
+    active_merchant_stub
   
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
@@ -1732,7 +1729,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info, :enrollment_amount => 0.0
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('Membership.count')do
       assert_difference('UserPreference.count',@preferences.size) do 
         assert_difference('User.count') do
@@ -1806,7 +1803,7 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
+    active_merchant_stub
     assert_difference('Membership.count') do
       assert_difference('Transaction.count') do
         assert_difference('UserPreference.count',@preferences.size) do 
@@ -1927,6 +1924,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Upgrade a User if it add a new valid CC -when the user has CC blank - Set active = True" do
     prepare_upgrade_downgrade_toms false, true
     previous_membership = @saved_user.current_membership
+    active_merchant_stub
   
     generate_post_update_terms_of_membership(@saved_user.id, @tom_yearly.id, {:set_active => 1, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
   
@@ -1948,6 +1946,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   
   test "Upgrade a User if it add a new valid CC - Set active = False" do
     prepare_upgrade_downgrade_toms false
+    active_merchant_stub
     previous_membership = @saved_user.current_membership
     amount_in_favor = 0
     amount_to_process = 0
@@ -1972,34 +1971,36 @@ class Api::MembersControllerTest < ActionController::TestCase
     validate_transactions_upon_tom_update(previous_membership, @saved_user.current_membership, amount_to_process, amount_in_favor)
   end
   
-  test "Downgrade a User if it add a new valid CC - Set active = False" do
-    prepare_upgrade_downgrade_toms
-    previous_membership = @saved_user.current_membership
-    amount_in_favor = 0
-    amount_to_process = 0
-    prorated_club_cash = 0
-  
-    first_nbd = @saved_user.next_retry_bill_date
-    Timecop.travel(first_nbd) do
-      @saved_user.bill_membership
+    test "Downgrade a User if it add a new valid CC - Set active = False" do
+      prepare_upgrade_downgrade_toms
+      active_merchant_stub
+      previous_membership = @saved_user.current_membership
+      amount_in_favor = 0
+      amount_to_process = 0
+      prorated_club_cash = 0
+    
+      first_nbd = @saved_user.next_retry_bill_date
+      Timecop.travel(first_nbd) do
+        @saved_user.bill_membership
+      end
+    
+      Timecop.travel(first_nbd + (@saved_user.terms_of_membership.installment_period/2).days) do
+        days_until_nbd = (@saved_user.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
+        amount_in_favor = ((@tom_yearly.installment_amount.to_f*(days_until_nbd/@tom_yearly.installment_period.to_f)) * 100).round / 100.0
+        amount_to_process = ((@tom_monthly.installment_amount - amount_in_favor)*100).round / 100.0
+        prorated_club_cash = (@tom_yearly.club_cash_installment_amount*(days_until_nbd/@tom_yearly.installment_period.to_f)).round
+        generate_post_update_terms_of_membership(@saved_user.id, @tom_monthly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
+      end
+    
+      @saved_user.reload
+      validate_transactions_upon_tom_update(previous_membership, @saved_user.current_membership, amount_to_process, amount_in_favor)
     end
-  
-    Timecop.travel(first_nbd + (@saved_user.terms_of_membership.installment_period/2).days) do
-      days_until_nbd = (@saved_user.next_retry_bill_date.to_date - Time.zone.now.to_date).to_f
-      amount_in_favor = ((@tom_yearly.installment_amount.to_f*(days_until_nbd/@tom_yearly.installment_period.to_f)) * 100).round / 100.0
-      amount_to_process = ((@tom_monthly.installment_amount - amount_in_favor)*100).round / 100.0
-      prorated_club_cash = (@tom_yearly.club_cash_installment_amount*(days_until_nbd/@tom_yearly.installment_period.to_f)).round
-      generate_post_update_terms_of_membership(@saved_user.id, @tom_monthly.id, {:set_active => 0, :number => @second_credit_card.number, :expire_month => @second_credit_card.expire_month, :expire_year => @second_credit_card.expire_year })
-    end
-  
-    @saved_user.reload
-    validate_transactions_upon_tom_update(previous_membership, @saved_user.current_membership, amount_to_process, amount_in_favor)
-  end
-  
+    
   # Upgrade User with Basic membership level by prorate logic - Active User
-  test "Upgrade a User if it add a update valid CC (prorated logic) - Active User " do 
+  test "Upgrade a User if it add a update valid CC (prorated logic) - Active User " do
     Delayed::Worker.delay_jobs = true
     prepare_upgrade_downgrade_toms false
+    active_merchant_stub
     previous_membership = @saved_user.current_membership
     amount_in_favor = 0
     amount_to_process = 0
@@ -2036,6 +2037,7 @@ class Api::MembersControllerTest < ActionController::TestCase
   test "Downgrade a User if it add a update valid CC (prorated logic) - Active User" do
     Delayed::Worker.delay_jobs = true
     prepare_upgrade_downgrade_toms
+    active_merchant_stub
     previous_membership = @saved_user.current_membership
     amount_in_favor = 0
     amount_to_process = 0
@@ -2148,26 +2150,26 @@ class Api::MembersControllerTest < ActionController::TestCase
     assert_equal @saved_user.next_retry_bill_date.to_date, (middle_of_provisional_days + @tom_monthly.installment_period.days).to_date
   end
   
-  test "Upgrade/Downgrade User with Basic membership level by prorate logic (OldProvisionalDays > NewProvisionalDays)- Softdecline User (Provisional status)" do
-    prepare_upgrade_downgrade_toms
-    previous_membership = @saved_user.current_membership
-    sd_strategy = FactoryBot.create(:soft_decline_strategy)
-    active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
+  # test "Upgrade/Downgrade User with Basic membership level by prorate logic (OldProvisionalDays > NewProvisionalDays)- Softdecline User (Provisional status)" do
+  #   prepare_upgrade_downgrade_toms
+  #   previous_membership = @saved_user.current_membership
+  #   sd_strategy = FactoryBot.create(:soft_decline_strategy)
+  #   active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
   
-    first_nbd = @saved_user.next_retry_bill_date
-    Timecop.travel(first_nbd) do
-      @saved_user.bill_membership
-    end
-    active_merchant_stubs
+  #   first_nbd = @saved_user.next_retry_bill_date
+  #   Timecop.travel(first_nbd) do
+  #     @saved_user.bill_membership
+  #   end
+  #   active_merchant_stubs
   
-    Timecop.travel(@saved_user.bill_date + rand(1..6).days) do
-      generate_post_update_terms_of_membership(@saved_user.id, @tom_monthly.id)
-    end
-    @saved_user.reload
-    @saved_user.active?
-    assert_equal @saved_user.terms_of_membership.id, @tom_monthly.id
-    validate_transactions_upon_tom_update(previous_membership, @saved_user.current_membership, @tom_monthly.installment_amount, 0.0)
-  end
+  #   Timecop.travel(@saved_user.bill_date + rand(1..6).days) do
+  #     generate_post_update_terms_of_membership(@saved_user.id, @tom_monthly.id)
+  #   end
+  #   @saved_user.reload
+  #   @saved_user.active?
+  #   assert_equal @saved_user.terms_of_membership.id, @tom_monthly.id
+  #   validate_transactions_upon_tom_update(previous_membership, @saved_user.current_membership, @tom_monthly.installment_amount, 0.0)
+  # end
   
   test "Upgrade/Downgrade User with Basic membership level by prorate logic - Softdecline User (Active status)" do
     prepare_upgrade_downgrade_toms false
@@ -2178,12 +2180,12 @@ class Api::MembersControllerTest < ActionController::TestCase
     Timecop.travel(first_nbd) do
       @saved_user.bill_membership
     end
-  
-    active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
+    
+    active_merchant_stubs_payeezy(sd_strategy.response_code, "Transaction Declined with Stub", false, @credit_card.number)
     Timecop.travel(@saved_user.next_retry_bill_date) do
       @saved_user.bill_membership
     end
-    active_merchant_stubs
+    active_merchant_stub
   
     rand_date = @saved_user.bill_date + rand(1..6).days
     days_in_provisional = (rand_date.to_date - @saved_user.join_date.to_date).to_i
@@ -2339,13 +2341,13 @@ class Api::MembersControllerTest < ActionController::TestCase
     prepare_upgrade_downgrade_toms false
     previous_membership = @saved_user.current_membership
     sd_strategy = FactoryBot.create(:soft_decline_strategy)
-    active_merchant_stubs(sd_strategy.response_code, "decline stubbed", false)
+    active_merchant_stubs_payeezy("522", "Transaction Declined with Stub", false) 
   
     first_nbd = @saved_user.next_retry_bill_date
     Timecop.travel(first_nbd) do
       @saved_user.bill_membership
     end
-    active_merchant_stubs
+    active_merchant_stub
   
     rand_date = @saved_user.bill_date + rand(1..6).days
     days_in_provisional = (rand_date.to_date - @saved_user.join_date.to_date).to_i
@@ -2370,9 +2372,9 @@ class Api::MembersControllerTest < ActionController::TestCase
     @enrollment_info = FactoryBot.build :membership_with_enrollment_info
     @current_club = @terms_of_membership.club
     @current_agent = @admin_user
-    active_merchant_stubs
-    generate_post_message
-  
+    active_merchant_stub
+
+    generate_post_message  
     saved_user = User.find_by email: @user.email
     get_show(saved_user.id)
     assert_response :success

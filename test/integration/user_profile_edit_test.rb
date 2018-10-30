@@ -25,7 +25,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     end
 
     if create_user_by_sloop
-      active_merchant_stubs
+      active_merchant_stub
       unsaved_user =  FactoryBot.build(:provisional_user_with_cc, :club_id => @club.id, :email => 'testing@withthisemail.com')
       credit_card = FactoryBot.build(:credit_card)
       enrollment_info = FactoryBot.build(:membership_with_enrollment_info_without_enrollment_amount)
@@ -46,6 +46,10 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
     }
     click_link_or_button 'Set wrong phone number'
     confirm_ok_js
+  end
+
+  def active_merchant_stub
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true)
   end
 
   ###########################################################
@@ -574,7 +578,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
   end
 
   test "user save the sale full save" do
-    active_merchant_stubs
+    active_merchant_stub
     setup_user
     bill_user(@saved_user, false)
     
@@ -588,7 +592,7 @@ class UserProfileEditTest < ActionDispatch::IntegrationTest
 
   test "See operations on CS" do
     setup_user(false, true)
-    active_merchant_stubs
+    active_merchant_stub
     @saved_user.current_membership.join_date = Time.zone.now-3.day
 
     final_amount = (@terms_of_membership_with_gateway.installment_amount / 2);

@@ -42,8 +42,8 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     @terms_of_membership_with_gateway_to_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership_with_gateway.update_attributes(:if_cannot_bill => "downgrade_tom", :downgrade_tom_id => @terms_of_membership_with_gateway_to_downgrade.id)
     @saved_user = create_user(@unsaved_user, credit_card, @terms_of_membership_with_gateway.name, true)
-    
-    active_merchant_stubs_process(@hd_decline.response_code, @hd_decline.notes)
+ 
+    active_merchant_stubs_payeezy(@hd_decline.response_code, @hd_decline.notes, false, credit_card.number)
     
     @saved_user.update_attribute(:next_retry_bill_date, Time.zone.now)
     prior_status = @saved_user.status
@@ -53,7 +53,7 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     within('.nav-tabs'){ click_on "Operations" }
     within("#operations_table")do
       assert page.has_content?("Downgraded member from TOM(#{@terms_of_membership_with_gateway.id}) to TOM(#{@terms_of_membership_with_gateway_to_downgrade.id})")
-      assert page.has_content?("Hard Declined: 9997 mes: Credit card is blank we wont bill")
+      assert page.has_content?("Hard Declined: 9997 payeezy: Credit card is blank we wont bill")
     end
     within('.nav-tabs'){ click_on "Transaction" }
     within('#transactions_table'){ assert page.has_content? "Sale : Credit card is blank we wont bill" }
@@ -102,14 +102,9 @@ class UsersCancelTest < ActionDispatch::IntegrationTest
     @saved_user.update_attribute(:recycled_times, 4)
     @saved_user.update_attribute(:next_retry_bill_date, Time.zone.now)
 
-    answer = ActiveMerchant::Billing::Response.new(0, @sd_decline.notes, 
-      { "transaction_id"=>"c25ccfecae10384698a44360444dead8", "error_code"=> @sd_decline.response_code, 
-       "auth_response_text"=>"No Match", "avs_result"=>"N", "auth_code"=>"T5768H" }, 
-      { "code"=>"N", "message"=>"Street address and postal code do not match.", 
-        "street_match"=>"N", "postal_match"=>"N" })
-    ActiveMerchant::Billing::MerchantESolutionsGateway.any_instance.stubs(:purchase).returns(answer)
+    active_merchant_stubs_payeezy(@sd_decline.response_code, @sd_decline.notes, false, credit_card.number)
+
     answer = @saved_user.bill_membership
-  
     operation = @saved_user.operations.where("operation_type = ?", Settings.operation_types.downgrade_user).first
     assert_equal operation.description, "Downgraded member from TOM(#{@terms_of_membership_with_gateway.id}) to TOM(#{@terms_of_membership_with_gateway_to_downgrade.id})"
     assert_equal @saved_user.current_membership.terms_of_membership_id, @terms_of_membership_with_gateway_to_downgrade.id

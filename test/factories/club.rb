@@ -48,7 +48,7 @@ FactoryBot.define do
                         <p>There seems to be a problem with your payment information.</p>"
     result_page_footer "Privacy Policy"
     after(:create) do |club| 
-      club.payment_gateway_configurations << FactoryBot.build(:payment_gateway_configuration)
+      club.payment_gateway_configurations << FactoryBot.build(:payeezy_payment_gateway_configuration)
       club.products << FactoryBot.create(:product)
     end
   end  
@@ -154,7 +154,7 @@ FactoryBot.define do
     family_memberships_allowed true
     time_zone { TZInfo::Timezone.all.sample.name }
     fulfillment_tracking_prefix 'T'
-    after(:create) { |club| club.payment_gateway_configurations << FactoryBot.build(:payment_gateway_configuration) }
+    after(:create) { |club| club.payment_gateway_configurations << FactoryBot.build(:payeezy_payment_gateway_configuration) }
     association :partner
     after(:create) { |club| FactoryBot.create(:product, club_id: club.id) }
   end  
@@ -172,8 +172,8 @@ FactoryBot.define do
     api_password { Faker::Internet.user_name }
     family_memberships_allowed false
     fulfillment_tracking_prefix 'T'
-    association :partner
-    after(:create) { |club| club.payment_gateway_configurations << FactoryBot.build(:payment_gateway_configuration) }
+    association :partner  
+    after(:create) { |club| club.payment_gateway_configurations << FactoryBot.build(:payeezy_payment_gateway_configuration) }
     after(:create) { |club| FactoryBot.create(:product, club_id: club.id) }
   end
 

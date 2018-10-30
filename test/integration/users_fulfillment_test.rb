@@ -86,6 +86,10 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
     fulfillment_file.generateXLS(change_status)
   end
 
+  def active_merchant_stub
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true)
+  end    
+
   ##########################################################
   ##TESTS
   ##########################################################
@@ -1533,7 +1537,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #Search fulfillment at "Not Processed" status from Initial Date to End Date
   test "Search fulfillment at Not Processed status by 'all times' checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1561,7 +1565,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #Search fulfillment at "In Process" status from Initial Date to End Date
   test "Search fulfillment at 'In Process' status by 'all times' checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1592,7 +1596,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #Search fulfillment at "On Hold" status from Initial Date to End Date
   test "Search fulfillment at 'On Hold' status by 'all times' checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1622,7 +1626,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   #Search fulfillment at "Sent" status from Initial Date to End Date
   test "Search fulfillment at 'Sent' status by 'all times' checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1652,7 +1656,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   # Search fulfillment at "Out of Stock" status from Initial Date to End Date
   test "Search fulfillment at 'Out of Stock' status by 'all times' checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1682,7 +1686,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   # Search fulfillment at "Returned" status from Initial Date to End Date
   test "Search fulfillment at 'Returned' status by 'all times' checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1712,7 +1716,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
   # Search fulfillment at "Bad address" status from Initial Date to End Date
   test "Search fulfillment at 'Bad address' status by 'all times' checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1741,7 +1745,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Update the status of all the fulfillments - In Process selecting the All results checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1780,7 +1784,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Update the status of all the fulfillments - Not processed selecting the All results checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1818,7 +1822,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Update the status of all the fulfillments - On Hold selecting the All results checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1857,7 +1861,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Update the status of all the fulfillments - Sent selecting the All results checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1896,7 +1900,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Update the status of all the fulfillments - Out of Stock selecting the All results checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1935,7 +1939,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Update the status of all the fulfillments - Returned selecting the All results checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -1974,7 +1978,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Update the status of all the fulfillments - Bad address selecting the All results checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2013,7 +2017,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
   test "Update the status of the fulfillments - Not processed using individual checkboxes" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2049,7 +2053,7 @@ class UsersFulfillmentTest < ActionDispatch::IntegrationTest
 
 test "Update the status of all the fulfillments - In process using individual checkboxes" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2086,7 +2090,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Update the status of all the fulfillments - On hold using individual checkboxes" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2123,7 +2127,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Update the status of all the fulfillments - Sent using individual checkboxes" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2160,7 +2164,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Update the status of all the fulfillments - Out of Stock using individual checkboxes" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2197,7 +2201,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Update the status of all the fulfillments - Returned using individual checkboxes" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2234,7 +2238,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Update the status of all the fulfillments - Bad address using individual checkboxes" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2271,7 +2275,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Error message if changing from one status to same status" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2285,7 +2289,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   
   test "Error message if changing from one status to 'blank' status" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2306,7 +2310,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   # See "Create XLS file" button - All time checkbox
   test "Create file at 'all time' checkbox" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2322,7 +2326,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Create file at Date range" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2336,7 +2340,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Create a fulfillment file with all times and with sloop product" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     product = Product.last
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info, :product_sku => "#{product.sku}")
     create_user_throught_sloop(enrollment_info)
@@ -2350,7 +2354,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Create a fulfillment file with initial-end dates and with sloop product" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     product = Product.last
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info, :product_sku => product.sku)
     create_user_throught_sloop(enrollment_info)
@@ -2364,7 +2368,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Create a fulfillment file with initial-end dates and with sloop product 2" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2404,7 +2408,7 @@ test "Update the status of all the fulfillments - In process using individual ch
   # Mark as sent - fulfillment file
   test "Check fulfillment file at sent status" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2458,7 +2462,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Agents can not change fulfillment status from User Profile" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
     5.times{FactoryBot.create(:fulfillment, :user_id => @saved_user.id, :product_sku => @product.sku, :product_id => @product.id, :club_id => @club.id)}
@@ -2543,7 +2547,7 @@ test "Update the status of all the fulfillments - In process using individual ch
     setup_user(false)
     @club2 = FactoryBot.create(:simple_club_with_gateway)
 
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2625,7 +2629,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Search Fulfillments by sku checking all times" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 
@@ -2658,7 +2662,7 @@ test "Update the status of all the fulfillments - In process using individual ch
 
   test "Search Fulfillments by sku selecting dates" do
     setup_user(false)
-    active_merchant_stubs
+    active_merchant_stub
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     create_user_throught_sloop(enrollment_info)
 

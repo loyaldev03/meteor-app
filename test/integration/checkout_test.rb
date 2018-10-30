@@ -15,6 +15,7 @@ class CheckoutTest < ActionDispatch::IntegrationTest
     @campaign = FactoryBot.create(:campaign, :club_id => @club.id, :terms_of_membership_id => @terms_of_membership.id)       
     @prospect = FactoryBot.create(:prospect, :club_id => @club.id, :campaign_id => @campaign.id, :terms_of_membership_id => @terms_of_membership.id)
     @credit_card = FactoryBot.create :credit_card_american_express  
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
     @product = FactoryBot.create(:random_product, :club_id => @club.id)
     @campaign.products << @product 
     @campaign1 = FactoryBot.create(:campaign_with_checkout_settings, club_id: @club.id, terms_of_membership_id: @terms_of_membership.id)
@@ -33,7 +34,7 @@ class CheckoutTest < ActionDispatch::IntegrationTest
   def fill_in_credit_card(number, expire_month, expire_year)
     fill_in 'credit_card[number]', with: number
     select expire_month, :from => 'credit_card[expire_month]'
-    select expire_year, :from => 'credit_card[expire_year]'   
+    select expire_year, :from => 'credit_card[expire_year]'  
   end
 
   test "create a user and show Thanks You web page" do   

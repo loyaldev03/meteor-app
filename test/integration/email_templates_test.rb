@@ -52,7 +52,7 @@ class EmailTemplatesTest < ActionDispatch::IntegrationTest
   test 'Show all user communications - Logged by General Admin' do
     sign_in_as(@admin_agent)
     visit terms_of_memberships_path(@partner.prefix, @club.name)
-    @tom2 = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'TOM for Email Templates Test2')
+    @tom2 = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id, name: 'Email Templates')
     communication = FactoryBot.create(:email_template, terms_of_membership_id: @tom2.id, name: "EmailTemplateTest")
     within('#terms_of_memberships_table') do
       within("tr", text: @tom.name) do

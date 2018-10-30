@@ -75,7 +75,6 @@ class RolesTest < ActionDispatch::IntegrationTest
     end
    end
 
-
   ##############################################################
   #ADMIN
   ##############################################################
@@ -758,7 +757,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     }
 
     @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
-    FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+    credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
     validate_view_user_base(@saved_user)
 
     assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
@@ -773,9 +772,10 @@ class RolesTest < ActionDispatch::IntegrationTest
     assert find(:xpath, "//a[@id='link_user_add_club_cash']")[:class].exclude? 'disabled'
     within('.nav-tabs'){click_on 'Credit Cards'}
     within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
-  
     @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
-    active_merchant_stubs
+
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
+
     @saved_user.bill_membership
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within('.nav-tabs'){click_on 'Transactions'}
@@ -809,7 +809,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       }
 
       @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
-      FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+      credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
       assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
@@ -826,7 +826,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
     
       @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
-      active_merchant_stubs
+      active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
       @saved_user.bill_membership
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
       within('.nav-tabs'){click_on 'Transactions'}
@@ -852,7 +852,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       }
 
       @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
-      FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+      credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
       validate_view_user_base(@saved_user)
 
       assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
@@ -869,7 +869,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
     
       @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
-      active_merchant_stubs
+      active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
       @saved_user.bill_membership
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
       within('.nav-tabs'){click_on 'Transactions'}
@@ -885,7 +885,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     test "club role agency available actions" do
       setup_user
       setup_agent_with_club_role(@club, 'agency')
-      FactoryBot.create(:credit_card_american_express, :active => false ,:user_id => @saved_user.id)
+      credit_card = FactoryBot.create(:credit_card_american_express, :active => false ,:user_id => @saved_user.id)
 
       within('#my_clubs_table'){
         assert page.has_selector?("#users")
@@ -913,7 +913,7 @@ class RolesTest < ActionDispatch::IntegrationTest
       within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].include? 'disabled' }
     
       @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
-      active_merchant_stubs
+      active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
       within('.nav-tabs'){click_on 'Transactions'}
       within('#transactions_table'){ assert find(:xpath, "//a[@id='refund']")[:class].include? 'disabled' }
@@ -948,7 +948,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     }
 
     @saved_user = create_user(unsaved_user,nil,@terms_of_membership_with_gateway.name)
-    FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
+    credit_card = FactoryBot.create(:credit_card_american_express, :user_id => @saved_user.id, :active => false)
     validate_view_user_base(@saved_user)
 
     assert find(:xpath, "//a[@id='edit']")[:class].exclude? 'disabled'
@@ -965,7 +965,7 @@ class RolesTest < ActionDispatch::IntegrationTest
     within('#credit_cards'){ assert find(:xpath, "//input[@id='activate_credit_card_button']")[:class].exclude? 'disabled' }
   
     @saved_user.update_attribute :next_retry_bill_date, Time.zone.now
-    active_merchant_stubs
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
     @saved_user.bill_membership
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     within('.nav-tabs'){click_on 'Transactions'}

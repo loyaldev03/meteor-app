@@ -7,21 +7,21 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @terms_of_membership_with_gateway_yearly = FactoryBot.create(:terms_of_membership_with_gateway_yearly, :club_id => @club.id)
     @user = FactoryBot.build(:user)
-    @credit_card = FactoryBot.build(:credit_card)
+    @credit_card = FactoryBot.build(:credit_card_master_card)
     @sd_strategy = FactoryBot.create(:soft_decline_strategy)
     @sd_mes_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "054")
     @sd_litle_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "305", :gateway => "litle")
     @sd_auth_net_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "316", :gateway => "authorize_net")
     @sd_first_data_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "605", :gateway => "first_data")
     @sd_stripe_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "card_declined", :gateway => "stripe")
-    @sd_payeezy_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "302", :gateway => "payeezy")
-    @hd_strategy = FactoryBot.create(:hard_decline_strategy)
-    FactoryBot.create(:without_grace_period_decline_strategy_monthly)
-    FactoryBot.create(:without_grace_period_decline_strategy_yearly)
+    @sd_payeezy_expired_strategy = FactoryBot.create(:soft_decline_strategy, :response_code => "522", :gateway => "payeezy")
+    @hd_strategy = FactoryBot.create(:hard_decline_strategy, :response_code => "502", :gateway => "payeezy")
+    FactoryBot.create(:without_grace_period_decline_strategy_monthly, :response_code => "9997", :gateway => "payeezy")
+    FactoryBot.create(:without_grace_period_decline_strategy_yearly, :response_code => "9997", :gateway => "payeezy")
   end
 
   def enroll_user(tom, amount=23, cc_blank=false, cc_card = nil)
-    active_merchant_stubs
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
     credit_card = cc_card.nil? ? @credit_card : cc_card
     answer = User.enroll(tom, @current_agent, amount, 
       { first_name: @user.first_name,
@@ -51,7 +51,7 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Enrollment with approval" do
     @tom_approval = FactoryBot.create(:terms_of_membership_with_gateway_needs_approval, :club_id => @club.id)
-    active_merchant_stubs
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
     assert_difference('Operation.count',2) do
       assert_no_difference('Fulfillment.count') do
         answer = User.enroll(@tom_approval, @current_agent, 23, 
@@ -73,7 +73,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Enrollment without approval" do
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     assert_difference('Operation.count',4) do   #EnrollBilling, club cash and EnrollmentInfo operations, fulfillment_creation
       assert_difference('Transaction.count',1) do
         assert_difference('Fulfillment.count') do
@@ -89,8 +89,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "controlled refund (refund completely a transaction)" do
-    active_merchant_stubs_store
-    active_merchant_stubs_purchase
+    active_merchant_stubs_payeezy
     active_user = create_active_user(@terms_of_membership)
     amount = @terms_of_membership.installment_amount
     active_user.update_attribute :next_retry_bill_date, Time.zone.now
@@ -114,7 +113,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Monthly user billed 24 months" do 
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
 
     user = enroll_user(@terms_of_membership)
     nbd = user.next_retry_bill_date
@@ -155,7 +154,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Yearly user billed 4 years" do 
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
 
     # if we use 5 years take care to have a credit card that does not get expired.
     @credit_card.expire_year = Time.zone.now.year + 7
@@ -214,20 +213,19 @@ class TransactionTest < ActiveSupport::TestCase
   ######################################
   ############ DECLINE ###################
   test "Monthly user SD until gets HD" do 
-    active_merchant_stubs_store
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
  
     user = enroll_user(@terms_of_membership)
     nbd = user.bill_date
     bill_date = user.bill_date
     
-    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+    active_merchant_stubs_payeezy(@sd_payeezy_expired_strategy.response_code, "decline stubbed", false)
 
     # bill users the day trial days expires. User should be billed but SD'd
     Timecop.travel(Time.zone.now + user.terms_of_membership.provisional_days.days) do
       TasksHelpers.bill_all_members_up_today
       user.reload
-      nbd = nbd + @sd_strategy.days.days
+      nbd = nbd + @sd_payeezy_expired_strategy.days.days
       assert_equal nbd.to_date, user.next_retry_bill_date.to_date
       assert_equal bill_date, user.bill_date
       assert_not_equal user.bill_date, user.next_retry_bill_date
@@ -249,7 +247,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_equal 0, user.recycled_times
           assert_equal 1, user.operations.where(operation_type: Settings.operation_types.membership_billing_hard_decline_by_max_retries).count
         else
-          nbd = nbd + @sd_strategy.days.days
+          nbd = nbd + @sd_payeezy_expired_strategy.days.days
           assert_equal nbd.to_date, user.next_retry_bill_date.to_date
           assert_equal bill_date, user.bill_date
           assert_not_equal user.bill_date, user.next_retry_bill_date
@@ -261,8 +259,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Monthly user SD until gets HD will downgrade the user" do 
-    active_merchant_stubs_store
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     @terms_of_membership_for_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id)
     @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
     @terms_of_membership.if_cannot_bill = "downgrade_tom"
@@ -272,12 +269,12 @@ class TransactionTest < ActiveSupport::TestCase
     nbd = user.bill_date
     bill_date = user.bill_date
     
-    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+    active_merchant_stubs_payeezy(@sd_payeezy_expired_strategy.response_code, "decline stubbed", false)
     # bill users the day trial days expires. User should be billed but SD'd
     Timecop.travel(Time.zone.now + user.terms_of_membership.provisional_days.days) do
       user.bill_membership
       user.reload
-      nbd = nbd + @sd_strategy.days.days
+      nbd = nbd + @sd_payeezy_expired_strategy.days.days
       assert_equal nbd.to_date, user.next_retry_bill_date.to_date
       assert_equal bill_date, user.bill_date
       assert_not_equal user.bill_date, user.next_retry_bill_date
@@ -297,7 +294,7 @@ class TransactionTest < ActiveSupport::TestCase
           assert_equal 1, user.operations.where(operation_type: Settings.operation_types.downgraded_because_of_hard_decline_by_max_retries).count
           assert_equal 0, user.recycled_times
         else
-          nbd = nbd + @sd_strategy.days.days
+          nbd = nbd + @sd_payeezy_expired_strategy.days.days
           assert_equal nbd.to_date, user.next_retry_bill_date.to_date
           assert_equal bill_date, user.bill_date
           assert_not_equal user.bill_date, user.next_retry_bill_date
@@ -309,8 +306,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Downgrade due to soft decline should update NRBD and BD according to new Terms of membership provisional days." do 
-    active_merchant_stubs_store
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     @terms_of_membership_for_downgrade = FactoryBot.create(:terms_of_membership_for_downgrade, :club_id => @club.id, provisional_days: 30)
     @terms_of_membership.downgrade_tom_id = @terms_of_membership_for_downgrade.id
     @terms_of_membership.if_cannot_bill = "downgrade_tom"
@@ -323,9 +319,9 @@ class TransactionTest < ActiveSupport::TestCase
     end
     user.reload
     
-    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+    active_merchant_stubs_payeezy(@sd_payeezy_expired_strategy.response_code, "decline stubbed", false)
 
-    (@sd_strategy.max_retries + 1).times do |time| 
+    (@sd_payeezy_expired_strategy.max_retries + 1).times do |time| 
       Timecop.travel(user.next_retry_bill_date) do
         TasksHelpers.bill_all_members_up_today
         user.reload
@@ -336,16 +332,15 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with SD is re-scheduled" do 
-    active_merchant_stubs_store
     assert_difference('Operation.count', 3) do
       assert_difference('Transaction.count',1) do
         active_user = create_active_user(@terms_of_membership)
-        active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
+        active_merchant_stubs_payeezy(@sd_payeezy_expired_strategy.response_code, "decline stubbed", false)
         nbd = active_user.bill_date
         answer = active_user.bill_membership
         active_user.reload
         assert !active_user.lapsed?, "user cant be lapsed"
-        assert_equal active_user.next_retry_bill_date.to_date.to_s, @sd_strategy.days.days.from_now.to_date.to_s, "next_retry_bill_date should #{@sd_strategy.days.days.from_now}"
+        assert_equal active_user.next_retry_bill_date.to_date.to_s, @sd_payeezy_expired_strategy.days.days.from_now.to_date.to_s, "next_retry_bill_date should #{@sd_payeezy_expired_strategy.days.days.from_now}"
         assert_equal active_user.bill_date.to_s, nbd.to_s, "bill_date should not be touched #{nbd}"
         assert_equal active_user.recycled_times, 1, "recycled_times should be 1"
         assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing_soft_decline, transaction_type: 'sale')
@@ -354,7 +349,6 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Chargeback an user" do 
-    active_merchant_stubs_store
     active_user = create_active_user(@terms_of_membership)
     nbd = active_user.bill_date
     answer = active_user.bill_membership
@@ -362,7 +356,8 @@ class TransactionTest < ActiveSupport::TestCase
     assert !active_user.lapsed?, "user cant be lapsed"
     
     trans = Transaction.where("operation_type = 101").first
-    active_user.chargeback!(trans,{:reason => "testing", :transaction_amount => trans.amount, :auth_code => trans.response_auth_code, adjudication_date: (Time.zone.now).to_s }, "testing")
+    active_user.chargeback!(trans,{"Received Date"=>(Time.zone.now).to_s, "Transaction Date"=>"2018-06-17", "Cardholder Number"=>"4815821234560709", "Invoice Number"=>"ESPINDOLACRU", "Chargeback Amount"=>trans.amount, "Chargeback Category"=>"DEBITED", "Chargeback Status"=>"OPEN", "Chargeback Reason Code"=>"1040","Chargeback Description"=>"Fraud - Card Absent Environment"})
+
     chargeback_trans = Transaction.find_by_operation_type 110
     assert_equal chargeback_trans.amount, -trans.amount
   end
@@ -372,6 +367,7 @@ class TransactionTest < ActiveSupport::TestCase
     blank_cc = FactoryBot.create( :blank_credit_card, :user_id => active_user.id )
 
     nbd = active_user.bill_date
+   
     assert_difference('Operation.count', 5) do
       assert_difference('Communication.count', 2) do
         assert_difference('Transaction.count', 1) do
@@ -412,12 +408,11 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with SD reaches the recycle limit, and HD cancels user." do 
-    active_merchant_stubs_store
     assert_difference('Operation.count', 6) do
       assert_difference('Communication.count', 2) do
         assert_difference('Transaction.count',1) do
           active_user = create_active_user(@terms_of_membership)
-          active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
+          active_merchant_stubs_payeezy(@sd_payeezy_expired_strategy.response_code, "decline stubbed", false) 
           amount = @terms_of_membership.installment_amount
           active_user.recycled_times = 4
           active_user.save
@@ -435,9 +430,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing with HD cancels user" do 
-    active_merchant_stubs_store
     active_user = create_active_user(@terms_of_membership)
-    active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
+    active_merchant_stubs_payeezy(@hd_strategy.response_code, "decline stubbed", false)
     assert_difference('Operation.count', 5) do
       assert_difference('Communication.count', 2) do
         assert_difference('Transaction.count',1) do
@@ -460,11 +454,10 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership.if_cannot_bill = "downgrade_tom"
     @terms_of_membership.save
 
-    active_merchant_stubs_store
     assert_difference('Operation.count', 5) do
       assert_difference('Transaction.count',1) do
         active_user = create_active_user(@terms_of_membership)
-        active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false) 
+        active_merchant_stubs_payeezy(@sd_payeezy_expired_strategy.response_code, "decline stubbed", false) 
         amount = @terms_of_membership.installment_amount
         active_user.recycled_times = 4
         active_user.save
@@ -485,11 +478,10 @@ class TransactionTest < ActiveSupport::TestCase
     @terms_of_membership.if_cannot_bill = "downgrade_tom"
     @terms_of_membership.save
 
-    active_merchant_stubs_store
     assert_difference('Operation.count', 5) do
       assert_difference('Transaction.count',1) do
         active_user = create_active_user(@terms_of_membership)
-        active_merchant_stubs(@hd_strategy.response_code, "decline stubbed", false)
+        active_merchant_stubs_payeezy(@hd_strategy.response_code, "decline stubbed", false)
         amount = @terms_of_membership.installment_amount
         answer = active_user.bill_membership
         active_user.reload
@@ -501,9 +493,8 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing declined, but there is no decline rule. Send email" do 
-    active_merchant_stubs_store
     active_user = create_active_user(@terms_of_membership)
-    active_merchant_stubs("34234", "decline stubbed", false) 
+    active_merchant_stubs_payeezy("34234", "decline stubbed", false) 
     amount = @terms_of_membership.installment_amount
     answer = active_user.bill_membership
     active_user.reload
@@ -514,10 +505,9 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Billing declined, but there is no decline rule and limit is reached. Send email" do 
-    active_merchant_stubs_store
     active_user = create_active_user(@terms_of_membership)
     active_user.update_attribute :recycled_times, 5
-    active_merchant_stubs("34234", "decline stubbed", false) 
+    active_merchant_stubs_payeezy("34234", "decline stubbed", false) 
     amount = @terms_of_membership.installment_amount
     answer = active_user.bill_membership
     active_user.reload
@@ -527,29 +517,29 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   # TODO: how do we stub faraday?
-  test "Chargeback processing should create transaction, blacklist and cancel the user" do
-    active_user = create_active_user(@terms_of_membership)
-    transaction = FactoryBot.create(:transaction, user: active_user, terms_of_membership: @terms_of_membership)
-    answer = { :body => '"Merchant Id","DBA Name","Control Number","Incoming Date","Card Number","Reference Number",' + 
-      '"Tran Date","Tran Amount","Trident Tran ID","Purchase ID","Client Ref Num","Auth Code","Adj Date",' +
-      '"Adj Ref Num","Reason","First Time","Reason Code","CB Ref Num","Terminal ID"\n' +
-      '"941000110030",""SAC*AO ADVENTURE CLUB"","2890810","07/26/2012","'+active_user.credit_cards.first.number.to_s+
-      '","25247702125003734750438",'+
-      '"05/03/2012","84.0","'+transaction.response_transaction_id+'","'+active_user.id.to_s+'",""'+
-      active_user.id.to_s+'"","00465Z",""07/27/2012-""' +
-      ',""00373475043"",""No Cardholder Authorization"","Y","4837","2206290194",""94100011003000000002""' }
+  # test "Chargeback processing should create transaction, blacklist and cancel the user" do
+  #   active_user = create_active_user(@terms_of_membership)
+  #   transaction = FactoryBot.create(:transaction, user: active_user, terms_of_membership: @terms_of_membership)
+  #   answer = { :body => '"Merchant Id","DBA Name","Control Number","Incoming Date","Card Number","Reference Number",' + 
+  #     '"Tran Date","Tran Amount","Trident Tran ID","Purchase ID","Client Ref Num","Auth Code","Adj Date",' +
+  #     '"Adj Ref Num","Reason","First Time","Reason Code","CB Ref Num","Terminal ID"\n' +
+  #     '"941000110030",""SAC*AO ADVENTURE CLUB"","2890810","07/26/2012","'+active_user.credit_cards.first.number.to_s+
+  #     '","25247702125003734750438",'+
+  #     '"05/03/2012","84.0","'+transaction.response_transaction_id+'","'+active_user.id.to_s+'",""'+
+  #     active_user.id.to_s+'"","00465Z",""07/27/2012-""' +
+  #     ',""00373475043"",""No Cardholder Authorization"","Y","4837","2206290194",""94100011003000000002""' }
 
-    # assert_difference('Transaction', 1) do 
-    #   PaymentGatewayConfiguration.process_mes_chargebacks('development')
-    #   assert_equal active_user.blacklisted, true
-    #   assert_equal active_user.status, "cancel"
-    # end
-  end
+  # assert_difference('Transaction', 1) do 
+  #   PaymentGatewayConfiguration.process_mes_chargebacks('development')
+  #   assert_equal active_user.blacklisted, true
+  #   assert_equal active_user.status, "cancel"
+  # end
+  # end
 
   test "enroll with monthly tom with no amount and cc blank" do
     @tom = FactoryBot.create(:terms_of_membership_monthly_without_provisional_day_and_amount, :club_id => @club.id)
     @credit_card.number = "0000000000"
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
  
     user = enroll_user(@tom, 0, true)
 
@@ -564,7 +554,7 @@ class TransactionTest < ActiveSupport::TestCase
   test "enroll with yearly tom with no amount and cc blank" do
     @tom = FactoryBot.create(:terms_of_membership_yearly_without_provisional_day_and_amount, :club_id => @club.id)
     @credit_card.number = "0000000000"
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     user = enroll_user(@tom, 0, true)
     
     assert_difference("Operation.count",4) do  # club_cash | renewal schedule NBD | billing | membership_bill_communication
@@ -573,154 +563,7 @@ class TransactionTest < ActiveSupport::TestCase
       end
     end
     assert_equal user.status, "active"
-  end
-
-  # # Tets Litle transactions
-  # def club_with_litle
-  #   @litle_club = FactoryBot.create(:simple_club_with_litle_gateway)
-  #   @litle_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-  #   @credit_card_litle = FactoryBot.build(:credit_card_american_express_litle)
-  #   active_merchant_stubs_litle
-  # end
-
-  # test "Bill membership with Litle" do
-  #   club_with_litle
-  #   @credit_card = @credit_card_litle # overwrite credit card
-  #   active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
-  #   amount = @litle_terms_of_membership.installment_amount
-  #   Timecop.travel(active_user.next_retry_bill_date) do
-  #     answer = active_user.bill_membership
-  #     active_user.reload
-  #     assert_equal active_user.status, 'active'
-  #     assert_not_nil active_user.transactions.find_by(operation_type: Settings.operation_types.membership_billing, transaction_type: 'sale')
-  #   end
-  # end
-  
-  # test "Bill membership with wrong payment gateway cofiguration set" do
-  #   user = enroll_user(@terms_of_membership)
-  #   user.club.payment_gateway_configurations.first.update_attribute :gateway, "random_gateway"
-  #   Timecop.travel(user.next_retry_bill_date) do
-  #     answer = user.bill_membership
-  #     assert answer[:message].include?("Error while processing this request. A ticket has been submitted to our IT crew, in order to fix this inconvenience")
-  #   end
-  # end 
-
-  # test "Enroll with Litle" do
-  #   club_with_litle
-  #   enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
-  # end
-
-  # test "Full refund with Litle" do
-  #   club_with_litle
-  #   @credit_card = @credit_card_litle # overwrite credit card
-  #   active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
-  #   amount = @litle_terms_of_membership.installment_amount
-  #   Timecop.travel(active_user.next_retry_bill_date) do
-  #     answer = active_user.bill_membership
-  #     active_user.reload
-  #     assert_equal active_user.status, 'active'
-  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', :conditions => ['user_id = ?', active_user.id]).first
-  #     answer = Transaction.refund(amount, trans.id)
-  #     assert_equal answer[:code], Settings.error_codes.success, answer[:message]
-  #     trans.reload
-  #     assert_equal trans.refunded_amount, amount
-  #     assert_equal trans.amount_available_to_refund, 0.0
-  #     trans = Transaction.find(:all, :limit => 1, :order => 'created_at desc', 
-  #                              :conditions => ['user_id = ? AND transaction_type = ?', active_user.id, 'credit']).first
-  #     assert_equal trans.operation_type, Settings.operation_types.credit
-  #     assert_equal trans.transaction_type, 'credit'
-  #   end
-  # end
-
-  # test "Partial refund with Litle" do
-  #   club_with_litle
-  #   @credit_card = @credit_card_litle # overwrite credit card
-  #   active_user = enroll_user(@litle_terms_of_membership, 100, false, @credit_card_litle)
-  #   amount = @litle_terms_of_membership.installment_amount
-  #   Timecop.travel(active_user.next_retry_bill_date) do
-  #     answer = active_user.bill_membership
-  #     active_user.reload
-  #     assert_equal active_user.status, 'active'
-  #     trans = Transaction.find(:all, :limit => 1, :conditions => ['user_id = ? and operation_type = ?', active_user.id, Settings.operation_types.membership_billing]).first
-  #     refunded_amount = amount-0.34
-  #     answer = Transaction.refund(refunded_amount, trans.id)
-  #     assert_equal answer[:code], Settings.error_codes.success, answer[:message]
-  #     trans.reload
-  #     assert_equal trans.refunded_amount, refunded_amount
-  #     assert_not_equal trans.amount_available_to_refund, 0.0
-  #     trans = Transaction.find(:all, :limit => 1, :conditions => ['user_id = ? and operation_type = ?', active_user.id, Settings.operation_types.credit]).first
-  #     assert_equal trans.operation_type, Settings.operation_types.credit
-  #     assert_equal trans.transaction_type, 'credit'
-  #   end
-  # end
-
-  # # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Litle
-  # test "Try billing an user's membership when he was previously SD for credit_card_expired for Litle" do 
-  #   @litle_club = FactoryBot.create(:simple_club_with_litle_gateway)
-  #   @litle_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-  #   @credit_card_litle = FactoryBot.build(:credit_card_american_express_litle)    
-
-  #   active_user = create_active_user(@litle_terms_of_membership)
-  #   active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
-  #   active_user.active_credit_card.update_attribute :token, @credit_card_litle.token
-
-  #   active_user.bill_membership
-
-  #   active_merchant_stubs_litle
-  #   Timecop.travel(active_user.next_retry_bill_date) do
-  #     old_year = active_user.active_credit_card.expire_year
-  #     old_month = active_user.active_credit_card.expire_month
-      
-  #     assert_difference('Operation.count',6) do
-  #       assert_difference('Transaction.count') do
-  #         active_user.bill_membership
-  #       end
-  #     end
-  #     active_user.reload
-  #     assert_equal active_user.active_credit_card.expire_year, old_year+2
-  #     assert_equal active_user.active_credit_card.expire_month, old_month
-  #   end
-
-  #   Timecop.travel(active_user.next_retry_bill_date) do
-  #     old_year = active_user.active_credit_card.expire_year
-  #     old_month = active_user.active_credit_card.expire_month
-  #     active_user.bill_membership
-  #     active_user.reload
-
-  #     assert_equal active_user.active_credit_card.expire_year, old_year
-  #     assert_equal active_user.active_credit_card.expire_month, old_month
-  #   end
-  # end
-
-  # test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for Litle" do 
-  #   @litle_club = FactoryBot.create(:simple_club_with_litle_gateway)
-  #   @litle_terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id)
-  #   @litle_terms_of_membership_the_second = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @litle_club.id, :name =>"second_one")
-  #   @credit_card_litle = FactoryBot.build(:credit_card_american_express_litle)
-
-  #   active_user = create_active_user(@litle_terms_of_membership)
-  #   active_user.active_credit_card.update_attribute :token, @credit_card_litle.token
-
-  #   active_merchant_stubs_litle(@sd_litle_expired_strategy.response_code, "decline stubbed", false)
-  #   active_user.bill_membership
-  #   active_user.change_terms_of_membership(@litle_terms_of_membership_the_second.id, "changing tom", 100)
-
-  #   Timecop.travel(active_user.next_retry_bill_date) do
-  #     active_merchant_stubs_litle
-
-  #     old_year = active_user.active_credit_card.expire_year
-  #     old_month = active_user.active_credit_card.expire_month
-      
-  #     assert_difference('Operation.count', 4) do
-  #       assert_difference('Transaction.count') do
-  #         active_user.bill_membership
-  #       end
-  #     end
-  #     active_user.reload
-  #     assert_equal active_user.active_credit_card.expire_year, old_year
-  #     assert_equal active_user.active_credit_card.expire_month, old_month
-  #   end
-  # end
+  end  
 
   test "should not update NBD after save the sale from monthly-tom to monthly-tom" do
     @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
@@ -827,7 +670,7 @@ class TransactionTest < ActiveSupport::TestCase
 
     assert_equal(operation.description, "Member billed successfully $#{amount} Transaction id: #{transaction.id}. Reason: testing event")
     assert_equal(operation.operation_type, Settings.operation_types.no_recurrent_billing)
-    assert_equal(transaction.full_label, "Sale : This transaction has been approved with stub. Reason: testing event")
+    assert_equal(transaction.full_label, "Sale : Transaction Normal - Approved with Stub. Reason: testing event")
     assert transaction.success?
 
     answer = Transaction.refund(amount, transaction.id)
@@ -916,24 +759,23 @@ class TransactionTest < ActiveSupport::TestCase
     assert_nil user.transactions.find_by(response_result: I18n.t('error_messages.airbrake_error_message'))
   end
 
-  # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for MeS
-  test "Try billing an user's membership when he was previously SD for credit_card_expired for MeS" do 
+  # Try billing an user's membership when he was previously SD for credit_card_expired before last billing for Payeezy
+  test "Try billing an user's membership when he was previously SD for credit_card_expired for Payeezy" do 
     active_user = create_active_user(@terms_of_membership)
-    active_merchant_stubs(@sd_mes_expired_strategy.response_code, "decline stubbed", false)
+    active_merchant_stubs_payeezy(@sd_payeezy_expired_strategy.response_code, "decline stubbed", false)
     active_user.bill_membership
 
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     Timecop.travel(active_user.next_retry_bill_date) do
       old_year = active_user.active_credit_card.expire_year
       old_month = active_user.active_credit_card.expire_month
-      
       assert_difference('Operation.count', 6) do
         assert_difference('Transaction.count') do
           active_user.bill_membership
         end
       end
       active_user.reload
-      assert_equal active_user.active_credit_card.expire_year, old_year+2
+      assert_equal active_user.active_credit_card.expire_year, old_year+2      
       assert_equal active_user.active_credit_card.expire_month, old_month
     end
 
@@ -950,11 +792,11 @@ class TransactionTest < ActiveSupport::TestCase
 
   test "Try billing an user's membership when he was previously SD for credit_card_expired on different membership for MeS" do 
     active_user = create_active_user(@terms_of_membership)
-    active_merchant_stubs(@sd_mes_expired_strategy, "decline stubbed", false)
+    active_merchant_stubs_payeezy(@sd_mes_expired_strategy, "decline stubbed", false)
     active_user.bill_membership
     active_user.change_terms_of_membership(@terms_of_membership_with_gateway_yearly.id, "changing tom", 100)
 
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     Timecop.travel(active_user.next_retry_bill_date) do
       old_year = active_user.active_credit_card.expire_year
       old_month = active_user.active_credit_card.expire_month
@@ -971,7 +813,7 @@ class TransactionTest < ActiveSupport::TestCase
   end
 
   test "Create and bill an user with installment period = X days or months at TOM" do 
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
 
     @club = FactoryBot.create(:simple_club_with_gateway_with_family)
     @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)

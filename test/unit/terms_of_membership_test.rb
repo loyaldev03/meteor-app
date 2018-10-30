@@ -8,10 +8,11 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     @club = FactoryBot.create(:simple_club_with_gateway)
     @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, :club_id => @club.id)
     @user = FactoryBot.build(:user)
-    @credit_card = FactoryBot.build(:credit_card)
+    @credit_card = FactoryBot.build(:credit_card_visa_payeezy)
   end
 
   def enroll_user(tom, amount=23, cc_blank=false, cc_card = nil)
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
     credit_card = cc_card.nil? ? @credit_card : cc_card
     answer = User.enroll(tom, @current_agent, amount, 
       { first_name: @user.first_name,
@@ -60,7 +61,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
 
   # Create a TOM with upgrate to >1
   test "Create an user with TOM upgrate to >1" do
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     @terms_of_membership_with_upgrade = FactoryBot.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 65, :provisional_days => 30, :installment_period => 30 )
@@ -97,7 +98,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
 
   #Create a TOM with upgrate to = 1
   test "Create an user with TOM upgrate to = 1" do
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     @terms_of_membership_with_upgrade = FactoryBot.build(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 1, :provisional_days => 30, :installment_period => 30 )
@@ -106,7 +107,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   end
 
   test "Create an user with Manual Payment with TOM upgrate to >1" do
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     @terms_of_membership_with_upgrade = FactoryBot.create(:terms_of_membership_with_gateway, 
                                                            :club_id => @club.id, :upgrade_tom_id => @terms_of_membership.id, 
                                                            :upgrade_tom_period => 65, :provisional_days => 30, :installment_period => 30 )
@@ -142,7 +143,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   end
 
   test "Should only allow updating TOMs when there are only testing accounts or no members at all" do
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     user = enroll_user(@terms_of_membership)
 
     @terms_of_membership.name = "NewNameToTest"    
@@ -155,7 +156,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
   end
 
   test "Should not allow deleting TOMs when there are members related to it" do
-    active_merchant_stubs
+    active_merchant_stubs_payeezy
     user = enroll_user(@terms_of_membership)
     
     assert !@terms_of_membership.destroy

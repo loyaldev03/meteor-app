@@ -15,7 +15,7 @@ class FulfillmentTest < ActiveSupport::TestCase
   end
 
   def enroll_user(user,tom, amount=23, cc_blank=false, cc_card = nil)
-    active_merchant_stubs
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
     credit_card = cc_card.nil? ? @credit_card : cc_card
     answer = User.enroll(tom, @current_agent, amount, 
       { first_name: user.first_name,

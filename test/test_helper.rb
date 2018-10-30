@@ -67,7 +67,8 @@ class ActiveSupport::TestCase
   CREDIT_CARD_TOKEN = { nil => "c25ccfecae10384698a44360444dea", "4012301230123010" => "c25ccfecae10384698a44360444dead8",
     "5589548939080095" => "c25ccfecae10384698a44360444dead7",
     "340504323632976" => "c25ccfecae10384698a44360444dead6", "123456" => "anytransactioniditsvalid.forinvalidccnumber",
-    "123456789" => "c25ccfecae10384698asddd60444dead6" }
+    "123456789" => "c25ccfecae10384698asddd60444dead6", "4000060001234562" => "8748333042191111", "340000000000009" => "032315636746108", 
+    "5199701234567892" => "9729852103506619", "4111111111111111" => "9782465740991323"}
 
   def active_merchant_stubs(code = "000", message = "This transaction has been approved with stub", success = true)
     answer = ActiveMerchant::Billing::Response.new(success, message,
@@ -125,11 +126,11 @@ class ActiveSupport::TestCase
   end
   
   
-  def active_merchant_stubs_payeezy(code = "100", message = "Transaction Normal - Approved with Stub", success = true)
+  def active_merchant_stubs_payeezy(code = "100", message = "Transaction Normal - Approved with Stub", success = true, credit_card_number=340000000000009)
     response = {"correlation_id"=>"228.1085182325738", "status"=>"success", "type"=>"FDToken", 
                 "token"=>{"type"=>"Mastercard", "cardholder_name"=>"test test", "exp_date"=>"0320", 
-                "value"=>"9782465740991323"}}
-    answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'Mastercard|test test|0320|9782465740991323')
+                "value"=>CREDIT_CARD_TOKEN[credit_card_number]}}
+    answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: "Mastercard|test test|0320|#{CREDIT_CARD_TOKEN[credit_card_number]}")
     ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:store).returns(answer)
     response = {"correlation_id"=>"228.5060252765196", "transaction_status"=> (success ? 'approved' : 'declined'), 
                 "validation_status"=>"success", "transaction_type"=>"purchase", "transaction_id"=>"ET131616", 
@@ -139,6 +140,7 @@ class ActiveSupport::TestCase
                 "gateway_message"=>"Transaction Normal"}                
     answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'ET131616|2218270190|token|100')
     ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:purchase).returns(answer)
+    ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:authorize).returns(answer)
     refund_answer = ActiveMerchant::Billing::Response.new(success, message, response, authorization: 'RETURN|2218270190|direct_debit|100')
     ActiveMerchant::Billing::PayeezyGateway.any_instance.stubs(:refund).returns(refund_answer)
   end
@@ -178,8 +180,7 @@ class ActiveSupport::TestCase
 
   def create_active_user(tom, user_type = :active_user, enrollment_type = :enrollment_info, user_args = {}, membership_args = {}, use_default_active_merchant_stub = true)
     if use_default_active_merchant_stub
-      active_merchant_stubs
-      active_merchant_stubs_store
+      active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true)
     end
 
     membership = FactoryBot.create("#{user_type}_membership", { terms_of_membership: tom }.merge(membership_args))
@@ -333,8 +334,8 @@ module ActionDispatch
                                         :response => 'test', :message => 'done.'}, :message => 'done.', :success => true
             )
       )
-
-      active_merchant_stubs_store(credit_card_to_load.number)
+      
+      active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card_to_load.number)
       post( api_members_url , { member: {:first_name => user.first_name,
                                 :last_name => user.last_name,
                                 :address => user.address,
@@ -403,9 +404,12 @@ module ActionDispatch
         select_country_and_state(unsaved_user.country)
         fill_in 'user[city]', :with => unsaved_user.city
         fill_in 'user[last_name]', :with => unsaved_user.last_name
-        fill_in 'user[zip]', :with => unsaved_user.zip
+        fill_in 'user[zip]', :with => unsaved_user.zip        
       end
-
+      #If you want create user with enrollment_fee use next sentence.
+      #page.execute_script("$('#user_enrollment_amount').val('0.5').change();")      
+      #find(:xpath, "//input[@id='user_enrollment_amount']", :visible => false).value
+      
       # page.execute_script("window.jQuery('#birt_date').next().click()")
       # within("#ui-datepicker-div") do
       #     if ((Time.zone.now+2.day).month != Time.zone.now.month)
@@ -446,12 +450,12 @@ module ActionDispatch
 
     def fill_in_credit_card_info(credit_card, cc_blank = false)
       if cc_blank
-        active_merchant_stubs_store("0000000000")
+        active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, "0000000000")
         within("#table_credit_card")do
           check "setter[cc_blank]"
         end
       else
-        active_merchant_stubs_store(credit_card.number)
+        active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
         within("#table_credit_card")do
           fill_in 'user[credit_card][number]', :with => credit_card.number
           select credit_card.expire_month.to_s, :from => 'user[credit_card][expire_month]'
@@ -473,7 +477,6 @@ module ActionDispatch
 
     # Check Refund email -  It is send it by CS inmediate
     def bill_user(user, do_refund = true, refund_amount = nil, update_next_bill_date_to_today = true)
-      active_merchant_stubs
       Time.zone = user.club.time_zone
 
       diff_between_next_bill_date_and_today = user.next_retry_bill_date - Time.zone.now
@@ -503,7 +506,8 @@ module ActionDispatch
       within("#transactions") do
         assert page.has_selector?("#transactions_table")
         Transaction.all.each do |transaction|
-          assert (page.has_content?("Sale : This transaction has been approved") or page.has_content?("Billing: Membership Fee - This transaction has been approved")  )
+          assert (page.has_content?("Transaction Normal - Approved with Stub") or page.has_content?("Sale : This transaction has been approved with stub"))
+          #assert (page.has_content?("Authorization : Transaction Normal - Approved with Stub") or page.has_content?("Sale : Transaction Normal - Approved with Stub") or page.has_content?("Billing: Membership Fee - Transaction Normal - Approved with Stub") or page.has_content?("Billing: Enrollment Fee - Transaction Normal - Approved with Stub") or page.has_content?("Sale : This transaction has been approved with stub"))
         end
         assert page.has_content?(user.terms_of_membership.installment_amount.to_s)
       end
@@ -532,7 +536,7 @@ module ActionDispatch
         end
         within(".nav-tabs"){ click_on 'Transactions' }
         within("#transactions_table") do
-          assert (page.has_content?("Credit : This transaction has been approved") or page.has_content?("Billing: Refund - This transaction has been approved")  )
+          assert (page.has_content?("Credit : Transaction Normal - Approved with Stub") or page.has_content?("Billing: Refund - Transaction Normal - Approved with Stub")  )
           assert page.has_content?(final_amount)
         end
         within(".nav-tabs"){ click_on 'Communications' }
@@ -546,7 +550,7 @@ module ActionDispatch
     def add_credit_card(user,credit_card, subscription_plan = nil)
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => user.id)
       click_on 'Add a credit card'
-      active_merchant_stubs_store(credit_card.number)
+      active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
 
       fill_in 'credit_card[number]', :with => credit_card.number
       select credit_card.expire_month.to_s, :from => 'credit_card[expire_month]'

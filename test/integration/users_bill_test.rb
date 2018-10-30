@@ -11,7 +11,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   end
 
   def setup_user(provisional_days = nil, create_user = true, club_with_gateway = :simple_club_with_gateway)
-    active_merchant_stubs
+    active_merchant_stub
 
     @admin_agent = FactoryBot.create(:confirmed_admin_agent)
     @club = FactoryBot.create(club_with_gateway)
@@ -35,6 +35,10 @@ class UsersBillTest < ActionDispatch::IntegrationTest
       visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     end
   end
+
+  def active_merchant_stub
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true)
+  end 
 
   ############################################################
   # UTILS
@@ -123,16 +127,16 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     bill_user(@saved_user,false,nil,false)
     next_bill_date = Time.zone.now.to_date + 1.day
     change_next_bill_date(next_bill_date)
-    find(".alert", :text => "Next bill date changed to #{next_bill_date.to_date}")
+    find(".alert", :text => "Next bill date changed to #{next_bill_date.to_s}")
   end
 
   test "See HD for 'Soft recycle limit'" do
     setup_user
     @saved_user.current_membership.update_attribute(:enrollment_amount, 0.0)
     @sd_strategy = FactoryBot.create(:soft_decline_strategy)
-    @hd_strategy = FactoryBot.create(:hard_decline_strategy) 
-    active_merchant_stubs(@sd_strategy.response_code, "decline stubbed", false)
-
+    @hd_strategy = FactoryBot.create(:hard_decline_strategy)
+    active_merchant_stubs_payeezy(@sd_strategy.response_code, "decline stubbed", false) 
+    
     within('#table_membership_information') do
       within('#td_mi_recycled_times') do
         assert page.has_content? "0"
@@ -172,7 +176,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   end
 
   test "create an user billing enroll > 0 and refund enrollment transaction" do
-    active_merchant_stubs
+    active_merchant_stub
     setup_user
     bill_user(@saved_user, true)
   end
@@ -258,7 +262,8 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   test "Refund a transaction with error" do
     setup_user
     @terms_of_membership_with_gateway.update_attribute(:installment_amount, 45.56)
-    active_merchant_stubs("34234", "decline stubbed", false)
+    active_merchant_stubs_payeezy("34234", "Transaction Declined with Stub", false)
+    #active_merchant_stubs("34234", "decline stubbed", false)
     @saved_user.bill_membership
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
@@ -339,7 +344,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   end 
 
   test "Billing membership amount on the Next Bill Date" do
-    active_merchant_stubs
+    active_merchant_stub
     setup_user
     next_bill_date = @saved_user.current_membership.join_date + @terms_of_membership_with_gateway.provisional_days.days
     next_bill_date_after_billing = @saved_user.next_retry_bill_date + @terms_of_membership_with_gateway.installment_period.days
@@ -355,14 +360,14 @@ class UsersBillTest < ActionDispatch::IntegrationTest
 
     within('.nav-tabs'){ click_on 'Transactions'}
     within("#transactions_table") do
-      assert page.has_content?("Sale : This transaction has been approved")
+      assert page.has_content?("Sale : Transaction Normal - Approved with Stub")
       assert page.has_content?(@terms_of_membership_with_gateway.installment_amount.to_s)
     end
   end 
 
   # supervisor should be able to refund
   test "Representative and Supervisor should be able to refund" do
-    active_merchant_stubs
+    active_merchant_stub
     setup_user
     ["representative", "supervisor"].each do |role|
       @admin_agent.update_attribute(:roles, role)
@@ -375,27 +380,26 @@ class UsersBillTest < ActionDispatch::IntegrationTest
   test "Hard decline for user without CC information when the billing date arrives" do
     setup_user(nil,false)
     @hd_strategy = FactoryBot.create(:hard_decline_strategy_for_billing)
-    active_merchant_stubs("9997", "This transaction has not been approved with stub", false)
-    
+
+    active_merchant_stubs_payeezy(@hd_strategy.response_code, "decline stubbed", false, "0000000000")
+        
     unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
     @saved_user = create_user(unsaved_user, nil, @terms_of_membership_with_gateway.name, true)
 
     within("#table_active_credit_card")do
       assert page.has_content?("0000 (unknown)")
     end
-    @saved_user.update_attribute(:next_retry_bill_date, Time.zone.now)
 
-    assert_difference("Communication.count",2)do
+    @saved_user.update_attribute(:next_retry_bill_date, Time.zone.now)
+    
+    excecute_like_server(@club.time_zone) do
       excecute_like_server(@club.time_zone) do
-        excecute_like_server(@club.time_zone) do
-          TasksHelpers.bill_all_members_up_today
-        end
+        TasksHelpers.bill_all_members_up_today
       end
     end
 
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)
     assert find_field('input_first_name').value == @saved_user.first_name
-
     within('.nav-tabs'){ click_on 'Operations'}
     within("#operations"){ assert page.has_content?("Communication 'Test hard_decline' sent") } 
     within("#operations"){ assert page.has_content?("Communication 'Test cancellation' sent") } 
@@ -407,7 +411,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
 
   test "Try billing an user with credit card ok, and within a club that allows billing." do
     setup_user
-    active_merchant_stubs    
+    active_merchant_stub    
     visit show_user_path(:partner_prefix => @saved_user.club.partner.prefix, :club_prefix => @saved_user.club.name, :user_prefix => @saved_user.id)      
     click_link_or_button(I18n.t('buttons.no_recurrent_billing'))
     fill_in('amount', :with => '100')
@@ -421,7 +425,7 @@ class UsersBillTest < ActionDispatch::IntegrationTest
     within("#operations") {assert page.has_content? "Member billed successfully $100 Transaction id: #{trans.id}. Reason: asd"}
     within(".nav-tabs") {click_on 'Transactions'}  
     within("#transactions_table") do
-      assert page.has_content?("Sale : This transaction has been approved")
+      assert page.has_content?("Sale : Transaction Normal - Approved with Stub.")      
       assert page.has_content?("100")
       assert page.has_selector?('#refund')
     end

@@ -156,9 +156,9 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     visit show_user_path(:partner_prefix => @partner.prefix, :club_prefix => @club.name, :user_prefix => @saved_user.id)
   end
 
-  # ##########################################################
-  # TESTS
-  # ##########################################################
+ #  # ##########################################################
+ #  # TESTS
+ #  # ##########################################################
 
   test "create user" do
   	setup_user(false)
@@ -170,8 +170,8 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     within(".nav-tabs"){ click_on 'Operations' }
     within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
     within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.user.has_no_preferences_saved')) }
-    within(".nav-tabs"){ click_on 'Transactions' }
-    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+    within(".nav-tabs"){ click_on 'Transactions' }    
+    within("#transactions_table") { assert page.has_content?("Authorization : Transaction Normal - Approved with Stub")}
     within(".nav-tabs"){ click_on 'Fulfillments' }
     within("#fulfillments") { assert page.has_content?(created_user.fulfillments.first.product_sku) }
     assert_equal(Fulfillment.count, 1)
@@ -704,7 +704,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     credit_card = FactoryBot.build(:credit_card_master_card)
-    active_merchant_stubs_store(credit_card.number)    
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number) 
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_approval.name,false)
     membership = @saved_user.current_membership
 
@@ -1109,7 +1109,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
 
     visit show_user_path(:partner_prefix => created_user.club.partner.prefix, :club_prefix => created_user.club.name, :user_prefix => created_user.id)
     click_on 'Add a credit card'
-    active_merchant_stubs_store(credit_card.number)
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
 
     fill_in 'credit_card[number]', :with => "credit_card_number"
     select credit_card.expire_month.to_s, :from => 'credit_card[expire_month]'
@@ -1153,7 +1153,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     within("#operations") { assert page.has_content?("Member enrolled successfully $0.0 on TOM(#{@terms_of_membership_with_gateway.id}) -#{@terms_of_membership_with_gateway.name}-") }
     within("#table_enrollment_info") { assert page.has_content?( I18n.t('activerecord.attributes.user.has_no_preferences_saved')) }
     within(".nav-tabs"){ click_on 'Transactions' }
-    within("#transactions_table") { assert page.has_content?(transactions_table_empty_text) }
+    within("#transactions_table") { assert page.has_content?("Authorization : Transaction Normal - Approved with Stub")}
     assert_equal(Fulfillment.count, 0)
   end
 end

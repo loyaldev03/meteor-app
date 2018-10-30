@@ -12,9 +12,8 @@ class CreditCardsControllerTest < ActionController::TestCase
     @partner = @club.partner
     @saved_user = create_active_user(@terms_of_membership, :user_with_api)
     @active_credit_card = FactoryBot.create :credit_card_master_card, :active => true, :user_id => @saved_user.id
-    @credit_card_master_card_number = "5589548939080095"
-    active_merchant_stubs_store(@credit_card_master_card_number)
-    # request.env["devise.mapping"] = Devise.mappings[:agent]
+    @credit_card_master_card_number = "5199701234567892"
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card_master_card_number)
   end
 
   def generate_post_message
@@ -24,13 +23,10 @@ class CreditCardsControllerTest < ActionController::TestCase
 
   test "Should add a new credit_card" do
   	sign_in @admin_user
-    
-    cc_number = @active_credit_card.number
-    
-    @credit_card = FactoryBot.build :credit_card_american_express
 
-    active_merchant_stubs_store(@credit_card.number)
-   
+    @credit_card = FactoryBot.build :credit_card_american_express
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
+
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',1) do
         generate_post_message
@@ -44,8 +40,6 @@ class CreditCardsControllerTest < ActionController::TestCase
 
   test "Should not add a new credit_card with different year, instead should update actual credit card" do
     sign_in @admin_user
-    
-    cc_number = @active_credit_card.number
     
     @credit_card = FactoryBot.build :credit_card_american_express, expire_year: (Time.zone.now + 1.year).year
     @credit_card.number = @credit_card_master_card_number
@@ -130,7 +124,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     @credit_card.expire_year = (Time.zone.now + 3.year).year
     @credit_card.expire_month = (Time.zone.now + 10.month).month
 
-    active_merchant_stubs_store(cc_number)
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, cc_number)
 
     assert_difference('Operation.count',2) do
       assert_difference('CreditCard.count',0) do
@@ -150,7 +144,7 @@ class CreditCardsControllerTest < ActionController::TestCase
     cc_token = @credit_card.token
     cc_number = @credit_card.number
 
-    active_merchant_stubs_store(cc_number)
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, cc_number)
 
     assert_difference('Operation.count',1) do
       assert_difference('CreditCard.count',0) do

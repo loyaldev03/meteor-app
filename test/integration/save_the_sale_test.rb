@@ -228,7 +228,6 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
       save_the_sale(@saved_user, @new_terms_of_membership_with_gateway, schedule_date, true, false)
     end
     @saved_user.reload
-    sleep(1)
     assert_equal @saved_user.change_tom_date, schedule_date
     assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => true, 'terms_of_membership_id' => @new_terms_of_membership_with_gateway.id, 'agent_id' => @admin_agent.id}
     assert @saved_user.club_cash_amount != 0
@@ -247,7 +246,6 @@ class SaveTheSaleTest < ActionDispatch::IntegrationTest
       save_the_sale(@saved_user, @new_terms_of_membership_with_gateway, schedule_date, false, false)
     end
     @saved_user.reload
-    sleep(1)
     assert_equal @saved_user.change_tom_date, schedule_date
     assert_equal @saved_user.change_tom_attributes, {'remove_club_cash' => false, 'terms_of_membership_id' => @new_terms_of_membership_with_gateway.id, 'agent_id' => @admin_agent.id}
     assert @saved_user.club_cash_amount != 0

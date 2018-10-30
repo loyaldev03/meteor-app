@@ -72,20 +72,20 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
     blacklist_user(@saved_user,@member_blacklist_reason.name)
     validate_blacklisted_user(@saved_user)
 
-    blacklisted_credit_card_number = "4012301230123010"
+    blacklisted_credit_card_number = "4000060001234562"
 
     unsaved_user =  FactoryBot.build(:active_user, :club_id => @club.id)
     enrollment_info = FactoryBot.build(:membership_with_enrollment_info)
     credit_card = FactoryBot.build(:credit_card_master_card)
-    active_merchant_stubs_store(credit_card.number)    
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
     @saved_user = create_user(unsaved_user,credit_card,@terms_of_membership_with_gateway.name,false)
     @saved_user.reload
     @saved_user.set_as_canceled!
 
-    credit_card = FactoryBot.build(:credit_card_master_card)
+    credit_card = FactoryBot.build(:credit_card_master_card)    
     credit_card.number = blacklisted_credit_card_number
-    active_merchant_stubs_store(credit_card.number)    
-
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
+ 
     assert_difference('User.count', 0) do 
       create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)
     end
@@ -110,14 +110,12 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
 
   test "create user with blacklist CC" do
     setup_user(false)
-    credit_card = FactoryBot.create(:credit_card_master_card)
     unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
     
-    bl_credit_card = FactoryBot.build(:credit_card)
+    bl_credit_card = FactoryBot.build(:credit_card)    
     @saved_user = create_user(unsaved_user, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     blacklist_user(@saved_user,@member_blacklist_reason.name)
     validate_blacklisted_user(@saved_user)
-
     unsaved_user = FactoryBot.build(:user_with_cc, :club_id => @club.id)
     @saved_user2 = fill_in_user(unsaved_user, bl_credit_card, @terms_of_membership_with_gateway.name, false)
     assert page.has_content?(I18n.t('error_messages.credit_card_blacklisted', :cs_phone_number => @club.cs_phone_number))
