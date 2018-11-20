@@ -1,6 +1,5 @@
 development:
   adapter: mysql2
-  # database: sac_production
   database: sac_platform_development
   host: localhost
   username: root
@@ -25,10 +24,13 @@ demo:
 
 production:
   adapter: mysql2
-  database: sac_platform_development
-  host: localhost
+  database: sac_production
+  host: 127.0.0.1
+  port: 35678
+  encoding: utf8	
   username: root
-  encoding: utf8
+  password: eqEgfNeU8opH03n[xk1{{s
+  pool: 15
 
 staging:
   adapter: mysql2

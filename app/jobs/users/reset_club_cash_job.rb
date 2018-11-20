@@ -14,7 +14,7 @@ module Users
         end
         
         user.add_club_cash(nil, amount_to_reset, message)
-        if not user.is_drupal?
+        unless user.is_drupal?
           user.club_cash_expire_date = user.club_cash_expire_date + 12.months
           user.save(:validate => false)
         end
