@@ -131,7 +131,6 @@ class Ability
       cannot :no_recurrent_billing, User
       cannot :api_sale, User
       cannot :add_club_cash, User
-      cannot :toggle_vip_member, User
       can :manage, Operation
       can :manage, CreditCard
       cannot :destroy, CreditCard
