@@ -120,7 +120,9 @@
     
     <div class="row-fluid" style="margin-top: 8px; margin-bottom: 8px">
       <div class="span4 offset8">
+        <% if current_user.can_update_vip_member_status? %>
         <%= link_to I18n.t(@current_user.vip_member ? 'buttons.unmark_as_vip_member' : 'buttons.mark_as_vip_member'), (can?(:toggle_vip_member, User) ? user_toggle_vip_member_path : '#') , :class => "btn btn-large-w btn-info #{'disabled' if cannot?(:toggle_vip_member, User)}", method: 'put', :id => "vip_member", data: {confirm: "Are you sure you want to change the users VIP status?"} %>
+        <% end %>
       </div>
     </div>
   </div>

@@ -44,6 +44,7 @@ class User < ActiveRecord::Base
   after_update :mkt_tool_check_email_changed_for_sync
   after_update :after_save_sync_to_remote_domain
   after_update :asyn_desnormalize_preferences
+  after_update :update_club_cash_if_vip_member
   after_destroy :cancel_user_at_remote_domain
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
@@ -445,6 +446,11 @@ class User < ActiveRecord::Base
       return true if transaction.is_response_code_cc_expired?
     end
     false
+  end
+  
+  def can_update_vip_member_status?
+    @tom_freemium ||= self.terms_of_membership.freemium?
+    ((not @tom_freemium) or (@tom_freemium and self.vip_member?))
   end
   
   ###############################################
@@ -1662,5 +1668,15 @@ class User < ActiveRecord::Base
     def prepend_zeros_to_phone_number
       self.phone_area_code    = format('%03d', phone_area_code.to_i)
       self.phone_local_number = format('%07d', phone_local_number.to_i)
+    end
+    
+    def update_club_cash_if_vip_member
+      if self.vip_member_changed? and not self.club_cash_amount_changed?
+        if vip_member?
+          add_club_cash(nil, 1, 'Marked user VIP Member.')
+        elsif club_cash_amount > 0
+          add_club_cash(nil, -1, 'Unmarked as VIP Member.')
+        end
+      end
     end
 end

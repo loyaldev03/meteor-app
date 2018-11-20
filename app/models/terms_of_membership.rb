@@ -87,6 +87,10 @@ class TermsOfMembership < ActiveRecord::Base
       true
     end
   end
+  
+  def freemium?
+    self.installment_amount == 0
+  end
 
   private
     def validate_payment_gateway_configuration
