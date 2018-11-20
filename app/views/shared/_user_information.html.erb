@@ -7,4 +7,7 @@
 	<% if @current_user.blacklisted? %>
   &nbsp;<small style="color: red;">Blacklisted!!!</small>
   <% end %>
+  <% if @current_user.vip_member? %>
+  &nbsp;<small class="text-info">Vip member</small>
+  <% end %>
 </h1>

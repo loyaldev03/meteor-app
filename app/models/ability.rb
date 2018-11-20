@@ -55,6 +55,7 @@ class Ability
     cannot :manage, EmailTemplate
     cannot :chargeback, Transaction
     cannot :toggle_testing_account, User
+    cannot :toggle_vip_member, User
     cannot :manual_review, Fulfillment
     cannot :bulk_process, Product
     cannot :send, Communication
@@ -130,6 +131,7 @@ class Ability
       cannot :no_recurrent_billing, User
       cannot :api_sale, User
       cannot :add_club_cash, User
+      cannot :toggle_vip_member, User
       can :manage, Operation
       can :manage, CreditCard
       cannot :destroy, CreditCard
@@ -160,6 +162,7 @@ class Ability
       cannot :api_get_banner_by_email, User
       cannot :api_campaign_get_data, Campaign
       cannot :api_sale, User
+      cannot :toggle_vip_member, User
       can :manage, Operation
       can :manage, UserNote
       can :manage, CreditCard
