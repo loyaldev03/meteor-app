@@ -29,26 +29,28 @@
       
       <%= render :partial => 'shared/reset_password_button', :locals => { use_large_button: false } %>
 
-      <% if @current_user.lapsed? || !@current_user.api_user || @current_user.api_id.blank? %>
-        <%= 
-          link_to "#", 
-            class: "btn btn-success disabled",
-            id: "show_remote_data",
-            style: 'float: right;' do %>
-          <i class='icon-download-alt'></i>
-          <%= t('buttons.show_remote_data') %>
-        <% end %>  
-      <% else %>
-        <%= 
-          link_to user_sync_data_path, 
-            remote: true,
-            class: "btn btn-success",
-            id: "show_remote_data",
-            style: 'float: right;',
-            data: { replace: '#sync-data' } do %>
-          <i class='icon-download-alt'></i>
-          <%= t('buttons.show_remote_data') %>
-        <% end %>    
+      <% if current_user.is_drupal? %>
+        <% if @current_user.lapsed? || !@current_user.api_user || @current_user.api_id.blank? %>
+          <%= 
+            link_to "#", 
+              class: "btn btn-success disabled",
+              id: "show_remote_data",
+              style: 'float: right;' do %>
+            <i class='icon-download-alt'></i>
+            <%= t('buttons.show_remote_data') %>
+          <% end %>  
+        <% else %>
+          <%= 
+            link_to user_sync_data_path, 
+              remote: true,
+              class: "btn btn-success",
+              id: "show_remote_data",
+              style: 'float: right;',
+              data: { replace: '#sync-data' } do %>
+            <i class='icon-download-alt'></i>
+            <%= t('buttons.show_remote_data') %>
+          <% end %>    
+        <% end %>
       <% end %>
     </div>
   <% end %>

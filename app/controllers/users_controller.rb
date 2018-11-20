@@ -358,7 +358,6 @@ class UsersController < ApplicationController
 
   def login_as_user
     am = @current_user.api_user
-
     if am
       if (lt = am.login_token) && lt.url
         redirect_to @current_user.full_autologin_url.to_s

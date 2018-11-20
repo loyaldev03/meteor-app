@@ -42,6 +42,9 @@ class Club < ActiveRecord::Base
   scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' AND (marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes not like '%\"mailchimp_api_key\":\"\"%') AND (marketing_tool_attributes like '%mailchimp_list_id%'AND marketing_tool_attributes not like '%\"mailchimp_list_id\":\"\"%')") }
   scope :is_enabled, -> { where(billing_enable: true) }
 
+  scope :drupal_configured, -> { where(api_type: "Drupal::Member") } 
+  scope :spree_configured, -> { where(api_type: "Spree::Member") } 
+
   has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename",
                            url: "/system/:attachment/:id/:style/:filename",
                            styles: { header: "120x40", thumb: "100x100#", small: "150x150>" }
@@ -147,10 +150,17 @@ class Club < ActiveRecord::Base
   def payment_gateway_configuration
     payment_gateway_configurations.first
   end
-
+  
+  def is_cms_configured?
+    (is_drupal? or is_spree?)
+  end
   # Improvements #25771 - Club cash transactions will be managed by Drupal User Points plugin.
-  def is_not_drupal?
-    api_type != 'Drupal::Member'
+  def is_drupal?
+    api_type == 'Drupal::Member'
+  end
+  
+  def is_spree?
+    api_type == 'Spree::Member'
   end
 
   def allow_club_cash_transaction?

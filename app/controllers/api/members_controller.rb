@@ -358,7 +358,7 @@ class Api::MembersController < ApplicationController
       response = { :message => I18n.t('error_messages.club_cash.null_amount'), :code => Settings.error_codes.wrong_data }
     elsif params[:amount].to_f < 0
       response = { :message => I18n.t('error_messages.club_cash.negative_amount'), :code => Settings.error_codes.wrong_data}
-    elsif not user.club.is_not_drupal?
+    elsif user.club.is_drupal?
       user.skip_api_sync!
       user.club_cash_amount = params[:amount]
       user.club_cash_expire_date = params[:expire_date]

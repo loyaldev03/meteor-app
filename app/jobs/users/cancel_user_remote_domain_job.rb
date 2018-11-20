@@ -4,7 +4,10 @@ module Users
 
     def perform(user_id:)
       user = User.find user_id
-      user.api_user.destroy! unless user.api_user.nil? or user.api_id.nil? or not user.club.billing_enable
+      res = user.api_user.destroy! unless user.api_user.nil? or user.api_id.nil? or not user.club.billing_enable
+      unless res.body['success']
+        raise res.body['error_message']
+      end
     end
   end
 end

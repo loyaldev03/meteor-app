@@ -52,8 +52,16 @@ class User < ActiveRecord::Base
   end
 
   def after_save_sync_to_remote_domain
-    if defined? Drupal::Member and Drupal::Member::OBSERVED_FIELDS.intersection(self.changed) #change tracker
-      Users::SyncToRemoteDomainJob.perform_now(user_id: self.id) unless @skip_api_sync || api_user.nil?
+    if is_cms_configured?
+      if is_drupal?
+        if(defined?(Drupal::Member) and Drupal::Member::OBSERVED_FIELDS.intersection(self.changed).any?) #change tracker
+          Users::SyncToRemoteDomainJob.perform_now(user_id: self.id) unless @skip_api_sync || api_user.nil?
+        end
+      elsif is_spree?
+        if(defined?(Spree::Member) and Spree::Member::OBSERVED_FIELDS.intersection(self.changed).any?) #change tracker
+          Users::SyncToRemoteDomainJob.perform_now(user_id: self.id) unless @skip_api_sync || api_user.nil?
+        end
+      end
     end
   end
 
@@ -332,7 +340,11 @@ class User < ActiveRecord::Base
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
 
   def can_be_synced_to_remote?
-    !(lapsed? or applied?) and club.billing_enable
+    if is_drupal?
+      !(lapsed? or applied?) and club.billing_enable
+    elsif is_spree?
+      !(applied?) and club.billing_enable
+    end
   end
 
   # Returns true if members is lapsed.
@@ -416,9 +428,9 @@ class User < ActiveRecord::Base
   end
 
   def can_add_club_cash?
-    if is_not_drupal?
+    if not is_drupal?
       return true
-    elsif not (self.api_id.blank? or self.api_id.nil?)
+    elsif not self.api_id.present?
       return true
     end
     false
@@ -780,7 +792,7 @@ class User < ActiveRecord::Base
       message = set_status_on_enrollment!(agent, trans, amount, membership, operation_type)
 
       response = { message: message, code: Settings.error_codes.success, member_id: self.id, autologin_url: self.full_autologin_url.to_s, status: self.status }
-      response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) unless self.is_not_drupal?
+      response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) if self.is_cms_configured?
       response
     rescue Exception => e
       logger.error e.inspect
@@ -889,7 +901,7 @@ class User < ActiveRecord::Base
       end
 
       response = { message: message, code: Settings.error_codes.success, member_id: self.id, autologin_url: self.full_autologin_url.to_s, status: self.status }
-      response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) unless self.is_not_drupal?
+      response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) if self.is_cms_configured?
       response
     rescue Exception => e
       logger.error e.inspect
@@ -956,9 +968,17 @@ class User < ActiveRecord::Base
   end
 
   ##################### Club cash ####################################
+  
+  def is_cms_configured?
+    @is_cms_configured  ||= club.is_cms_configured?
+  end
+  
+  def is_spree?
+    @is_spree ||= club.is_spree?
+  end
 
-  def is_not_drupal?
-    @is_not_drupal ||= club.is_not_drupal?
+  def is_drupal?
+    @is_drupal ||= club.is_drupal?
   end
 
   # Resets user club cash in case of a cancelation.
@@ -968,7 +988,7 @@ class User < ActiveRecord::Base
   
   def nillify_club_cash_upon_cancellation
     message = 'Removing club cash because of member cancellation'
-    if not is_not_drupal?
+    if is_drupal?
       self.club_cash_amount = 0
       self.save
       Auditory.audit(nil, self, message, self, Settings.operation_types.reset_club_cash)
@@ -1000,7 +1020,7 @@ class User < ActiveRecord::Base
       elsif amount.to_f == 0
         answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
         answer[:errors] = { amount: "Invalid amount" } 
-      elsif is_not_drupal?
+      elsif not is_drupal?
         ClubCashTransaction.transaction do
           begin
             if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0

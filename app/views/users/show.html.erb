@@ -397,7 +397,7 @@
   <% if @current_user.has_link_to_api? and can? :see_sync_status, User, @current_club.id %>
     <li><a href="#sync_status" data-toggle="tab" name="sync_status">Sync Status</a></li>
   <% end %>
-  <% if @current_club.is_not_drupal? and @current_agent.can? :list, ClubCashTransaction, @current_club.id%>
+  <% if not @current_club.is_drupal? and @current_agent.can? :list, ClubCashTransaction, @current_club.id%>
     <% if @current_club.allow_club_cash_transaction? %>
       <li><a href="#club_cash_transactions" data-toggle="tab" name="club_cash_transactions">Club Cash</a></li>
     <% end %>  
@@ -451,7 +451,7 @@
 	    </div>
 	  </div>
 	<% end %>
-  <% if @current_club.is_not_drupal? and @current_agent.can? :list, ClubCashTransaction, @current_club.id%>
+  <% if not @current_club.is_drupal? and @current_agent.can? :list, ClubCashTransaction, @current_club.id %>
 	  <% if @current_club.allow_club_cash_transaction? %>
 	    <div class="tab-pane" id="club_cash_transactions">
 	      <div class="tab_body_padding">
