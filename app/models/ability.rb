@@ -162,7 +162,6 @@ class Ability
       cannot :api_get_banner_by_email, User
       cannot :api_campaign_get_data, Campaign
       cannot :api_sale, User
-      cannot :toggle_vip_member, User
       can :manage, Operation
       can :manage, UserNote
       can :manage, CreditCard
@@ -224,7 +223,6 @@ class Ability
       can :list, UserNote
       can :list, Communication
       can :list_my_clubs, Club
-      cannot :cancel_save_the_sale, Operation
     # Fulfillment Managment role: Team de Fulfillment
     when 'fulfillment_managment' then
       can :manage, User
