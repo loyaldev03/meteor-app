@@ -9,7 +9,7 @@ module Users
         operation_message = 'Removing expired club cash.'
         
         if user.is_spree?
-          amount_to_reset   = user.vip_member? ? Settings.club_cash_vip_default_amount : user.terms_of_membership.initial_club_cash
+          amount_to_reset   = user.terms_of_membership.initial_club_cash + (Settings.vip_additional_club_cash if user.vip_member?).to_i
           operation_message = "Reseting Club cash cash amount to #{amount_to_reset} for #{user.vip_member? ? 'vip member' : 'paid member'}."
         end
         

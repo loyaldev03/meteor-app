@@ -1673,9 +1673,9 @@ class User < ActiveRecord::Base
     def update_club_cash_if_vip_member
       if self.vip_member_changed? and not self.club_cash_amount_changed?
         if vip_member?
-          add_club_cash(nil, 1, 'Marked user VIP Member.')
+          add_club_cash(nil, Settings.vip_additional_club_cash, 'Marked user VIP Member.')
         elsif club_cash_amount > 0
-          add_club_cash(nil, -1, 'Unmarked as VIP Member.')
+          add_club_cash(nil, -Settings.vip_additional_club_cash, 'Unmarked as VIP Member.')
         end
       end
     end

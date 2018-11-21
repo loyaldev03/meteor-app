@@ -2,7 +2,7 @@ defaults: &defaults
   days_to_wait_to_cancel_fulfillments: 2
   next_retry_on_missing_decline: 20.days
   number_of_retries_on_missing_decline: 4
-  club_cash_vip_default_amount: 4
+  vip_additional_club_cash: 1
   maximum_number_of_subscribers_to_automatically_resync: 2000
   max_size_for_upload_files: 1024
   email_to_send_product_list: 'platformadmins@xagax.com'
