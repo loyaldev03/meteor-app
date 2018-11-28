@@ -222,6 +222,7 @@ class Ability
       can :list, UserNote
       can :list, Communication
       can :list_my_clubs, Club
+      cannot :cancel_save_the_sale, Operation
     # Fulfillment Managment role: Team de Fulfillment
     when 'fulfillment_managment' then
       can :manage, User

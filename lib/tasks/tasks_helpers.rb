@@ -203,8 +203,10 @@ module TasksHelpers
 
   def self.process_email_sync_error
     user_list = {}
-    base = User.joins(:club).where("clubs.api_type = 'Drupal::Member' AND sync_status = 'with_error' AND last_sync_error like '%The e-mail address%is already taken%'")
-    base = User.joins(:club).where("clubs.api_type = 'Spree::Member' AND sync_status = 'with_error' AND last_sync_error like '%Email has already been taken%'")
+    base = User.joins(:club).where("sync_status = 'with_error' AND 
+                                     ((clubs.api_type = 'Drupal::Member' AND last_sync_error like '%The e-mail address%is already taken%') OR 
+                                     (clubs.api_type = 'Spree::Member' AND last_sync_error like '%Email has already been taken%'))")
+    
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_email_sync_error rake task, processing #{base.length} users"
     base.find_in_batches do |group|
       group.each_with_index do |user, index|

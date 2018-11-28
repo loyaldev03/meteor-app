@@ -49,7 +49,13 @@ class User < ActiveRecord::Base
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_user_at_remote_domain
-    Users::CancelUserRemoteDomainJob.perform_later(user_id: self.id)    
+    if is_cms_configured?
+      if is_drupal?
+        Users::CancelUserRemoteDomainJob.perform_later(user_id: self.id)
+      elsif is_spree?
+        Users::SyncToRemoteDomainJob.perform_later(user_id: self.id)
+      end
+    end
   end
 
   def after_save_sync_to_remote_domain
@@ -429,7 +435,7 @@ class User < ActiveRecord::Base
   end
 
   def can_add_club_cash?
-    if not is_drupal?
+    if !is_drupal?
       return true
     elsif not self.api_id.present?
       return true
@@ -1026,7 +1032,7 @@ class User < ActiveRecord::Base
       elsif amount.to_f == 0
         answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
         answer[:errors] = { amount: "Invalid amount" } 
-      elsif not is_drupal?
+      elsif !is_drupal?
         ClubCashTransaction.transaction do
           begin
             if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
