@@ -51,9 +51,9 @@ class User < ActiveRecord::Base
   def cancel_user_at_remote_domain
     if is_cms_configured?
       if is_drupal?
-        Users::CancelUserRemoteDomainJob.perform_later(user_id: self.id)
+        Users::CancelUserRemoteDomainJob.perform_later(user_id: id)
       elsif is_spree?
-        Users::SyncToRemoteDomainJob.perform_later(user_id: self.id)
+        Users::SyncToRemoteDomainJob.perform_later(user_id: id)
       end
     end
   end
@@ -61,18 +61,14 @@ class User < ActiveRecord::Base
   def after_save_sync_to_remote_domain
     if is_cms_configured?
       if is_drupal?
-        if(defined?(Drupal::Member) and Drupal::Member::OBSERVED_FIELDS.intersection(self.changed).any?) #change tracker
-          Users::SyncToRemoteDomainJob.perform_now(user_id: self.id) unless @skip_api_sync || api_user.nil?
-        end
+        Users::SyncToRemoteDomainJob.perform_now(user_id: id) if defined?(Drupal::Member) && (Drupal::Member::OBSERVED_FIELDS.intersection(changed).any? && (!@skip_api_sync || api_user.nil?)) # change tracker
       elsif is_spree?
-        if(defined?(Spree::Member) and Spree::Member::OBSERVED_FIELDS.intersection(self.changed).any?) #change tracker
-          Users::SyncToRemoteDomainJob.perform_now(user_id: self.id) unless @skip_api_sync || api_user.nil?
-        end
+        Users::SyncToRemoteDomainJob.perform_now(user_id: id) if defined?(Spree::Member) && (Spree::Member::OBSERVED_FIELDS.intersection(changed).any? && (!@skip_api_sync || api_user.nil?)) # change tracker
       end
     end
   end
 
-  validates :country, 
+  validates :country,
     presence:                    true, 
     length:                      { is: 2, allow_nil: true },
     inclusion:                   { within: self.supported_countries }
@@ -396,8 +392,8 @@ class User < ActiveRecord::Base
   end
 
   def has_link_to_api?
-    self.api_user and not self.lapsed?
-  end 
+    api_user && !lapsed?
+  end
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
@@ -453,12 +449,12 @@ class User < ActiveRecord::Base
     end
     false
   end
-  
+
   def can_update_vip_member_status?
-    @tom_freemium ||= self.terms_of_membership.freemium?
-    ((not @tom_freemium) or (@tom_freemium and self.vip_member?))
+    @tom_freemium ||= terms_of_membership.freemium?
+    ((!@tom_freemium) || (@tom_freemium && vip_member?))
   end
-  
+
   ###############################################
 
   def change_terms_of_membership(tom, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil, schedule_date = nil, additional_actions = {})
@@ -684,7 +680,7 @@ class User < ActiveRecord::Base
     unless club.billing_enable
       return { message: I18n.t('error_messages.club_is_not_enable_for_new_enrollments', cs_phone_number: club.cs_phone_number), code: Settings.error_codes.club_is_not_enable_for_new_enrollments }      
     end
-    
+
     user = User.find_by(email: user_params[:email], club_id: club.id)
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
     credit_card = CreditCard.new number: credit_card_params[:number], expire_year: credit_card_params[:expire_year], expire_month: credit_card_params[:expire_month]
@@ -803,8 +799,12 @@ class User < ActiveRecord::Base
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, membership, operation_type)
 
-      response = { message: message, code: Settings.error_codes.success, member_id: self.id, autologin_url: self.full_autologin_url.to_s, status: self.status }
-      response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) if self.is_cms_configured?
+      response = { message: message, code: Settings.error_codes.success, member_id: id, autologin_url: full_autologin_url.to_s, status: status }
+      if is_cms_configured?
+        # after_save_sync_to_remote_domain(true)
+        response[:api_role]   = tom.api_role.to_s.split(',')
+        response[:bill_date]  = (next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y"))
+      end
       response
     rescue Exception => e
       logger.error e.inspect
@@ -912,8 +912,11 @@ class User < ActiveRecord::Base
         change_next_bill_date(new_next_bill_date, agent, "Moved next bill date due to Tom change. Already spend #{days_already_in_provisional} days in previous membership.")
       end
 
-      response = { message: message, code: Settings.error_codes.success, member_id: self.id, autologin_url: self.full_autologin_url.to_s, status: self.status }
-      response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) if self.is_cms_configured?
+      response = { message: message, code: Settings.error_codes.success, member_id: id, autologin_url: full_autologin_url.to_s, status: status }
+      if is_cms_configured?
+        response[:api_role]   = tom.api_role.to_s.split(',')
+        response[:bill_date]  = (next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y"))
+      end
       response
     rescue Exception => e
       logger.error e.inspect
