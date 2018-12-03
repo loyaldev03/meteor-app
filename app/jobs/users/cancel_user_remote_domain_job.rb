@@ -3,12 +3,11 @@ module Users
     queue_as :drupal_queue
 
     def perform(user_id:)
-      user = User.find user_id
-      res = user.api_user.destroy! unless user.api_user.nil? or user.api_id.nil? or not user.club.billing_enable
-      if res.nil?
-        raise "CancelUserRemoteDomainJob::UnexpectedError: CMS Account not destroyed."
-      elseif !res.body['success']
-        raise res.body['error_message']
+      user  = User.find user_id
+      if !user.api_id.nil? and user.club.billing_enable
+        res = user.api_user.destroy! 
+        raise 'CancelUserRemoteDomainJob::UnexpectedError: CMS Account not destroyed.' if res.nil?
+        raise res.body['error_message'] if !res.body['success']
       end
     end
   end

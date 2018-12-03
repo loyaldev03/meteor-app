@@ -292,7 +292,7 @@ module TasksHelpers
       tz = Time.zone.now
       begin
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
-        Users::CancelUserRemoteDomainJob.perform_now(user_id: user.id) if defined?(Spree::Member)
+        Users::CancelUserRemoteDomainJob.perform_now(user_id: user.id)
         user.marketing_tool_remove_from_list
         user.index.remove user rescue nil
         Operation.delete_all(["user_id = ?", user.id])
