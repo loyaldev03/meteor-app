@@ -288,11 +288,11 @@ module TasksHelpers
     today = Time.zone.now.to_date
     base = User.where(testing_account: true)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:delete_testing_accounts rake task, processing #{base.length} users"
-    base.select{|user| user.transactions.where(success: true).sum(:amount)==0.0}.to_enum.with_index.each do |user,index| 
+    base.select{ |user| user.transactions.where(success: true).sum(:amount) == 0.0 }.to_enum.with_index.each do |user, index|
       tz = Time.zone.now
       begin
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
-        Users::CancelUserRemoteDomainJob.perform_now(user_id: user.id)
+        Users::CancelUserRemoteDomainJob.perform_now(user_id: user.id) if defined?(Spree::Member)
         user.marketing_tool_remove_from_list
         user.index.remove user rescue nil
         Operation.delete_all(["user_id = ?", user.id])
@@ -358,5 +358,4 @@ module TasksHelpers
       Campaign.by_transport(transport).where(club_id: club_ids).map{|c| c.missing_days(date: date)}
     end
   end
-
 end

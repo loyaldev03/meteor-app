@@ -620,8 +620,8 @@ class UserTest < ActiveSupport::TestCase
 
   test "should delete user testing account" do
     club = FactoryBot.create(:simple_club_with_gateway)
-    user = FactoryBot.create(:user, :club_id => club.id,:testing_account => true)
-    assert_difference("User.count",-1) do
+    FactoryBot.create(:user, club_id: club.id, testing_account: true)
+    assert_difference('User.count', -1) do
       TasksHelpers.delete_testing_accounts
     end
   end
