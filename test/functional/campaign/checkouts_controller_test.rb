@@ -26,7 +26,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
         'aol.om'
       ] },
       { good: 'aom.com', wrong: [] },       
-      { good: 'att.net', wrong: [
+      { good: 'att.net', wrong: [ 
         'at.net',
         'att.bet',
         'att.met',
@@ -79,7 +79,6 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
         'gmail.con',
         'gmail.coom',
         'gmail.cpm',
-        'gmail.net',
         'gmail.ocm',
         'gmail.om',
         'gmaill.com',
@@ -88,7 +87,7 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
         'gmial.com',
         'gmil.com',
         'gnail.com',
-        'gnsil.con'
+        'gnsil.com'
       ] },
       { good: 'hotmail.com', wrong: [
         'hhhotmail.com',
@@ -136,7 +135,6 @@ class Campaigns::CheckoutsControllerTest < ActionController::TestCase
       ] },
       { good: 'windstream.net', wrong: [] },
       { good: 'xagax.com', wrong: [
-        'xgax.com',
         'xagx.com',
         'xxagax.com',
         'xxxagax.com'

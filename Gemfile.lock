@@ -18,9 +18,9 @@ GIT
 
 GIT
   remote: git://github.com/dmferrari/mailcheck-ruby.git
-  revision: 19ff4cc6730aa60e8aa3e15b1f1da583663eda2a
+  revision: 8359c51386fadb8e72322bc89ae20f45b23eea6e
   specs:
-    mailcheck (1.0.8)
+    mailcheck (1.0.11)
 
 GIT
   remote: git://github.com/ifad/data-confirm-modal.git
@@ -606,4 +606,4 @@ DEPENDENCIES
   yard-rest
 
 BUNDLED WITH
-   1.16.2
+   1.16.6
