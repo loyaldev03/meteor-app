@@ -14,9 +14,9 @@ module Users
           amount_to_reset   = -user.club_cash_amount
           user.add_club_cash(nil, amount_to_reset, 'Removing expired club cash.')
         end
+        user.club_cash_expire_date = user.club_cash_expire_date + 12.months
+        user.save(:validate => false)
       end
-      user.club_cash_expire_date = user.club_cash_expire_date + 12.months
-      user.save(:validate => false)
     end
   end
 end
