@@ -13,7 +13,7 @@ module Users
           operation_message = "Reseting Club cash cash amount to #{amount_to_reset} for #{user.vip_member? ? 'vip member' : 'paid member'}."
         end
         
-        user.add_club_cash(nil, amount_to_reset, message)
+        user.add_club_cash(nil, amount_to_reset, operation_message)
         unless user.is_drupal?
           user.club_cash_expire_date = user.club_cash_expire_date + 12.months
           user.save(:validate => false)
