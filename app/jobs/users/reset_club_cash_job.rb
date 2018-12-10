@@ -11,11 +11,11 @@ module Users
           if amount_to_add > 0
             user.add_club_cash(nil, amount_to_add, "Reseting Club cash cash amount to #{amount_to_reset} for #{user.vip_member? ? 'vip member' : 'paid member'}.")
           end
-        elsif !user.is_drupal?
+        elsif !user.is_cms_configured?
           amount_to_reset   = -user.club_cash_amount
           user.add_club_cash(nil, amount_to_reset, 'Removing expired club cash.')
         end
-        user.club_cash_expire_date = user.club_cash_expire_date + 12.months
+        user.club_cash_expire_date = (user.club_cash_expire_date || Time.current.to_date) + 12.months
         user.save(validate: false)
       end
     end

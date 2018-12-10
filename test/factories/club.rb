@@ -172,7 +172,7 @@ FactoryBot.define do
     api_password { Faker::Internet.user_name }
     family_memberships_allowed false
     fulfillment_tracking_prefix 'T'
-    association :partner  
+    association :partner
     after(:create) { |club| club.payment_gateway_configurations << FactoryBot.build(:payeezy_payment_gateway_configuration) }
     after(:create) { |club| FactoryBot.create(:product, club_id: club.id) }
   end
@@ -185,6 +185,24 @@ FactoryBot.define do
     billing_enable true
     time_zone { TZInfo::Timezone.all.sample.name }
     api_type 'Wordpress::Member'
+    association :api_domain, factory: :domain
+    api_username { Faker::Internet.user_name }
+    api_password { Faker::Internet.user_name }
+    family_memberships_allowed false
+    fulfillment_tracking_prefix 'T'
+    association :partner
+    after(:create) { |club| club.payment_gateway_configurations << FactoryBot.build(:payment_gateway_configuration) }
+    after(:create) { |club| FactoryBot.create(:product, club_id: club.id) }
+  end
+
+  factory :club_with_spree_api, class: Club do
+    sequence(:name) {|n| "club_with_wordpress_api_#{Faker::Lorem.characters(10)}" }
+    description "My description"
+    cs_phone_number "123 456 7891"
+    cs_email 'customer_service@example.com'
+    billing_enable true
+    time_zone { TZInfo::Timezone.all.sample.name }
+    api_type 'Spree::Member'
     association :api_domain, factory: :domain
     api_username { Faker::Internet.user_name }
     api_password { Faker::Internet.user_name }

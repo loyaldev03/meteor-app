@@ -433,7 +433,7 @@ class User < ActiveRecord::Base
   def can_add_club_cash?
     if !is_drupal?
       return true
-    elsif not self.api_id.present?
+    elsif self.api_id.present?
       return true
     end
     false
@@ -1022,7 +1022,7 @@ class User < ActiveRecord::Base
   end
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
-  def assign_club_cash(message = "Adding club cash after billing", enroll = false)
+  def assign_club_cash(message = "Adding club cash after billing", enroll = false)   
     Users::AssignClubCashJob.set(wait: 5.minutes).perform_later(self.id, message, enroll)
   end
 

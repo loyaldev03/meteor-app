@@ -13,28 +13,6 @@ class FulfillmentTest < ActiveSupport::TestCase
     @product_without_stock = FactoryBot.create(:product_without_stock_and_not_recurrent, club_id: @terms_of_membership_with_gateway.club.id, sku: 'NOSTOCK')
     @product_recurrent = FactoryBot.create(:product_with_recurrent, club_id: @terms_of_membership_with_gateway.club.id, sku: 'NORECURRENT')
   end
-
-  def enroll_user(user,tom, amount=23, cc_blank=false, cc_card = nil)
-    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, @credit_card.number)
-    credit_card = cc_card.nil? ? @credit_card : cc_card
-    answer = User.enroll(tom, @current_agent, amount, 
-      { first_name: user.first_name,
-        last_name: user.last_name, address: user.address, city: user.city, gender: 'M',
-        zip: user.zip, state: user.state, email: user.email, type_of_phone_number: user.type_of_phone_number,
-        phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code,
-        phone_local_number: user.phone_local_number, country: 'US', 
-        product_sku: Settings.others_product }, 
-      { number: credit_card.number, 
-        expire_year: credit_card.expire_year, expire_month: credit_card.expire_month },
-      cc_blank)
-
-    assert (answer[:code] == Settings.error_codes.success), answer[:message]+answer.inspect
-
-    saved_user = User.find(answer[:member_id])
-    assert_not_nil saved_user
-    assert_equal saved_user.status, 'provisional'
-    saved_user
-  end
  
   #cancel user and check if not_processed fulfillments were updated to canceled
   test "cancel user after more than two days of enrollment. It should not cancel the fulfillment." do
