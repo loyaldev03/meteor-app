@@ -452,7 +452,7 @@ class User < ActiveRecord::Base
 
   def can_update_vip_member_status?
     @tom_freemium ||= terms_of_membership.freemium?
-    ((!@tom_freemium) || (@tom_freemium && vip_member?))
+    (!@tom_freemium || vip_member?) && (!self.lapsed? || vip_member?)
   end
 
   ###############################################
