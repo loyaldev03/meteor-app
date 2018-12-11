@@ -42,8 +42,8 @@ class Club < ActiveRecord::Base
   scope :mailchimp_related, lambda { where("marketing_tool_client = 'mailchimp_mandrill' AND (marketing_tool_attributes like '%mailchimp_api_key%' AND marketing_tool_attributes not like '%\"mailchimp_api_key\":\"\"%') AND (marketing_tool_attributes like '%mailchimp_list_id%'AND marketing_tool_attributes not like '%\"mailchimp_list_id\":\"\"%')") }
   scope :is_enabled, -> { where(billing_enable: true) }
 
-  scope :drupal_configured, -> { where(api_type: "Drupal::Member") } 
-  scope :spree_configured, -> { where(api_type: "Spree::Member") } 
+  scope :with_drupal_configured, -> { where(api_type: 'Drupal::Member') } 
+  scope :with_spree_configured, -> { where(api_type: 'Spree::Member') } 
 
   has_attached_file :logo, path: ":rails_root/public/system/:attachment/:id/:style/:filename",
                            url: "/system/:attachment/:id/:style/:filename",

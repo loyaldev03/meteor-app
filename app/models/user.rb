@@ -784,8 +784,8 @@ class User < ActiveRecord::Base
       membership.save!
 
       self.update_attribute :current_membership_id, membership.id
-      
-      
+
+
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
@@ -799,13 +799,15 @@ class User < ActiveRecord::Base
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, membership, operation_type)
 
-      response = { message: message, code: Settings.error_codes.success, member_id: id, autologin_url: full_autologin_url.to_s, status: status }
-      if is_cms_configured?
-        # after_save_sync_to_remote_domain(true)
-        response[:api_role]   = tom.api_role.to_s.split(',')
-        response[:bill_date]  = (next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y"))
-      end
-      response
+      { 
+        message: message,
+        code: Settings.error_codes.success,
+        member_id: id,
+        autologin_url: full_autologin_url.to_s,
+        status: status,
+        api_role: tom.api_role.to_s.split(','),
+        bill_date: (next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y"))
+      }
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
@@ -912,12 +914,15 @@ class User < ActiveRecord::Base
         change_next_bill_date(new_next_bill_date, agent, "Moved next bill date due to Tom change. Already spend #{days_already_in_provisional} days in previous membership.")
       end
 
-      response = { message: message, code: Settings.error_codes.success, member_id: id, autologin_url: full_autologin_url.to_s, status: status }
-      if is_cms_configured?
-        response[:api_role]   = tom.api_role.to_s.split(',')
-        response[:bill_date]  = (next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y"))
-      end
-      response
+      { 
+        message: message, 
+        code: Settings.error_codes.success, 
+        member_id: id, 
+        autologin_url: full_autologin_url.to_s,
+        status: status,
+        api_role: tom.api_role.to_s.split(','),
+        bill_date: (next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y"))
+      }
     rescue Exception => e
       logger.error e.inspect
       Auditory.report_issue("User:prorated_enroll -- user turned invalid while enrolling", e, { user: self.id, credit_card: credit_card.id, membership: membership.id })

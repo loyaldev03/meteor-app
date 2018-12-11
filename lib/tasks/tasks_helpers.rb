@@ -123,7 +123,7 @@ module TasksHelpers
   end
 
   def self.process_sync
-    base = User.joins(:club).where('clubs.api_type = "Drupal::Member" AND status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )').with_billing_enable.select('users.id')
+    base = User.joins(:club).merge(Club.with_drupal_configured).where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )').with_billing_enable.select('users.id')
     tz = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users lapsed and api_id not null, processing #{base.length} users"
     base.find_in_batches do |group|
@@ -144,7 +144,7 @@ module TasksHelpers
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
     base =  User.where('last_sync_error like "There is no user with ID%"').with_billing_enable.select('users.id')
-    base2 = User.joins(:club).where('clubs.api_type = "Drupal::Member" AND status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"').with_billing_enable.select('users.id')
+    base2 = User.joins(:club).merge(Club.with_drupal_configured).where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"').with_billing_enable.select('users.id')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users with error sync related to wrong api_id, processing #{base.length+base2.length} users"
     tz = Time.zone.now
     index = 0
@@ -164,21 +164,21 @@ module TasksHelpers
             unless api_m.nil?
               if api_m.save!(force: true)
                 unless user.last_sync_error_at
-                  Auditory.audit(nil, user, "Member synchronized by batch script", user, Settings.operation_types.user_drupal_account_synced_batch)
+                  Auditory.audit(nil, user, 'Member synchronized by batch script', user, Settings.operation_types.user_drupal_account_synced_batch)
                 end
               end
             end
           end
           index = index + 1
         rescue Exception => e
-          Auditory.report_issue("Users::Sync", e, {:user => user_id})
+          Auditory.report_issue('Users::Sync', e, {:user => user_id})
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
-    base = User.joins(:club).where("clubs.api_type = 'Drupal::Member' AND sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").with_billing_enable.select('users.id').limit(2000)
+    base = User.joins(:club).merge(Club.with_drupal_configured).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").with_billing_enable.select('users.id').limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users not_synced or with_error, processing #{base.length} users"
     tz = Time.zone.now
     base.to_enum.with_index.each do |user_id,index|

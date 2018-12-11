@@ -256,7 +256,7 @@ FactoryBot.define do
 
   factory :free_terms_of_membership, class: TermsOfMembership do
     sequence(:name) {|n| "test yearly without provisional day and amount_#{n}" }
-    api_role 6
+    api_role 7
     installment_amount 0
     installment_period 36500
     initial_fee 0
