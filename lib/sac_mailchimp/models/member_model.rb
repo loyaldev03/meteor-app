@@ -147,7 +147,8 @@ module SacMailchimp
         'EXTERNALID' => 'external_id',
         'GENDER' => 'gender',
         'PHONE' => 'full_phone_number',
-        'CJOINDATE' => 'current_join_date'
+        'CJOINDATE' => 'current_join_date',
+        'VIPMEMBER' => 'vip_member'
       }
     end
 
@@ -168,7 +169,7 @@ module SacMailchimp
     end
 
     def terms_of_membership_fieldmap
-      { 
+      {
         'IAMOUNT' => 'installment_amount'
       }
     end
@@ -205,7 +206,7 @@ module SacMailchimp
     end
 
     def has_fake_email?(subscriber_email = nil)
-      ["mailinator.com", "test.com", "noemail.com"].include? (subscriber_email || self.user.email).downcase.split("@")[1]
+      ['mailinator.com', 'test.com', 'noemail.com'].include? (subscriber_email || self.user.email).downcase.split('@')[1]
     end
 	end
 end
