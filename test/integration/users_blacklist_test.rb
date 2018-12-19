@@ -34,8 +34,8 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
   def validate_blacklisted_user(user, validate_cancel_date = false)
     user.reload
     text_reason = "Blacklisted member and all its credit cards. Reason: #{@member_blacklist_reason.name}"
-    assert page.has_content?(text_reason)
-    assert page.has_content?("Blacklisted!!!")
+    assert page.has_content?(text_reason)    
+    assert page.has_content?("Blacklisted")
     assert_equal user.blacklisted, true
 
     if validate_cancel_date
@@ -159,8 +159,7 @@ class UserBlacklistTest < ActionDispatch::IntegrationTest
   test "Blacklist an user with status Lapsed" do
     setup_user
     @saved_user.set_as_canceled
-    @saved_user.reload
-    
+    @saved_user.reload    
     blacklist_user(@saved_user,@member_blacklist_reason.name)
     validate_blacklisted_user(@saved_user)
   end
