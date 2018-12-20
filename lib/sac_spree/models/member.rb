@@ -59,7 +59,7 @@ module Spree
         first_name: user.first_name,
         last_name: user.last_name,
         member_id: user.reload.id,
-        preferences: user.preferences,
+        preferences: user.preferences.present? ? user.preferences : {},
         vip_event_quota: user.club_cash_amount,
         role: role
       }
