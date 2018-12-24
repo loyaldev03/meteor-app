@@ -431,6 +431,12 @@ development:
         PREF2: driver_2
         PREF3: car
         PREF4: track
+    123:
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
 
 test:
   <<: *defaults
