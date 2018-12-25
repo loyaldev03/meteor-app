@@ -504,6 +504,12 @@ prototype:
         PREF2: driver_2
         PREF3: car
         PREF4: track
+    123:
+      preferences:
+        PREF1: driver_1
+        PREF2: driver_2
+        PREF3: car
+        PREF4: track
   elasticsearch:
     url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
 
