@@ -133,7 +133,7 @@ module TasksHelpers
           api_m = user.api_user
           unless api_m.nil?
             api_m.destroy!
-            Auditory.audit(nil, user, "User's drupal account destroyed by batch script", user, Settings.operation_types.user_drupal_account_destroyed_batch)
+            Auditory.audit(nil, user, "User's CMS account destroyed by batch script", user, Settings.operation_types.user_drupal_account_destroyed_batch)
           end
         rescue Exception => e
           Auditory.report_issue("Users::Sync", e, {:user => user_id})
@@ -211,7 +211,7 @@ module TasksHelpers
     base.find_in_batches do |group|
       group.each_with_index do |user, index|
         club = user.club
-        row = "ID: #{user.id} - Partner-Club: #{club.partner.name}-#{club.name} - Email: #{user.email} - Status: #{user.status} - Drupal domain link: #{user.club.api_domain.url}/admin/#{user.is_drupal? ? 'people' : 'users'}"
+        row = "ID: #{user.id} - Partner-Club: #{club.partner.name}-#{club.name} - Email: #{user.email} - Status: #{user.status} - CMS domain link: #{user.club.api_domain.url}/admin/#{user.is_drupal? ? 'people' : 'users'}"
         user_list.merge!("user#{index+1}" => row)
       end
     end
