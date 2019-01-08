@@ -68,10 +68,12 @@ module PayeezyAccountUpdater
         begin
           user = User.find_by('id = ? OR email LIKE ?', data['Invoice Number'], "#{data['Invoice Number']}%")
           raise "Chargeback ##{data['Invoice Number']} could not be processed: Could not find user! #{data.to_s}" unless user
-          transaction_chargebacked = user.transactions.find_by("payment_gateway_configuration_id = ? AND DATE(created_at) = ? AND last_digits = ? AND amount = ?", gateway.id, data['Transaction Date'], data['Cardholder Number'][-4,4], data['Processed Transaction Amount'])
-          raise "Chargeback ##{data['Invoice Number']} could not be processed: Could not find transaction! #{data.to_s}" unless transaction_chargebacked
+          sale_transaction_date     = data['Transaction Date'].to_date
+          transactions_chargebacked  = user.transactions.where("payment_gateway_configuration_id = ? AND DATE(created_at) >= ? AND DATE(created_at) <=? AND last_digits = ? AND amount = ?", gateway.id, sale_transaction_date - 1.day, sale_transaction_date, data['Cardholder Number'][-4,4], data['Processed Transaction Amount'])
+          raise "Chargeback ##{data['Invoice Number']} could not be processed: Could not find transaction! #{data.to_s}" unless transactions_chargebacked.first
+          raise "Chargeback ##{data['Invoice Number']} could not be processed: Multiple possible sale transactions found." if transactions_chargebacked.count > 1
 
-          user.chargeback! transaction_chargebacked, data, data['Chargeback Description']
+          user.chargeback! transactions_chargebacked.first, data, data['Chargeback Description']
         rescue Exception => e
           Auditory.report_issue("PAYEEZY::chargeback_report", $!, { :gateway_id => gateway.id.to_s, :data => data })
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
