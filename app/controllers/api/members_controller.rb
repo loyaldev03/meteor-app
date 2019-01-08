@@ -231,6 +231,7 @@ class Api::MembersController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] id Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
+  # @optional [Boolean] include_available_preferences Boolean value to request available preference options for this user.
   # @response_field [Hash] credit_card Information related to member's credit card.
   #  <ul>
   #     <li><strong>last_4_digits</strong> Member's active credit card last four digits. </li>
@@ -314,18 +315,25 @@ class Api::MembersController < ApplicationController
         expire_month: (credit_card && credit_card.expire_month),
         expire_year: (credit_card && credit_card.expire_year)
       },
-      current_membership:{
+      current_membership: {
         status: membership.status,
         join_date: membership.join_date.to_datetime.change(:offset => user.get_offset_related).to_s,
         cancel_date: membership.cancel_date.nil? ? '' : membership.cancel_date.to_datetime.change(:offset => user.get_offset_related).to_s,
         terms_of_membership_id: membership.terms_of_membership_id
       }
     }
-    response.merge!( external_id: user.external_id ) if user.club.requires_external_id
+    response[:external_id] = user.external_id if user.club.requires_external_id
+
+    if params[:include_available_preferences] == true
+      response[:available_preferences] = Rails.cache.fetch(club) do
+        club.preference_groups.includes(:preferences).map { |pref| { name: pref.name, code: pref.code, preferences: pref.preferences.pluck(:name) } }
+      end
+    end
+
     render json: response
   rescue ActiveRecord::RecordNotFound
     render json: { code: Settings.error_codes.not_found, message: 'Member not found' }
-  end    
+  end
 
   ##
   # Updates member's club cash's data. Have in mind that in order to use this feature, member's club must allow club cash transaction within it.  

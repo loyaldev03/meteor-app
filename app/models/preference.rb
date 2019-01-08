@@ -1,5 +1,5 @@
 class Preference < ActiveRecord::Base
-  belongs_to :preference_group
+  belongs_to :preference_group, touch: true
   validates :name, :preference_group_id, presence: true
   validates :name, uniqueness: { scope: :preference_group }
 
