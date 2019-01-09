@@ -1,11 +1,11 @@
 require 'ruby-jmeter'
 
-UNBOUNCE_LANDING_PAGE       = 'http://products.onmc.com/load-test'.freeze
+UNBOUNCE_LANDING_PAGE       = 'https://products.onmc.com/load-test/?utm_campaign=sloop&utm_source=nascar&utm_medium=referral&utm_content=loadtest&audience=loadtest&campaign_id=65c04a3a4hn4h4s2'.freeze
 
 PHOENIX_DOMAIN              = 'https://checkout.onmc.com'.freeze
 PHOENIX_AUTHENTICATION_KEY  = 'S6i8PVaB4WvW6R3n9z19'.freeze
 PHOENIX_CAMPAIGN_ID         = '83e90b20c12f0d72d723010b80c59ee81'.freeze
-PHOENIX_USER_ID             = '84226813de8c53703b1ca07d5b08c40e1'.freeze
+PHOENIX_USER_ID             = '13782dbe4ccb129827f0df31ad6bc8ec1'.freeze
 
 PRODUCT_SKU                 = 'LOADTESTINGVARIANT1'.freeze
 
