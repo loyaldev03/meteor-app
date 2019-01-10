@@ -324,7 +324,7 @@ class Api::MembersController < ApplicationController
     }
     response[:external_id] = user.external_id if user.club.requires_external_id
 
-    if params[:include_available_preferences] == true
+    if ['true', true].include? params[:include_available_preferences]
       response[:available_preferences] = Rails.cache.fetch(club) do
         club.preference_groups.includes(:preferences).map { |pref| { name: pref.name, code: pref.code, preferences: pref.preferences.pluck(:name) } }
       end
