@@ -38,7 +38,7 @@ module Spree
       res = Hashie::Mash.new(conn.post("/api/v1/users/#{user.api_id}/generate_urllogin").body)
       user.update_column :autologin_url, res.url
       res
-    rescue StandardError
+    rescue StandardError => e
       Auditory.report_issue('Spree:Member:login_token', e, member: user.id)
       nil
     end
