@@ -16,7 +16,7 @@ test do
 
   cookies
 
-  threads count: 60, duration: 900 do
+  threads count: 60, duration: 1200 do
     transaction 'enroll' do
       visit name: 'Unbounce - Landing Page visit', url: UNBOUNCE_LANDING_PAGE
 
