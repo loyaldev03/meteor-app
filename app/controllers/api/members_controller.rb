@@ -288,12 +288,13 @@ class Api::MembersController < ApplicationController
     response = {
       code: Settings.error_codes.success,
       member: {
-        first_name: user.first_name, 
-        last_name: user.last_name, 
+        first_name: user.first_name,
+        last_name: user.last_name,
         email: user.email,
-        address: user.address, 
-        city: user.city, 
-        state: user.state, 
+        address: user.address,
+        city: user.city,
+        country: user.country,
+        state: user.state,
         zip: user.zip,
         birth_date: user.birth_date,
         phone_country_code: user.phone_country_code, 
