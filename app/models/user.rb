@@ -1245,7 +1245,8 @@ class User < ActiveRecord::Base
 
     if credit_cards.empty? or allow_cc_blank
       unless only_validate
-        answer = add_new_credit_card(new_credit_card, current_agent, set_active)
+        answer          = add_new_credit_card(new_credit_card, current_agent, set_active)
+        new_credit_card = reload.active_credit_card
       end
     # credit card is blacklisted
     elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? 
