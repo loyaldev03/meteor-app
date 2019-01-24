@@ -1246,7 +1246,7 @@ class User < ActiveRecord::Base
     if credit_cards.empty? or allow_cc_blank
       unless only_validate
         answer          = add_new_credit_card(new_credit_card, current_agent, set_active)
-        new_credit_card = reload.active_credit_card
+        new_credit_card = reload.active_credit_card if set_active
       end
     # credit card is blacklisted
     elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? 
@@ -1254,7 +1254,8 @@ class User < ActiveRecord::Base
     # is this credit card already of this members and its already active?
     elsif not credit_cards.select { |cc| cc.user_id == self.id and cc.active }.empty? 
       unless only_validate
-        answer = active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
+        answer          = active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
+        new_credit_card = reload.active_credit_card
       end
     elsif not family_memberships_allowed and not credit_cards.select { |cc| cc.user_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.user_id != self.id and cc.active }.empty?
       answer = { message: I18n.t('error_messages.credit_card_in_use', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.credit_card_in_use, errors: { number: "Credit card is already in use" }}
@@ -1279,6 +1280,7 @@ class User < ActiveRecord::Base
     elsif family_memberships_allowed or credit_cards.select { |cc| cc.active }.empty? 
       unless only_validate
         answer = add_new_credit_card(new_credit_card, current_agent, set_active)
+        new_credit_card = reload.active_credit_card if set_active
       end
     else
       answer = { message: I18n.t('error_messages.credit_card_in_use', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.credit_card_in_use, errors: { number: "Credit card is already in use" }}
