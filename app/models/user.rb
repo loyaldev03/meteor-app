@@ -1032,7 +1032,7 @@ class User < ActiveRecord::Base
   end
 
   # Adds club cash transaction. 
-  def add_club_cash(agent, amount = 0, description = nil)
+  def add_club_cash(agent, amount = 0, description = nil, set_expire_date = false)
     answer = { code: Settings.error_codes.club_cash_transaction_not_successful, message: "Could not save club cash transaction"  }
     begin
       if not club.allow_club_cash_transaction?
@@ -1047,7 +1047,8 @@ class User < ActiveRecord::Base
               cct = ClubCashTransaction.new(amount: amount, description: description)
               self.club_cash_transactions << cct
               raise "Could not save club cash transaction" unless cct.valid? and self.valid?
-              self.club_cash_amount = self.club_cash_amount + amount.to_f
+              self.club_cash_amount       = self.club_cash_amount + amount.to_f
+              self.club_cash_expire_date  = Time.current.to_date + 1.year if set_expire_date
               self.save(validate: false)
               message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }."+(description.blank? ? '' : " Concept: #{description}")
               if amount.to_f > 0
@@ -1502,9 +1503,10 @@ class User < ActiveRecord::Base
         Transaction.generate_balance_transaction(agent, self, amount_in_favor, current_membership)
       end
       if club_cash_to_substract || is_spree?
-        club_cash_balance = (is_spree? ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount).to_i - club_cash_to_substract.to_i
+        club_cash_to_add = is_spree? ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount
+        club_cash_balance = club_cash_to_add.to_i - club_cash_to_substract.to_i
         club_cash_balance = -self.club_cash_amount if club_cash_balance < 0 && club_cash_balance.abs > self.club_cash_amount
-        self.add_club_cash(agent, club_cash_balance, "Prorating club cash. Adding #{terms_of_membership.club_cash_installment_amount} minus #{club_cash_to_substract.to_i} from previous Subscription plan.")
+        self.add_club_cash(agent, club_cash_balance, "Prorating club cash. Adding #{club_cash_to_add} minus #{club_cash_to_substract.to_i} from previous Subscription plan.", true)
       end
       schedule_renewal if check_upgradable
     end
