@@ -1497,21 +1497,16 @@ class User < ActiveRecord::Base
       unless set_as_active
         Auditory.report_issue("Billing::set_as_active - Can't set as active after prorated update", nil, { member: self.id, membership: current_membership.id, transaction_id: trans.id, transaction_amount: trans.amount, transaction_response: trans.response })
       end
-
       if amount_in_favor > 0.0
         Transaction.generate_balance_transaction(agent, self, -amount_in_favor, former_membership, sale_transaction)
         Transaction.generate_balance_transaction(agent, self, amount_in_favor, current_membership)
       end
-      if club_cash_to_substract
-        club_cash_balance = terms_of_membership.club_cash_installment_amount - club_cash_to_substract 
-        if club_cash_balance < 0 and club_cash_balance.abs > self.club_cash_amount
-          club_cash_balance = -self.club_cash_amount 
-        end
-        self.add_club_cash(agent, club_cash_balance, "Prorating club cash. Adding #{terms_of_membership.club_cash_installment_amount} minus #{club_cash_to_substract} from previous Subscription plan.")
+      if club_cash_to_substract || is_spree?
+        club_cash_balance = (is_spree? ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount).to_i - club_cash_to_substract.to_i
+        club_cash_balance = -self.club_cash_amount if club_cash_balance < 0 && club_cash_balance.abs > self.club_cash_amount
+        self.add_club_cash(agent, club_cash_balance, "Prorating club cash. Adding #{terms_of_membership.club_cash_installment_amount} minus #{club_cash_to_substract.to_i} from previous Subscription plan.")
       end
-      if check_upgradable
-        schedule_renewal
-      end
+      schedule_renewal if check_upgradable
     end
 
     def record_date

@@ -6,8 +6,10 @@ module Users
       user    = User.find(user_id)
       amount  = enroll ? user.terms_of_membership.initial_club_cash_amount : user.terms_of_membership.club_cash_installment_amount
       user.add_club_cash(nil, amount, message)
-      if !user.is_drupal? && !user.terms_of_membership.freemium? && user.club_cash_expire_date.nil? # first club cash assignment
-        user.update_attribute :club_cash_expire_date, user.join_date + 1.year
+      if !user.is_drupal? && !user.terms_of_membership.freemium?
+        if user.club_cash_expire_date.nil? # first club cash assignment
+          user.update_attribute :club_cash_expire_date, user.join_date + 1.year
+        end
       end
     end
   end
