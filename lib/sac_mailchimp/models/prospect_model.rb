@@ -75,9 +75,9 @@ module SacMailchimp
     end
 
     def preferences_fieldmap
-      Settings['club_params'][user.club_id]['preferences']
+      Settings['club_params'][@club.id]['preferences']
     rescue NoMethodError => e
-      Auditory.audit(nil, user.club, I18n.t('error_messages.preferences_not_set_for_club') + " - #{e}")
+      Auditory.audit(nil, @club, I18n.t('error_messages.preferences_not_set_for_club') + " - #{e}")
     end
 
     def client
