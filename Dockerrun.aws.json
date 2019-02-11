@@ -1,0 +1,13 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "858744600536.dkr.ecr.us-east-2.amazonaws.com/phoenix/platform:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "3000",
+      "HostPort": "80"
+    }
+  ]
+}

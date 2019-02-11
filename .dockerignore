@@ -1,0 +1,7 @@
+.dockerignore
+tmp/
+doc/
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+.git
+.gitignore
