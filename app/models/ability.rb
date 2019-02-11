@@ -56,6 +56,7 @@ class Ability
     cannot :chargeback, Transaction
     cannot :toggle_testing_account, User
     cannot :manual_review, Fulfillment
+    cannot :import_shipping_cost, Fulfillment
     cannot :bulk_process, Product
     cannot :send, Communication
     cannot :unblacklist, User

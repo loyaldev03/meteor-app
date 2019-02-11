@@ -65,6 +65,7 @@ en:
   reject: 'Reject'
   reject_save_the_sale: 'Reject Save the Sale'
   not_set: 'Not set'
+  import_shipping_cost: 'Import Shipping Costs'
   enums:
     campaign:
       transport:

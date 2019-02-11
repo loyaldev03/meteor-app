@@ -60,6 +60,9 @@
                     <% if current_agent.can? :manual_review, Fulfillment, current_club.id %>
                       <li><%= link_to t('activerecord.model.suspected_fulfillments'), suspected_fulfillments_path(current_club.partner.prefix, current_club.name) %></li>
                     <% end %>
+                    <% if current_agent.can? :import_shipping_cost, Fulfillment, current_club.id %>
+                      <li><%= link_to t('import_shipping_cost'), fulfillment_import_shipping_cost_path(current_club.partner.prefix, current_club.name) %></li>
+                    <% end %>
                   <% end %>
                   <% if @current_agent.can?(:read, Campaign, @current_club.id) or @current_agent.can?(:read, CampaignDay, @current_club.id) or @current_agent.can?(:read, TransportSetting, @current_club.id) %>
                     <li class="divider"></li>

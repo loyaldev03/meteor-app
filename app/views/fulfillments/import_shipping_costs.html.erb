@@ -1,0 +1,17 @@
+<section>
+  <div class="page-header">
+      <h1>Fulfillments - Import shipping costs</h1>
+  </div>
+</section>
+
+<%= form_for :fulfillment, url: fulfillment_import_shipping_cost_path, method: :post do |f| %>
+
+  <%= f.label :shipping_cost_report, :class => 'help-inline' %>
+  <%= f.file_field :file, required: true, accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/xls,application/xlsx' %>
+
+  </br></br></br></br>
+    
+  <div class="form-group">
+    <%= f.submit :class => 'btn btn-primary' %>
+  </div>
+<% end %>

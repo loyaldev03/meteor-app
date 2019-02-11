@@ -184,6 +184,22 @@ class FulfillmentsController < ApplicationController
     evidences = fulfillment.suspected_fulfillment_evidences.order("match_age ASC").paginate(page: params[:page], per_page: 20) if fulfillment
     render :partial => 'suspected_fulfillment_information', locals: { fulfillment: fulfillment, evidences: evidences }
   end
+
+  def import_shipping_costs
+    if request.post?
+      if params[:fulfillment] && params[:fulfillment][:file]
+        if (params[:fulfillment][:file].size.to_f / 2**20) <= 4
+          if ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/xls', 'application/xlsx'].include? params[:fulfillment][:file].content_type
+            # create Job to analyze these rows or 
+          else
+            flash.now[:error] = "Format not supported. Please, provide an xlsx file"
+          end
+        else
+          flash.now[:error] = 'The file is too large. The maximum size of a file is 4Mb.'
+        end
+      else
+        flash.now[:error] = 'The file is required. Please, provide a file before submitting.'
+      end
+    end
+  end
 end
-
-
