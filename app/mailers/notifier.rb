@@ -1,7 +1,8 @@
 class Notifier < ActionMailer::Base
+  layout 'mailer', only: %i[shipping_cost_updater_result]
   default from: Settings.platform_email
   default bcc: Settings.platform_admins_email
-  
+
   def pre_bill(email)
     to = Rails.env == 'prototype' ? Settings.email_to_use_on_action_mailer_as_recipient : email
     mail :to => to, :subject => "Pre bill email to #{email}"
@@ -82,6 +83,11 @@ class Notifier < ActionMailer::Base
     mail :to => agent.email, :subject => "Fulfillment file ##{fulfillment_file.id}"
   end
 
+  def shipping_cost_updater_result(reports_processed, errors_count)
+    @reports_processed  = reports_processed
+    @errors_count       = errors_count
+    # mail to: Settings.shipping_cost_report_recipient,
+    mail to: 'sebastian@xagax.com',
+        subject: "#{I18n.l(Time.zone.now, format: :default )} - Shipment Updater Results"
+  end
 end
- 
-

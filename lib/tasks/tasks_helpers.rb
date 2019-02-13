@@ -333,6 +333,36 @@ module TasksHelpers
     end
   end
 
+  def self.process_shipping_cost
+    documents = Dir['tmp/shipping_cost_reports/*']
+    if documents.any?
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, format: :dashed)}] Starting fulfillments:process_shipping_cost_reports rake task, processing #{documents.size} reports."
+      documents.each do |document|
+        document_name = document.gsub("#{Settings.shipping_cost_report_folder}/", '')
+        doc           = SimpleXlsxReader.open(document)
+        rows_names = doc.sheets.first.rows.select{ |row| row.include? 'ZONE' }.first
+        errors        = []
+        doc.sheets.first.rows.each do |row|
+          tracking_code = row[2] # PACKAGE ID
+          next if tracking_code.nil? || !tracking_code.starts_with?('N')
+
+          fulfillment = Fulfillment.find_by tracking_code: tracking_code
+          if fulfillment
+            fulfillment.shipping_cost = row[13] # UPS-MI
+            unless fulfillment.save
+              errors << { error: "Fulfillment not saved: #{fulfillment.errors.full_messages}", row: rows_names.each_with_object({}) { |element, result| result[element] = row[result.size] ; result } }
+            end
+          else
+            errors << { error: 'Fulfillment not found', row: rows_names.each_with_object({}) { |element, result| result[element] = row[result.size] ; result } }
+          end
+        end
+        Auditory.notify_pivotal_tracker('Fulfillment Shipping Cost Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", errors) if errors.any?
+        File.delete(document)
+      end
+    end
+    Notifier.shipping_cost_updater_result(documents, errors).deliver_later
+  end
+
   #######################################################
   ################ CAMPAIGN #############################
   #######################################################

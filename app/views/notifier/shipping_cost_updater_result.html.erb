@@ -1,0 +1,24 @@
+<% content_for :header do %>
+  <% if @errors_count == 0 %>
+    <div class="alert alert-good"><h1> Shipping cost files have been successfully processed.</h1></div>
+  <% else %>
+    <div class="alert alert-bad"><h1> There has been some errors while processing shipping cost files.</h1></div>
+  <% end %>
+<% end %>
+
+
+<% content_for :body do %>
+  <p>Dear agent,</p>
+  <p>Here is the list of reports processed during the night:</p>
+  <ul>
+    <% @reports_processed.each do |report| %>
+      <li><%= report %></li>
+    <% end %>
+  </ul>
+  
+  <% if @errors_count.positive? %>
+    <p>There have been <%= @errors_count %> errors while processing these reports. We have created a new Story with more details related to them.</p>
+  <% end %>
+
+  <p>Regards,</p>
+<% end %>

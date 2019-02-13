@@ -13,6 +13,8 @@ defaults: &defaults
   others_product: "SLOOPS"
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe', 'payeezy']
   logger_level_for_tasks: 'DEBUG'
+  shipping_cost_report_folder: 'tmp/shipping_cost_reports'
+  shipping_cost_report_recipient: 'slaino@meteoraffinity.com,sdeluca@meteoraffinity.com'
   pivotal_tracker:
     project_id: 840477
     token: "93edf6fdb44a44b280a675b85c464c5b"
@@ -445,6 +447,7 @@ test:
 
 production:
   <<: *defaults
+  shipping_cost_report_recipient: 'tbrady@meteoraffinity.com,ndavid@meteoraffinity.com'
   campaign_manager_recipients: 'mbrossard@meteoraffinity.com,ndavid@meteoraffinity.com,lerrick@meteoraffinity.com'
   email_to_send_product_list: 'tbrady@meteoraffinity.com,ndavid@meteoraffinity.com'
   logger_level_for_tasks: 'INFO'

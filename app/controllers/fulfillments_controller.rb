@@ -190,9 +190,13 @@ class FulfillmentsController < ApplicationController
       if params[:fulfillment] && params[:fulfillment][:file]
         if (params[:fulfillment][:file].size.to_f / 2**20) <= 4
           if ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/xls', 'application/xlsx'].include? params[:fulfillment][:file].content_type
-            # create Job to analyze these rows or 
+            FileUtils.mkdir_p(Settings.shipping_cost_report_folder) unless File.directory?(Settings.shipping_cost_report_folder)
+            document = File.open("#{Settings.shipping_cost_report_folder}/#{params[:fulfillment][:file].original_filename}", 'wb')
+            document.write(params[:fulfillment][:file].read)
+            document.close
+            flash.now[:success] = 'File was uploaded successfully. It will be processed during the night.'
           else
-            flash.now[:error] = "Format not supported. Please, provide an xlsx file"
+            flash.now[:error] = 'Format not supported. Please, provide an xlsx file'
           end
         else
           flash.now[:error] = 'The file is too large. The maximum size of a file is 4Mb.'

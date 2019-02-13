@@ -418,6 +418,9 @@ GEM
     settingslogic (2.0.8)
     shared-mime-info (0.2.5)
     simple_oauth (0.1.9)
+    simple_xlsx_reader (1.0.4)
+      nokogiri
+      rubyzip
     simplecov (0.16.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
@@ -590,6 +593,7 @@ DEPENDENCIES
   select2-rails
   selenium-webdriver
   settingslogic (= 2.0.8)
+  simple_xlsx_reader
   simplecov
   state_machine (= 1.1.2)
   timecop
