@@ -18,6 +18,7 @@ module SacMailchimp
       update_prospect(res)
     rescue Exception => e
       update_prospect(Gibbon::MailChimpError.new("unexpected error", { detail: e.to_s }))
+      raise e
     end
 
     def self.email_belongs_to_prospect_and_no_user?(subscriber_email, club_id)
