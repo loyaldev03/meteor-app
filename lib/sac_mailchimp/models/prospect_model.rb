@@ -40,7 +40,7 @@ module SacMailchimp
 
     def subscriber_data
     	attributes = {"STATUS" => 'prospect'}
-    	fieldmap.each do |api_field, our_field| 
+    	fieldmap.each do |api_field, our_field|
         attributes.merge!(SacMailchimp.format_attribute(self.prospect, api_field, our_field))
       end
       if self.prospect.preferences and preferences_fieldmap
@@ -75,9 +75,9 @@ module SacMailchimp
     end
 
     def preferences_fieldmap
-      Settings['club_params'][@club.id]['preferences']
-    rescue NoMethodError => e
-      Auditory.audit(nil, @club, I18n.t('error_messages.preferences_not_set_for_club') + " - #{e}")
+      if Settings['club_params'] && Settings['club_params'][@club.id] && Settings['club_params'][@club.id]['preferences']
+        Settings['club_params']['preferences']
+      end
     end
 
     def client
