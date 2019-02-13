@@ -32,8 +32,8 @@ module SacMailchimp
             base = club.prospects.where('need_sync_to_marketing_client = 1').order('created_at ASC').limit(1000)
           end
           Rails.logger.info "    ... took #{Time.zone.now - tzc}seconds for club ##{club.id}"
+          Auditory.report_issue('Mailchimp::ProspectSync: Unexpected errors. Check logs. Check logs.', nil, exception_count: exception_count) if exception_count > 0
         end
-        Auditory.report_issue('Mailchimp::ProspectSync: Unexpected errors. Check logs. Check logs.', nil, exception_count: exception_count) if exception_count > 0
       end
     end
 
