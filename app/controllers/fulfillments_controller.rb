@@ -190,10 +190,17 @@ class FulfillmentsController < ApplicationController
       if params[:fulfillment] && params[:fulfillment][:file]
         if (params[:fulfillment][:file].size.to_f / 2**20) <= 4
           if ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/xls', 'application/xlsx'].include? params[:fulfillment][:file].content_type
-            FileUtils.mkdir_p(Settings.shipping_cost_report_folder) unless File.directory?(Settings.shipping_cost_report_folder)
-            document = File.open("#{Settings.shipping_cost_report_folder}/#{params[:fulfillment][:file].original_filename}", 'wb')
+            temp_file_url = "tmp/#{params[:fulfillment][:file].original_filename}"
+            document = File.open(temp_file_url, 'wb')
             document.write(params[:fulfillment][:file].read)
             document.close
+
+            obj = Aws::S3::Resource.new(region: Settings.s3_region, credentials: Aws::Credentials.new(Settings.s3_credentials.apikey, Settings.s3_credentials.secret_access_key))
+                                   .bucket(Settings.s3_bucket)
+                                   .object("#{Settings.s3_credentials.shipping_cost_report_folder}/#{params[:fulfillment][:file].original_filename}")
+            obj.upload_file(File.open(temp_file_url))
+
+            File.delete(document)
             flash.now[:success] = 'File was uploaded successfully. It will be processed during the night.'
           else
             flash.now[:error] = 'Format not supported. Please, provide an xlsx file'

@@ -83,9 +83,10 @@ class Notifier < ActionMailer::Base
     mail :to => agent.email, :subject => "Fulfillment file ##{fulfillment_file.id}"
   end
 
-  def shipping_cost_updater_result(reports_processed, errors_count)
+  def shipping_cost_updater_result(reports_processed, success_count, errors)
     @reports_processed  = reports_processed
-    @errors_count       = errors_count
+    @success_count      = success_count
+    @errors             = errors
     # mail to: Settings.shipping_cost_report_recipient,
     mail to: 'sebastian@xagax.com',
         subject: "#{I18n.l(Time.zone.now, format: :default )} - Shipment Updater Results"

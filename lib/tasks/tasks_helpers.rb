@@ -334,33 +334,50 @@ module TasksHelpers
   end
 
   def self.process_shipping_cost
-    documents = Dir['tmp/shipping_cost_reports/*']
-    if documents.any?
-      Rails.logger.info " *** [#{I18n.l(Time.zone.now, format: :dashed)}] Starting fulfillments:process_shipping_cost_reports rake task, processing #{documents.size} reports."
-      documents.each do |document|
-        document_name = document.gsub("#{Settings.shipping_cost_report_folder}/", '')
-        doc           = SimpleXlsxReader.open(document)
-        rows_names = doc.sheets.first.rows.select { |row| row.include? 'ZONE' }.first
-        errors     = []
-        doc.sheets.first.rows.each do |row|
-          tracking_code = row[2] # PACKAGE ID
-          next if tracking_code.nil? || !tracking_code.starts_with?('N')
+    s3      = Aws::S3::Resource.new(region: Settings.s3_region, credentials: Aws::Credentials.new(Settings.s3_credentials.apikey, Settings.s3_credentials.secret_access_key))
+    bucket  = s3.bucket(Settings.s3_bucket)
+    objects = bucket.objects(prefix: Settings.s3_credentials.shipping_cost_report_folder)
 
-          fulfillment = Fulfillment.find_by tracking_code: tracking_code
-          if fulfillment
-            fulfillment.shipping_cost = row[13] # UPS-MI
-            unless fulfillment.save
-              errors << { error: "Fulfillment not saved: #{fulfillment.errors.full_messages}", row: rows_names.each_with_object({}) { |element, result| result[element] = row[result.size] ; result } }
+    if objects.any?
+      success_count = 0
+      errors        = []
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, format: :dashed)}] Starting fulfillments:process_shipping_cost_reports rake task, processing #{objects.count} reports."
+      objects.each do |object|
+        begin
+          document_name = object.key.gsub("#{Settings.s3_credentials.shipping_cost_report_folder}/", '')
+          temp_file_url = "tmp/#{document_name}"
+          object.download_file(temp_file_url)
+          doc = SimpleXlsxReader.open("tmp/#{document_name}")
+          doc.sheets.first.rows.each do |row|
+            tracking_code = row[2] # PACKAGE ID
+            next if tracking_code.nil? || !tracking_code.starts_with?('N')
+
+            fulfillment = Fulfillment.find_by tracking_code: tracking_code
+            if fulfillment
+              fulfillment.shipping_cost = row[13] # UPS-MI
+              if fulfillment.save
+                success_count += 1
+              else
+                errors << { error: "Fulfillment not saved: #{fulfillment.errors.full_messages}", tracking_code: tracking_code }
+                Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
+              end
+            else
+              errors << { error: 'Fulfillment not found', tracking_code: tracking_code }
+              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: Fulfillment not found - row: #{row}"
             end
-          else
-            errors << { error: 'Fulfillment not found', row: rows_names.each_with_object({}) { |element, result| result[element] = row[result.size] ; result } }
           end
+          Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", errors) if errors.any?
+
+          record_file = bucket.object("#{Settings.s3_credentials.shipping_cost_report_processed_folder}/#{document_name}")
+          record_file.upload_file(File.open(temp_file_url))
+          object.delete
+          File.delete(temp_file_url)
+        rescue Zip::ZipError
+          Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater', "Could not process #{document_name}. File could not be downloaded from S3 to be processed.")
         end
-        Auditory.notify_pivotal_tracker('Fulfillment Shipping Cost Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", errors) if errors.any?
-        File.delete(document)
       end
     end
-    Notifier.shipping_cost_updater_result(documents, errors).deliver_later
+    Notifier.shipping_cost_updater_result(objects.collect { |obj| obj.key.gsub("#{Settings.s3_credentials.shipping_cost_report_folder}/", '') }, success_count, errors).deliver_now
   end
 
   #######################################################

@@ -1,5 +1,5 @@
 <% content_for :header do %>
-  <% if @errors_count == 0 %>
+  <% if @errors.empty? %>
     <div class="alert alert-good"><h1> Shipping cost files have been successfully processed.</h1></div>
   <% else %>
     <div class="alert alert-bad"><h1> There has been some errors while processing shipping cost files.</h1></div>
@@ -16,8 +16,14 @@
     <% end %>
   </ul>
   
-  <% if @errors_count.positive? %>
-    <p>There have been <%= @errors_count %> errors while processing these reports. We have created a new Story with more details related to them.</p>
+  <p> <%= @success_count %> fulfillments were updated successfully. There have been <%= @errors.count %> errors while processing these reports. </p> 
+  <% if @errors.any? %>
+    <p>We have created a new Story with more details related to them, but here is the list of errors too:</p>
+    <ul>
+    <% @errors.each do |error_data| %>
+      <li><%= error_data[:tracking_code] %> - <%= error_data[:error] %> </li>
+    <% end %>
+    </ul>
   <% end %>
 
   <p>Regards,</p>
