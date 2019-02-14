@@ -15,7 +15,7 @@ module SacMailchimp
             tz = Time.zone.now
             begin
               Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-              member.marketing_tool_sync
+              member.mailchimp_sync_to_remote_domain!
             rescue StandardError
               Rails.logger.error "    [!] Mailchimp::MemberSync failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
               exception_count += 1
