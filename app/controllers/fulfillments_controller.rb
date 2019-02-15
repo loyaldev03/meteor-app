@@ -188,7 +188,7 @@ class FulfillmentsController < ApplicationController
   def import_shipping_costs
     if request.post?
       if params[:fulfillment] && params[:fulfillment][:file]
-        if (params[:fulfillment][:file].size.to_f / 2**20) <= 4
+        if params[:fulfillment][:file].size.to_f <= 4.megabytes
           if ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/xls', 'application/xlsx'].include? params[:fulfillment][:file].content_type
             temp_file_url = "tmp/#{params[:fulfillment][:file].original_filename}"
             document = File.open(temp_file_url, 'wb')
