@@ -28,27 +28,46 @@ class Auditory
     end
   end
 
-  def self.create_user_story(description, title, project_id = Settings.pivotal_tracker.project_id, story_type = 'bug', assignee = nil)
+  def self.create_user_story(description, title, project_id = Settings.pivotal_tracker.project_id, story_type = 'bug', assignee = nil, attachment = nil)
     client = TrackerApi::Client.new(token: Settings.pivotal_tracker.token)
     project = client.project(project_id)
     story = project.create_story(name: "[#{Rails.env}] #{title}", story_type: story_type, description: description)
     story.attributes = { owner_ids: [assignee] } if assignee # Refer to config/initializers/pivotal_tracker.rb for a list of asignee ids.
     story.save
+
+    if attachment
+      comment = story.create_comment(text: '')
+      comment.create_attachments(files: ['tmp/details.txt'])
+    end
   end
 
   def self.notify_pivotal_tracker(error, exception = '', params = {}, assignee = nil)
-    unless ['test', 'development'].include? Rails.env
-      description = <<-EOF
-        **Message:**
-        ```#{exception}```
+    unless %w[test development].include? Rails.env
+      if params.to_s.size > 15000
+        descripcion = <<-EOF
+          **Message:**
+          ```#{exception}```
+        EOF
 
-        -----------------------------
+        attachment = File.open('tmp/details.txt', "wb")
+        params.each { |data| attachment.write "#{data}\n" }
+        attachment.close
 
-        **Parameters**
-        \n#{params.collect{|k,v| "* #{k}: #{v}" }.join("\n")}
+        Auditory.create_user_story(description, error, Settings.pivotal_tracker.project_id, 'bug', assignee, attachment)
+        File.delete(attachment)
+      else
+        description = <<-EOF
+          **Message:**
+          ```#{exception}```
 
-      EOF
-      Auditory.create_user_story(description, error, Settings.pivotal_tracker.project_id, 'bug', assignee)
+          -----------------------------
+
+          **Parameters**
+          \n#{params.collect{|k,v| "* #{k}: #{v}" }.join("\n")}
+
+        EOF
+        Auditory.create_user_story(description, error, Settings.pivotal_tracker.project_id, 'bug', assignee)
+      end
     end
   end
 

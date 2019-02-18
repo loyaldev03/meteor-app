@@ -344,8 +344,8 @@ module TasksHelpers
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, format: :dashed)}] Starting fulfillments:process_shipping_cost_reports rake task, processing #{objects.count} reports."
       objects.each do |object|
         begin
-          file_errors = []
           document_name = object.key.gsub("#{Settings.s3_credentials.shipping_cost_report_folder}/", '')
+          file_errors   = []
           temp_file_url = "tmp/#{document_name}"
           object.download_file(temp_file_url)
           doc = SimpleXlsxReader.open("tmp/#{document_name}")
@@ -383,7 +383,11 @@ module TasksHelpers
             end
           end
 
-          Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", file_errors) if file_errors.any?
+          if file_errors.any?
+            
+            Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", file_errors)
+            
+          end
           errors += file_errors
 
           record_file = bucket.object("#{Settings.s3_credentials.shipping_cost_report_processed_folder}/#{document_name}")
