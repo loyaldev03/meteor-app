@@ -344,6 +344,7 @@ module TasksHelpers
       Rails.logger.info " *** [#{I18n.l(Time.zone.now, format: :dashed)}] Starting fulfillments:process_shipping_cost_reports rake task, processing #{objects.count} reports."
       objects.each do |object|
         begin
+          file_errors = []
           document_name = object.key.gsub("#{Settings.s3_credentials.shipping_cost_report_folder}/", '')
           temp_file_url = "tmp/#{document_name}"
           object.download_file(temp_file_url)
@@ -353,26 +354,37 @@ module TasksHelpers
             cost_center   = row[5] # COST CENTER 1
             next if tracking_code.nil? || !tracking_code.starts_with?('N')
 
-            fulfillment = Fulfillment.find_by tracking_code: tracking_code, product_sku: cost_center
-            if fulfillment
-              if fulfillment.shipping_cost.nil?
-                fulfillment.shipping_cost = row[13] # UPS-MI
-                if fulfillment.save
-                  success_count += 1
-                else
-                  errors << { error: "Fulfillment not saved: #{fulfillment.errors.full_messages}", tracking_code: tracking_code }
-                  Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
-                end
-              else
-                errors << { error: 'Possible duplicated Fulfillment. It Already has shipping cost set.', tracking_code: tracking_code }
-                Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: Fulfillment already has shipping cost updated - row: #{row}"
-              end
-            else
-              errors << { error: 'Fulfillment not found', tracking_code: tracking_code }
+            fulfillments = Fulfillment.where tracking_code: tracking_code, product_sku: cost_center
+            if fulfillments.empty?
+              file_errors << { error: 'Fulfillment not found', tracking_code: tracking_code }
               Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: Fulfillment not found - row: #{row}"
+              next
+            end
+
+            if fulfillments.count > 1
+              file_errors << { error: "Found more than one fulfillment with tracking code #{tracking_code} and sku #{cost_center}. Check and fix manually.", tracking_code: tracking_code }
+              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: Found more than one fulfillment with tracking code #{tracking_code} and sku #{cost_center}. - row: #{row}"
+              next
+            end
+
+            fulfillment = fulfillments.first
+            unless fulfillment.shipping_cost.nil?
+              file_errors << { error: "Fulfillment already has shipping cost set (current shipping cost: #{fulfillment.shipping_cost} - New shipping cost: #{row[13]}", tracking_code: tracking_code }
+              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
+              next
+            end
+
+            fulfillment.shipping_cost = row[13] # UPS-MI
+            if fulfillment.save
+              success_count += 1
+            else
+              file_errors << { error: "Fulfillment not saved: #{fulfillment.errors.full_messages}", tracking_code: tracking_code }
+              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
             end
           end
-          Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", errors) if errors.any?
+
+          Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", file_errors) if file_errors.any?
+          errors += file_errors
 
           record_file = bucket.object("#{Settings.s3_credentials.shipping_cost_report_processed_folder}/#{document_name}")
           record_file.upload_file(File.open(temp_file_url))
