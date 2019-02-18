@@ -350,16 +350,22 @@ module TasksHelpers
           doc = SimpleXlsxReader.open("tmp/#{document_name}")
           doc.sheets.first.rows.each do |row|
             tracking_code = row[2] # PACKAGE ID
+            cost_center   = row[5] # COST CENTER 1
             next if tracking_code.nil? || !tracking_code.starts_with?('N')
 
-            fulfillment = Fulfillment.find_by tracking_code: tracking_code
+            fulfillment = Fulfillment.find_by tracking_code: tracking_code, product_sku: cost_center
             if fulfillment
-              fulfillment.shipping_cost = row[13] # UPS-MI
-              if fulfillment.save
-                success_count += 1
+              if fulfillment.shipping_cost.nil?
+                fulfillment.shipping_cost = row[13] # UPS-MI
+                if fulfillment.save
+                  success_count += 1
+                else
+                  errors << { error: "Fulfillment not saved: #{fulfillment.errors.full_messages}", tracking_code: tracking_code }
+                  Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
+                end
               else
-                errors << { error: "Fulfillment not saved: #{fulfillment.errors.full_messages}", tracking_code: tracking_code }
-                Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
+                errors << { error: 'Possible duplicated Fulfillment. It Already has shipping cost set.', tracking_code: tracking_code }
+                Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: Fulfillment already has shipping cost updated - row: #{row}"
               end
             else
               errors << { error: 'Fulfillment not found', tracking_code: tracking_code }
@@ -376,8 +382,8 @@ module TasksHelpers
           Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater', "Could not process #{document_name}. File could not be downloaded from S3 to be processed.")
         end
       end
+      Notifier.shipping_cost_updater_result(objects.collect { |obj| obj.key.gsub("#{Settings.s3_credentials.shipping_cost_report_folder}/", '') }, success_count, errors).deliver_now
     end
-    Notifier.shipping_cost_updater_result(objects.collect { |obj| obj.key.gsub("#{Settings.s3_credentials.shipping_cost_report_folder}/", '') }, success_count, errors).deliver_now
   end
 
   #######################################################
