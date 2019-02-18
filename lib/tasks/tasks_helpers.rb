@@ -350,8 +350,8 @@ module TasksHelpers
           object.download_file(temp_file_url)
           doc = SimpleXlsxReader.open("tmp/#{document_name}")
           doc.sheets.first.rows.each do |row|
-            tracking_code = row[2] # PACKAGE ID
-            cost_center   = row[5] # COST CENTER 1
+            tracking_code = row[2].to_s.strip # PACKAGE ID
+            cost_center   = row[5].to_s.strip # COST CENTER 1
             next if tracking_code.nil? || !tracking_code.starts_with?('N')
 
             fulfillments = Fulfillment.where tracking_code: tracking_code, product_sku: cost_center
@@ -384,9 +384,7 @@ module TasksHelpers
           end
 
           if file_errors.any?
-            
             Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", file_errors)
-            
           end
           errors += file_errors
 
