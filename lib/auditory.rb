@@ -43,8 +43,8 @@ class Auditory
 
   def self.notify_pivotal_tracker(error, exception = '', params = {}, assignee = nil)
     unless %w[test development].include? Rails.env
-      if params.to_s.size > 15000
-        descripcion = <<-EOF
+      if params.to_s.size > 10000
+        description = <<-EOF
           **Message:**
           ```#{exception}```
         EOF
