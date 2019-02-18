@@ -36,7 +36,7 @@ class Auditory
     story.save
 
     if attachment
-      comment = story.create_comment(text: '')
+      comment = story.create_comment(text: 'Details related to the error.')
       comment.create_attachments(files: ['tmp/details.txt'])
     end
   end
