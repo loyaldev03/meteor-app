@@ -11,8 +11,8 @@
   <p>Dear agent,</p>
   <p>Here is the list of reports processed during the night:</p>
   <ul>
-    <% @reports_processed.each do |report| %>
-      <li><%= report %></li>
+    <% @file_names_processed.each do |file_name| %>
+      <li><%= file_name %></li>
     <% end %>
   </ul>
   
