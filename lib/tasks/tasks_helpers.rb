@@ -333,6 +333,73 @@ module TasksHelpers
     end
   end
 
+  def self.process_shipping_cost
+    s3      = Aws::S3::Resource.new(region: Settings.s3_region, credentials: Aws::Credentials.new(Settings.s3_credentials.apikey, Settings.s3_credentials.secret_access_key))
+    bucket  = s3.bucket(Settings.s3_bucket)
+    objects = bucket.objects(prefix: Settings.s3_credentials.shipping_cost_report_folder)
+
+    if objects.any?
+      success_count = 0
+      errors        = []
+      Rails.logger.info " *** [#{I18n.l(Time.zone.now, format: :dashed)}] Starting fulfillments:process_shipping_cost_reports rake task, processing #{objects.count} reports."
+      objects.each do |object|
+        begin
+          document_name = object.key.gsub("#{Settings.s3_credentials.shipping_cost_report_folder}/", '')
+          file_errors   = []
+          temp_file_url = "tmp/#{document_name}"
+          object.download_file(temp_file_url)
+          doc = SimpleXlsxReader.open("tmp/#{document_name}")
+          doc.sheets.first.rows.each do |row|
+            tracking_code = row[2].to_s.strip # PACKAGE ID
+            cost_center   = row[5].to_s.strip # COST CENTER 1
+            next if tracking_code.nil? || !tracking_code.starts_with?('N')
+
+            fulfillments = Fulfillment.where tracking_code: tracking_code, product_sku: cost_center
+            if fulfillments.empty?
+              file_errors << { error: 'Fulfillment not found', tracking_code: tracking_code }
+              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: Fulfillment not found - row: #{row}"
+              next
+            end
+
+            if fulfillments.count > 1
+              file_errors << { error: "Found more than one fulfillment with tracking code #{tracking_code} and sku #{cost_center}. Check and fix manually.", tracking_code: tracking_code }
+              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: Found more than one fulfillment with tracking code #{tracking_code} and sku #{cost_center}. - row: #{row}"
+              next
+            end
+
+            fulfillment = fulfillments.first
+            unless fulfillment.shipping_cost.nil?
+              file_errors << { error: "Fulfillment already has shipping cost set (current shipping cost: #{fulfillment.shipping_cost} - New shipping cost: #{row[13]}", tracking_code: tracking_code }
+              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
+              next
+            end
+
+            fulfillment.shipping_cost = row[13] # UPS-MI
+            if fulfillment.save
+              success_count += 1
+            else
+              file_errors << { error: "Fulfillment not saved: #{fulfillment.errors.full_messages}", tracking_code: tracking_code }
+              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
+            end
+          end
+
+          if file_errors.any?
+            Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater found some errors', "There have been some errors while analyzing the report #{document_name} during the night.", file_errors)
+          end
+          errors += file_errors
+
+          record_file = bucket.object("#{Settings.s3_credentials.shipping_cost_report_processed_folder}/#{document_name}")
+          record_file.upload_file(File.open(temp_file_url))
+          object.delete
+          File.delete(temp_file_url)
+        rescue Zip::ZipError
+          Auditory.notify_pivotal_tracker('Fulfillment::ShippingCost::Updater', "Could not process #{document_name}. File could not be downloaded from S3 to be processed.")
+        end
+      end
+      Notifier.shipping_cost_updater_result(objects.collect { |obj| obj.key.gsub("#{Settings.s3_credentials.shipping_cost_report_folder}/", '') }, success_count, errors).deliver_now
+    end
+  end
+
   #######################################################
   ################ CAMPAIGN #############################
   #######################################################

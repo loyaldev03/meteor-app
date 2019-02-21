@@ -13,6 +13,14 @@ defaults: &defaults
   others_product: "SLOOPS"
   payment_gateways: ['mes', 'authorize_net', 'first_data', 'litle', 'trust_commerce', 'stripe', 'payeezy']
   logger_level_for_tasks: 'DEBUG'
+  shipping_cost_report_recipient: 'slaino@meteoraffinity.com,sdeluca@meteoraffinity.com'
+  s3_bucket: 'xagaxmarketingcampaignsdev'
+  s3_region: 'us-west-2'
+  s3_credentials:
+    apikey: 'AKIAIDA572IAALRTB26Q'
+    secret_access_key: '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'
+    shipping_cost_report_folder: 'shipping_cost_reports/not_processed'
+    shipping_cost_report_processed_folder: 'shipping_cost_reports/processed'
   pivotal_tracker:
     project_id: 840477
     token: "93edf6fdb44a44b280a675b85c464c5b"
@@ -445,9 +453,12 @@ test:
 
 production:
   <<: *defaults
+  shipping_cost_report_recipient: 'tbrady@meteoraffinity.com,ndavid@meteoraffinity.com'
   campaign_manager_recipients: 'mbrossard@meteoraffinity.com,ndavid@meteoraffinity.com,lerrick@meteoraffinity.com'
   email_to_send_product_list: 'tbrady@meteoraffinity.com,ndavid@meteoraffinity.com'
   logger_level_for_tasks: 'INFO'
+  s3_bucket: 'campaign-checkout-assets-production'
+  s3_region: 'us-east-1'  
   mes_report_service:
     user: Stoneacrereports
     password: do3!lAjo5
@@ -482,6 +493,8 @@ production:
 prototype:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
+  s3_bucket: 'campaign-checkout-assets-dev'
+  s3_region: 'us-east-1'
   club_params:
     39:
       show_bbb_seal: true
@@ -502,6 +515,8 @@ prototype:
 
 staging:
   <<: *defaults
+  s3_bucket: 'campaign-checkout-assets-staging'
+  s3_region: 'us-east-1'
   xxxyyyzzz: reibel3y5estrada8
   club_params:
     36:

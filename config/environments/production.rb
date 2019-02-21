@@ -93,10 +93,10 @@ Rails.application.configure do
   config.paperclip_defaults = {
     storage: :s3,
     s3_credentials: {
-      bucket: 'campaign-checkout-assets-production',
-      access_key_id: 'AKIAIDA572IAALRTB26Q',
-      secret_access_key: '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',
-      s3_region: 'us-east-1'
+      bucket: Settings.s3_bucket,
+      access_key_id: Settings.s3_credentials.apikey,
+      secret_access_key: Settings.s3_credentials.secret_access_key,
+      s3_region: Settings.s3_region
     }
   }
 
