@@ -54,6 +54,7 @@ gem 'state_machine', '1.1.2'
 gem 'cancan'
 gem 'easy_roles'
 gem "axlsx", "~> 2.0.1"
+gem 'simple_xlsx_reader'
 
 gem 'twitter-bootstrap-rails', '2.2.7'
 

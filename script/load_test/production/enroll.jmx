@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="2.9" jmeter="3.0" ruby-jmeter="3.0">
+<jmeterTestPlan version="1.2" properties="3.1" jmeter="3.1" ruby-jmeter="3.0">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="TestPlan" enabled="true">
       <stringProp name="TestPlan.comments"/>
@@ -31,10 +31,10 @@
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">60</stringProp>
         <stringProp name="ThreadGroup.ramp_time">30</stringProp>
-        <longProp name="ThreadGroup.start_time">1524162493000</longProp>
-        <longProp name="ThreadGroup.end_time">1524162493000</longProp>
+        <longProp name="ThreadGroup.start_time">1547226296000</longProp>
+        <longProp name="ThreadGroup.end_time">1547226296000</longProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">900</stringProp>
+        <stringProp name="ThreadGroup.duration">1200</stringProp>
         <stringProp name="ThreadGroup.delay"/>
         <boolProp name="ThreadGroup.delayedStart">true</boolProp>
       </ThreadGroup>
@@ -46,15 +46,58 @@
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Unbounce - Landing Page visit" enabled="true">
             <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="Unbounce - Landing Page visit" enabled="true">
-              <collectionProp name="Arguments.arguments"/>
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="utm_campaign" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">sloop</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">utm_campaign</stringProp>
+                </elementProp>
+                <elementProp name="utm_source" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">nascar</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">utm_source</stringProp>
+                </elementProp>
+                <elementProp name="utm_medium" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">referral</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">utm_medium</stringProp>
+                </elementProp>
+                <elementProp name="utm_content" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">loadtest</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">utm_content</stringProp>
+                </elementProp>
+                <elementProp name="audience" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">loadtest</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">audience</stringProp>
+                </elementProp>
+                <elementProp name="campaign_id" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">65c04a3a4hn4h4s2</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                  <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  <stringProp name="Argument.name">campaign_id</stringProp>
+                </elementProp>
+              </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.domain">products.onmc.com</stringProp>
-            <stringProp name="HTTPSampler.port">80</stringProp>
+            <stringProp name="HTTPSampler.port">443</stringProp>
             <stringProp name="HTTPSampler.connect_timeout"/>
             <stringProp name="HTTPSampler.response_timeout"/>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
+            <stringProp name="HTTPSampler.protocol">https</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"/>
-            <stringProp name="HTTPSampler.path">/load-test</stringProp>
+            <stringProp name="HTTPSampler.path">/load-test/</stringProp>
             <stringProp name="HTTPSampler.method">GET</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
@@ -169,6 +212,7 @@
               <boolProp name="XPathExtractor.validate">false</boolProp>
               <boolProp name="XPathExtractor.tolerant">true</boolProp>
               <boolProp name="XPathExtractor.namespace">false</boolProp>
+              <stringProp name="Sample.scope">all</stringProp>
             </XPathExtractor>
             <hashTree/>
           </hashTree>
@@ -286,7 +330,7 @@
                 </elementProp>
                 <elementProp name="user_id" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">f5cf00e0d0e60403e1814f5fa4e1a5431</stringProp>
+                  <stringProp name="Argument.value">13782dbe4ccb129827f0df31ad6bc8ec1</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                   <stringProp name="Argument.name">user_id</stringProp>

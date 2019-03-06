@@ -9,23 +9,26 @@ module SacMailchimp
       def sync_members_to_mailchimp
         base = User.where("(need_sync_to_marketing_client = 1 OR (marketing_client_synced_status = 'error' AND marketing_client_last_sync_error LIKE ? AND DATE(marketing_client_last_sync_error_at) = ?)) AND club_id IN (?)", "%#{SacMailchimp::MULTIPLE_SIGNED_ERROR_MESSAGE}%", (Time.current - 4.days).to_date, Club.mailchimp_related.pluck(:id))
         Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:sync_members_to_mailchimp, processing #{base.count} members"
+        exception_count = 0
         base.find_in_batches do |group|
-          group.each_with_index do |member,index|
+          group.each_with_index do |member, index|
             tz = Time.zone.now
             begin
               Rails.logger.info "  *[#{index+1}] processing member ##{member.id}"
-              member.marketing_tool_sync
-            rescue Exception => e
-              Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"        
+              member.mailchimp_sync_to_remote_domain!
+            rescue StandardError
+              Rails.logger.error "    [!] Mailchimp::MemberSync failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+              exception_count += 1
             end
             Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for member ##{member.id}"
           end
         end
+        Auditory.report_issue('Mailchimp::UserSync: Unexpected errors. Check logs.', nil, exception_count: exception_count) if exception_count > 0
       end
     end
 
     module InstanceMethods
-      
+
       def mailchimp_sync_to_remote_domain!
         return if @skip_mailchimp_sync
         time_elapsed = Benchmark.ms do

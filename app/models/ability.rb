@@ -57,6 +57,7 @@ class Ability
     cannot :toggle_testing_account, User
     cannot :toggle_vip_member, User
     cannot :manual_review, Fulfillment
+    cannot :import_shipping_cost, Fulfillment
     cannot :bulk_process, Product
     cannot :send, Communication
     cannot :unblacklist, User

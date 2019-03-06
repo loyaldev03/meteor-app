@@ -139,6 +139,7 @@ SacPlatform::Application.routes.draw do
         get '/list_for_file/:fulfillment_file_id' => 'fulfillments#list_for_file', as: 'fulfillment_list_for_file'
         get '/mark_file_as_sent/:fulfillment_file_id' => 'fulfillments#mark_file_as_sent', as: 'fulfillment_file_mark_as_sent'
         get '/mark_file_as_packed/:fulfillment_file_id' => 'fulfillments#mark_file_as_packed', as: 'fulfillment_file_mark_as_packed'
+        match '/import_shipping_costs' => 'fulfillments#import_shipping_costs', as: 'fulfillment_import_shipping_cost', via: %i[get post]
       end
 
       scope '/fulfillment/:id' do

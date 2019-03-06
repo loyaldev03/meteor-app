@@ -40,16 +40,24 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 
   config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = { :address => "localhost", :port => 1025 }
+
+  config.action_mailer.smtp_settings = {
+    :enable_starttls_auto => true,
+    :address        => 'smtp.gmail.com',
+    :port           => 587,
+    :domain         => 'xagax.com',
+    :authentication => :login,
+    :user_name      => 'platform@xagax.com',
+    :password       => 'a4my0fm3'
+  }
 
   config.paperclip_defaults = {
     storage: :s3,
     s3_credentials: {
-      bucket: 'xagaxmarketingcampaignsdev',
-      access_key_id: 'AKIAIDA572IAALRTB26Q',
-      secret_access_key: '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',
-      s3_region: 'us-west-2'
+      bucket: Settings.s3_bucket,
+      access_key_id: Settings.s3_credentials.apikey,
+      secret_access_key: Settings.s3_credentials.secret_access_key,
+      s3_region: Settings.s3_region
     }
   }
-
 end

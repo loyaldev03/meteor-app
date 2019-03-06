@@ -9,27 +9,30 @@ module SacMailchimp
       def sync_prospects_to_mailchimp
         club_base = Club.mailchimp_related
         club_base.each do |club|
-          tzc = Time.zone.now
           prospect_club_count = club.prospects.where("need_sync_to_marketing_client = 1").count
           Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting mkt_tools:sync_prospects_to_mailchimp, processing #{prospect_club_count} prospects for club #{club.id}"
-          base = club.prospects.where("need_sync_to_marketing_client = 1").order("created_at ASC").limit(1000)
-          index = 0
+          tzc             = Time.zone.now
+          base            = club.prospects.where('need_sync_to_marketing_client = 1').order('created_at ASC').limit(1000)
+          index           = 0
+          exception_count = 0
           while not base.empty? do
             base.each do |prospect|
               tz = Time.zone.now
               begin
                 Rails.logger.info "  *[#{index+1}] processing prospect ##{prospect.id}"
                 prospect.mailchimp_after_create_sync_to_remote_domain(club) if defined?(SacMailchimp::ProspectModel)
-              rescue Exception => e
+              rescue StandardError
                 prospect.update_attribute :need_sync_to_marketing_client, 0
-                Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+                Rails.logger.error "    [!] Mailchimp::ProspectSync failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+                exception_count += 1
               end
               Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for prospect ##{prospect.id}"
-              index+=1
+              index += 1
             end
-            base = club.prospects.where("need_sync_to_marketing_client = 1").order("created_at ASC").limit(1000)
+            base = club.prospects.where('need_sync_to_marketing_client = 1').order('created_at ASC').limit(1000)
           end
           Rails.logger.info "    ... took #{Time.zone.now - tzc}seconds for club ##{club.id}"
+          Auditory.report_issue('Mailchimp::ProspectSync: Unexpected errors. Check logs. Check logs.', nil, exception_count: exception_count) if exception_count > 0
         end
       end
     end

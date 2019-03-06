@@ -184,6 +184,33 @@ class FulfillmentsController < ApplicationController
     evidences = fulfillment.suspected_fulfillment_evidences.order("match_age ASC").paginate(page: params[:page], per_page: 20) if fulfillment
     render :partial => 'suspected_fulfillment_information', locals: { fulfillment: fulfillment, evidences: evidences }
   end
+
+  def import_shipping_costs
+    if request.post?
+      if params[:fulfillment] && params[:fulfillment][:file]
+        if params[:fulfillment][:file].size.to_f <= 4.megabytes
+          if ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel', 'application/xls', 'application/xlsx'].include? params[:fulfillment][:file].content_type
+            temp_file_url = "tmp/#{params[:fulfillment][:file].original_filename}"
+            document = File.open(temp_file_url, 'wb')
+            document.write(params[:fulfillment][:file].read)
+            document.close
+
+            obj = Aws::S3::Resource.new(region: Settings.s3_region, credentials: Aws::Credentials.new(Settings.s3_credentials.apikey, Settings.s3_credentials.secret_access_key))
+                                   .bucket(Settings.s3_bucket)
+                                   .object("#{Settings.s3_credentials.shipping_cost_report_folder}/#{params[:fulfillment][:file].original_filename}")
+            obj.upload_file(File.open(temp_file_url))
+
+            File.delete(document)
+            flash.now[:success] = 'File was uploaded successfully. It will be processed during the night.'
+          else
+            flash.now[:error] = 'Format not supported. Please, provide an xlsx file'
+          end
+        else
+          flash.now[:error] = 'The file is too large. The maximum size of a file is 4Mb.'
+        end
+      else
+        flash.now[:error] = 'The file is required. Please, provide a file before submitting.'
+      end
+    end
+  end
 end
-
-
