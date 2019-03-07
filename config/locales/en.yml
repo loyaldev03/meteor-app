@@ -147,6 +147,8 @@ en:
     new_domain: "New Domain"
     mark_as_testing_account: "Mark as testing account"
     unmark_as_testing_account: "Unmark as testing account"
+    mark_as_vip_member: "Mark as vip member"
+    unmark_as_vip_member: "Unmark as vip member"
     set_not_processed: "Set as not processed"
     details: 'Details'
     mark_as_sent: 'Mark as Sent'

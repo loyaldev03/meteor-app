@@ -44,20 +44,31 @@ class User < ActiveRecord::Base
   after_update :mkt_tool_check_email_changed_for_sync
   after_update :after_save_sync_to_remote_domain
   after_update :asyn_desnormalize_preferences
+  after_update :update_club_cash_if_vip_member
   after_destroy :cancel_user_at_remote_domain
 
   # skip_api_sync wont be use to prevent remote destroy. will be used to prevent creates/updates
   def cancel_user_at_remote_domain
-    Users::CancelUserRemoteDomainJob.perform_later(user_id: self.id)    
-  end
-
-  def after_save_sync_to_remote_domain
-    if defined? Drupal::Member and Drupal::Member::OBSERVED_FIELDS.intersection(self.changed) #change tracker
-      Users::SyncToRemoteDomainJob.perform_now(user_id: self.id) unless @skip_api_sync || api_user.nil?
+    if is_cms_configured?
+      if is_drupal?
+        Users::CancelUserRemoteDomainJob.perform_later(user_id: id)
+      elsif is_spree?
+        Users::SyncToRemoteDomainJob.perform_later(user_id: id)
+      end
     end
   end
 
-  validates :country, 
+  def after_save_sync_to_remote_domain
+    if is_cms_configured?
+      if is_drupal?
+        Users::SyncToRemoteDomainJob.perform_now(user_id: id) if defined?(Drupal::Member) && (Drupal::Member::OBSERVED_FIELDS.intersection(changed).any? && (!@skip_api_sync || api_user.nil?)) # change tracker
+      elsif is_spree?
+        Users::SyncToRemoteDomainJob.perform_now(user_id: id) if defined?(Spree::Member) && (Spree::Member::OBSERVED_FIELDS.intersection(changed).any? && (!@skip_api_sync || api_user.nil?)) # change tracker
+      end
+    end
+  end
+
+  validates :country,
     presence:                    true, 
     length:                      { is: 2, allow_nil: true },
     inclusion:                   { within: self.supported_countries }
@@ -332,7 +343,11 @@ class User < ActiveRecord::Base
   ####  METHODS USED TO SHOW OR NOT BUTTONS. 
 
   def can_be_synced_to_remote?
-    !(lapsed? or applied?) and club.billing_enable
+    if is_drupal?
+      !(lapsed? or applied?) and club.billing_enable
+    elsif is_spree?
+      !(applied?) and club.billing_enable
+    end
   end
 
   # Returns true if members is lapsed.
@@ -377,8 +392,8 @@ class User < ActiveRecord::Base
   end
 
   def has_link_to_api?
-    self.api_user and not self.lapsed?
-  end 
+    api_user && !lapsed?
+  end
 
   # Returns true if member is lapsed or if it didnt reach the max reactivation times.
   def can_recover?
@@ -416,9 +431,9 @@ class User < ActiveRecord::Base
   end
 
   def can_add_club_cash?
-    if is_not_drupal?
+    if !is_drupal?
       return true
-    elsif not (self.api_id.blank? or self.api_id.nil?)
+    elsif self.api_id.present?
       return true
     end
     false
@@ -434,7 +449,12 @@ class User < ActiveRecord::Base
     end
     false
   end
-  
+
+  def can_update_vip_member_status?
+    @tom_freemium ||= terms_of_membership.freemium?
+    (!@tom_freemium || vip_member?) && (!self.lapsed? || vip_member?)
+  end
+
   ###############################################
 
   def change_terms_of_membership(tom, operation_message, operation_type, agent = nil, prorated = false, credit_card_params = nil, membership_params = nil, schedule_date = nil, additional_actions = {})
@@ -660,7 +680,7 @@ class User < ActiveRecord::Base
     unless club.billing_enable
       return { message: I18n.t('error_messages.club_is_not_enable_for_new_enrollments', cs_phone_number: club.cs_phone_number), code: Settings.error_codes.club_is_not_enable_for_new_enrollments }      
     end
-    
+
     user = User.find_by(email: user_params[:email], club_id: club.id)
     # credit card exist? . we need this token for CreditCard.joins(:member) and enrollment billing.
     credit_card = CreditCard.new number: credit_card_params[:number], expire_year: credit_card_params[:expire_year], expire_month: credit_card_params[:expire_month]
@@ -764,8 +784,8 @@ class User < ActiveRecord::Base
       membership.save!
 
       self.update_attribute :current_membership_id, membership.id
-      
-      
+
+
       if trans
         # We cant assign this information before , because models must be created AFTER transaction
         # is completed succesfully
@@ -779,9 +799,15 @@ class User < ActiveRecord::Base
       self.reload
       message = set_status_on_enrollment!(agent, trans, amount, membership, operation_type)
 
-      response = { message: message, code: Settings.error_codes.success, member_id: self.id, autologin_url: self.full_autologin_url.to_s, status: self.status }
-      response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) unless self.is_not_drupal?
-      response
+      { 
+        message: message,
+        code: Settings.error_codes.success,
+        member_id: id,
+        autologin_url: full_autologin_url.to_s,
+        status: status,
+        api_role: tom.api_role.to_s.split(','),
+        bill_date: (next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y"))
+      }
     rescue Exception => e
       logger.error e.inspect
       error_message = (self.id.nil? ? "User:enroll" : "User:recovery/save the sale") + " -- user turned invalid while enrolling"
@@ -888,9 +914,15 @@ class User < ActiveRecord::Base
         change_next_bill_date(new_next_bill_date, agent, "Moved next bill date due to Tom change. Already spend #{days_already_in_provisional} days in previous membership.")
       end
 
-      response = { message: message, code: Settings.error_codes.success, member_id: self.id, autologin_url: self.full_autologin_url.to_s, status: self.status }
-      response.merge!({ api_role: tom.api_role.to_s.split(','), bill_date: (self.next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y")) }) unless self.is_not_drupal?
-      response
+      { 
+        message: message, 
+        code: Settings.error_codes.success, 
+        member_id: id, 
+        autologin_url: full_autologin_url.to_s,
+        status: status,
+        api_role: tom.api_role.to_s.split(','),
+        bill_date: (next_retry_bill_date.nil? ? '' : self.next_retry_bill_date.strftime("%m/%d/%Y"))
+      }
     rescue Exception => e
       logger.error e.inspect
       Auditory.report_issue("User:prorated_enroll -- user turned invalid while enrolling", e, { user: self.id, credit_card: credit_card.id, membership: membership.id })
@@ -956,9 +988,17 @@ class User < ActiveRecord::Base
   end
 
   ##################### Club cash ####################################
+  
+  def is_cms_configured?
+    @is_cms_configured  ||= club.is_cms_configured?
+  end
+  
+  def is_spree?
+    @is_spree ||= club.is_spree?
+  end
 
-  def is_not_drupal?
-    @is_not_drupal ||= club.is_not_drupal?
+  def is_drupal?
+    @is_drupal ||= club.is_drupal?
   end
 
   # Resets user club cash in case of a cancelation.
@@ -968,7 +1008,7 @@ class User < ActiveRecord::Base
   
   def nillify_club_cash_upon_cancellation
     message = 'Removing club cash because of member cancellation'
-    if not is_not_drupal?
+    if is_drupal?
       self.club_cash_amount = 0
       self.save
       Auditory.audit(nil, self, message, self, Settings.operation_types.reset_club_cash)
@@ -987,12 +1027,12 @@ class User < ActiveRecord::Base
   end
 
   # Adds club cash when membership billing is success. Only on each 12th month, and if it is not the first billing.
-  def assign_club_cash(message = "Adding club cash after billing", enroll = false)
+  def assign_club_cash(message = "Adding club cash after billing", enroll = false)   
     Users::AssignClubCashJob.set(wait: 5.minutes).perform_later(self.id, message, enroll)
   end
 
   # Adds club cash transaction. 
-  def add_club_cash(agent, amount = 0, description = nil)
+  def add_club_cash(agent, amount = 0, description = nil, set_expire_date = false)
     answer = { code: Settings.error_codes.club_cash_transaction_not_successful, message: "Could not save club cash transaction"  }
     begin
       if not club.allow_club_cash_transaction?
@@ -1000,14 +1040,15 @@ class User < ActiveRecord::Base
       elsif amount.to_f == 0
         answer[:message] = I18n.t("error_messages.club_cash_transaction_invalid_amount")
         answer[:errors] = { amount: "Invalid amount" } 
-      elsif is_not_drupal?
+      elsif !is_drupal?
         ClubCashTransaction.transaction do
           begin
             if (amount.to_f < 0 and amount.to_f.abs <= self.club_cash_amount) or amount.to_f > 0
               cct = ClubCashTransaction.new(amount: amount, description: description)
               self.club_cash_transactions << cct
               raise "Could not save club cash transaction" unless cct.valid? and self.valid?
-              self.club_cash_amount = self.club_cash_amount + amount.to_f
+              self.club_cash_amount       = self.club_cash_amount + amount.to_f
+              self.club_cash_expire_date  = Time.current.to_date + 1.year if set_expire_date
               self.save(validate: false)
               message = "#{cct.amount.to_f.abs} club cash was successfully #{ amount.to_f >= 0 ? 'added' : 'deducted' }."+(description.blank? ? '' : " Concept: #{description}")
               if amount.to_f > 0
@@ -1205,7 +1246,8 @@ class User < ActiveRecord::Base
 
     if credit_cards.empty? or allow_cc_blank
       unless only_validate
-        answer = add_new_credit_card(new_credit_card, current_agent, set_active)
+        answer          = add_new_credit_card(new_credit_card, current_agent, set_active)
+        new_credit_card = reload.active_credit_card if set_active
       end
     # credit card is blacklisted
     elsif not credit_cards.select { |cc| cc.blacklisted? }.empty? 
@@ -1213,7 +1255,8 @@ class User < ActiveRecord::Base
     # is this credit card already of this members and its already active?
     elsif not credit_cards.select { |cc| cc.user_id == self.id and cc.active }.empty? 
       unless only_validate
-        answer = active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
+        answer          = active_credit_card.update_expire(new_year, new_month, current_agent) # lets update expire month
+        new_credit_card = reload.active_credit_card
       end
     elsif not family_memberships_allowed and not credit_cards.select { |cc| cc.user_id == self.id and not cc.active }.empty? and not credit_cards.select { |cc| cc.user_id != self.id and cc.active }.empty?
       answer = { message: I18n.t('error_messages.credit_card_in_use', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.credit_card_in_use, errors: { number: "Credit card is already in use" }}
@@ -1238,6 +1281,7 @@ class User < ActiveRecord::Base
     elsif family_memberships_allowed or credit_cards.select { |cc| cc.active }.empty? 
       unless only_validate
         answer = add_new_credit_card(new_credit_card, current_agent, set_active)
+        new_credit_card = reload.active_credit_card if set_active
       end
     else
       answer = { message: I18n.t('error_messages.credit_card_in_use', cs_phone_number: self.club.cs_phone_number), code: Settings.error_codes.credit_card_in_use, errors: { number: "Credit card is already in use" }}
@@ -1454,21 +1498,17 @@ class User < ActiveRecord::Base
       unless set_as_active
         Auditory.report_issue("Billing::set_as_active - Can't set as active after prorated update", nil, { member: self.id, membership: current_membership.id, transaction_id: trans.id, transaction_amount: trans.amount, transaction_response: trans.response })
       end
-
       if amount_in_favor > 0.0
         Transaction.generate_balance_transaction(agent, self, -amount_in_favor, former_membership, sale_transaction)
         Transaction.generate_balance_transaction(agent, self, amount_in_favor, current_membership)
       end
-      if club_cash_to_substract
-        club_cash_balance = terms_of_membership.club_cash_installment_amount - club_cash_to_substract 
-        if club_cash_balance < 0 and club_cash_balance.abs > self.club_cash_amount
-          club_cash_balance = -self.club_cash_amount 
-        end
-        self.add_club_cash(agent, club_cash_balance, "Prorating club cash. Adding #{terms_of_membership.club_cash_installment_amount} minus #{club_cash_to_substract} from previous Subscription plan.")
+      if club_cash_to_substract || is_spree?
+        club_cash_to_add = is_spree? ? terms_of_membership.initial_club_cash_amount : terms_of_membership.club_cash_installment_amount
+        club_cash_balance = club_cash_to_add.to_i - club_cash_to_substract.to_i
+        club_cash_balance = -self.club_cash_amount if club_cash_balance < 0 && club_cash_balance.abs > self.club_cash_amount
+        self.add_club_cash(agent, club_cash_balance, "Prorating club cash. Adding #{club_cash_to_add} minus #{club_cash_to_substract.to_i} from previous Subscription plan.", true)
       end
-      if check_upgradable
-        schedule_renewal
-      end
+      schedule_renewal if check_upgradable
     end
 
     def record_date
@@ -1642,5 +1682,15 @@ class User < ActiveRecord::Base
     def prepend_zeros_to_phone_number
       self.phone_area_code    = format('%03d', phone_area_code.to_i)
       self.phone_local_number = format('%07d', phone_local_number.to_i)
+    end
+    
+    def update_club_cash_if_vip_member
+      if self.vip_member_changed? and not self.club_cash_amount_changed?
+        if vip_member?
+          add_club_cash(nil, Settings.vip_additional_club_cash, 'Marked user VIP Member.')
+        elsif club_cash_amount > 0
+          add_club_cash(nil, -Settings.vip_additional_club_cash, 'Unmarked as VIP Member.')
+        end
+      end
     end
 end

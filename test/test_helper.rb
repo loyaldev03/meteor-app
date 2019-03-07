@@ -192,6 +192,27 @@ class ActiveSupport::TestCase
     active_user
   end
 
+  def enroll_user(user, tom, amount=23, cc_blank=false, credit_card = FactoryBot.build(:credit_card))
+    active_merchant_stubs_payeezy("100", "Transaction Normal - Approved with Stub", true, credit_card.number)
+    answer        = User.enroll(tom, nil, amount, 
+      { first_name: user.first_name,
+        last_name: user.last_name, address: user.address, city: user.city, gender: 'M',
+        zip: user.zip, state: user.state, email: user.email, type_of_phone_number: user.type_of_phone_number,
+        phone_country_code: user.phone_country_code, phone_area_code: user.phone_area_code,
+        phone_local_number: user.phone_local_number, country: 'US', 
+        product_sku: Settings.others_product }, 
+      { number: credit_card.number, 
+        expire_year: credit_card.expire_year, expire_month: credit_card.expire_month },
+      cc_blank)
+
+    assert (answer[:code] == Settings.error_codes.success), answer[:message]+answer.inspect
+
+    saved_user = User.find(answer[:member_id])
+    assert_not_nil saved_user
+    assert_equal saved_user.status, 'provisional'
+    saved_user
+  end
+
   def excecute_like_server(club_timezone)
     Time.zone = "UTC"
     yield

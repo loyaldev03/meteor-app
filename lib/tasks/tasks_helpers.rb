@@ -122,8 +122,8 @@ module TasksHelpers
     end
   end
 
-  def self.process_sync 
-    base = User.where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )').with_billing_enable.select('users.id')
+  def self.process_sync
+    base = User.joins(:club).merge(Club.with_drupal_configured).where('status = "lapsed" AND api_id != "" and ( last_sync_error not like "There is no user with ID%" or last_sync_error is NULL )').with_billing_enable.select('users.id')
     tz = Time.zone.now
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users lapsed and api_id not null, processing #{base.length} users"
     base.find_in_batches do |group|
@@ -133,7 +133,7 @@ module TasksHelpers
           api_m = user.api_user
           unless api_m.nil?
             api_m.destroy!
-            Auditory.audit(nil, user, "User's drupal account destroyed by batch script", user, Settings.operation_types.user_drupal_account_destroyed_batch)
+            Auditory.audit(nil, user, "User's CMS account destroyed by batch script", user, Settings.operation_types.user_drupal_account_destroyed_batch)
           end
         rescue Exception => e
           Auditory.report_issue("Users::Sync", e, {:user => user_id})
@@ -144,7 +144,7 @@ module TasksHelpers
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
     base =  User.where('last_sync_error like "There is no user with ID%"').with_billing_enable.select('users.id')
-    base2 = User.where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"').with_billing_enable.select('users.id')
+    base2 = User.joins(:club).merge(Club.with_drupal_configured).where('status = "lapsed" and last_sync_error like "%The e-mail address%is already taken%"').with_billing_enable.select('users.id')
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users with error sync related to wrong api_id, processing #{base.length+base2.length} users"
     tz = Time.zone.now
     index = 0
@@ -164,21 +164,21 @@ module TasksHelpers
             unless api_m.nil?
               if api_m.save!(force: true)
                 unless user.last_sync_error_at
-                  Auditory.audit(nil, user, "Member synchronized by batch script", user, Settings.operation_types.user_drupal_account_synced_batch)
+                  Auditory.audit(nil, user, 'Member synchronized by batch script', user, Settings.operation_types.user_drupal_account_synced_batch)
                 end
               end
             end
           end
           index = index + 1
         rescue Exception => e
-          Auditory.report_issue("Users::Sync", e, {:user => user_id})
+          Auditory.report_issue('Users::Sync', e, {:user => user_id})
           Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
         end
       end
     end
     Rails.logger.info "    ... took #{Time.zone.now - tz}seconds"
 
-    base = User.joins(:club).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").with_billing_enable.select('users.id').limit(2000)
+    base = User.joins(:club).merge(Club.with_drupal_configured).where("sync_status IN ('with_error', 'not_synced') AND status != 'lapsed' AND clubs.api_type != '' ").with_billing_enable.select('users.id').limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_sync rake task with users not_synced or with_error, processing #{base.length} users"
     tz = Time.zone.now
     base.to_enum.with_index.each do |user_id,index|
@@ -203,12 +203,15 @@ module TasksHelpers
 
   def self.process_email_sync_error
     user_list = {}
-    base = User.where("sync_status = 'with_error' AND last_sync_error like '%The e-mail address%is already taken%'")
+    base = User.joins(:club).where("sync_status = 'with_error' AND 
+                                     ((clubs.api_type = 'Drupal::Member' AND last_sync_error like '%The e-mail address%is already taken%') OR 
+                                     (clubs.api_type = 'Spree::Member' AND last_sync_error like '%Email has already been taken%'))")
+    
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:process_email_sync_error rake task, processing #{base.length} users"
     base.find_in_batches do |group|
       group.each_with_index do |user, index|
         club = user.club
-        row = "ID: #{user.id} - Partner-Club: #{club.partner.name}-#{club.name} - Email: #{user.email} - Status: #{user.status} - Drupal domain link: #{user.club.api_domain.url}/admin/people}"
+        row = "ID: #{user.id} - Partner-Club: #{club.partner.name}-#{club.name} - Email: #{user.email} - Status: #{user.status} - CMS domain link: #{user.club.api_domain.url}/admin/#{user.is_drupal? ? 'people' : 'users'}"
         user_list.merge!("user#{index+1}" => row)
       end
     end
@@ -285,7 +288,7 @@ module TasksHelpers
     today = Time.zone.now.to_date
     base = User.where(testing_account: true)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:delete_testing_accounts rake task, processing #{base.length} users"
-    base.select{|user| user.transactions.where(success: true).sum(:amount)==0.0}.to_enum.with_index.each do |user,index| 
+    base.select{ |user| user.transactions.where(success: true).sum(:amount) == 0.0 }.to_enum.with_index.each do |user, index|
       tz = Time.zone.now
       begin
         Rails.logger.info "  *[#{index+1}] processing user ##{user.id}"
@@ -422,5 +425,4 @@ module TasksHelpers
       Campaign.by_transport(transport).where(club_id: club_ids).map{|c| c.missing_days(date: date)}
     end
   end
-
 end

@@ -1,5 +1,5 @@
 class PreferenceGroup < ActiveRecord::Base
-  belongs_to :club
+  belongs_to :club, touch: true
   has_many :preferences
   has_and_belongs_to_many :campaigns
 

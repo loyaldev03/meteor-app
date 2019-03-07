@@ -240,6 +240,16 @@ class UsersController < ApplicationController
     redirect_to show_user_path
   end
 
+  def toggle_vip_member
+    @current_user.toggle :vip_member
+    if @current_user.save
+      flash[:notice] = @current_user.vip_member ? "User marked as Vip Member" : "User is no longer set as vip member."
+    else
+      flash[:error] = "User could not be updated"
+    end
+    redirect_to show_user_path
+  end
+
   def full_save
     message = "Full save done"
     Auditory.audit(@current_agent, nil, message, @current_user, Settings.operation_types.full_save)
@@ -358,7 +368,6 @@ class UsersController < ApplicationController
 
   def login_as_user
     am = @current_user.api_user
-
     if am
       if (lt = am.login_token) && lt.url
         redirect_to @current_user.full_autologin_url.to_s

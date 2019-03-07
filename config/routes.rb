@@ -98,6 +98,7 @@ SacPlatform::Application.routes.draw do
         match '/no_recurrent_billing' => 'users#no_recurrent_billing', as: 'user_no_recurrent_billing', :via => [:get, :post]
         match '/manual_billing' => 'users#manual_billing', as: 'user_manual_billing', :via => [:get, :post]
         put '/toggle_testing_account' => 'users#toggle_testing_account', as: 'user_toggle_testing_account'
+        put '/toggle_vip_member' => 'users#toggle_vip_member', as: 'user_toggle_vip_member'
         match '/' => 'users#show', as: 'show_user', :via => [:get, :post]
         put '/remove_future_tom_change' => 'users#unschedule_future_tom_update', as: 'user_unschedule_future_tom_update'
 

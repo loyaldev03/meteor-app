@@ -5,6 +5,9 @@
   <%= @current_user.id %> - 
   <%= @current_user.first_name %> <%= @current_user.last_name %> 
 	<% if @current_user.blacklisted? %>
-  &nbsp;<small style="color: red;">Blacklisted!!!</small>
+  &nbsp;<small style="padding: 4px" class="btn-danger">Blacklisted</small>
+  <% end %>
+  <% if @current_user.vip_member? %>
+  &nbsp;<small style="padding: 4px" class="btn-info">Vip member</small>
   <% end %>
 </h1>

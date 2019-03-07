@@ -254,6 +254,23 @@ FactoryBot.define do
     # association :club, factory: :simple_club_with_gateway
   end
 
+  factory :free_terms_of_membership, class: TermsOfMembership do
+    sequence(:name) {|n| "test yearly without provisional day and amount_#{n}" }
+    api_role 7
+    installment_amount 0
+    installment_period 36500
+    initial_fee 0
+    trial_period_amount 0
+    is_payment_expected 1
+    subscription_limits 0
+    if_cannot_bill 'cancel'
+    needs_enrollment_approval false
+    initial_club_cash_amount 0
+    club_cash_installment_amount 0
+    skip_first_club_cash 0
+    provisional_days 0
+  end
+
   factory :terms_of_membership_yearly_without_provisional_day_and_amount, class: TermsOfMembership do
     sequence(:name) {|n| "test yearly without provisional day and amount_#{n}" }
     api_role 6
