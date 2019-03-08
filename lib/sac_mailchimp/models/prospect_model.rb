@@ -71,8 +71,7 @@ module SacMailchimp
         'CAMPAIGNID' => 'campaign_code',
         'MEDIUM' => 'utm_medium',
         'PRODUCTSKU' => 'product_sku',
-        'LANDINGURL' => 'landing_url',
-        'VIPMEMBER' => 'vip_member'
+        'LANDINGURL' => 'landing_url'
       }
     end
 
