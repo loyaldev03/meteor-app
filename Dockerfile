@@ -3,7 +3,7 @@ ENV APP_HOME /app
 ENV RAILS_ENV production
 ENV RACK_ENV production
 ENV RAILS_SERVE_STATIC_FILES true
-RUN apt-get update -qq && apt-get install -y --no-install-recommends build-essential
+RUN apt-get update -qq && apt-get install -y apt-transport-https && apt-get install -y --no-install-recommends build-essential
 RUN apt-get install -y mysql-client
 RUN apt-get install -y libxml2-dev libxslt1-dev
 RUN apt-get install -y libqtwebkit4 libqt4-dev xvfb
