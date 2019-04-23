@@ -7,17 +7,17 @@ class FulfillmentsController < ApplicationController
       @status = params[:status]
       if params[:all_times] == '1'     
         if params[:radio_product_filter].blank?
-          @fulfillments = Fulfillment.includes(:user).joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ?', params[:status], @current_club.id).not_renewed
+          @fulfillments = Fulfillment.includes(:user).joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ?', params[:status], @current_club.id).not_renewed.limit(6000)
         elsif params[:radio_product_filter] == 'sku'
-          @fulfillments = Fulfillment.includes(:user).joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ? and product_sku like ?', params[:status], @current_club.id, "%#{params[:product_filter]}%").not_renewed
+          @fulfillments = Fulfillment.includes(:user).joins(:user).where('fulfillments.status = ? and fulfillments.club_id = ? and product_sku like ?', params[:status], @current_club.id, "%#{params[:product_filter]}%").not_renewed.limit(6000)
         end
       else
         if params[:radio_product_filter].blank?
           @fulfillments = Fulfillment.includes(:user).joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? ', 
-            params[:status], params[:initial_date], params[:end_date], @current_club.id]).not_renewed
+            params[:status], params[:initial_date], params[:end_date], @current_club.id]).not_renewed.limit(6000)
         elsif params[:radio_product_filter] == 'sku'
           @fulfillments = Fulfillment.includes(:user).joins(:user).where(['fulfillments.status = ? AND date(assigned_at) BETWEEN ? and ? AND fulfillments.club_id = ? AND product_sku like ? ', 
-            params[:status], params[:initial_date], params[:end_date], @current_club.id, "%#{params[:product_filter]}%"]).not_renewed
+            params[:status], params[:initial_date], params[:end_date], @current_club.id, "%#{params[:product_filter]}%"]).not_renewed.limit(6000)
         end
       end
       @product_filter = params[:product_filter]

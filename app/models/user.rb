@@ -262,9 +262,9 @@ class User < ActiveRecord::Base
     if set_join_date
       membership.update_attribute :join_date, Time.zone.now
     end
-    
-    Users::PostEnrollmentTasks.perform_later(self.id, skip_send_fulfillment)
-    
+
+    Users::PostEnrollmentTasks.perform_later(id, skip_send_fulfillment)
+
     if not skip_nbd_and_current_join_date_update_for_sts and is_billing_expected?
       self.bill_date = membership.join_date + terms_of_membership.provisional_days.days
       self.next_retry_bill_date = membership.join_date + terms_of_membership.provisional_days.days
@@ -442,9 +442,9 @@ class User < ActiveRecord::Base
   def can_change_next_bill_date?
     not self.applied? and not self.lapsed?
   end
-  
+
   def has_been_sd_cc_expired?
-    self.transactions.where('membership_id = ? AND transaction_type = "sale"', self.current_membership_id).order('created_at DESC').limit(self.recycled_times).each do |transaction|
+    transactions.where('membership_id = ? AND transaction_type = "sale" AND success = false', current_membership_id).reorder('created_at DESC').limit(recycled_times).each do |transaction|
       return true if transaction.is_response_code_cc_expired?
     end
     false
@@ -452,7 +452,11 @@ class User < ActiveRecord::Base
 
   def can_update_vip_member_status?
     @tom_freemium ||= terms_of_membership.freemium?
-    (!@tom_freemium || vip_member?) && (!self.lapsed? || vip_member?)
+    (!@tom_freemium || vip_member?) && (!lapsed? || vip_member?)
+  end
+
+  def vip_member?
+    member_group_type_id ? (member_group_type.name == 'VIP') : false
   end
 
   ###############################################
@@ -1685,8 +1689,9 @@ class User < ActiveRecord::Base
     end
     
     def update_club_cash_if_vip_member
-      if self.vip_member_changed? and not self.club_cash_amount_changed?
-        if vip_member?
+      if member_group_type_id_changed? && !club_cash_amount_changed?
+        member_group_type = member_group_type_id_change.last ? MemberGroupType.find(member_group_type_id_change.last) : nil
+        if member_group_type && member_group_type.name == 'VIP'
           add_club_cash(nil, Settings.vip_additional_club_cash, 'Marked user VIP Member.')
         elsif club_cash_amount > 0
           add_club_cash(nil, -Settings.vip_additional_club_cash, 'Unmarked as VIP Member.')

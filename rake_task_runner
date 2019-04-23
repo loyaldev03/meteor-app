@@ -89,10 +89,6 @@ echo "`date` rake clubs:count_members_in_clubs"
 cd /var/www/$2/current && bundle exec rake clubs:count_members_in_clubs >> $LOGFILE 2>&1
 
 DATE=`date +"%u"` # 1 monday
-if [ "$1" == "production" ]; then
-  echo "`date` running remote script distribute_production_data.sh"
-  ssh deploy@50.116.28.74 -p 30003 '/home/deploy/sac-platform-reporting/current/scripts/distribute_production_data.sh >> /home/deploy/sac-platform-reporting/current/log/nightly.log 2>&1'
-fi
 if [ `date +"%d"` == "01" ]; then
   echo "`date` rake users:delete_testing_accounts"
   cd /var/www/$2/current && bundle exec rake users:delete_testing_accounts  >> $LOGFILE 2>&1 &
@@ -102,11 +98,11 @@ fi
 echo "`date` rake mkt_tools:sync_prospects_to_mailchimp"
 cd /var/www/$2/current && bundle exec rake mkt_tools:sync_prospects_to_mailchimp  >> $LOGFILE 2>&1 &
 
-if [ "$1" == "production" ]; then
-  echo "`date` running rsync to keep copy of production logs within reporting"
-  rsync -av --delete -e 'ssh -p 30003' --include '*.log' --include *$(date +"%Y%m%d").gz --exclude '*' /var/www/$2/current/log/ deploy@reporting2.affinitystop.com:/home/deploy/production-logs
-  ssh -p 30003 deploy@reporting2.affinitystop.com rm /home/deploy/production-logs/*$(date -d "-1 month" +"%Y%m")*.gz
-fi
+# if [ "$1" == "production" ]; then
+#   echo "`date` running rsync to keep copy of production logs within reporting"
+#   rsync -av --delete -e 'ssh -p 30003' --include '*.log' --include *$(date +"%Y%m%d").gz --exclude '*' /var/www/$2/current/log/ deploy@reporting2.affinitystop.com:/home/deploy/production-logs
+#   ssh -p 30003 deploy@reporting2.affinitystop.com rm /home/deploy/production-logs/*$(date -d "-1 month" +"%Y%m")*.gz
+# fi
 
 # blacklist temporary unblacklisted users
 echo "`date` rake users:blacklist_users_unblacklisted_temporary"

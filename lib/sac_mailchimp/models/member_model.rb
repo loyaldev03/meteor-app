@@ -127,6 +127,7 @@ module SacMailchimp
           attributes.merge!({ api_field => self.user.preferences[our_field].to_s })
         end
       end
+      attributes['VIPMEMBER'] = user.vip_member?
 			attributes
     end
 
@@ -147,8 +148,7 @@ module SacMailchimp
         'EXTERNALID' => 'external_id',
         'GENDER' => 'gender',
         'PHONE' => 'full_phone_number',
-        'CJOINDATE' => 'current_join_date',
-        'VIPMEMBER' => 'vip_member'
+        'CJOINDATE' => 'current_join_date'
       }
     end
 

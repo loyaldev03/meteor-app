@@ -1,6 +1,5 @@
 module SacStore
   class FulfillmentModel < Struct.new(:fulfillment)
-
     def notify_fulfillment_assignation
       unless fulfillment.store_id
         response = conn.post FULFILLMENT_ASSIGNATION_URL, { api_key: settings['api_token'], variant_id: fulfillment.product.store_id.to_s }

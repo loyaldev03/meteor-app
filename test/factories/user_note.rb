@@ -1,7 +1,5 @@
 FactoryBot.define do
-
   factory :user_note do
-  	description 'This note'
+    description { 'This note' }
   end
-
 end

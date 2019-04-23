@@ -60,7 +60,7 @@ module TasksHelpers
 
   # Method used from rake task and also from tests!
   def self.reset_club_cash_up_today
-    base = User.joins(:club).where("date(club_cash_expire_date) <= ? AND clubs.api_type != 'Drupal::Member' AND club_cash_enable = true", Time.zone.now.to_date).limit(2000)
+    base = User.joins(:club).where("date(club_cash_expire_date) <= ? AND (clubs.api_type IS NULL OR clubs.api_type != 'Drupal::Member') AND club_cash_enable = true", Time.zone.now.to_date).limit(2000)
     Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting members:reset_club_cash_up_today rake task, processing #{base.length} users"
     base.to_enum.with_index.each do |user,index|
       tz = Time.zone.now

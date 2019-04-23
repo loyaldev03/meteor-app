@@ -6,7 +6,7 @@ Rollbar.configure do |config|
 
   if Rails.env.test? || Rails.env.development?
     config.enabled = false
-  else  
+  else
     config.js_enabled = true
     config.js_options = {
       accessToken: '293697812b20421e95d293d70c6f6b23',

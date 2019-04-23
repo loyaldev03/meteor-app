@@ -12,7 +12,7 @@ gem 'paperclip', '~> 5.1.0'
 gem 'aws-sdk', '~> 2.10.0'
 
 gem 'acts_as_list'
-gem 'delayed_job_active_record'
+gem 'delayed_job_active_record', '~> 4.1', '>= 4.1.3'
 gem "delayed_job_web" # FIXME it is not working in rails 4
 # uncomment if pardot is enabled again
 # gem "ruby-pardot"
@@ -37,7 +37,7 @@ gem 'jquery-ui-rails', '6.0.1'
 gem 'jquery-datatables', github: 'sebastianGitDL/jquery-datatables'
 
 gem 'carmen-rails'
-gem 'country_code_select', '~> 1.0.0'
+#gem 'country_code_select', '~> 1.0.0'
 gem 'i18n-country-translations'
 gem 'devise'
 gem 'devise-async'
@@ -108,7 +108,7 @@ gem 'data-confirm-modal', github: 'ifad/data-confirm-modal', branch: 'bootstrap2
 gem 'mailcheck', github: 'dmferrari/mailcheck-ruby'
 
 group :test do 
-  gem 'factory_bot_rails'
+  gem 'factory_bot_rails', '~> 4.11'
   gem 'faker'
   gem 'mocha', require: false
   gem 'capybara'

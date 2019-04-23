@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180926190913) do
+ActiveRecord::Schema.define(version: 20190212191942) do
 
   create_table "agents", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -401,12 +401,12 @@ ActiveRecord::Schema.define(version: 20180926190913) do
     t.string   "product_sku",                     limit: 255
     t.datetime "assigned_at"
     t.datetime "renewable_at"
-    t.string   "status",                          limit: 255,                         default: "not_processed"
-    t.datetime "created_at",                                                                                    null: false
-    t.datetime "updated_at",                                                                                    null: false
+    t.string   "status",                          limit: 255,                          default: "not_processed"
+    t.datetime "created_at",                                                                                     null: false
+    t.datetime "updated_at",                                                                                     null: false
     t.string   "tracking_code",                   limit: 255
-    t.boolean  "recurrent",                                                           default: false
-    t.boolean  "renewed",                                                             default: false
+    t.boolean  "recurrent",                                                            default: false
+    t.boolean  "renewed",                                                              default: false
     t.integer  "user_id",                         limit: 8
     t.integer  "club_id",                         limit: 8
     t.string   "full_name",                       limit: 255
@@ -417,11 +417,12 @@ ActiveRecord::Schema.define(version: 20180926190913) do
     t.integer  "full_name_matches_count",         limit: 4
     t.integer  "full_address_matches_count",      limit: 4
     t.integer  "full_phone_number_matches_count", limit: 4
-    t.decimal  "average_match_age",                           precision: 6, scale: 2
+    t.decimal  "average_match_age",                           precision: 6,  scale: 2
     t.integer  "matching_fulfillments_count",     limit: 4
     t.integer  "product_id",                      limit: 4
     t.integer  "store_id",                        limit: 4
     t.string   "sync_result",                     limit: 255
+    t.decimal  "shipping_cost",                               precision: 11, scale: 2
   end
 
   add_index "fulfillments", ["club_id", "assigned_at", "status"], name: "index_fulfillments_on_club_id_and_assigned_at_and_status", using: :btree
@@ -824,6 +825,7 @@ ActiveRecord::Schema.define(version: 20180926190913) do
     t.date     "change_tom_date"
     t.text     "change_tom_attributes",               limit: 65535
     t.string   "slug",                                limit: 100
+    t.boolean  "vip_member",                                                                 default: false
   end
 
   add_index "users", ["club_id", "api_id"], name: "api_id_UNIQUE", unique: true, using: :btree

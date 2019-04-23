@@ -449,6 +449,8 @@ development:
 test:
   <<: *defaults
   xxxyyyzzz: reibel3y5estrada8
+  elasticsearch:
+    url: https://vpc-meteor-affinity-es-prod-ir5577tgwdn43stkwr5j5lw5jm.us-east-2.es.amazonaws.com
   club_params:
     1234:
       show_bbb_seal: true
@@ -465,7 +467,7 @@ production:
   email_to_send_product_list: 'tbrady@meteoraffinity.com,ndavid@meteoraffinity.com'
   logger_level_for_tasks: 'INFO'
   s3_bucket: 'campaign-checkout-assets-production'
-  s3_region: 'us-east-1'  
+  s3_region: 'us-east-1'
   mes_report_service:
     user: Stoneacrereports
     password: do3!lAjo5
@@ -476,7 +478,7 @@ production:
     url: https://www.merchante-solutions.com/
   xxxyyyzzz: 7faf4f991bc44841a00423b8db9602bb
   elasticsearch:
-    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
+    url: https://vpc-meteor-affinity-es-prod-ir5577tgwdn43stkwr5j5lw5jm.us-east-2.es.amazonaws.com
   pivotal_tracker:
     project_id: 840771
     token: "93edf6fdb44a44b280a675b85c464c5b"
@@ -524,7 +526,7 @@ prototype:
         PREF3: car
         PREF4: track
   elasticsearch:
-    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
+    url: https://vpc-meteor-affinity-es-prod-ir5577tgwdn43stkwr5j5lw5jm.us-east-2.es.amazonaws.com
 
 staging:
   <<: *defaults
@@ -540,7 +542,7 @@ staging:
         PREF3: car
         PREF4: track
   elasticsearch:
-    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
+    url: https://vpc-meteor-affinity-es-prod-ir5577tgwdn43stkwr5j5lw5jm.us-east-2.es.amazonaws.com
 
 demo:
   <<: *defaults

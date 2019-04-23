@@ -13,7 +13,7 @@ module SacPlatform
     # -- all .rb files in that directory are automatically loaded.
 
     #config.autoload_paths += %W(#{config.root}/lib/validators/ #{config.root}/app/models/gateways/ #{config.root}/app/models/additional_data_forms/)
-    config.autoload_paths += %W(#{config.root}/lib/validators/ #{config.root}/app/models/gateways/)
+    config.autoload_paths += %W(#{config.root}/lib/validators/ #{config.root}/app/models/gateways/ #{config.root}/lib/support/)
 
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
@@ -31,6 +31,9 @@ module SacPlatform
     # Be sure to have the adapter's gem in your Gemfile and follow
     # the adapter's specific installation and deployment instructions.
     config.active_job.queue_adapter = :delayed_job
+
+    config.middleware.swap "Rails::Rack::Logger", "HealthCheckLogger"
+    config.middleware.insert_after "HealthCheckLogger", "MiddlewareHealthCheck"
 
     config.middleware.insert_before 0, "Rack::Cors" do
       allow do

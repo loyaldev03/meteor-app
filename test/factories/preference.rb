@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory :preference do
-    name {Faker::Lorem.characters(20)}
+    name { Faker::Lorem.characters(20) }
   end
-end 
+end

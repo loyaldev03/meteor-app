@@ -14,6 +14,6 @@ module Spree
   end
 
   def self.test_mode!
-    # Club.send :include, Drupal::ClubTestExtensions
+    Spree.enable_integration!
   end
 end

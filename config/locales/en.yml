@@ -147,8 +147,6 @@ en:
     new_domain: "New Domain"
     mark_as_testing_account: "Mark as testing account"
     unmark_as_testing_account: "Unmark as testing account"
-    mark_as_vip_member: "Mark as vip member"
-    unmark_as_vip_member: "Unmark as vip member"
     set_not_processed: "Set as not processed"
     details: 'Details'
     mark_as_sent: 'Mark as Sent'
@@ -826,7 +824,7 @@ en:
   mailchimp:
     error_details:
       cant_subscribe: 'is in a compliance state due to unsubscribe, bounce, or compliance review and cannot be subscribed.'
-      fake_or_invalid_email: 'looks fake or invalid, please enter a real email address.'
+      fake_or_invalid_email: 'Please provide a valid email address'
   date:
     formats:
       default: "%m/%d/%Y"

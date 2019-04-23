@@ -32,6 +32,7 @@
           attributes << {"name" => api_field, "content" => self.user.preferences[our_field].to_s}
         end
       end
+      attributes << { 'name' => 'VIPMEMBER', 'content' => user.vip_member? }
       attributes
     end
 
@@ -52,8 +53,7 @@
         'EXTERNALID' => 'external_id',
         'GENDER' => 'gender',
         'PHONE' => 'full_phone_number',
-        'CJOINDATE' => 'current_join_date',
-        'VIPMEMBER' => 'vip_member'
+        'CJOINDATE' => 'current_join_date'
       }
     end
 

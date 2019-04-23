@@ -1,7 +1,5 @@
 FactoryBot.define do
-
   factory :communication_type do
-    name 'email'
+    name { 'email' }
   end
-
 end

@@ -367,7 +367,7 @@ class Api::MembersController < ApplicationController
       response = { :message => I18n.t('error_messages.club_cash.null_amount'), :code => Settings.error_codes.wrong_data }
     elsif params[:amount].to_f < 0
       response = { :message => I18n.t('error_messages.club_cash.negative_amount'), :code => Settings.error_codes.wrong_data}
-    elsif user.club.is_drupal?
+    elsif user.club.is_drupal? || user.club.is_spree?
       user.skip_api_sync!
       user.club_cash_amount = params[:amount]
       user.club_cash_expire_date = params[:expire_date]
@@ -621,9 +621,6 @@ class Api::MembersController < ApplicationController
   rescue NoMethodError
     Auditory.report_issue("API::TermsOfMembership::update", $!)
     render json: { :message => "There are some params missing. Please check them.", :code => Settings.error_codes.wrong_data }
-  rescue Exception
-    Auditory.report_issue("API::TermsOfMembership::update", $!)
-    render json: { :message => I18n.t('error_messages.unrecoverable_error'), :code => Settings.error_codes.wrong_data }
   end
 
   ##

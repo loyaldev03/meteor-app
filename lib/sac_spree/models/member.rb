@@ -1,6 +1,6 @@
 module Spree
   class Member < Struct.new(:user)
-    OBSERVED_FIELDS = %w[email club_cash_amount status current_membership_id vip_member first_name last_name preferences].to_set.freeze
+    OBSERVED_FIELDS = %w[email club_cash_amount status current_membership_id member_group_type_id first_name last_name preferences].to_set.freeze
 
     def update!
       res = conn.put "/api/v1/users/#{user.api_id}/update_account", fieldmap
@@ -60,7 +60,7 @@ module Spree
         last_name: user.last_name,
         external_id: user.reload.id,
         preferences: user.preferences.present? ? user.preferences : {},
-        vip_event_quota: user.club_cash_amount,
+        vip_event_points: user.club_cash_amount,
         role: role
       }
 
