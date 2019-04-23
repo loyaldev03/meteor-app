@@ -127,7 +127,7 @@ module SacMailchimp
           attributes.merge!({ api_field => self.user.preferences[our_field].to_s })
         end
       end
-      attributes['VIPMEMBER'] = user.vip_member?
+      attributes['VIPMEMBER'] = user.vip_member?.to_s
 			attributes
     end
 

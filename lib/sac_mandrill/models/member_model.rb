@@ -32,7 +32,7 @@
           attributes << {"name" => api_field, "content" => self.user.preferences[our_field].to_s}
         end
       end
-      attributes << { 'name' => 'VIPMEMBER', 'content' => user.vip_member? }
+      attributes << { 'name' => 'VIPMEMBER', 'content' => user.vip_member?.to_s }
       attributes
     end
 
