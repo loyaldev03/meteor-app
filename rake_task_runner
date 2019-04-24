@@ -26,10 +26,10 @@ cd $2 && bundle exec rake users:process_sync  >> $LOGFILE 2>&1
 if [ "$1" == "production" ]; then
   echo "`date` rake payeezy:chargeback_report"
   cd $2 && bundle exec rake payeezy:chargeback_report  >> $LOGFILE 2>&1
-  echo "`date` rake payeezy:account_updater_send_file_to_process"
-  cd $2 && bundle exec rake payeezy:account_updater_send_file_to_process  >> $LOGFILE 2>&1
-  echo "`date` rake payeezy:account_updater_process_response"
-  cd $2 && bundle exec rake payeezy:account_updater_process_response  >> $LOGFILE 2>&1
+  # echo "`date` rake payeezy:account_updater_send_file_to_process"
+  # cd $2 && bundle exec rake payeezy:account_updater_send_file_to_process  >> $LOGFILE 2>&1
+  # echo "`date` rake payeezy:account_updater_process_response"
+  # cd $2 && bundle exec rake payeezy:account_updater_process_response  >> $LOGFILE 2>&1
 fi
 
 # nowadys we will run billing once per day
