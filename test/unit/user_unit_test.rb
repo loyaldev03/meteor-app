@@ -3,9 +3,10 @@ require 'test_helper'
 class UserUnitTest < ActiveSupport::TestCase
   setup do
     FactoryBot.create(:batch_agent)
-    @club                = FactoryBot.create(:simple_club_with_gateway)
-    Time.zone            = @club.time_zone
-    @terms_of_membership = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id)
+    @club                     = FactoryBot.create(:simple_club_with_gateway)
+    Time.zone                 = @club.time_zone
+    @terms_of_membership      = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id)
+    @free_terms_of_membership = FactoryBot.create(:free_terms_of_membership, club_id: @club.id)
     active_merchant_stubs_payeezy
   end
 
@@ -476,5 +477,31 @@ class UserUnitTest < ActiveSupport::TestCase
       user.set_as_canceled!
       assert_not_nil user.reload.communications.find_by(template_type: 'cancellation')
     end
+  end
+
+  ################################################################
+  ######## VIP MEMBER logic
+  ################################################################
+
+  test 'User gets additional club cash when updated to vip member.' do
+    user                = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    original_club_cash  = user.club_cash_amount
+    assert_nil user.member_group_type
+    user.member_group_type_id = MemberGroupType.find_by(name: 'VIP').id
+    assert user.save
+    assert_equal user.club_cash_amount, original_club_cash + Settings.vip_additional_club_cash
+
+    original_club_cash        = user.club_cash_amount
+    user.member_group_type_id = nil
+    assert user.save
+    assert_equal user.club_cash_amount, original_club_cash - Settings.vip_additional_club_cash
+  end
+
+  test 'User is not allowed to be set as VIP member when is LAM.' do
+    user = enroll_user(FactoryBot.build(:user), @free_terms_of_membership)
+    assert_nil user.member_group_type
+    user.member_group_type_id = MemberGroupType.find_by(name: 'VIP').id
+    assert !user.save
+    assert user.errors[:classification].include? 'Cannot set as VIP Member when user is associated to Freemium Membership.'
   end
 end

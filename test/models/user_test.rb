@@ -8,7 +8,6 @@ class UserTest < ActiveSupport::TestCase
     @partner                          = @club.partner
     Time.zone                         = @club.time_zone
     @terms_of_membership_with_gateway = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club.id)
-    @wordpress_terms_of_membership    = FactoryBot.create :wordpress_terms_of_membership_with_gateway, club_id: @club.id
     @sd_strategy                      = FactoryBot.create(:soft_decline_strategy)
   end
 
@@ -71,7 +70,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test 'Should reset club_cash when user is canceled' do
-    user = enroll_user(FactoryBot.build(:user), @wordpress_terms_of_membership)
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership_with_gateway)
     user.add_club_cash 100, 'testing'
     user.set_as_canceled
     assert_equal 0, user.reload.club_cash_amount, "The user is #{user.status} with #{user.club_cash_amount}"
