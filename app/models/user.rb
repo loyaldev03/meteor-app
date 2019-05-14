@@ -37,6 +37,7 @@ class User < ActiveRecord::Base
   before_save :set_marketing_client_sync_as_needed
   before_save :apply_downcase_to_email
   before_save :prepend_zeros_to_phone_number
+  before_update :check_if_vip_member_allowed
   after_create :elasticsearch_asyn_call
   after_create 'asyn_desnormalize_preferences(force: true)'
   after_save :create_operation_on_testing_account_toggle
@@ -1688,12 +1689,23 @@ class User < ActiveRecord::Base
       self.phone_local_number = format('%07d', phone_local_number.to_i)
     end
     
+    def check_if_vip_member_allowed
+      if member_group_type_id_changed?
+        member_group_type = member_group_type_id_change.last ? MemberGroupType.find(member_group_type_id_change.last) : nil
+        if member_group_type && member_group_type.name == 'VIP' && terms_of_membership.freemium?
+          errors.add(:classification, 'Cannot set as VIP Member when user is associated to Freemium Membership.')
+          return false
+        end
+      end
+    end
+    
     def update_club_cash_if_vip_member
       if member_group_type_id_changed? && !club_cash_amount_changed?
-        member_group_type = member_group_type_id_change.last ? MemberGroupType.find(member_group_type_id_change.last) : nil
-        if member_group_type && member_group_type.name == 'VIP'
+        old_member_group_type = member_group_type_id_change.first ? MemberGroupType.find(member_group_type_id_change.first) : nil
+        new_member_group_type = member_group_type_id_change.last ? MemberGroupType.find(member_group_type_id_change.last) : nil
+        if new_member_group_type&.name == 'VIP'
           add_club_cash(nil, Settings.vip_additional_club_cash, 'Marked user VIP Member.')
-        elsif club_cash_amount > 0
+        elsif club_cash_amount > 0 && ((new_member_group_type.nil? || member_group_type&.name != 'VIP') && old_member_group_type&.name == 'VIP')
           add_club_cash(nil, -Settings.vip_additional_club_cash, 'Unmarked as VIP Member.')
         end
       end

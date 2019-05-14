@@ -526,7 +526,8 @@ prototype:
         PREF3: car
         PREF4: track
   elasticsearch:
-    url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
+    url: 'localhost:9200/'
+    # url: https://xagax-admin-elastic:VZOeQMinp5ApYU94R@7cff828b377b7b0f000.qbox.io
     # url: https://vpc-meteor-affinity-es-prod-ir5577tgwdn43stkwr5j5lw5jm.us-east-2.es.amazonaws.com
 
 staging:

@@ -9,7 +9,8 @@ class Api::ClubCashTransactionController < ApplicationController
   #
   # @required [String] api_key Agent's authentication token. This token allows us to check if the agent is allowed to request this action.
   # @required [Integer] Member's ID. Integer autoincrement value that is used by platform. Have in mind this is part of the url.
-  # @required [Hash] club_cash_transaction Hash with necessary information to create the club cash transaction. It has the following information: 
+  # @required [Boolean] skip_api_sync Boolean to set if user should be synchronize or not against frontend.
+  # @required [Hash] club_cash_transaction Hash with necessary information to create the club cash transaction. It has the following information:
   #   <ul>
   #     <li><strong>amount</strong> Amount of the club cash to add or deduct. Positive value to add, or negative value to deduct. We only accept numbers with up to two digits after the comma. (required) (Eg: 2.50 , -10.99, 25) </li>
   #     <li><strong>description</strong> Description of the club cash. (Eg. "Adding $20 club cash because of enroll.".) [optional]</li>
@@ -29,7 +30,8 @@ class Api::ClubCashTransactionController < ApplicationController
   def create
     user = User.find(params[:member_id])
     my_authorize! :manage_club_cash_api, ClubCashTransaction, user.club_id
-    render json: user.add_club_cash(current_agent,params[:club_cash_transaction][:amount],params[:club_cash_transaction][:description])
+    user.skip_api_sync! if params[:skip_api_sync].present?
+    render json: user.add_club_cash(current_agent, params[:club_cash_transaction][:amount],params[:club_cash_transaction][:description])
   rescue ActiveRecord::RecordNotFound
     render json: { :message => "Member not found", :code => Settings.error_codes.not_found }
   rescue NoMethodError => e
