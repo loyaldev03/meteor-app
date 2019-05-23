@@ -63,8 +63,12 @@ class User < ActiveRecord::Base
     if is_cms_configured?
       if is_drupal?
         Users::SyncToRemoteDomainJob.perform_now(user_id: id) if defined?(Drupal::Member) && (Drupal::Member::OBSERVED_FIELDS.intersection(changed).any? && (!@skip_api_sync || api_user.nil?)) # change tracker
-      elsif is_spree?
-        Users::SyncToRemoteDomainJob.perform_now(user_id: id) if defined?(Spree::Member) && (Spree::Member::OBSERVED_FIELDS.intersection(changed).any? && (!@skip_api_sync || api_user.nil?)) # change tracker
+      elsif is_spree? && defined?(Spree::Member)
+        unless @skip_api_sync
+          if api_id.nil? || Spree::Member::OBSERVED_FIELDS.intersection(changed).any?
+            Users::SyncToRemoteDomainJob.perform_now(user_id: id)
+          end
+        end
       end
     end
   end

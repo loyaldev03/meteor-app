@@ -44,10 +44,13 @@ production:
 
 staging:
   adapter: mysql2
-  database: sac_platform_staging
-  host: localhost
+  database: <%= ENV['RDS_DB_NAME'] %>
+  host: <%= ENV['RDS_HOSTNAME'] %>
+  port: <%= ENV['RDS_PORT'] %>
   encoding: utf8
-  username: root
+  username: <%= ENV['RDS_USERNAME'] %>
+  password: <%= ENV['RDS_PASSWORD'] %>
+  pool: 15
 
 prototype:
   adapter: mysql2

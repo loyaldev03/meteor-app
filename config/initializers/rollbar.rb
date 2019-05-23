@@ -4,7 +4,7 @@ Rollbar.configure do |config|
 
   config.access_token = 'cdfd552324374371bc4033127d42abc3'
 
-  if Rails.env.test? || Rails.env.development?
+  if !Rails.env.production?
     config.enabled = false
   else
     config.js_enabled = true
