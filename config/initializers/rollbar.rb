@@ -4,10 +4,10 @@ Rollbar.configure do |config|
 
   config.access_token = 'cdfd552324374371bc4033127d42abc3'
 
-  if Rails.env.test? || Rails.env.development?
+  if !Rails.env.production?
     config.enabled = false
   else
-    config.js_enabled = true
+    config.js_enabled = false
     config.js_options = {
       accessToken: '293697812b20421e95d293d70c6f6b23',
       captureUncaught: true,

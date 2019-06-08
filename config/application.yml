@@ -536,7 +536,7 @@ staging:
   s3_region: 'us-east-1'
   xxxyyyzzz: reibel3y5estrada8
   club_params:
-    36:
+    1:
       show_bbb_seal: true
       preferences:
         PREF1: driver_1
@@ -544,7 +544,7 @@ staging:
         PREF3: car
         PREF4: track
   elasticsearch:
-    url: https://vpc-meteor-affinity-es-prod-ir5577tgwdn43stkwr5j5lw5jm.us-east-2.es.amazonaws.com
+    url: https://vpc-phoenix-stage-gehootcdlksvao4ppd254x3pr4.us-east-2.es.amazonaws.com
 
 demo:
   <<: *defaults

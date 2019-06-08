@@ -2,7 +2,7 @@ class Api::ClubCashTransactionController < ApplicationController
   skip_before_filter :verify_authenticity_token
 
   ##
-  # This method adds or deducts an specific amount of club cash on a member. In case you want to add club cash, the amount value has to be a positive number, while if you want to remove club cash, the amount value has to be negative. Have in mind that in order to use this feature, member's club must allow club cash transaction within it.  
+  # This method adds or deducts an specific amount of club cash on a member. In case you want to add club cash, the amount value has to be a positive number, while if you want to remove club cash, the amount value has to be negative. Have in mind that in order to use this feature, member's club must allow club cash transaction within it.
   #
   # @resource /api/v1/members/:member_id/club_cash_transaction
   # @action POST
@@ -21,7 +21,7 @@ class Api::ClubCashTransactionController < ApplicationController
   #
   # @example_request
   #   curl -v -k -X POST --data-ascii '{"club_cash_transaction":{"amount":"10", "description":"testing"}, "api_key":"3v5L15ovoJyee8mKh5DQ"}' -H "Content-Type: application/json" https://dev.affinitystop.com:3000/api/v1/members/11349954802/club_cash_transaction
-  # @example_request_description Example of valid request. 
+  # @example_request_description Example of valid request.
   #
   # @example_response
   #   {"message":"Club cash processed at drupal correctly. Amount: 10. Concept: testing", "code":"000"}
