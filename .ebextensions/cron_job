@@ -1,0 +1,1 @@
+15 5 * * * root docker exec -i $(docker ps -q) /bin/bash -c '/app/rake_task_runner production /app' >> /var/log/ma_cron_rake.log 2>&1
