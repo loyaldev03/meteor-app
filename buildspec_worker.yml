@@ -13,10 +13,8 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - mv Dockerrun.aws.json.staging Dockerrun.aws.json
-      - mv Dockerfile.staging Dockerfile
-      - rm .ebextensions/cron-rake.config
-      - rm .ebextensions/cron_job
+      - mv Dockerrun.aws.json.production Dockerrun.aws.json
+      - mv Dockerfile.worker Dockerfile
       - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
       - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
   post_build:
