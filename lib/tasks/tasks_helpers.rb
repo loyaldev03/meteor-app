@@ -371,12 +371,6 @@ module TasksHelpers
             end
 
             fulfillment = fulfillments.first
-            unless fulfillment.shipping_cost.nil?
-              file_errors << { error: "Fulfillment already has shipping cost set (current shipping cost: #{fulfillment.shipping_cost} - New shipping cost: #{row[13]}", tracking_code: tracking_code }
-              Rails.logger.info "[!] Fulfillment::ShippingCostUpdate::Error: #{fulfillment.errors.full_messages} - row: #{row}"
-              next
-            end
-
             fulfillment.shipping_cost = row[13] # UPS-MI
             if fulfillment.save
               success_count += 1
