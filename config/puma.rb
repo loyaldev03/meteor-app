@@ -9,19 +9,17 @@ port        ENV['PORT']     || 3000
 environment ENV['RACK_ENV'] || 'development'
 
 before_fork do
+  require 'puma_stats_logger'
   if defined?(PumaStatsLogger)
     Rails.logger.debug "Running PumaStatsLogger"
-    Rails.logger.info "Running PumaStatsLogger"
     PumaStatsLogger.run
   else
     Rails.logger.debug "NOT Running PumaStatsLogger"
-    Rails.logger.info "NOT Running PumaStatsLogger"
   end
 end
 
 on_worker_boot do
-  Rails.logger.debug "Puma on_worker_boot"
-  Rails.logger.info "Puma on_worker_boot"
+  Rails.logger.debug "puma on_worker_boot"
   # Worker specific setup for Rails 4.1+
   # See: https://devcenter.heroku.com/articles/deploying-rails-applications-with-the-puma-web-server#on-worker-boot
   ActiveRecord::Base.establish_connection
