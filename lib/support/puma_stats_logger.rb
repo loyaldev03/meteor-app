@@ -7,7 +7,7 @@ class PumaStatsLogger
     metadata_endpoint = 'http://169.254.169.254/latest/meta-data/'
     instance_id = Net::HTTP.get( URI.parse( metadata_endpoint + 'instance-id' ) )
 
-    ec2 = AWS::EC2.new()
+    ec2 = Aws::EC2.new()
     puts "ec2: #{ec2.methods}"
     instance = ec2.instances[instance_id]
     puts "instance: #{instance}"
