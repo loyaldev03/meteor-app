@@ -15,8 +15,8 @@
 /tmp
 /solr
 
-# DO NOT UPLOAD ANY OF THESE FILES THAT SET THE RUBY or GEMSET VERSION. 
-# THEY MIGHT BREAK THE CORRECT OPERATION OF PRODUCTION SCRIPTS. SEE #67983314 
+# DO NOT UPLOAD ANY OF THESE FILES THAT SET THE RUBY or GEMSET VERSION.
+# THEY MIGHT BREAK THE CORRECT OPERATION OF PRODUCTION SCRIPTS. SEE #67983314
 .rvmrc
 .ruby-version
 .ruby-gemset
@@ -35,3 +35,6 @@ coverage
 /account_updater_files
 
 .byebug_history
+
+lib/support/puma_stats_logger.rb
+config/puma.rb
