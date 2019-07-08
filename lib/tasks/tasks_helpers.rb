@@ -8,18 +8,24 @@ module TasksHelpers
     file = File.open("/tmp/bill_all_members_up_today_#{Rails.env}.lock", File::RDWR|File::CREAT, 0644)
     file.flock(File::LOCK_EX)
 
-    base = User.joins(:current_membership => :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND users.club_id IN (select id from clubs where billing_enable = true) AND users.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1 AND (users.change_tom_date IS NULL OR DATE(users.change_tom_date) > ?)", Time.zone.now.to_date, Time.zone.now.to_date).limit(4000)
-    Rails.logger.info " *** [#{I18n.l(Time.zone.now, :format =>:dashed)}] Starting users:billing rake task, processing #{base.length} users"
-    base.to_enum.with_index.each do |user,index| 
-      tz = Time.zone.now
-      begin
-        Rails.logger.info "  *[#{index+1}] processing user ##{user.id} nbd: #{user.next_retry_bill_date}"
-        user.bill_membership
-      rescue Exception => e
-        Auditory.report_issue("Billing::Today", e, { :user => user.id, :credit_card => user.active_credit_card.id })
-        Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+    base = User.joins(current_membership: :terms_of_membership).where("DATE(next_retry_bill_date) <= ? AND users.club_id IN (select id from clubs where billing_enable = true) AND users.status NOT IN ('applied','lapsed') AND manual_payment = false AND terms_of_memberships.is_payment_expected = 1 AND (users.change_tom_date IS NULL OR DATE(users.change_tom_date) > ?)", Time.zone.now.to_date, Time.zone.now.to_date).limit(4000)
+    Rails.logger.info " *** [#{I18n.l(Time.zone.now, format: :dashed)}] Starting users:billing rake task, processing #{base.length} users"
+    base.to_enum.with_index.each do |user, index|
+      user.with_lock do
+        tz = Time.zone.now
+        begin
+          Rails.logger.info "  *[#{index + 1}] processing user ##{user.id} nbd: #{user.next_retry_bill_date}"
+          if user.next_retry_bill_date.to_date > Time.current.to_date
+            Rails.logger.info '    [!] Avoiding billing since it was already billed today.'
+            next
+          end
+          user.bill_membership
+        rescue Exception => e
+          Auditory.report_issue("Billing::Today", e, { :user => user.id, :credit_card => user.active_credit_card.id })
+          Rails.logger.info "    [!] failed: #{$!.inspect}\n\t#{$@[0..9] * "\n\t"}"
+        end
+        Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
       end
-      Rails.logger.info "    ... took #{Time.zone.now - tz}seconds for user ##{user.id}"
     end
     file.flock(File::LOCK_UN)
   end

@@ -94,5 +94,11 @@ echo "`date` rake users:blacklist_users_unblacklisted_temporary"
 cd $2 && bundle exec rake users:blacklist_users_unblacklisted_temporary >> $LOGFILE 2>&1
 
 
+if [ "$1" == "production" ]; then
+  echo "`date` Starting mysql dump generation and upload to S3."
+  /bin/bash script/custom/upload-master-backup.sh
+fi
+
+
 WAIT_PIDS=`jobs -l | awk '{print $2}'`
 wait $WAIT_PIDS
