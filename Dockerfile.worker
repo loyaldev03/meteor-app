@@ -3,6 +3,8 @@ ENV APP_HOME /app
 ENV RAILS_ENV production
 ENV RACK_ENV production
 ENV RAILS_SERVE_STATIC_FILES true
+ENV PYTHONIOENCODING=UTF-8
+
 RUN sed -i '/jessie-updates/d' /etc/apt/sources.list
 RUN apt-get update -qq
 RUN apt-get install -y apt-transport-https
@@ -12,6 +14,18 @@ RUN apt-get install -y mysql-client
 RUN apt-get install -y libxml2-dev libxslt1-dev
 RUN apt-get install -y libqtwebkit4 libqt4-dev xvfb
 RUN apt-get install -y nodejs
+
+RUN apt-get install -y \
+    less \
+    man \
+    ssh \
+    python \
+    python-pip \
+    python-virtualenv \
+    vim \
+    vim-nox \
+    zip
+
 RUN apt-get clean autoclean \
   && apt-get autoremove -y \
   && rm -rf \
@@ -19,6 +33,20 @@ RUN apt-get clean autoclean \
     /var/lib/dpkg \
     /var/lib/cache \
     /var/lib/log
+    
+RUN adduser --disabled-login --gecos '' aws
+
+WORKDIR /home/aws
+
+USER aws
+
+RUN \
+    mkdir aws && \
+    virtualenv aws/env && \
+    ./aws/env/bin/pip install awscli && \
+    echo 'source $HOME/aws/env/bin/activate' >> .bashrc && \
+    echo 'complete -C aws_completer aws' >> .bashrc
+    
 RUN mkdir $APP_HOME
 RUN mkdir $APP_HOME/tmp
 WORKDIR $APP_HOME
@@ -29,6 +57,10 @@ ADD . $APP_HOME
 # should be moved when the app is updated
 RUN chmod +x script/docker/entrypoint.sh
 ENTRYPOINT ["sh", "script/docker/entrypoint.sh"]
+
+RUN chmod +x script/docker/entrypoint.sh
+ENTRYPOINT ["sh", "script/docker/entrypoint.sh"]
+
 RUN bundle exec rake assets:precompile --trace
 VOLUME /app/public
 EXPOSE 3000
