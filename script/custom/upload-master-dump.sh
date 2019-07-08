@@ -1,7 +1,7 @@
 #!/bin/bash
 
-BACKUP_FILE_RAW=/tmp/phoenix-dump.sql
-BACKUP_FILE=/tmp/phoenix-dump.sql.gz
+BACKUP_FILE_RAW=/app/tmp/db_dump/phoenix-dump.sql
+BACKUP_FILE=/app/tmp/db_dump/phoenix-dump.sql.gz
 AWS_BUCKET=phoenix-production-database-dump
 
 echo `date` "Generating dump."
