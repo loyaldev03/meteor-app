@@ -34,11 +34,11 @@ RUN apt-get clean autoclean \
     /var/lib/cache \
     /var/lib/log
     
-RUN adduser --disabled-login --gecos '' aws
+# RUN adduser --disabled-login --gecos '' aws
 
 WORKDIR /home/aws
 
-USER aws
+# USER aws
 
 RUN \
     mkdir aws && \
