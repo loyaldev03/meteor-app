@@ -30,16 +30,7 @@ RUN apt-get update && \
     && pip3 install --upgrade pip \
     && apt-get clean
 
-    
-RUN adduser --disabled-login --gecos '' aws
-
-WORKDIR /home/aws
-
-USER aws
-
 RUN pip3 --no-cache-dir install --upgrade awscli
-    
-USER root
 
 RUN apt-get clean autoclean \
   && apt-get autoremove -y \
