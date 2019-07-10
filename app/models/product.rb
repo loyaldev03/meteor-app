@@ -89,7 +89,7 @@ class Product < ActiveRecord::Base
 
   def self.send_product_list_email(clubs_id = nil)
     product_xls = Product.generate_xls(clubs_id)
-    temp = Tempfile.new("posts.xlsx")
+    temp = Tempfile.new('posts.xlsx', 'tmp')
 
     product_xls.serialize temp.path
     Notifier.product_list(temp).deliver_now!

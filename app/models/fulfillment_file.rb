@@ -70,13 +70,12 @@ class FulfillmentFile < ActiveRecord::Base
     else
       fulfillments = self.fulfillments.includes(:user)
     end
-    xls_package = self.generateXLS(false)
-    temp_file = Tempfile.new("fulfillment_file_#{self.id}.xls")
+    xls_package = generateXLS(false)
+    temp_file   = Tempfile.new("fulfillment_file_#{id}.xls", 'tmp')
     xls_package.serialize temp_file.path
-    
+
     temp_file.close
-    Notifier.manual_fulfillment_file(self.agent,self,temp_file).deliver_now!
+    Notifier.manual_fulfillment_file(agent, self, temp_file).deliver_now!
     temp_file.unlink
   end
-
 end
