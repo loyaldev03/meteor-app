@@ -1,3 +1,5 @@
+require 'test_helper'
+
 class UserBillingTest < ActiveSupport::TestCase
   setup do
     @club                 = FactoryBot.create(:simple_club_with_gateway)
