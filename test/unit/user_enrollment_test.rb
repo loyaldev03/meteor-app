@@ -1,3 +1,5 @@
+require 'test_helper'
+
 class UserEnrollmentTest < ActiveSupport::TestCase
   setup do
     @club                 = FactoryBot.create(:simple_club_with_gateway)
@@ -209,6 +211,34 @@ class UserEnrollmentTest < ActiveSupport::TestCase
     assert_equal 'provisional', user.status, 'Status was not updated.'
     assert_not_equal user.current_membership_id, old_membership_id
     assert_nil user.current_membership.parent_membership_id
+  end
+
+  test 'Lapsed user can be recovered (through enroll method) and updated' do
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    user.set_as_canceled!
+    old_membership_id = user.current_membership_id
+    user_information = FactoryBot.build(:user, email: user.email)
+    enroll_user(user_information, @terms_of_membership)
+    assert_equal 'provisional', user.reload.status, 'Status was not updated.'
+    assert_not_equal user.current_membership_id, old_membership_id
+    assert_nil user.current_membership.parent_membership_id
+    %i[first_name last_name address state city country zip].each do |attribute|
+      assert_equal user.send(attribute), user_information.send(attribute)
+    end
+  end
+
+  test 'Lapsed user is not recovered nor information is updated when recovery fails (trough enroll method)' do
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    user.set_as_canceled!
+    old_membership_id = user.current_membership_id
+    user_information = FactoryBot.build(:user, email: user.email)
+    enroll_user_with_error(user_information, @terms_of_membership)
+    assert_equal 'provisional', user.reload.status, 'Status was not updated.'
+    assert_not_equal user.current_membership_id, old_membership_id
+    assert_nil user.current_membership.parent_membership_id
+    %i[first_name last_name address state city country zip].each do |attribute|
+      assert_equal user.send(attribute), user.send(attribute)
+    end
   end
 
   test 'Lapsed user can be recovered unless it needs approval' do
