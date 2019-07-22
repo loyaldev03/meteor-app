@@ -44,10 +44,10 @@ module Spree
     end
 
     def fieldmap
-      role = if user.vip_member?
-               'vip_member'
-             elsif user.lapsed?
-               'cancelled_member'
+      role = if user.lapsed?
+              'cancelled_member'
+             elsif user.vip_member?
+              'vip_member'
              elsif user.terms_of_membership.api_role.to_i == 6
                'standard_member'
              elsif user.terms_of_membership.api_role.to_i == 7

@@ -63,11 +63,9 @@ class User < ActiveRecord::Base
     if is_cms_configured?
       if is_drupal?
         Users::SyncToRemoteDomainJob.perform_now(user_id: id) if defined?(Drupal::Member) && (Drupal::Member::OBSERVED_FIELDS.intersection(changed).any? && (!@skip_api_sync || api_user.nil?)) # change tracker
-      elsif is_spree? && defined?(Spree::Member)
-        unless @skip_api_sync
-          if api_id.nil? || Spree::Member::OBSERVED_FIELDS.intersection(changed).any?
-            Users::SyncToRemoteDomainJob.perform_now(user_id: id)
-          end
+      elsif is_spree? && defined?(Spree::Member) && !@skip_api_sync
+        if api_id.nil? || Spree::Member::OBSERVED_FIELDS.intersection(changed).any?
+          Users::SyncToRemoteDomainJob.perform_now(user_id: id)
         end
       end
     end
@@ -697,7 +695,7 @@ class User < ActiveRecord::Base
     if user.nil?
       user = User.new
       user.update_user_data_by_params user_params
-      user.skip_api_sync! if user.api_id.present? || skip_api_sync
+      user.skip_api_sync! if skip_api_sync
       user.club = club
       credit_card.get_token(tom.payment_gateway_configuration, user, cc_blank)
       unless user.valid? and credit_card.errors.size == 0
@@ -709,8 +707,8 @@ class User < ActiveRecord::Base
       Auditory.audit(current_agent, tom, message, user, Settings.operation_types.user_email_blacklisted)
       return { message: message, code: Settings.error_codes.user_email_blacklisted, errors: {blacklisted: "Member is blacklisted"} }
     else
-      user.skip_api_sync! if user.api_id.present? || skip_api_sync
-      # first update first name and last name, then validate credti card
+      user.skip_api_sync! if skip_api_sync
+      # first update first name and last name, then validate credit card
       user.update_user_data_by_params user_params
       credit_card.get_token(tom.payment_gateway_configuration, user, cc_blank)
       return { message: I18n.t('error_messages.user_data_invalid'), code: Settings.error_codes.user_data_invalid, 
@@ -986,7 +984,7 @@ class User < ActiveRecord::Base
     c = self.club
     d = c.api_domain if c
 
-    if d and self.autologin_url
+    if d and self.autologin_url.present?
       URI.parse(d.url) + self.autologin_url
     else
       nil
