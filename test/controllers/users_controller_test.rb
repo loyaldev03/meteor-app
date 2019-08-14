@@ -38,6 +38,38 @@ class UsersControllerTest < ActionController::TestCase
     assert_equal(@saved_user.next_retry_bill_date, correct_date)
   end
 
+  test 'should get set_undeliverable' do
+    %w[admin supervisor fulfillment_managment].each do |role|
+      @agent.update_attribute :roles, role
+      get :set_undeliverable, partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id
+      assert_response :success
+    end
+  end
+
+  test 'should post set_undeliverable' do
+    %w[admin supervisor].each do |role|
+      @agent.update_attribute :roles, role
+      post :set_undeliverable, partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id, wrong_address: true
+      assert_response :redirect
+    end
+  end
+
+  test 'should get set_unreachable' do
+    %w[admin supervisor].each do |role|
+      @agent.update_attribute :roles, role
+      get :set_unreachable, partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id
+      assert_response :success
+    end
+  end
+
+  test 'should post set_unreachable' do
+    %w[admin supervisor].each do |role|
+      @agent.update_attribute :roles, role
+      post :set_unreachable, partner_prefix: @partner.prefix, club_prefix: @club.name, user_prefix: @saved_user.id, wrong_phone_number: true
+      assert_response :redirect
+    end
+  end
+
   test 'should get to bill event section' do
     FactoryBot.create(:simple_club_with_gateway)
     %w[admin supervisor].each do |role|

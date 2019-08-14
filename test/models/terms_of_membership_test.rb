@@ -20,7 +20,7 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     assert @new_terms_of_membership.save
   end
 
-  test 'Should delete email teplates related when deleting Tom' do
+  test 'Should delete email templates related when deleting Tom' do
     id = @terms_of_membership.id
     @terms_of_membership.destroy
     assert_equal EmailTemplate.where(terms_of_membership_id: id).count, 0
@@ -36,6 +36,30 @@ class TermsOfMembershipTest < ActiveSupport::TestCase
     @terms_of_membership.club_cash_installment_amount = -10
     assert_not @terms_of_membership.valid?
     assert @terms_of_membership.errors[:club_cash_installment_amount].include? 'must be greater than or equal to 0'
+  end
+
+  test 'Should not allow enter invalid characters on amounts of club cash' do
+    assert @terms_of_membership.valid?
+    @terms_of_membership.initial_club_cash_amount = '##@@@@@&&***hjkmmmdd'
+    assert_not @terms_of_membership.valid?
+    assert @terms_of_membership.errors[:initial_club_cash_amount].include? 'is not a number'
+
+    @terms_of_membership.initial_club_cash_amount = 10
+    @terms_of_membership.club_cash_installment_amount = '##@@@@@&&***hjkmmmdd'
+    assert_not @terms_of_membership.valid?
+    assert @terms_of_membership.errors[:club_cash_installment_amount].include? 'is not a number'
+  end
+
+  test 'Should not allow enter float amounts of club cash' do
+    assert @terms_of_membership.valid?
+    @terms_of_membership.initial_club_cash_amount = '3,258'
+    assert_not @terms_of_membership.valid?
+    assert @terms_of_membership.errors[:initial_club_cash_amount].include? 'is not a number'
+
+    @terms_of_membership.initial_club_cash_amount = 10
+    @terms_of_membership.club_cash_installment_amount = '63,589'
+    assert_not @terms_of_membership.valid?
+    assert @terms_of_membership.errors[:club_cash_installment_amount].include? 'is not a number'
   end
 
   test 'Should only allow updating TOMs when there are only testing accounts or no members at all' do

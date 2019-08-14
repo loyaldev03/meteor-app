@@ -47,60 +47,6 @@ class ClubsTest < ActionDispatch::IntegrationTest
     check('club[family_memberships_allowed]')
   end
 
-  test 'creates a club' do
-    skip('no run now')
-    setup_environment
-    unsaved_club = FactoryBot.build(:simple_club_with_gateway)
-    visit clubs_path(@partner.prefix)
-    click_link_or_button 'New Club'
-    fill_in_club(unsaved_club)
-    click_link_or_button 'Create Club'
-    assert page.has_content?("The club #{unsaved_club.name} was successfully created")
-  end
-
-  test 'Search and see clubs' do
-    skip('no run now')
-    setup_environment
-    saved_club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
-    visit my_clubs_path
-    within('#my_clubs_table_filter') do
-      find(:css, 'input').set(saved_club.name)
-    end
-    within('#my_clubs_table') do
-      assert page.has_content?(saved_club.id.to_s)
-      page.has_content?(saved_club.name)
-      assert page.has_content?(saved_club.description)
-    end
-  end
-
-  test 'should update club' do
-    skip('no run now')
-    setup_environment
-    saved_club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
-    unsaved_club = FactoryBot.build(:simple_club_with_gateway, partner_id: @partner.id)
-    visit clubs_path(@partner.prefix)
-    within('#clubs_table') do
-      click_link_or_button 'Edit'
-    end
-    fill_in_club(unsaved_club)
-    click_link_or_button 'Update'
-    saved_club.reload
-    assert page.has_content?("The club #{saved_club.name} was successfully updated.")
-    assert_equal(saved_club.reload.description, 'My description')
-  end
-
-  test 'should delete club' do
-    skip('no run now')
-    setup_environment
-    saved_club = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
-    visit clubs_path(@partner.prefix)
-    within('#clubs_table') do
-      click_link_or_button 'Destroy'
-      confirm_ok_js
-    end
-    assert page.has_content?("Club #{saved_club.name} was successfully destroyed")
-  end
-
   test 'should see all clubs as admin on my clubs section' do
     setup_environment
     5.times { FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id) }
@@ -121,33 +67,6 @@ class ClubsTest < ActionDispatch::IntegrationTest
       assert page.has_content?('Campaigns')
       assert page.has_content?('Campaign Days')
     end
-  end
-
-  test 'Configure and Update Mailchimp/Mandrill marketing gateway - Login by General Admin' do
-    setup_environment
-    skip('no run now')
-    unsaved_club = FactoryBot.build(:simple_club_with_gateway)
-    visit clubs_path(@partner.prefix)
-    click_link_or_button 'New Club'
-    fill_in_club(unsaved_club)
-
-    configure_mailchimp_mandrill('mailchimp_api_key_test', 'mandrill_api_key_test', 'list_id_test')
-
-    assert_difference('Club.count', 1) do
-      click_link_or_button 'Create Club'
-      assert page.has_content?("The club #{unsaved_club.name} was successfully created")
-    end
-    assert page.has_content? 'mailchimp_api_key_test'
-    assert page.has_content? 'mandrill_api_key_test'
-    assert page.has_content? 'list_id_test'
-
-    club = Club.last
-    assert club.mailchimp_mandrill_client?
-    click_link_or_button('Edit')
-
-    configure_mailchimp_mandrill('mailchimp_api_key_test_new', 'mandrill_api_key_test_new', 'list_id_test_new')
-    click_link_or_button 'Update Club'
-    assert page.has_content? "The club #{club.name} was successfully updated."
   end
 
   test 'Configure and Update Mailchimp/Mandrill marketing gateway - Login by Admin by Club' do

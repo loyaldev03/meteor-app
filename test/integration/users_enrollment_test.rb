@@ -214,9 +214,6 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
   test 'create user without phone number' do
     unsaved_user = FactoryBot.build(:active_user, club_id: @club.id, phone_country_code: nil, phone_area_code: nil, phone_local_number: nil)
     fill_in_user(unsaved_user)
-    within('#table_contact_information') do
-      assert find_field('user[phone_country_code]').value == '1' # Because it is set to its default value when lost focus
-    end
     within('#error_explanation') do
       assert page.has_content?("phone_area_code: can't be blank,is not a number,is too short (minimum is 1 character)")
       assert page.has_content?("phone_local_number: can't be blank,is not a number,is too short (minimum is 1 character)")
@@ -742,7 +739,7 @@ class UsersEnrollmentTest < ActionDispatch::IntegrationTest
     User.find_by_email(unsaved_user.email)
 
     visit edit_club_path(@club_with_family.partner.prefix, @club_with_family.id)
-    assert page.has_checked_field?('club_club_cash_enable')
+    # assert page.has_checked_field?('club_club_cash_enable')
 
     unsaved_user = FactoryBot.build(:active_user, club_id: @club_with_family.id)
     create_user_by_sloop(@admin_agent, unsaved_user, credit_card, enrollment_info, @terms_of_membership_with_gateway)

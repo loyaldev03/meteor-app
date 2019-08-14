@@ -5,7 +5,7 @@
     </div>
     <div class="col-sm-12 col-md-8">
       <% if @campaign && @prospect %>
-        <%= replace_tokens(@checkout_settings[:error_page_content], @club, @campaign, @prospect).html_safe %>
+        <%= replace_tokens(@error_message, @club, @campaign, @prospect).html_safe %>
       <% else %>
         <h3>There was an error processing your request</h3>
         <p>Contact customer service for more information:</p>

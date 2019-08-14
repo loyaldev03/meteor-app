@@ -71,7 +71,14 @@ class Campaigns::CheckoutsController < ApplicationController
 
   def duplicated; end
 
-  def error; end
+  def error
+    @error_message = if %w[904 905].include?(params[:response_code])
+                       landing_page_url = generate_edit_user_info_url(@prospect)
+                       "<h2>We're Sorry!</h2><p>Due to the popularity of your selected item, we just ran out! If you would like to select a different item, <a href=" + landing_page_url + '>please click here!</a></p><p>If you have any questions, please contact our Member Service team at %%CS_PHONE_NUMBER%% (Monday - Friday 9am-5pm EST) or email at <a href="mailto:%%CS_EMAIL%%">%%CS_EMAIL%%</a>.</p>'
+                     else
+                       @checkout_settings[:error_page_content]
+                     end
+  end
 
   def critical_error; end
 
@@ -143,6 +150,7 @@ class Campaigns::CheckoutsController < ApplicationController
 
   def campaign_active
     return if @campaign.nil? || @campaign.active?
+
     Rails.logger.error 'Checkout::CheckIfActiveError: Campaign is not active'
     Auditory.notify_pivotal_tracker('Checkout: User tried enrolling to a closed campaign', 'There was an enrollment try to an already closed campaign. Please make sure that the campaign is properly closed in the Source.', campaign_id: @campaign.id, initial_date: @campaign.initial_date, finish_date: @campaign.finish_date, today: Date.today.to_s)
     redirect_to error_checkout_path(campaign_id: @campaign), alert: I18n.t('error_messages.campaign_is_not_active')
@@ -151,11 +159,10 @@ class Campaigns::CheckoutsController < ApplicationController
   def authenticate_campaign_agent_from_token!
     if params[:api_key].present?
       agent = Agent.find_for_authentication(authentication_token: params[:api_key])
-      if agent && Devise.secure_compare(agent.authentication_token, params[:api_key])
-        sign_in agent
-      end
+      sign_in agent if agent && Devise.secure_compare(agent.authentication_token, params[:api_key])
     end
     return if agent_signed_in?
+
     load_campaign
     if @campaign && @campaign.landing_url.present?
       redirect_to @campaign.landing_url
@@ -187,7 +194,11 @@ class Campaigns::CheckoutsController < ApplicationController
       redirect_to thank_you_checkout_path(campaign_id: @campaign, user_id: User.find(response[:member_id]).slug)
     else
       Rails.logger.error "Checkout::CreateError: #{response.inspect}"
-      redirect_to (%w[407 409 9507].include?(response[:code]) ? duplicated_checkout_path(campaign_id: @campaign, token: prospect.token) : error_checkout_path(campaign_id: @campaign, token: prospect.token)), alert: response[:message]
+      if %w[407 409 9507].include?(response[:code])
+        redirect_to duplicated_checkout_path(campaign_id: @campaign, token: prospect.token)
+      else
+        redirect_to error_checkout_path(campaign_id: @campaign, token: prospect.token, response_code: response[:code])
+      end
     end
   end
 
@@ -197,6 +208,7 @@ class Campaigns::CheckoutsController < ApplicationController
 
   def can_show_page?
     return if agent_signed_in? || session[:last_visited_page]
+
     load_campaign
     if @campaign && @campaign.landing_url.present?
       redirect_to @campaign.landing_url
@@ -227,10 +239,10 @@ class Campaigns::CheckoutsController < ApplicationController
   end
 
   def set_appletouch_icon
-      @appletouch_icon = if @club.appletouch_icon_file_name.present?
-                               @club.appletouch_icon.url
-                             else
-                               '/apple-touch-icon-precomposed.png'
-                             end
+    @appletouch_icon = if @club.appletouch_icon_file_name.present?
+                         @club.appletouch_icon.url
+                       else
+                         '/apple-touch-icon-precomposed.png'
+                       end
   end
 end

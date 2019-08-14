@@ -290,7 +290,7 @@ class MembersTasksTest < ActiveSupport::TestCase
     end
   end
 
-  test 'Unblack list marked users during the night' do
+  test 'Unblacklist marked users during the night' do
     user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
     user.blacklist(Agent.first, 'testing')
     assert user.blacklisted?

@@ -115,31 +115,6 @@ class UserTest < ActiveSupport::TestCase
     assert_equal original_club_cash_amount, user.club_cash_amount, "The user is #{user.status} with $#{user.club_cash_amount}"
   end
 
-  test 'if active user is blacklisted, should have cancel date set' do
-    user = enroll_user(FactoryBot.build(:user), @terms_of_membership_with_gateway)
-    assert user.provisional?
-    assert_nil user.cancel_date
-
-    user.blacklist(nil, 'Test')
-    assert_not_nil user.reload.cancel_date
-    assert_equal user.blacklisted, true
-  end
-
-  test 'if lapsed user is blacklisted, it should not be canceled again' do
-    user = enroll_user(FactoryBot.build(:user), @terms_of_membership_with_gateway)
-    user.cancel! Time.current, 'testing'
-    user.set_as_canceled!
-    assert user.lapsed?
-
-    cancel_date = user.cancel_date
-    Timecop.travel(Time.current + 10.days) do
-      assert_difference('Operation.count', 1) { user.blacklist(nil, 'Test') }
-      assert_not_nil user.reload.cancel_date
-      assert_equal user.cancel_date.to_date, cancel_date.to_date
-      assert_equal user.blacklisted, true
-    end
-  end
-
   test 'Add club cash - more than maximum value on an user related to drupal' do
     agent   = FactoryBot.create(:confirmed_admin_agent)
     club    = FactoryBot.create(:club_with_api)

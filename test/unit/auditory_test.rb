@@ -1,3 +1,5 @@
+require 'test_helper'
+
 class AuditoryTest < ActiveSupport::TestCase
   test 'save operation' do
     agent               = FactoryBot.create(:agent)

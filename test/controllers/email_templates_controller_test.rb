@@ -51,10 +51,12 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     @admin_agent = FactoryBot.create(:confirmed_admin_agent)
     sign_in @admin_agent
     comm = FactoryBot.build(:email_template, terms_of_membership_id: @tom.id)
-    post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: {
-      name: comm.name, client: comm.client, external_attributes: comm.external_attributes
-    }
-    assert_response :success
+    assert_difference('EmailTemplate.count') do
+      post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: {
+        name: comm.name, client: comm.client, external_attributes: comm.external_attributes, template_type: comm.template_type, days: comm.days
+      }
+    end
+    assert_redirected_to terms_of_membership_email_templates_url(partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id)
   end
 
   test 'Non Admin agents should not get create' do
@@ -142,6 +144,18 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     post :test_communications, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, id: @tom.email_templates.first.id, email_template_id: @communication.id, user_id: @saved_user2.id
     assert_response :success
     assert @response.body.include? 'Member does not belong to same club as the Template.'
+  end
+
+  test 'Admin should update email_template' do
+    [:confirmed_admin_agent].each do |agent|
+      sign_agent_with_global_role(agent)
+      comm = FactoryBot.create(:email_template, terms_of_membership_id: @tom.id)
+      comm1 = FactoryBot.build(:email_template, terms_of_membership_id: @tom.id)
+      put :update, id: comm.id, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: {
+        name: comm1.name, client: comm1.client, external_attributes: comm1.external_attributes, template_type: comm1.template_type, days: comm1.days
+      }
+      assert_redirected_to terms_of_membership_email_templates_url(partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id)
+    end
   end
 
   test 'Non Admin agents should not get update' do
@@ -264,10 +278,12 @@ class EmailTemplatesControllerTest < ActionController::TestCase
     club_role.role = 'admin'
     club_role.save
     comm = FactoryBot.build(:email_template, terms_of_membership_id: @tom.id)
-    post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: {
-      name: comm.name, client: comm.client, external_attributes: comm.external_attributes
-    }
-    assert_response :success
+    assert_difference('EmailTemplate.count') do
+      post :create, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: {
+        name: comm.name, client: comm.client, external_attributes: comm.external_attributes, template_type: comm.template_type, days: comm.days
+      }
+    end
+    assert_redirected_to terms_of_membership_email_templates_url(partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id)
   end
 
   test 'agent with club roles should not get create' do
@@ -301,6 +317,26 @@ class EmailTemplatesControllerTest < ActionController::TestCase
       club_role.save
       get :edit, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, id: @tom.email_templates.first.id
       assert_response :unauthorized
+    end
+  end
+
+  test 'agent with club role should update email_template' do
+    sign_agent_with_club_role(:agent, 'admin')
+    comm = FactoryBot.create(:email_template, terms_of_membership_id: @tom.id)
+    comm1 = FactoryBot.build(:email_template, terms_of_membership_id: @tom.id)
+    put :update, id: comm.id, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, email_template: {
+      name: comm1.name, client: comm1.client, external_attributes: comm1.external_attributes, template_type: comm1.template_type, days: comm1.days
+    }
+    assert_redirected_to terms_of_membership_email_templates_url(partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id)
+  end
+
+  test 'non admin agent should update email_template' do
+    %w[supervisor representative api agency fulfillment_managment landing].each do |role|
+      sign_agent_with_club_role(:agent, role)
+      perform_call_as(@agent) do
+        put :update, partner_prefix: @partner.prefix, club_prefix: @club.name, terms_of_membership_id: @tom.id, id: @tom.email_templates.first.id
+        assert_response :unauthorized
+      end
     end
   end
 end

@@ -88,7 +88,7 @@ class TransportSettingsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'agents that should create transport settings' do
+  test 'agents that should create facebook transport settings' do
     [:confirmed_admin_agent].each do |agent|
       transportSetting = FactoryBot.build(:transport_settings_facebook, club_id: @club.id)
       sign_agent_with_global_role(agent)
@@ -100,6 +100,66 @@ class TransportSettingsControllerTest < ActionController::TestCase
       end
       transportsettingcreated = TransportSetting.find_by club_id: @club.id, transport: TransportSetting.transports['facebook']
       assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, club_prefix: @club.name, id: transportsettingcreated.id)
+    end
+  end
+
+  test 'agents that should create mailchimp transport settings' do
+    [:confirmed_admin_agent].each do |agent|
+      club1 = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
+      transportSetting = FactoryBot.build(:transport_settings_mailchimp, club_id: club1.id)
+      sign_agent_with_global_role(agent)
+      assert_difference('TransportSetting.count', 1) do
+        post :create, partner_prefix: @partner_prefix, club_prefix: club1.name, transport_setting: {
+          transport: transportSetting.transport, api_key: transportSetting.api_key
+        }
+      end
+      transportsettingcreated = TransportSetting.find_by club_id: club1.id, transport: TransportSetting.transports['mailchimp']
+      assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, club_prefix: club1.name, id: transportsettingcreated.id)
+    end
+  end
+
+  test 'agents that should create google_analytics transport settings' do
+    [:confirmed_admin_agent].each do |agent|
+      club1 = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
+      ts_google_analytics = FactoryBot.build(:transport_settings_google_analytics, club_id: club1.id)
+      sign_agent_with_global_role(agent)
+      assert_difference('TransportSetting.count', 1) do
+        post :create, partner_prefix: @partner_prefix, club_prefix: club1.name, transport_setting: {
+          transport: ts_google_analytics.transport, tracking_id: ts_google_analytics.tracking_id
+        }
+      end
+      transportsettingcreated = TransportSetting.find_by club_id: club1.id, transport: TransportSetting.transports['google_analytics']
+      assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, club_prefix: club1.name, id: transportsettingcreated.id)
+    end
+  end
+
+  test 'agents that should create google_tag_manager transport settings' do
+    [:confirmed_admin_agent].each do |agent|
+      club1 = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
+      ts_google_tag_manager = FactoryBot.build(:transport_settings_google_tag_manager, club_id: club1.id)
+      sign_agent_with_global_role(agent)
+      assert_difference('TransportSetting.count', 1) do
+        post :create, partner_prefix: @partner_prefix, club_prefix: club1.name, transport_setting: {
+          transport: ts_google_tag_manager.transport, container_id: ts_google_tag_manager.container_id
+        }
+      end
+      transportsettingcreated = TransportSetting.find_by club_id: club1.id, transport: TransportSetting.transports['google_tag_manager']
+      assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, club_prefix: club1.name, id: transportsettingcreated.id)
+    end
+  end
+
+  test 'agents that should create store transport settings' do
+    [:confirmed_admin_agent].each do |agent|
+      club1 = FactoryBot.create(:simple_club_with_gateway, partner_id: @partner.id)
+      ts_store = FactoryBot.build(:transport_settings_store, club_id: club1.id)
+      sign_agent_with_global_role(agent)
+      assert_difference('TransportSetting.count', 1) do
+        post :create, partner_prefix: @partner_prefix, club_prefix: club1.name, transport_setting: {
+          transport: ts_store.transport, url: ts_store.url, api_token: ts_store.api_token
+        }
+      end
+      transportsettingcreated = TransportSetting.find_by club_id: club1.id, transport: TransportSetting.transports['store_spree']
+      assert_redirected_to transport_setting_path(assigns(:transportSetting), partner_prefix: @partner_prefix, club_prefix: club1.name, id: transportsettingcreated.id)
     end
   end
 

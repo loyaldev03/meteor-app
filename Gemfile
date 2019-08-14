@@ -24,6 +24,8 @@ gem 'exact_target_sdk', github: 'daws/exact_target_sdk'
 gem 'gibbon', github: 'amro/gibbon'
 gem 'mandrill-api'
 
+gem 'puma'
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
@@ -117,7 +119,6 @@ group :test do
   gem 'simplecov'
   gem "timecop"
   gem 'connection_pool'
-  gem 'puma'
 end
 
 group :test, :development do

@@ -504,4 +504,58 @@ class UserUnitTest < ActiveSupport::TestCase
     assert !user.save
     assert user.errors[:classification].include? 'Cannot set as VIP Member when user is associated to Freemium Membership.'
   end
+
+  ################################################################
+  ######## Blacklist and Unblacklist
+  ################################################################
+
+  test 'if active user is blacklisted, should have cancel date set' do
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    assert user.provisional?
+    assert_nil user.cancel_date
+
+    user.blacklist(nil, 'Test')
+    assert user.blacklisted
+    assert_equal user.cancel_date.to_date, Time.current.to_date
+    assert user.credit_cards.pluck(:blacklisted).exclude? false
+  end
+
+  test 'if lapsed user is blacklisted, it should not be canceled again' do
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    user.cancel! Time.current, 'testing'
+    user.set_as_canceled!
+    assert user.lapsed?
+
+    original_cancel_date = user.cancel_date
+    Timecop.travel(Time.current + 10.days) do
+      assert_difference('Operation.count', 1) { user.blacklist(nil, 'Test') }
+      assert user.blacklisted
+      assert_not_nil user.reload.cancel_date
+      assert_equal user.cancel_date.to_date, original_cancel_date.to_date
+    end
+  end
+
+  test 'Permanent unblacklist should remove blacklist flag' do
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    user.blacklist(Agent.first, 'testing')
+    assert user.blacklisted?
+
+    assert_difference('Operation.count') do
+      user.unblacklist(Agent.first, 'testing')
+    end
+    assert_not user.blacklisted?
+    assert_not_nil user.operations.find_by(operation_type: Settings.operation_types.unblacklisted)
+  end
+
+  test 'Temporary unblacklist should remove blacklist flag ' do
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    user.blacklist(Agent.first, 'testing')
+    assert user.blacklisted?
+
+    assert_difference('Operation.count') do
+      user.unblacklist(Agent.first, 'testing', 'temporary')
+    end
+    assert_not user.blacklisted?
+    assert_not_nil user.operations.find_by(operation_type: Settings.operation_types.unblacklisted_temporary)
+  end
 end

@@ -63,7 +63,7 @@ class UserEnrollmentTest < ActiveSupport::TestCase
     end
   end
 
-  def enroll_user_with_error(user, tom, options = {} )
+  def enroll_user_with_error(user, tom, options = {})
     amount      = options[:amount] || 23
     cc_blank    = options[:cc_blank] || false
     credit_card = options[:credit_card] || FactoryBot.build(:credit_card)
@@ -121,6 +121,54 @@ class UserEnrollmentTest < ActiveSupport::TestCase
       assert_equal user.active_credit_card.token, CreditCard::BLANK_CREDIT_CARD_TOKEN
       assert_equal user.active_credit_card.last_digits, '0000'
       assert_equal user.active_credit_card.cc_type, 'unknown'
+    end
+  end
+
+  test 'Enrollment with blacklisted email returns error' do
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    user.blacklist(nil, 'Test')
+
+    response = enroll_user_with_error(FactoryBot.build(:user, email: user.email), @terms_of_membership)
+    assert user.blacklisted
+    assert_equal response[:code], Settings.error_codes.user_email_blacklisted
+    assert_equal response[:message], I18n.t('error_messages.user_email_blacklisted', cs_phone_number: user.club.cs_phone_number)
+    assert_equal response[:errors][:blacklisted], 'Member is blacklisted'
+  end
+
+  test 'Enrollment with blacklisted credit card returns error' do
+    user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+    user.blacklist(nil, 'Test')
+
+    response = enroll_user_with_error(FactoryBot.build(:user), @terms_of_membership)
+    assert user.active_credit_card.blacklisted
+    assert_equal response[:code], Settings.error_codes.credit_card_blacklisted
+    assert_equal response[:message], I18n.t('error_messages.credit_card_blacklisted', cs_phone_number: user.club.cs_phone_number)
+    assert_equal response[:errors][:number], 'Credit card is blacklisted'
+  end
+
+  test 'Enrollment with blacklisted email within another club is allowed' do
+    @club2                 = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership2  = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club2.id)
+    user2 = enroll_user(FactoryBot.build(:user), @terms_of_membership2)
+    user2.blacklist(nil, 'Test')
+
+    assert_difference('User.count') do
+      user = enroll_user(FactoryBot.build(:user, email: user2.email), @terms_of_membership)
+      assert user2.blacklisted
+      assert_not_nil user
+    end
+  end
+
+  test 'Enrollment with blacklisted credit card within another club is allowed' do
+    @club2                 = FactoryBot.create(:simple_club_with_gateway)
+    @terms_of_membership2  = FactoryBot.create(:terms_of_membership_with_gateway, club_id: @club2.id)
+    user2 = enroll_user(FactoryBot.build(:user), @terms_of_membership2)
+    user2.blacklist(nil, 'Test')
+
+    assert_difference('User.count') do
+      user = enroll_user(FactoryBot.build(:user), @terms_of_membership)
+      assert user2.blacklisted
+      assert_not_nil user
     end
   end
 
@@ -418,7 +466,6 @@ class UserEnrollmentTest < ActiveSupport::TestCase
     assert_equal saved_user.current_membership.utm_medium, Membership::CS_UTM_MEDIUM_UPGRADE
     assert_equal saved_user.current_membership.utm_campaign, Membership::CS_UTM_CAMPAIGN
   end
-
 
   test 'Change terms of membership UPGRADE ACTIVE user' do
     prepare_upgrade_downgrade_toms(activate_user: true)
